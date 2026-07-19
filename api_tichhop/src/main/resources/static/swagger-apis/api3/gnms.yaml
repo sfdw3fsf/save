@@ -1,0 +1,2575 @@
+openapi: 3.0.1
+info:
+  title: one bss gnms
+  description: ONE BSS GNMS
+  contact: {}
+  license:
+    name: vnptit-erp
+    url: http://unlicense.org
+  version: 1.0.0
+servers:
+#- url: https://gnms-api.vnpt-technology.vn:97/nms/rest/
+- url: http://localhost:8088/nms/rest/
+security:
+- ApiKeyAuth: ['Key 7c346306450740d2882cce00530da1aa']
+tags: []
+paths:
+  /device/reboot:
+    get:
+      tags:
+      - device
+      description: Khởi động lại thiết bị
+      operationId: reboot
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /backup/getListBackup:
+    get:
+      tags:
+      - backup
+      description: Lấy danh sách file backup của thiết bị
+      operationId: getListBackup
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileBackupListResponse'
+  /backup/delxml:
+    post:
+      tags:
+      - backup
+      description: Xóa file backup cấu hình
+      operationId: delxml
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Chuỗi JSON định danh các object file backup muốn xóa
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileBackup'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+  /backup/backup:
+    get:
+      tags:
+      - backup
+      description: Backup cấu hình thiết bị
+      operationId: backup
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      - name: backupName
+        in: query
+        description: Tên file backup
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Đường dẫn file đã được backup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /backup/restore:
+    post:
+      tags:
+      - backup
+      description: Khôi phục cấu hình thiết bị
+      operationId: restore
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Chuỗi JSON định danh file backup cần backup
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileBackup'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+  /device/getByOptical:
+    get:
+      tags:
+      - device
+      description: Lấy thông tin chi tiết thiết bị
+      operationId: searchDevice
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceParamResponse'
+  /device/getUptime:
+    get:
+      tags:
+      - device
+      description: Lấy thông tin uptime thiết bị
+      operationId: getUptime
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Thời gian uptime tính theo giây
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /batch/action:
+    post:
+      tags:
+      - batch
+      description: reboot/reset/xóa file backup thiết bị hàng loạt
+      operationId: batch_action
+      requestBody:
+        description: Chuỗi JSON định danh file backup cần backup
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchInput'
+        required: true
+      responses:
+        200:
+          description: url trỏ tới api check kết quả thực hiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+  /batch/result:
+    get:
+      tags:
+      - batch
+      description: Kết quả log batch (reboot, reset, …)
+      operationId: batch_result
+      parameters:
+      - name: batchID
+        in: query
+        description: Batch session ID của lệnh cần tra cứu log
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Kết quả trả về là một Json object dạng List, mỗi object là
+            log cho từng thiết bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchLogListResponse'
+  /backup/delAll:
+    get:
+      tags:
+      - backup
+      description: Xóa toàn bộ file backup của một thiết bị
+      operationId: backup_delAll
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là một Json object dạng List, mỗi object là
+            log cho từng thiết bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/delete:
+    get:
+      tags:
+      - device
+      description: Xóa thiết bị
+      operationId: delete
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là một Json object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/getListWlan:
+    get:
+      tags:
+      - device
+      description: Lấy thông tin wifi
+      operationId: device_getListWlan
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là một Json List object các Wlan của thiết bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceWlanListResponse'
+  /device/onOffWifi:
+    post:
+      tags:
+      - device
+      description: Cấu hình on/off wifi
+      operationId: device_onOffWifi
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: List các object wifi cần bật/tắt
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceWlan'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: wifis
+  /device/updateWifi:
+    post:
+      tags:
+      - device
+      description: Cấu hình thông tin wifi (wlan)
+      operationId: device_updateWifi
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: List các object wifi cần bật/tắt
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceWlan'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: wifis
+  /backup/searchTemplate:
+    get:
+      tags:
+      - backup
+      description: Tìm kiếm template ZeroTouch
+      operationId: backup_searchTemplate
+      parameters:
+      - name: templateName
+        in: query
+        description: Lọc kết quả template theo template Name
+        schema:
+          type: string
+      - name: modelName
+        in: query
+        description: Lọc kết quả template theo model name dòng thiết bị
+        schema:
+          type: string
+      - name: templateCode
+        in: query
+        description: Lọc kết quả template theo template Code
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về thành công là chuỗi json chứa list các template
+            ZeroTouch tìm kiếm thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateZerotouchListResponse'
+  /backup/getTemplateImport:
+    get:
+      tags:
+      - backup
+      description: Lấy file import cấu hình ZeroTouch
+      operationId: backup_getTemplateImport
+      parameters:
+      - name: templateCode
+        in: query
+        description: Template Code cần để lấy import file
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về thành công file excel (.xls) để người dùng cấu
+            hình dịch vụ cho thiết bị.
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+  /backup/templateUpload:
+    post:
+      tags:
+      - backup
+      description: Import cấu hình ZeroTouch cho nhiều thiết bị
+      operationId: backup_templateUpload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                fileExcel:
+                  type: string
+                  description: File excel chứa cấu hình zerotouch của nhiều thiết bị
+                  format: binary
+      responses:
+        200:
+          description: Kết quả trả về thành công là file excel (.xls) có thêm cột result chứa url file zerotouch (là file backup) vừa được tạo trên hệ thống
+          content:
+            application/xls:
+              schema:
+                type: string
+                format: binary
+                description: File excel chứa cấu hình zerotouch của nhiều thiết bị
+  /backup/getTemplate:
+    get:
+      tags:
+      - backup
+      description: Lấy chuỗi cấu hình cho từng template
+      operationId: backup_getTemplate
+      parameters:
+      - name: templateCode
+        in: query
+        description: Template code sử dụng
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa các tham số cần để cấu hình cho template, chú ý tham số serial dùng để lưu trường Serial của thiết bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateInfResponse'
+  /backup/importZerotouch:
+    post:
+      tags:
+      - backup
+      description: Cấu hình zero touch cho 1 thiết bị
+      operationId: backup_importZerotouch
+      parameters:
+      - name: templateCode
+        in: query
+        description: Template code sử dụng
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Thông tin cấu hình zero touch
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateInf'
+        required: true
+      responses:
+        200:
+          description: Kết quả trả về thành công là url file backup đã tạo cho thiết bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: objectConfig
+  /device/getAccWebGui:
+    get:
+      tags:
+      - device
+      description: Lấy thông tin account đăng nhập WebGui của thiết bị
+      operationId: device_getAccWebGui
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa thông tin account đăng nhập
+            thiết bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccWebGuiListResponse'
+  /device/configWebGuiPass:
+    get:
+      tags:
+      - device
+      description: Lấy cấu hình account đăng nhập thiết bị
+      operationId: device_configWebGuiPass
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      - name: username
+        in: query
+        description: Username login
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Password mới
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa message thông báo kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/getListWan:
+    get:
+      tags:
+      - device
+      description: Lấy thông tin các WAN của thiết bị
+      operationId: device_getListWan
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa danh sách các WAN của thiết
+            bị
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceWanListResponse'
+  /device/getWirelessAdvance:
+    get:
+      tags:
+      - device
+      description: Lấy thông tin cấu hình advance của wifi (channel, công suất phát,
+        …)
+      operationId: device_getWirelessAdvance
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa thông tin cấu hình wif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceWirelessAdvResponse'
+  /device/setWirelessAdvance:
+    post:
+      tags:
+      - device
+      description: Cấu hình thông tin wifi advance
+      operationId: device_setWirelessAdvance
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Object cấu hình wifi advance
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceWirelessAdv'
+        required: true
+      responses:
+        200:
+          description: Kết quả trả về thành công là chuỗi json
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: newConfig
+  /backup/getJsonReportWifi:
+    get:
+      tags:
+      - backup
+      description: Lấy Report Wifi
+      operationId: backup_getJsonReportWifi
+      parameters:
+      - name: areaId
+        in: query
+        description: Area Id. Nếu rỗng kết quả trả về sẽ là tất cả Area có trên hệ
+          thống
+        required: true
+        schema:
+          type: number
+      - name: listSerialNumber
+        in: query
+        description: Danh sách serial number cách nhau bởi dấu phẩy “,”. Nếu rỗng
+          kết quả trả về sẽ là tất cả Searial Number có trên hệ thống
+        required: true
+        schema:
+          type: string
+      - name: Start
+        in: query
+        description: Vị trí bản ghi đầu tiên muốn lấy. Đối với lần lấy đầu tiên start
+          = 0. Với lần lấy tiếp theo check trường start trong kết quả response. Nếu
+          start = -1 có nghĩa là người dùng đã lấy được tất cả các bản ghi cần lấy
+          => Hoàn thành. Với start khác -1, lấy giá trị start trong response của request
+          trước để làm input của request tiếp theo. Đối với lần lấy thứ n. Kết quả
+          trả về của start sẽ là vị trí đầu tiên của lần lấy thứ n+1.
+        required: true
+        schema:
+          type: number
+      - name: Limit
+        in: query
+        description: Số lượng bản ghi muốn lấy (mặc định là 1000, giá trị cho phép
+          là 0 – 2000).
+        required: true
+        schema:
+          type: number
+      - name: startDate
+        in: query
+        description: Thời gian bắt đầu của báo cáo.
+        required: true
+        schema:
+          type: string
+      - name: endDate
+        in: query
+        description: Thời gian kết thúc. Nếu để rỗng, hệ thống sẽ lấy mặc định là
+          thời gian hiện tại.
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa danh sách thiết bị trong
+            báo cáo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListReportWifiResponse'
+  /device/ping:
+    get:
+      tags:
+      - device
+      description: Kiểm tra kết nối của thiết bị
+      operationId: device_ping
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      - name: host
+        in: query
+        description: url hoặc ip của host cần kiểm tra kết nối
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả ping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResultResponse'
+  /device/diagnostic:
+    get:
+      tags:
+      - device
+      description: Đo kiểm kết nối của thiết bị
+      operationId: device_diagnostic
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      - name: pingto
+        in: query
+        description: url hoặc ip của host cần kiểm tra kết nối
+        required: true
+        schema:
+          type: string
+      - name: downloadurl
+        in: query
+        description: url test download file
+        required: true
+        schema:
+          type: string
+      - name: uploadurl
+        in: query
+        description: url upload file test (kích thước 10Mb)
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả ping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticResponse'
+  /device/getInfoDeviceConnect:
+    get:
+      tags:
+      - device
+      description: Lấy danh sách thông tin thiết bị kết nối wifi
+      operationId: device_getInfoDeviceConnect
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/v2/GW040H/getListWlan:
+    get:
+      tags:
+      - GW040H
+      description: API lấy dang sách wlan hiện có của GW040H
+      operationId: device_getListWlan_v2
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceWlanListResponse'
+  /device/v2/GW040H/updateWifi:
+    post:
+      tags:
+      - GW040H
+      description: API cập nhật thông tin wlan cho GW040H
+      operationId: device_updateWifi_v2
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: List các object wifi cần bật/tắt
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceWlan'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: wifis
+  /device/v2/GW040H/getWirelessAdvance:
+    get:
+      tags:
+      - GW040H
+      description: API lấy danh sách các wlan advance cho GW040H
+      operationId: device_getWirelessAdvance_v2
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa thông tin cấu hình wif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceWirelessAdvV2ListResponse'
+  /device/v2/GW040H/setWirelessAdvance:
+    post:
+      tags:
+      - GW040H
+      description: API cập nhật thông tin wlan advance cho GW040H
+      operationId: device_setWirelessAdvance_v2
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Object cấu hình wifi advance
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceWirelessAdvV2'
+        required: true
+      responses:
+        200:
+          description: Kết quả trả về thành công là chuỗi json
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: newConfig
+  /device/updateWifiType:
+    post:
+      tags:
+      - device
+      description: API cấu hình Wifi
+      operationId: device_updateWifiType
+      parameters:
+      - name: optical
+        in: query
+        description: Mã Optical Serial number của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: List các object wifi cần bật/tắt
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceWlan'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: wifis
+  /device/fetchConnectedUserInfor:
+    get:
+      tags:
+      - device
+      description: API lấy số lượng người dùng trong mạng LAN
+      operationId: device_fetchConnectedUserInfor
+      parameters:
+      - name: serialNumber
+        in: query
+        description: Mã OpticalNo của thiết bị(phân biệt hoa thường)
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectedUserListResponse'
+  /device/fetchOpticalInfo:
+    get:
+      tags:
+      - device
+      description: API lấy thông tin nhiệt độ, công suất thu phát của module quang trên ONT
+      operationId: device_fetchOpticalInfo
+      parameters:
+      - name: serialNumber
+        in: query
+        description: Mã OpticalNo của thiết bị(phân biệt hoa thường)
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpticalInfoListResponse'
+  /user/configNewPassWord:
+    post:
+      tags:
+      - user
+      description: API đổi mật khẩu đăng nhập của thiết bị
+      operationId: user_configNewPassWord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccConfig'
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/deleteDevice:
+    get:
+      tags:
+      - device
+      description: API xoá ONT
+      operationId: device_deleteDevice
+      parameters:
+      - name: optical
+        in: query
+        description: Danh sách thiết bị xoá
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/delWan:
+    post:
+      tags:
+      - device
+      description: API xoá wan trên ONT
+      operationId: device_delWan
+      parameters:
+      - name: optical
+        in: query
+        description: Mã OpticalNo của thiết bị
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceWan'
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/getResultFactoryReset:
+    get:
+      tags:
+      - device
+      description: API xoá ONT
+      operationId: device_getResultFactoryReset
+      parameters:
+      - name: serialNumber
+        in: query
+        description: Mã OpticalNo của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/rebootDevice:
+    get:
+      tags:
+      - device
+      description: API reboot ONT
+      operationId: device_rebootDevice
+      parameters:
+      - name: serialNumber
+        in: query
+        description: Mã OpticalNo của thiết bị
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/searchAdslDeviceAdslFirmware:
+    get:
+      tags:
+      - device
+      description: API thống kê ONT
+      operationId: device_searchAdslDeviceAdslFirmware
+      parameters:
+      - name: start
+        in: query
+        description: ""
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: ""
+        required: true
+        schema:
+          type: string
+      - name: areaName
+        in: query
+        description: ""
+        required: true
+        schema:
+          type: string
+      - name: areaId
+        in: query
+        description: ""
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAdslDeviceResponse'
+  /device/addBridgeWan:
+    post:
+      tags:
+      - device
+      description: API cài đặt Wan bridge
+      operationId: device_addBridgeWan
+      parameters:
+      - name: serviceDescription
+        in: query
+        description: "Brigde name (Ví dụ: br_eth0)"
+        required: true
+        schema:
+          type: string
+      - name: vlanMux802_1Priority
+        in: query
+        description: "Vlan 802.1P Priority"
+        required: true
+        schema:
+          type: integer
+      - name: vlanMuxID
+        in: query
+        description: "Vlan ID"
+        required: true
+        schema:
+          type: integer
+      - name: enableWan
+        in: query
+        description: "Enable wan"
+        required: true
+        schema:
+          type: boolean
+      - name: optical
+        in: query
+        description: "Số serial của thiết bị"
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Kết quả trả về là object Json chứa kết quả
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/reset:
+    get:
+      tags:
+        - device
+      description: Reset lại thiết bị
+      operationId: device_reset
+      parameters:
+        - name: optical
+          in: query
+          description: Mã Optical Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /device/getWanInterfacesList:
+    get:
+      tags:
+        - device
+      description: API get WAN Interfaces list
+      operationId: device_getWanInterfacesList
+      parameters:
+        - name: serialNumber
+          in: query
+          description: Mã Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WanLanInterfacesListResponse'
+  /device/getLanInterfacesList:
+    get:
+      tags:
+        - device
+      description: API get LAN Interfaces list
+      operationId: device_getLanInterfacesList
+      parameters:
+        - name: serialNumber
+          in: query
+          description: Mã Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WanLanInterfacesListResponse'
+  /device/getInterfaceGroupingList:
+    get:
+      tags:
+        - device
+      description: API get Interface Grouping list
+      operationId: device_getInterfaceGroupingList
+      parameters:
+        - name: serialNumber
+          in: query
+          description: Mã Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterfaceGroupingListResponse'
+  /device/addInterfaceGrouping:
+    post:
+      tags:
+        - device
+      description: API add Interface Grouping
+      operationId: device_addInterfaceGrouping
+      parameters:
+        - name: serialNumber
+          in: query
+          description: Mã Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Object InterfaceGrouping
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddInterfaceGroupingRequest'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+  /device/deleteInterfaceGrouping:
+    post:
+      tags:
+        - device
+      description: API delete Interface Grouping
+      operationId: device_deleteInterfaceGrouping
+      parameters:
+        - name: serialNumber
+          in: query
+          description: Mã Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Object InterfaceGrouping
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteInterfaceGroupingRequest'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+  /device/addWan:
+    post:
+      tags:
+        - device
+      description: API add Wan
+      operationId: device_addWan
+      parameters:
+        - name: optical
+          in: query
+          description: Mã Optical Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Object WAN
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceWan'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+  /device/getBoundInterfacesList:
+    get:
+      tags:
+        - device
+      description: API get bound interfaces list
+      operationId: device_getBoundInterfacesList
+      parameters:
+        - name: optical
+          in: query
+          description: Mã Optical Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoundInterfacesListResponse'
+  /device/getVoice:
+    get:
+      tags:
+        - device
+      description: API get voice configuration
+      operationId: device_getVoice
+      parameters:
+        - name: optical
+          in: query
+          description: Mã Optical Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVoiceListResponse'
+  /device/setVoice:
+    post:
+      tags:
+        - device
+      description: API set voice configuration
+      operationId: device_setVoice
+      parameters:
+        - name: optical
+          in: query
+          description: Mã Optical Serial number của thiết bị
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Object set voice
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SIPObject:
+                  type: object
+                LineObject:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/LineObject'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+      x-codegen-request-body-name: body
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header       # can be "header", "query" or "cookie"
+      name: Authorization
+  # responses:
+  #   DefaultErrResponse:
+  #     description: unexpected error.
+  #     schema:
+  #       $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    BatchInput:
+      title: BatchInput
+      type: object
+      properties:
+        listSerial:
+          type: string
+          description: ""
+          example: VNPT00AAAfc4,vnpt00bbcf24,VNPT0072696a
+        actionType:
+          type: integer
+          description: |
+            Loại file backup:
+              * 100 : reboot
+              * 101 : reset
+              * 104 : xóa file backup
+        actionParams:
+          type: string
+          description: ""
+          example: 11231756|112346378|tool_
+    BatchLogListResponse:
+      title: BatchLogListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BatchLog'
+    BatchLog:
+      title: BatchLog
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Thứ tự log
+        batchID:
+          type: integer
+          description: Batch Session ID của lệnh
+        opticalSerial:
+          type: string
+          description: Optical của thiết bị
+        status:
+          type: integer
+          description: |
+            Trạng thái thực hiện lệnh:
+              * 1 : Đang thực hiện
+              * 2 : Success
+              * 3 : Error
+        description:
+          type: string
+          description: Mô tả lệnh
+        type:
+          type: integer
+          description: 'Loại tác động: reboot, reset, …'
+        Result:
+          type: string
+          description: Mô tả kết quả thực hiện lệnh
+        timeInsert:
+          type: number
+          description: Thời điểm thực hiện lệnh
+        timeFinish:
+          type: number
+          description: Thời điểm kết thúc lệnh
+    PingResultResponse:
+      title: PingResultResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/PingResult'
+    DiagnosticResponse:
+      title: DiagnosticResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        pingResult:
+          $ref: '#/components/schemas/PingResult'
+        downloadResult:
+          $ref: '#/components/schemas/DownloadResult'
+        uploadResult:
+          $ref: '#/components/schemas/UploadResult'
+    PingResult:
+      title: PingResult
+      type: object
+      properties:
+        diagnosticsState:
+          type: string
+          description: ""
+        host:
+          type: string
+          description: ""
+        dscp:
+          type: integer
+          description: ""
+        numberOfRepetitions:
+          type: integer
+          description: ""
+        timeout:
+          type: integer
+          description: ""
+        dataBlockSize:
+          type: integer
+          description: ""
+        successCount:
+          type: integer
+          description: ""
+        failureCount:
+          type: integer
+          description: ""
+        averageResponseTime:
+          type: integer
+          description: ""
+        minimumResponseTime:
+          type: integer
+          description: ""
+        maximumResponseTime:
+          type: integer
+          description: ""
+        jitter:
+          type: integer
+          description: ""
+        deviceTime:
+          type: string
+          description: ""
+    DownloadResult:
+      title: DownloadResult
+      type: object
+      properties:
+        diagnosticState:
+          type: string
+          description: ""
+        testInterface:
+          type: string
+          description: ""
+        downloadUrl:
+          type: string
+          description: ""
+        dscp:
+          type: integer
+          description: ""
+        ethernetPriority:
+          type: integer
+          description: ""
+        romTime:
+          type: string
+          description: ""
+        bomTime:
+          type: string
+          description: ""
+        eomTime:
+          type: string
+          description: ""
+        testBytesReceived:
+          type: number
+          description: ""
+        totalBytesReceived:
+          type: number
+          description: ""
+        tcpOpenRequestTime:
+          type: string
+          description: ""
+        tcpOpenResponseTime:
+          type: string
+          description: ""
+        speed:
+          type: number
+          description: ""
+        deviceTime:
+          type: string
+          description: ""
+        romTimeInMiliseconds:
+          type: number
+          description: ""
+        bomTimeInMiliseconds:
+          type: number
+          description: ""
+        eomTimeInMiliseconds:
+          type: number
+          description: ""
+        tcpopenReqInMiliseconds:
+          type: number
+          description: ""
+        tcpopenResInMiliseconds:
+          type: number
+          description: ""
+    UploadResult:
+      title: UploadResult
+      type: object
+      properties:
+        diagnosticState:
+          type: string
+          description: ""
+        testInterface:
+          type: string
+          description: ""
+        uploadUrl:
+          type: string
+          description: ""
+        dscp:
+          type: integer
+          description: ""
+        ethernetPriority:
+          type: integer
+          description: ""
+        romTime:
+          type: string
+          description: ""
+        bomTime:
+          type: string
+          description: ""
+        eomTime:
+          type: string
+          description: ""
+        testBytesReceived:
+          type: number
+          description: ""
+        totalBytesReceived:
+          type: number
+          description: ""
+        tcpOpenRequestTime:
+          type: string
+          description: ""
+        tcpOpenResponseTime:
+          type: string
+          description: ""
+        speed:
+          type: number
+          description: ""
+        deviceTime:
+          type: string
+          description: ""
+        romTimeInMiliseconds:
+          type: number
+          description: ""
+        bomTimeInMiliseconds:
+          type: number
+          description: ""
+        eomTimeInMiliseconds:
+          type: number
+          description: ""
+        tcpopenReqInMiliseconds:
+          type: number
+          description: ""
+        tcpopenResInMiliseconds:
+          type: number
+          description: ""
+    DeviceWirelessAdvResponse:
+      title: deviceWirelessAdvResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/DeviceWirelessAdv'
+    DeviceWirelessAdv:
+      title: DeviceWirelessAdv
+      type: object
+      properties:
+        channel:
+          type: number
+          description: ""
+        bandwidth:
+          type: number
+          description: ""
+        country:
+          type: string
+          description: ""
+        autoChannelTimer:
+          type: number
+          description: ""
+        transmitPower:
+          type: number
+          description: ""
+    DeviceWirelessAdvV2ListResponse:
+      title: DeviceWirelessAdvV2ListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceWirelessAdvV2'
+    DeviceWirelessAdvV2:
+      title: DeviceWirelessAdvV2
+      type: object
+      properties:
+        instance:
+          type: string
+          description: ""
+        channelWidth:
+          type: string
+          description: ""
+        channel:
+          type: string
+          description: ""
+        autoChannelTimer:
+          type: number
+          description: ""
+        transmitPower:
+          type: number
+          description: ""
+        enable:
+          type: boolean
+          description: ""
+    AccWebGuiListResponse:
+      title: AccWebGuiListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccWebGui'
+    AccWebGui:
+      title: AccWebGui
+      properties:
+        username:
+          type: string
+          description: Tên truy cập
+        password:
+          type: string
+          description: Mật khẩu đăng nhập vào thiết bị
+    AccConfig:
+      title: AccConfig
+      allOf:
+      - $ref: '#/components/schemas/AccWebGui'
+      properties:
+        serialNumber:
+          type: string
+          description: Số serial của thiết bị
+    DeviceWlanResponse:
+      title: DeviceWlanResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/DeviceWlan'
+    DeviceWlanListResponse:
+      title: DeviceWlanListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceWlan'
+    DeviceWlan:
+      title: deviceWlan
+      type: object
+      properties:
+        enable:
+          type: boolean
+          description: Trạng thái bật/tắt
+        ssid:
+          type: string
+          description: Tên ssid
+        authMode:
+          type: string
+          description: Xác thực
+        password:
+          type: string
+          description: Mật khẩu
+        encrypt:
+          type: string
+          description: Chế độ mã hóa
+        type:
+          type: string
+          description: |
+            loại wifi:
+              * main_wifi
+              * wifi_guest_0
+              * ...
+        index:
+          type: integer
+          description: ""
+    DeviceWanListResponse:
+      title: DeviceWanListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceWan'
+
+    DeviceWan:
+      title: deviceWan
+      type: object
+      properties:
+        wanIfname:
+          type: string
+          description: wanIfname
+        wanName:
+          type: string
+          description: wanName
+        wanInstancePath:
+          type: string
+          description: wanInstancePath
+        wanType:
+          type: string
+          description: wanType
+        connectionType:
+          type: string
+          description: connectionType
+        connectionStatus:
+          type: string
+          description: connectionStatus
+        vlanPriority:
+          type: integer
+          description: vlanPriority
+        vlanMuxID:
+          type: integer
+          description: vlanMuxID
+        vlanTPID:
+          type: integer
+          description: vlanTPID
+        ipv4Enable:
+          type: boolean
+          description: ipv4Enable
+        ipv6Enable:
+          type: boolean
+          description: ipv6Enable
+        natEnable:
+          type: boolean
+          description: natEnable
+        firewallEnable:
+          type: boolean
+          description: firewallEnable
+        igmpSourceEnable:
+          type: boolean
+          description: igmpSourceEnable
+        mldSourceEnable:
+          type: boolean
+          description: mldSourceEnable
+        igmpEnabled:
+          type: boolean
+          description: igmpEnabled
+        mldEnabled:
+          type: boolean
+          description: mldEnabled
+        fullConeNatEnable:
+          type: boolean
+          description: fullConeNatEnable
+        enable:
+          type: boolean
+          description: enable
+        connectionID:
+          type: integer
+          description: connectionID
+        wanIndex:
+          type: integer
+          description: wanIndex
+        userName:
+          type: string
+          description: userName
+        password:
+          type: string
+          description: password
+        vpiValue:
+          type: integer
+          description: vpiValue
+        vciValue:
+          type: integer
+          description: vciValue
+        addressingType:
+          type: string
+          description: addressingType
+        externalIPAdress:
+          type: string
+          description: externalIPAdress
+        subnetMask:
+          type: string
+          description: subnetMask
+        defaultGateway:
+          type: string
+          description: defaultGateway
+        dnsServers:
+          type: string
+          description: dnsServers
+        dnsIfName:
+          type: string
+          description: dnsIfName
+        ipv6AddressingType:
+          type: string
+          description: ipv6AddressingType
+        ipv6Status:
+          type: string
+          description: ipv6Status
+        unnumberedModel:
+          type: boolean
+          description: unnumberedModel
+        dhcp6cForAddress:
+          type: string
+          description: dhcp6cForAddress
+        dhcp6cForPrefixDelegation:
+          type: string
+          description: dhcp6cForPrefixDelegation
+        dhcp6cPrefixDelegationEnable:
+          type: string
+          description: dhcp6cPrefixDelegationEnable
+        externalIPv6Address:
+          type: string
+          description: externalIPv6Address
+        defaultIPv6Gateway:
+          type: string
+          description: defaultIPv6Gateway
+        ipv6DnsServer:
+          type: string
+          description: ipv6DnsServer
+    ListAdslDeviceResponse:
+      title: ListAdslDeviceResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/ListAdslDevice'
+    ListAdslDevice:
+      title: ListAdslDevice
+      properties:
+        totalCount:
+          type: integer
+          description: ""
+        adslDeviceList:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdslDevice'
+    AdslDevice:
+      title: AdslDevice
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Tên thiết bị
+        adslName:
+          type: string
+          description: Tên thiết bị
+        serialNumber:
+          type: string
+          description: Serial của thiết bị
+        productClass:
+          type: string
+          description: ""
+        oui:
+          type: string
+          description: ""
+        softwareVersion:
+          type: string
+          description: ""
+        hardwareVersion:
+          type: string
+          description: ""
+        manufacturer:
+          type: string
+          description: Phiên bản Firmware của thiết bị
+        ipAddress:
+          type: string
+          description: Địa chỉ quản lý của thiết bị
+        opticalSerial:
+          type: string
+          description: ""
+        connectionRequest:
+          type: string
+          description: ""
+        productType:
+          type: string
+          description: ""
+        productTypeID:
+          type: string
+          description: ""
+        menID:
+          type: string
+          description: Mã MEN của thiết bị
+        validate:
+          type: integer
+          description: ""
+        areaID:
+          type: string
+          description: Mã định danh khu vực của ONT
+        areaName:
+          type: string
+          description: Tên khu vực
+        provinceName:
+          type: string
+          description: ""
+        provinceId:
+          type: string
+          description: ""
+        status:
+          type: integer
+          description: ""
+        lastInformTime:
+          type: number
+          description: Thời điểm cuối thiết bị gửi bản tin inform về hệ thống
+    DeviceParamResponse:
+      title: DeviceParamResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/DeviceParam'
+    DeviceParam:
+      title: DeviceParam
+      type: object
+      properties:
+        adslName:
+          type: string
+          description: Tên thiết bị
+        serialNumber:
+          type: string
+          description: Serial của thiết bị
+        productClass:
+          type: string
+          description: ""
+        oui:
+          type: string
+          description: ""
+        softwareVersion:
+          type: string
+          description: ""
+        hardwareVersion:
+          type: string
+          description: ""
+        manufacturer:
+          type: string
+          description: Phiên bản Firmware của thiết bị
+        provisioningCode:
+          type: string
+          description: ""
+        connectionRequest:
+          type: string
+          description: ""
+        ipAddress:
+          type: string
+          description: Địa chỉ quản lý của thiết bị
+        modelName:
+          type: string
+          description: ""
+        areaID:
+          type: string
+          description: Mã định danh khu vực của ONT
+        areaName:
+          type: string
+          description: Tên khu vực
+        menID:
+          type: string
+          description: Mã MEN của thiết bị
+        productID:
+          type: integer
+          description: ""
+        opticalSerial:
+          type: string
+          description: ""
+        lastInformTime:
+          type: number
+          description: Thời điểm cuối thiết bị gửi bản tin inform về hệ thống
+        joinTime:
+          type: number
+          description: ""
+    TemplateInfResponse:
+      title: TemplateInfResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/TemplateInf'
+    TemplateInf:
+      title: TemplateInf
+      type: object
+      properties:
+        pppoe_user:
+          type: string
+          description: ""
+        pppoe_vlanid:
+          type: string
+          description: ""
+        wifi_mytv_pass:
+          type: string
+          description: ""
+        wifi_name:
+          type: string
+          description: ""
+        wifi_5g_pass:
+          type: string
+          description: ""
+        serial:
+          type: string
+          description: ""
+        bridge_vlanid:
+          type: string
+          description: ""
+        wifi_mytv_name:
+          type: string
+          description: ""
+        wifi_pass:
+          type: string
+          description: ""
+        pppoe_pass:
+          type: string
+          description: ""
+        wifi_5g_name:
+          type: string
+          description: ""
+    TemplateZerotouchListResponse:
+      title: TemplateZerotouchListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateZerotouch'
+    TemplateZerotouch:
+      title: TemplateZerotouch
+      type: object
+      properties:
+        id:
+          type: number
+          description: ""
+        templateName:
+          type: string
+          description: ""
+        templateCode:
+          type: string
+          description: ""
+        url:
+          type: string
+          description: ""
+        modelname:
+          type: string
+          description: ""
+        softwareVersion:
+          type: string
+          description: ""
+        description:
+          type: string
+          description: ""
+        createDate:
+          type: string
+          description: ""
+        status:
+          type: number
+          description: ""
+        inputFormat:
+          type: string
+          description: ""
+    FileBackupListResponse:
+      title: FileBackupListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileBackup'
+    FileBackup:
+      title: FileBackup
+      type: object
+      properties:
+        url:
+          type: string
+          description: Đường dẫn file backup
+        backup_date:
+          type: string
+          description: Ngày thực hiện backup
+        opticalSerial:
+          type: string
+          description: Mã định danh thiết bị
+        type:
+          type: integer
+          description: |
+            Loại file backup:
+              * 0 : tự động
+              * 1 : manual
+        softwareVersion:
+          type: string
+          description: Phiên bản firmware của ONT
+        areaID:
+          type: string
+          description: Mã định danh khu vực của ONT
+        areaName:
+          type: string
+          description: Tên khu vực
+        menID:
+          type: string
+          description: Mã MEN của thiết bị
+    ConnectedUserListResponse:
+      title: ConnectedUserListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectedUser'
+    ConnectedUser:
+      title: ConnectedUser
+      type: object
+      properties:
+        macAddress:
+          type: string
+          description: ""
+        isActive:
+          type: boolean
+          description: ""
+        addressSource:
+          type: string
+          description: ""
+        hostName:
+          type: string
+          description: ""
+        ipAddress:
+          type: string
+          description: ""
+        interfaceType:
+          type: string
+          description: ""
+        leaseTimeRemaining:
+          type: number
+          description: ""
+        ifName:
+          type: string
+          description: ""
+    OpticalInfoListResponse:
+      title: OpticalInfoListResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpticalInfo'
+    OpticalInfo:
+      title: OpticalInfo
+      type: object
+      properties:
+        txBias:
+          type: integer
+          description: ""
+        rxVcc:
+          type: integer
+          description: ""
+        bOSAtemperature:
+          type: integer
+          description: ""
+        rxPower:
+          type: integer
+          description: ""
+        txPower:
+          type: integer
+          description: ""
+    ListReportWifiResponse:
+      title: ListReportWifiResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          $ref: '#/components/schemas/ListReportWifi'
+    ListReportWifi:
+      title: ListReportWifi
+      properties:
+        total:
+          type: integer
+          description: ""
+        start:
+          type: integer
+          description: ""
+        limit:
+          type: integer
+          description: ""
+        listReportWifi:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportWifi'
+    ReportWifi:
+      title: ReportWifi
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ""
+        opticalSerial:
+          type: string
+          description: ""
+        softwareVersion:
+          type: string
+          description: ""
+        modelName:
+          type: string
+          description: ""
+        startTime:
+          type: number
+          description: ""
+        endTime:
+          type: number
+          description: ""
+        areaId:
+          type: integer
+          description: ""
+        areaName:
+          type: string
+          description: ""
+        description:
+          type: string
+          description: ""
+        productID:
+          type: integer
+          description: ""
+        bandwidth:
+          type: string
+          description: ""
+        encryption:
+          type: string
+          description: ""
+        networkAuth:
+          type: string
+          description: ""
+        countryCode:
+          type: string
+          description: ""
+        disableWmm:
+          type: string
+          description: ""
+        enableMulticast:
+          type: string
+          description: ""
+        ssid:
+          type: string
+          description: ""
+        txPower:
+          type: string
+          description: ""
+        channel:
+          type: string
+          description: ""
+        wifiMode:
+          type: string
+          description: ""
+        autoChannelTimer:
+          type: string
+          description: ""
+        enableTraficSchedule:
+          type: string
+          description: ""
+        airtimeFairness:
+          type: string
+          description: ""
+        internetTime:
+          type: string
+          description: ""
+        staticDNS:
+          type: string
+          description: ""
+        dnsIfName:
+          type: string
+          description: ""
+        wifiInstance:
+          type: integer
+          description: ""
+        flagInValid:
+          type: boolean
+          description: ""
+    WifiAuthMode:
+      type: string
+      enum:
+      - open
+      - shared
+      - radius
+      - wpa2
+      - psk2
+      - wpa wpa2
+      - psk psk2
+    WifiEncryption:
+      type: string
+      enum:
+      - aes
+      - tkip+aes
+    BaseResponse:
+      title: BaseResponse
+      type: object
+      properties:
+        error_code:
+          type: string
+          description: |
+            Kết quả thực hiện:
+             * `0` - success
+             * `501` - Device not found
+             * `502` - Device not connected
+             * `503` - Invalid parameter
+             * `500` - Other error
+             * `401` - Invalid user or password
+             * `504` - Keep silent
+             * `541` - Lỗi khác
+          default: "0"
+        message:
+          type: string
+          default: "success"
+        result:
+          type: string
+    ErrorResponse:
+      title: ErrorResponse
+      allOf:
+      - $ref: '#/components/schemas/BaseResponse'
+    WanLanInterfaces:
+      title: WanLanInterfaces
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ""
+        type:
+          type: string
+          description: ""
+        name:
+          type: string
+          description: ""
+    GNMSResponse:
+      title: GNMSResponse
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: ""
+        errorMessage:
+          type: string
+          description: ""
+    WanInterfacesResponse:
+      title: WanInterfacesResponse
+      allOf:
+        - $ref: '#/components/schemas/GNMSResponse'
+      properties:
+        wanInterfacesList:
+          type: array
+          items:
+            $ref: '#/components/schemas/WanLanInterfaces'
+    LanInterfacesResponse:
+      title: LanInterfacesResponse
+      allOf:
+        - $ref: '#/components/schemas/GNMSResponse'
+      properties:
+        lanInterfacesList:
+          type: array
+          items:
+            $ref: '#/components/schemas/WanLanInterfaces'
+    WanLanInterfacesListResponse:
+      title: WanLanInterfacesListResponse
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WanLanInterfaces'
+    InterfaceGrouping:
+      title: InterfaceGrouping
+      type: object
+      properties:
+        index:
+          type: string
+          description: ""
+        groupName:
+          type: string
+          description: ""
+        wanInterface:
+          type: string
+          description: ""
+        lanInterface:
+          type: string
+          description: ""
+        wanInterfaceName:
+          type: string
+          description: ""
+        lanInterfaceName:
+          type: string
+          description: ""
+    AddInterfaceGroupingRequest:
+      title: AddInterfaceGroupingRequest
+      type: object
+      properties:
+        groupName:
+          type: string
+          description: ""
+        wanInterface:
+          type: string
+          description: "WAN Interface ID: Get from API getWanInterfacesList"
+        lanInterface:
+          type: string
+          description: "LAN Interface ID: Get from API getLanInterfacesList"
+    DeleteInterfaceGroupingRequest:
+      title: DeleteInterfaceGroupingRequest
+      type: object
+      properties:
+        index:
+          type: string
+          description: "ID of group: Get from API getInterfaceGroupingList"
+        wanInterfaceId:
+          type: string
+          description: "WAN ID"
+        lanInterfaceId:
+          type: string
+          description: "List LAN ID"
+    InterfaceGroupingList:
+      title: InterfaceGroupingList
+      allOf:
+        - $ref: '#/components/schemas/GNMSResponse'
+      properties:
+        interfaceGroupingList:
+          type: array
+          items:
+            $ref: '#/components/schemas/InterfaceGrouping'
+    InterfaceGroupingListResponse:
+      title: InterfaceGroupingListResponse
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InterfaceGrouping'
+#    SIPObject:
+#      title: SIPObject
+#      type: object
+#      properties:
+#        enableVoiceService:
+#          type: string
+#          description: ""
+#        boundIfName:
+#          type: string
+#        BoundIfNameArr:
+#          type: array
+#          items:
+#            type: string
+#        regions:
+#          type: array
+#          items:
+#            type: string
+#        ipAddressFamily:
+#          type: string
+#          description: ""
+#        region:
+#          type: string
+#          description: ""
+#        digitMap:
+#          type: string
+#          description: ""
+#        userAgentDomain:
+#          type: string
+#          description: ""
+#        proxyServer:
+#          type: string
+#          description: ""
+#        proxyServerPort:
+#          type: string
+#          description: ""
+#        outBoundProxy:
+#          type: string
+#          description: ""
+#        outBoundProxyPort:
+#          type: string
+#          description: ""
+#        registrarServer:
+#          type: string
+#          description: ""
+#        registrarServerPort:
+#          type: string
+#          description: ""
+#        dtmfMethod:
+#          type: string
+#          description: ""
+    LineObject:
+      title: LineObject
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ""
+        enable:
+          type: string
+          description: ""
+        callIDNamer:
+          type: string
+          description: ""
+        sipAuthUserName:
+          type: string
+          description: ""
+        sipAuthUserPass:
+          type: string
+          description: ""
+        sipUri:
+          type: string
+          description: ""
+        callStatus:
+          type: string
+          description: ""
+        callState:
+          type: string
+          description: ""
+        callWaitingEnable:
+          type: string
+          description: ""
+    GetVoiceList:
+      title: GetVoiceList
+      allOf:
+        - $ref: '#/components/schemas/GNMSResponse'
+      properties:
+        SIPObject:
+          type: object
+        LineObject:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineObject'
+    GetVoiceListResponse:
+      title: GetVoiceListResponse
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        SIPObject:
+          type: object
+        LineObject:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineObject'
+    BoundInterfacesList:
+      title: BoundInterfacesList
+      allOf:
+        - $ref: '#/components/schemas/GNMSResponse'
+      properties:
+        boundInterfacesList:
+          type: array
+          items:
+            type: string
+            description: ""
+    BoundInterfacesListResponse:
+      title: BoundInterfacesListResponse
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      properties:
+        boundInterfacesList:
+          type: array
+          items:
+            type: string
+            description: ""

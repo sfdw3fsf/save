@@ -1,0 +1,15 @@
+export type StorageContentType =
+  | 'PDF'
+  | 'RAR'
+  | 'ZIP'
+  | 'COMPRESSED_ZIP'
+  | 'JPEG'
+  | 'PNG'
+  | 'CSV'
+  | 'EXCEL_XLS'
+  | 'EXCEL'
+  | 'WORD_DOC'
+  | 'WORD'
+  | 'PPT'
+  | 'PPTX'
+  | 'SVG';

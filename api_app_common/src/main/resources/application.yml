@@ -1,0 +1,572 @@
+spring:
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${REDIS_TTL:200}
+  security:
+    access-token-validity: ${ACCESS_TOKEN_VALIDITY:86400}
+    admin-token-validity: ${ADMIN_TOKEN_VALIDITY:7200}
+    refresh-token-validity: ${REFRESH_TOKEN_VALIDITY:1237200}
+  redis:
+    cluster:
+      nodes:
+        - ${REDIS_URL1:10.168.6.204:31168}
+        - ${REDIS_URL2:10.168.6.201:31912}
+        - ${REDIS_URL3:10.168.6.205:31542}
+        - ${REDIS_URL4:10.168.6.202:31427}
+        - ${REDIS_URL5:10.168.6.203:30687}
+        - ${REDIS_URL6:10.168.6.200:30315}
+      max-redirects: 3
+    username: ${REDIS_USERNAME:default}
+    password: ${REDIS_PASSWORD:kpVs2Roz6A0Rq3w8z4up}
+    cache-prefix: ${REDIS_CACHE_PREFIX:App_common}
+    lettuce:
+      shutdown-timeout: 10
+    timeout: 30
+  jms:
+    listener:
+      receive-timeout: 30s
+  application:
+    name: app-com
+  datasource:
+    oneapp:
+      url: ${DB_HPG:jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS=(PROTOCOL=TCP)(HOST=10.159.28.219)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=PDB1))) }
+      username: ${css_usr:AQoHDwUCAwkQCA0EljcJrcmsSXdiMx0p74PiLXJO7Kv5DQ==}
+      password: ${css_pwd:AQoHDwUCAwkQCA0EsAo0gtWxvh/0v1q1JscIDNtGv8dyN6LGzwmq} 
+      crypto_key : ${crypto_key:lybaomatBss}     
+  databases:
+    oneapp:
+      url: ${DB:jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS=(PROTOCOL=TCP)(HOST=10.159.28.219)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=PDB1))) }
+      username: ${css_usr:AQoHDwUCAwkQCA0EljcJrcmsSXdiMx0p74PiLXJO7Kv5DQ==}
+      password: ${css_pwd:AQoHDwUCAwkQCA0EsAo0gtWxvh/0v1q1JscIDNtGv8dyN6LGzwmq} 
+      crypto_key : ${crypto_key:lybaomatBss}
+      max-pool-size: 10 
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+server:
+   port: ${PORT_COM:8084}
+app:
+  firebase-configuration-file: vnptoneapp-firebase-adminsdk-el19x-5cd24bc972.json
+  config:
+    appceptnull: true
+  tinhthanh: ${tinhthanh:all} 
+  poolsize: ${MAX_POOL:100}
+  
+management:
+  endpoints:
+    web:
+      exposure:
+        # Đảm bảo 'health' nằm trong danh sách được mở ra web
+        include: "health,info" 
+  endpoint:
+    health:
+      # (Tùy chọn) Luôn hiển thị chi tiết trạng thái Disk, DB...
+      show-details: always
+  health:
+    redis:
+      enabled: false
+ekyc:
+  username: ${EKYC_USERNAME:luattd@vnpt.vn}
+  password: ${EKYC_PASSWORD:Luattd1@vnpt.vn}
+  client-id: ${EKYC_CLIENT_ID:5_hour}
+  grant-type: ${EKYC_GRANT_TYPE:password}
+  client-secret: ${EKYC_CLIENT_SECRET:password}
+---
+logging:
+  mode: ${fluentd_mode:fluentd}
+#  mode: local
+  fluentd:
+    tag: ${fluentd_tag:VNPTIT.ERP.ONE_APP_BANHANG}
+    host: ${fluentd_host:10.159.28.112}
+    port: ${fluentd_post:24224}
+    timeout: 1000
+    capacity: 500000      
+--- 
+#Document
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /document.html
+eureka:   #<1>
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 5
+    leaseRenewalIntervalInSeconds: 5
+    health-check-url-path: /actuator/health
+    metadata-map:
+      startup: ${random.int}    #needed to trigger info and endpoint update after restart
+  client:
+    initial-instance-info-replication-interval-seconds: 5
+    registry-fetch-interval-seconds: 5
+    registryFetchIntervalSeconds: 5
+    service-url: 
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    healthcheck:
+      enabled: true
+      
+---      
+eureka:
+ instance:
+   ip-address: ${CLIENT_IP_ADDRESS:local.idg.vnpt.vn}
+   prefer-ip-address: ${PREFER_IP_ADDRESS:false}
+   hostname: ${HOSTNAME:app-com}
+---
+vnptinvoice:
+  publicservice: ${PublishService:/PublishService.asmx}
+  bizservice: ${BusinessService:/BusinessService.asmx}
+  portalservice: ${PortalService:/PortalService.asmx}
+  agg:
+    url: ${invoice_agg:https://aggservice.vnpt-invoice.com.vn}
+    username: ${username_agg:aggservice}
+    password: ${pass_agg:Angiang@2015}
+    account: ${account_agg:aggadmin}
+    acpass: ${acpass_agg:Angiang@2015}
+    keyitem: ${tt78_agg:0}
+  bdg:
+    url: ${invoice_bdg:https://bdgservice.vnpt-invoice.com.vn}
+    username: ${username_bdg:bdgservice}
+    password: ${pass_bdg:Binhduong@2015}
+    account: ${account_bdg:hddt.bdg}
+    acpass: ${acpass_bdg:Binhduong@2017}
+    keyitem: ${tt78_bdg:0}
+  bdh:
+    url: ${invoice_bdh:https://bdh-tt78admin.vnpt-invoice.com.vn}
+    username: ${username_bdh:bdhcssservice}
+    password: ${pass_bdh:1234567aA@}
+    account: ${account_bdh:bdhcss}
+    acpass: ${acpass_bdh:1234567aA@}
+    keyitem: ${tt78_bdh:1}
+  bgg:
+    url: ${invoice_bgg:https://bggservice.vnpt-invoice.com.vn}
+    username: ${username_bgg:bggcssservice}
+    password: ${pass_bgg:1234567aA@}
+    account: ${account_bgg:bggcss}
+    acpass: ${acpass_bgg:1234567aA@}
+    keyitem: ${tt78_bgg:0}
+  bkn:
+    url: ${invoice_bkn:https://bknservice.vnpt-invoice.com.vn}
+    username: ${username_bkn:vtbkservice}
+    password: ${pass_bkn:Vtbk@123}
+    account: ${account_bkn:bknadmin}
+    acpass: ${acpass_bkn:A123456a@}
+    keyitem: ${tt78_bkn:0}
+  blu:
+    url: ${invoice_blu:https://blu-tt78admin.vnpt-invoice.com.vn}
+    username: ${username_blu:bluservice}
+    password: ${pass_blu:Baclieu@2015}
+    account: ${account_blu:bluadmin}
+    acpass: ${acpass_blu:Baclieu@2015}
+    keyitem: ${tt78_blu:0}
+  bnh:
+    url: ${invoice_bnh:https://bnhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_bnh:bnhservice}
+    password: ${pass_bnh:Bnh@123##}
+    account: ${account_bnh:bnhcss}
+    acpass: ${acpass_bnh:1234567aA@}
+    keyitem: ${tt78_bnh:0}
+  bpc:
+    url: ${invoice_bpc:https://bpcservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_bpc:bpcservice}
+    password: ${pass_bpc:Binhphuoc@2015}
+    account: ${account_bpc:bpcadmin}
+    acpass: ${acpass_bpc:Binhphuoc@2015}
+    keyitem: ${tt78_bpc:0}
+  bte:
+    url: ${invoice_bte:https://bteservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_bte:bteservice}
+    password: ${pass_bte:Bentre@2015}
+    account: ${account_bte:bteadmin}
+    acpass: ${acpass_bte:Bentre@2015}
+    keyitem: ${tt78_bte:0}
+  btn:
+    url: ${invoice_btn:https://btnservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_btn:btncssservice}
+    password: ${pass_btn:1234567aA@}
+    account: ${account_btn:btncss}
+    acpass: ${acpass_btn:1234567aA@}
+    keyitem: ${tt78_btn:0}
+  cbg:
+    url: ${invoice_cbg:https://cbgservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_cbg:cbgservicev2}
+    password: ${pass_cbg:123456aA@}
+    account: ${account_cbg:caobangadmin1}
+    acpass: ${acpass_cbg:Admcbg@1236}
+    keyitem: ${tt78_cbg:0}
+  cmu:
+    url: ${invoice_cmu:https://cmuservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_cmu:cmuservice}
+    password: ${pass_cmu:Camau@2015}
+    account: ${account_cmu:cmusxkd_pc}
+    acpass: ${acpass_cmu:Cmu#2017&}
+    keyitem: ${tt78_cmu:0}
+  cto:
+    url: ${invoice_cto:https://cto-tt78admin.vnpt-invoice.com.vn/}
+    username: ${username_cto:ctoservice}
+    password: ${pass_cto:Cantho@2015}
+    account: ${account_cto:pketoan}
+    acpass: ${acpass_cto:Ketoan@#2017}
+    keyitem: ${tt78_cto:1}
+  dbn:
+    url: ${invoice_dbn:https://dbn-tt78admin.vnpt-invoice.com.vn}
+    username: ${username_dbn:dbncssservice}
+    password: ${pass_dbn:1234567aA@}
+    account: ${account_dbn:dbncss}
+    acpass: ${acpass_dbn:1234567aA@}
+    keyitem: ${tt78_dbn:1}
+  dlc:
+    url: ${invoice_dlc:https://dlkservice.vnpt-invoice.com.vn}
+    username: ${username_dlc:dlkservice}
+    password: ${pass_dlc:Hddt#dlkservice!2015}
+    account: ${account_dlc:dlkcss}
+    acpass: ${acpass_dlc:Hddt#hddt2019$}
+    keyitem: ${tt78_dlc:0}
+  dng:
+    url: ${invoice_dng:https://dnservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_dng:dngservice}
+    password: ${pass_dng:123456aA@}
+    account: ${account_dng:erphddt}
+    acpass: ${acpass_dng:Erp@invoice.com.vn/pt123}
+    keyitem: ${tt78_dng:0}
+  dni:
+    url: ${invoice_dni:https://dniservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_dni:dniservice}
+    password: ${pass_dni:Dongnai@2015}
+    account: ${account_dni:dniadmin}
+    acpass: ${acpass_dni:Dongnai@2015}
+    keyitem: ${tt78_dni:0}
+  dno:
+    url: ${invoice_dno:https://dnoservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_dno:dknservice}
+    password: ${pass_dno:Dkn@123##}
+    account: ${account_dno:dnoadmintq}
+    acpass: ${acpass_dno:123456aA@}
+    keyitem: ${tt78_dno:0}
+  dtp:
+    url: ${invoice_dtp:https://dtpservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_dtp:dtpcssservice}
+    password: ${pass_dtp:1234567aA@}
+    account: ${account_dtp:dtpcss}
+    acpass: ${acpass_dtp:1234567aA@}
+    keyitem: ${tt78_dtp:0}
+  gli:
+    url: ${invoice_gli:https://gliservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_gli:glservice}
+    password: ${pass_gli:Gl@123##}
+    account: ${account_gli:thanhlt}
+    acpass: ${acpass_gli:thanh123456}
+    keyitem: ${tt78_gli:0}
+  hbh:
+    url: ${invoice_hbh:https://hbhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hbh:hbhhpgservice}
+    password: ${pass_hbh:Hbh@123##}
+    account: ${account_hbh:hbhhpg}
+    acpass: ${acpass_hbh:Hbh@123##}
+    keyitem: ${tt78_hbh:0}
+  hcm:
+    url: ${invoice_hcm:https://hcm-tt78admin.vnpt-invoice.com.vn/}
+    username: ${username_hcm:hcmservice}
+    password: ${pass_hcm:hcmtelecom@1258}
+    account: ${account_hcm:hcmadmin}
+    acpass: ${acpass_hcm:Nhu290878$}
+    keyitem: ${tt78_hcm:1}
+  hdg:
+    url: ${invoice_hdg:https://hdservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hdg:hdservice}
+    password: ${pass_hdg:Hd@123##}
+    account: ${account_hdg:hdadmin}
+    acpass: ${acpass_hdg:Hd@042016}
+    keyitem: ${tt78_hdg:0}
+  hgg:
+    url: ${invoice_hgg:https://hggservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hgg:hggservice}
+    password: ${pass_hgg:Hgg@123456}
+    account: ${account_hgg:hggadmin}
+    acpass: ${acpass_hgg:Hgg@123456}
+    keyitem: ${tt78_hgg:0}
+  hgi:
+    url: ${invoice_hgi:https://hgiservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hgi:hgicssservice}
+    password: ${pass_hgi:1234567aA@}
+    account: ${account_hgi:hgicss}
+    acpass: ${acpass_hgi:1234567aA@}
+    keyitem: ${tt78_hgi:0}
+  hni:
+    url: ${invoice_hni:https://hn-tt78admin.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hni:hnicssservice}
+    password: ${pass_hni:1234567aA@}
+    account: ${account_hni:hnicss}
+    acpass: ${acpass_hni:Ttkdhni@321}
+    keyitem: ${tt78_hni:1}
+  hnm:
+    url: ${invoice_hnm:https://hnmservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hnm:hnmcssservice}
+    password: ${pass_hnm:1234567aA@}
+    account: ${account_hnm:hnmcss}
+    acpass: ${acpass_hnm:1234567aA@}
+    keyitem: ${tt78_hnm:0}
+  hpg:
+    url: ${invoice_hpg:https://hp-tt78admin.vnpt-invoice.com.vn}
+    username: ${username_hpg:hpservice}
+    password: ${pass_hpg:1234567}
+    account: ${account_hpg:webservice_hpg}
+    acpass: ${acpass_hpg:Webservice123@}
+    keyitem: ${tt78_hpg:1}
+  hth:
+    url: ${invoice_hth:https://hth-tt78admin.vnpt-invoice.com.vn}
+    username: ${username_hth:hthservice}
+    password: ${pass_hth:Hth@123##}
+    account: ${account_hth:ttkdhth}
+    acpass: ${acpass_hth:Ttkd@hth123}
+    keyitem: ${tt78_hth:0}
+  hue:
+    url: ${invoice_hue:https://hueservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hue:hueservice2}
+    password: ${pass_hue:123456aA@}
+    account: ${account_hue:hueadmin}
+    acpass: ${acpass_hue:Abc123!@#}
+    keyitem: ${tt78_hue:0}
+  hyn:
+    url: ${invoice_hyn:https://hyservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_hyn:hyservice}
+    password: ${pass_hyn:Hy@123##}
+    account: ${account_hyn:hyadmin}
+    acpass: ${acpass_hyn:tinhcuoc2015@}
+    keyitem: ${tt78_hyn:0}
+  kgg:
+    url: ${invoice_kgg:https://kggservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_kgg:kggservice}
+    password: ${pass_kgg:Kiengiang@2015}
+    account: ${account_kgg:kggadmin}
+    acpass: ${acpass_kgg:Kiengiang@2015}
+    keyitem: ${tt78_kgg:0}
+  kha:
+    url: ${invoice_kha:https://khaservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_kha:khaservice}
+    password: ${pass_kha:Kha@123##}
+    account: ${account_kha:ttkd_all_kha}
+    acpass: ${acpass_kha:css_hddt_Kha0258}
+    keyitem: ${tt78_kha:0}
+  ktm:
+    url: ${invoice_ktm:https://kontumservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_ktm:ktservice}
+    password: ${pass_ktm:Adm1@#invoice.com.vn/ptinvoice.com.vn/p2015}
+    account: ${account_ktm:ktmcss-einv}
+    acpass: ${acpass_ktm:einv@invoice.com.vn/pKTM2020}
+    keyitem: ${tt78_ktm:0}
+  lan:
+    url: ${invoice_lan:https://lanservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_lan:lanservice}
+    password: ${pass_lan:Longan@2015}
+    account: ${account_lan:yenpn}
+    acpass: ${acpass_lan:Yen@2017}
+    keyitem: ${tt78_lan:0}
+  lci:
+    url: ${invoice_lci:https://laocaiservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_lci:laocaiservice}
+    password: ${pass_lci:laocai@123456LC}
+    account: ${account_lci:bacnb.lci}
+    acpass: ${acpass_lci:Bac@1234}
+    keyitem: ${tt78_lci:0}
+  lcu:
+    url: ${invoice_lcu:https://lcuservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_lcu:lcucssservice}
+    password: ${pass_lcu:1234567aA@}
+    account: ${account_lcu:lcuadmin}
+    acpass: ${acpass_lcu:Lcu@1234567}
+    keyitem: ${tt78_lcu:0}
+  ldg:
+    url: ${invoice_ldg:https://ldgservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_ldg:ldgservice}
+    password: ${pass_ldg:Lamdong@2015}
+    account: ${account_ldg:ldgadmin}
+    acpass: ${acpass_ldg:Lamdong@2015}
+    keyitem: ${tt78_ldg:0}
+  lsn:
+    url: ${invoice_lsn:https://lsnservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_lsn:lsnservice}
+    password: ${pass_lsn:Lsn@123##}
+    account: ${account_lsn:lsnadmin}
+    acpass: ${acpass_lsn:invoice.com.vn/pt@7654321}
+    keyitem: ${tt78_lsn:0}
+  nan:
+    url: ${invoice_nan:https://naservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_nan:nancssservice}
+    password: ${pass_nan:1234567aA@}
+    account: ${account_nan:nancss}
+    acpass: ${acpass_nan:1234567aA@}
+    keyitem: ${tt78_nan:0}
+  nbh:
+    url: ${invoice_nbh:https://nbhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_nbh:vtnbservice}
+    password: ${pass_nbh:Vtnb@123}
+    account: ${account_nbh:nbhcss}
+    acpass: ${acpass_nbh:1234567aA@}
+    keyitem: ${tt78_nbh:0}
+  ndh:
+    url: ${invoice_ndh:https://ndhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_ndh:invoice.com.vn/pndhservice}
+    password: ${pass_ndh:invoice.com.vn/pndh@123##}
+    account: ${account_ndh:namdinhadmin}
+    acpass: ${acpass_ndh:Nd@1234567}
+    keyitem: ${tt78_ndh:0}
+  ntn:
+    url: ${invoice_ntn:https://ntnservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_ntn:ntnservice}
+    password: ${pass_ntn:Ninhthuan@2015}
+    account: ${account_ntn:ntnuser}
+    acpass: ${acpass_ntn:Ninhthuan@2015}
+    keyitem: ${tt78_ntn:0}
+  pto:
+    url: ${invoice_pto:https://pto-tt78admin.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_pto:ptoservicev2}
+    password: ${pass_pto:123456aA@}
+    account: ${account_pto:ptoadmin}
+    acpass: ${acpass_pto:Dhnv@2016}
+    keyitem: ${tt78_pto:1}
+  pyn:
+    url: ${invoice_pyn:https://pyservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_pyn:pyncssservice}
+    password: ${pass_pyn:1234567aA@}
+    account: ${account_pyn:pyncss}
+    acpass: ${acpass_pyn:1234567aA@}
+    keyitem: ${tt78_pyn:0}
+  qbh:
+    url: ${invoice_qbh:https://qbservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_qbh:qbservice2}
+    password: ${pass_qbh:abcd1234A@}
+    account: ${account_qbh:qbhadmin}
+    acpass: ${acpass_qbh:abcd1234A@}
+    keyitem: ${tt78_qbh:0}
+  qnh:
+    url: ${invoice_qnh:https://qnh-tt78admin.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_qnh:qnhcssservice}
+    password: ${pass_qnh:1234567aA@}
+    account: ${account_qnh:qnhcss}
+    acpass: ${acpass_qnh:1234567aA@}
+    keyitem: ${tt78_qnh:1}
+  qni:
+    url: ${invoice_qni:https://qngservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_qni:qngservice}
+    password: ${pass_qni:Hddt@qn2015}
+    account: ${account_qni:qnguser}
+    acpass: ${acpass_qni:Qnihoadon@123}
+    keyitem: ${tt78_qni:0}
+  qnm:
+    url: ${invoice_qnm:https://qnmservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_qnm:qnmservice}
+    password: ${pass_qnm:qnmAdmin15#@!}
+    account: ${account_qnm:qnmadmin}
+    acpass: ${acpass_qnm:Qnmadmin15#@!}
+    keyitem: ${tt78_qnm:0}
+  qti:
+    url: ${invoice_qti:https://qtiservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_qti:qtiservice}
+    password: ${pass_qti:Qt@123##}
+    account: ${account_qti:trangttn.qti}
+    acpass: ${acpass_qti:MqNt!12389}
+    keyitem: ${tt78_qti:0}
+  sla:
+    url: ${invoice_sla:https://slaservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_sla:slaservice}
+    password: ${pass_sla:Sla@123##}
+    account: ${account_sla:thuyltv.sla}
+    acpass: ${acpass_sla:Thuy@2016}
+    keyitem: ${tt78_sla:0}
+  stg:
+    url: ${invoice_stg:https://stgservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_stg:stgservice}
+    password: ${pass_stg:Soctrang@2015}
+    account: ${account_stg:stgadmin}
+    acpass: ${acpass_stg:Soctrang@2016}
+    keyitem: ${tt78_stg:0}
+  tbh:
+    url: ${invoice_tbh:https://tbhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tbh:vttbservice}
+    password: ${pass_tbh:Vttb@123}
+    account: ${account_tbh:vttbadmin}
+    acpass: ${acpass_tbh:Vttb@1234}
+    keyitem: ${tt78_tbh:0}
+  tgg:
+    url: ${invoice_tgg:https://tggservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tgg:tggservice}
+    password: ${pass_tgg:Tiengiang@2015}
+    account: ${account_tgg:tggadmin}
+    acpass: ${acpass_tgg:Tiengiang@2015}
+    keyitem: ${tt78_tgg:0}
+  tha:
+    url: ${invoice_tha:https://thservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tha:thservice}
+    password: ${pass_tha:thservice@123}
+    account: ${account_tha:cssvung}
+    acpass: ${acpass_tha:Ttkd@123}
+    keyitem: ${tt78_tha:0}
+  tnh:
+    url: ${invoice_tnh:https://tnhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tnh:tnhservice}
+    password: ${pass_tnh:Tayninh@2015}
+    account: ${account_tnh:tnhadmin}
+    acpass: ${acpass_tnh:Tayninh@2021}
+    keyitem: ${tt78_tnh:0}
+  tnn:
+    url: ${invoice_tnn:https://tnservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tnn:tnnservice}
+    password: ${pass_tnn:Tn@1234567}
+    account: ${account_tnn:tnadmin}
+    acpass: ${acpass_tnn:Tn@1234567}
+    keyitem: ${tt78_tnn:0}
+  tqg:
+    url: ${invoice_tqg:https://tqgservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tqg:tqgcssservice}
+    password: ${pass_tqg:1234567aA@}
+    account: ${account_tqg:tqgcss}
+    acpass: ${acpass_tqg:1234567aA@}
+    keyitem: ${tt78_tqg:0}
+  tvh:
+    url: ${invoice_tvh:https://tvhservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_tvh:tvhservice}
+    password: ${pass_tvh:Travinh@2015}
+    account: ${account_tvh:admin_tvh}
+    acpass: ${acpass_tvh:Travinh@042016}
+    keyitem: ${tt78_tvh:0}
+  vlg:
+    url: ${invoice_vlg:https://vlgservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_vlg:vlgservice}
+    password: ${pass_vlg:Vinhlong@2015}
+    account: ${account_vlg:vlg2018}
+    acpass: ${acpass_vlg:Vlg@2018}
+    keyitem: ${tt78_vlg:0}
+  vpc:
+    url: ${invoice_vpc:https://vpcservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_vpc:vtvpservice}
+    password: ${pass_vpc:Vpc@##2018#$$}
+    account: ${account_vpc:vpcadmin}
+    acpass: ${acpass_vpc:TTKDvpc@211}
+    keyitem: ${tt78_vpc:0}
+  vtu:
+    url: ${invoice_vtu:https://vtuservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_vtu:vtuservice}
+    password: ${pass_vtu:Vungtau@2015}
+    account: ${account_vtu:vtuadmin}
+    acpass: ${acpass_vtu:Vungtau@2016}
+    keyitem: ${tt78_vtu:0}
+  ybi:
+    url: ${invoice_ybi:https://ybiservice.invoice.com.vn/pt-invoice.com.invoice.com.vn/}
+    username: ${username_ybi:ybicssservice}
+    password: ${pass_ybi:1234567aA@}
+    account: ${account_ybi:ybicss}
+    acpass: ${acpass_ybi:1234567aA@}
+    keyitem: ${tt78_ybi:0}
+---   
+
+logging:
+  level:
+    com.zaxxer.hikari: debug
+---
+mahoa:
+  key: ${def_secret_key:7marODbpaKvRbvdJ}    

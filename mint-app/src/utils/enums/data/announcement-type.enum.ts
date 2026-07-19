@@ -1,0 +1,14 @@
+export enum ANNOUNCEMENT_SEARCH_TYPE {
+  ALL = 'ALL',
+  TITLE = 'TITLE',
+  CONTENT = 'CONTENT',
+}
+
+export enum ANNOUNCEMENT_STATUS_TYPE {
+  NEW = 'NEW',
+}
+
+export enum ANNOUNCEMENT_ATTACHMENT_TYPE {
+  FILE = 'FILE',
+  IMAGE = 'IMAGE',
+}

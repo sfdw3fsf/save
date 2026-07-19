@@ -1,0 +1,229 @@
+package vn.vnpt.vnptit.ecms.service;
+
+import org.springframework.stereotype.Service;
+import vn.vnpt.context.AppRequestContext;
+import vn.vnpt.database.AppSqlException;
+import vn.vnpt.database.DbContext;
+import vn.vnpt.database.SqlParameter;
+import vn.vnpt.message.ApiResult;
+import vn.vnpt.vnptit.ecms.dto.idc.UpsertLoaiVaiTroDto;
+
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class DanhMucLoaiVaiTroService {
+
+    private final DbContext dbContext;
+
+    public DanhMucLoaiVaiTroService(DbContext dbContext) {
+        this.dbContext = dbContext;
+    }
+
+    // ===========================================
+    // GET LIST
+    // ===========================================
+    public Object getAll() throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+
+        params.add(new SqlParameter(
+                "p_cursor",
+                null,
+                SqlParameter.ParameterDirection.OUTPUT,
+                Types.REF_CURSOR
+        ));
+
+        return dbContext.executeSpWithCursorToListMap(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_GET_LOAIVAITRO_LIST",
+                params
+        );
+    }
+
+    // ===========================================
+    // GET DETAIL
+    // ===========================================
+    public Object getDetail(Long id) throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+        params.add(new SqlParameter("p_id", id, Types.NUMERIC));
+
+        SqlParameter cursor = new SqlParameter("p_cursor", Types.REF_CURSOR);
+        params.add(cursor);
+
+        dbContext.executeStoredProcedure(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_GET_LOAIVAITRO_BY_ID",
+                params
+        );
+
+        return mapFirstRow(cursor.getOutValue());
+    }
+
+    // ===========================================
+    // INSERT / UPDATE
+    // ===========================================
+    public ApiResult insertOrUpdate(UpsertLoaiVaiTroDto dto) throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+
+        params.add(new SqlParameter("p_id", dto.getId(), Types.NUMERIC));
+        params.add(new SqlParameter("p_ten", dto.getTen(), Types.NVARCHAR));
+        params.add(new SqlParameter("p_tentat", dto.getTenTat(), Types.VARCHAR));
+        params.add(new SqlParameter("p_mota", dto.getMoTa(), Types.VARCHAR));
+        params.add(new SqlParameter("p_sudung", dto.getHieuLuc(), Types.NUMERIC));
+        params.add(new SqlParameter("p_ghichu", dto.getGhiChu(), Types.VARCHAR));
+        params.add(new SqlParameter("p_nguoicn",
+                AppRequestContext.getCurrent().getUserName(),
+                Types.VARCHAR));
+
+        SqlParameter result = new SqlParameter("p_result", Types.NUMERIC);
+        SqlParameter errorCode = new SqlParameter("p_err_code", Types.VARCHAR);
+        SqlParameter errorMessage = new SqlParameter("p_err_msg", Types.VARCHAR);
+
+        params.add(result);
+        params.add(errorCode);
+        params.add(errorMessage);
+
+        dbContext.executeStoredProcedure(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_INSERT_UPDATE_LOAIVAITRO",
+                params
+        );
+
+        return getApiResult(result, errorCode, errorMessage);
+    }
+
+    // ===========================================
+    // DELETE SINGLE
+    // ===========================================
+    public ApiResult delete(Long id) throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+        params.add(new SqlParameter("p_id", id, Types.NUMERIC));
+
+        SqlParameter result = new SqlParameter("p_result", Types.NUMERIC);
+        SqlParameter errorCode = new SqlParameter("p_err_code", Types.VARCHAR);
+        SqlParameter errorMessage = new SqlParameter("p_err_msg", Types.VARCHAR);
+
+        params.add(result);
+        params.add(errorCode);
+        params.add(errorMessage);
+
+        dbContext.executeStoredProcedure(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_DELETE_LOAIVAITRO",
+                params
+        );
+
+        return getApiResult(result, errorCode, errorMessage);
+    }
+
+    // ===========================================
+    // DELETE MULTI
+    // ===========================================
+    public ApiResult deleteMulti(String listId) throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+        params.add(new SqlParameter("p_list_id", listId, Types.VARCHAR));
+
+        SqlParameter success = new SqlParameter("p_success", Types.NUMERIC);
+        SqlParameter failed  = new SqlParameter("p_failed", Types.NUMERIC);
+        SqlParameter errList = new SqlParameter("p_err_list", Types.VARCHAR);
+
+        params.add(success);
+        params.add(failed);
+        params.add(errList);
+
+        dbContext.executeStoredProcedure(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_DELETE_MULTI_LOAIVAITRO",
+                params
+        );
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("success", success.getOutValue());
+        resultMap.put("failed", failed.getOutValue());
+        resultMap.put("errorIds", errList.getOutValue());
+
+        ApiResult apiResult = new ApiResult();
+        apiResult.setData(resultMap);
+
+        int sVal = toInt(success.getOutValue());
+        int fVal = toInt(failed.getOutValue());
+
+        if (sVal == 0) {
+            apiResult.setErrorCode("BSS-DELETE_ERR_MULTI");
+            apiResult.setMessage("Không có bản ghi nào được xoá.");
+        } else if (fVal > 0) {
+            apiResult.setErrorCode("BSS-PARTIAL_SUCCESS");
+            apiResult.setMessage("Xóa thành công một phần.");
+        } else {
+            apiResult.setErrorCode("BSS-00000000");
+            apiResult.setMessage("Xóa thành công toàn bộ.");
+        }
+
+        return apiResult;
+    }
+
+    // ===========================================
+    // CHECK TRÙNG TÊN
+    // ===========================================
+    public boolean checkTenTonTai(Long id, String ten) throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+        params.add(new SqlParameter("p_id", id, Types.NUMERIC));
+        params.add(new SqlParameter("p_ten", ten, Types.VARCHAR));
+
+        SqlParameter exist = new SqlParameter("p_exist", Types.NUMERIC);
+        params.add(exist);
+
+        dbContext.executeStoredProcedure(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_CHECK_LOAIVAITRO_TEN",
+                params
+        );
+
+        return toInt(exist.getOutValue()) > 0;
+    }
+
+    // ===========================================
+    // CHECK TRÙNG TÊN TẮT
+    // ===========================================
+    public boolean checkTenTatTonTai(Long id, String tenTat) throws AppSqlException {
+
+        List<SqlParameter> params = new ArrayList<>();
+        params.add(new SqlParameter("p_id", id, Types.NUMERIC));
+        params.add(new SqlParameter("p_tentat", tenTat, Types.VARCHAR));
+
+        SqlParameter exist = new SqlParameter("p_exist", Types.NUMERIC);
+        params.add(exist);
+
+        dbContext.executeStoredProcedure(
+                "ECMS.PKG_IDC_TAINGUYEN_V2.SP_CHECK_LOAIVAITRO_TENTAT",
+                params
+        );
+
+        return toInt(exist.getOutValue()) > 0;
+    }
+
+    // ===========================================
+    // Helpers
+    // ===========================================
+    private Object mapFirstRow(Object cursorValue) {
+        if (cursorValue instanceof List) {
+            List<?> list = (List<?>) cursorValue;
+            if (!list.isEmpty()) return list.get(0);
+        }
+        return null;
+    }
+
+    private int toInt(Object obj) {
+        return obj == null ? 0 : ((Number) obj).intValue();
+    }
+    private ApiResult getApiResult(SqlParameter result, SqlParameter errorCode, SqlParameter errorMessage) {
+        ApiResult apiResult = new ApiResult();
+        apiResult.setErrorCode(errorCode.getOutValue() != null ? errorCode.getOutValue().toString() : "BSS-00000000");
+        apiResult.setMessage(errorMessage.getOutValue() != null ? errorMessage.getOutValue().toString() : "");
+        apiResult.setData(result.getOutValue());
+        return apiResult;
+    }
+}

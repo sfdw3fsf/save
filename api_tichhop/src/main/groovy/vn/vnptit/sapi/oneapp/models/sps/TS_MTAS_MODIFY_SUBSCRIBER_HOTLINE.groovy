@@ -1,0 +1,15 @@
+package vn.vnptit.sapi.oneapp.models.sps
+
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+
+@JsonIgnoreProperties(["metaClass"])
+class TS_MTAS_MODIFY_SUBSCRIBER_HOTLINE {
+    @JsonProperty("msisdn")
+    public String msisdn
+    @JsonProperty("service_action")
+    public String service_action
+    @JsonProperty("hotline")
+    public String hotline
+}

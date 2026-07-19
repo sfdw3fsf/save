@@ -1,0 +1,61 @@
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+      colors: {
+        'green-main': '#0d4221',
+        'green-sub': '#1c472c',
+        'ligt-green': '#e4f5eb',
+        'dark-green': '#0d4221',
+        'green-lime': '#04C53B',
+        'green-pale': '#e7f3eb',
+        'green-light': '#E2EEE6',
+        'green-ivy': '#174a2a',
+        'green-bright': '#07543a',
+        'green-envy': '#86A090',
+        'green-teal': '#52936b',
+        'grey-main': '#999999',
+        'grey-cost': '#fafafb',
+        'grey-sub': '#4c4c4c',
+        'grey-blue': '#495057',
+        'grey-green': '#555555',
+        'grey-neutral': '#D9D9D9',
+        'dark-grey': '#232323',
+        'grey-mist': '#C9C9C9',
+        'grey-light': '#F7F7F7',
+        'grey-dark': '#555555',
+        'grey-charcoal': '#666766',
+        'grey-silver': '#F4F4F4',
+        'grey-stone': '#A6A6A6',
+        'yellow-pale': '#FFFCF5',
+        'yellow-medium': '#FAE100',
+        'light-grey': '#CCCCCC',
+        'grey-off-white': '#eaeaea',
+        'grey-cloud': '#E5E5E5',
+        'grey-onyx': '#222222',
+        'grey-ghost': '#f5f5f5',
+        'grey-slate': '#666666',
+        'grey-pearl': '#f9f9f9',
+        'grey-text': '#a9a9a9',
+        'black-nero': '#191919',
+        'black-70': '#4C4C4C',
+      },
+    },
+    fontFamily: {
+      siena: ['var(--font-siena)'],
+    },
+  },
+  plugins: [],
+};
+export default config;

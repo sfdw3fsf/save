@@ -1,0 +1,4 @@
+export enum STOCK_ORDER_MATERIAL {
+  GOLD = 'GOLD',
+  SILVER = 'SILVER',
+}

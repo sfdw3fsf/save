@@ -1,0 +1,120 @@
+/**
+ * GetDeviceInfoResponse.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
+
+package ws.client.vasc;
+
+public class GetDeviceInfoResponse  implements java.io.Serializable {
+    private String getDeviceInfoResult;
+
+    public GetDeviceInfoResponse() {
+    }
+
+    public GetDeviceInfoResponse(
+           String getDeviceInfoResult) {
+           this.getDeviceInfoResult = getDeviceInfoResult;
+    }
+
+
+    /**
+     * Gets the getDeviceInfoResult value for this GetDeviceInfoResponse.
+     * 
+     * @return getDeviceInfoResult
+     */
+    public String getGetDeviceInfoResult() {
+        return getDeviceInfoResult;
+    }
+
+
+    /**
+     * Sets the getDeviceInfoResult value for this GetDeviceInfoResponse.
+     * 
+     * @param getDeviceInfoResult
+     */
+    public void setGetDeviceInfoResult(String getDeviceInfoResult) {
+        this.getDeviceInfoResult = getDeviceInfoResult;
+    }
+
+    private Object __equalsCalc = null;
+    public synchronized boolean equals(Object obj) {
+        if (!(obj instanceof GetDeviceInfoResponse)) return false;
+        GetDeviceInfoResponse other = (GetDeviceInfoResponse) obj;
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (__equalsCalc != null) {
+            return (__equalsCalc == obj);
+        }
+        __equalsCalc = obj;
+        boolean _equals;
+        _equals = true && 
+            ((this.getDeviceInfoResult==null && other.getGetDeviceInfoResult()==null) || 
+             (this.getDeviceInfoResult!=null &&
+              this.getDeviceInfoResult.equals(other.getGetDeviceInfoResult())));
+        __equalsCalc = null;
+        return _equals;
+    }
+
+    private boolean __hashCodeCalc = false;
+    public synchronized int hashCode() {
+        if (__hashCodeCalc) {
+            return 0;
+        }
+        __hashCodeCalc = true;
+        int _hashCode = 1;
+        if (getGetDeviceInfoResult() != null) {
+            _hashCode += getGetDeviceInfoResult().hashCode();
+        }
+        __hashCodeCalc = false;
+        return _hashCode;
+    }
+
+    // Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc =
+        new org.apache.axis.description.TypeDesc(GetDeviceInfoResponse.class, true);
+
+    static {
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://tempuri.org/", ">GetDeviceInfoResponse"));
+        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("getDeviceInfoResult");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "GetDeviceInfoResult"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+        return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+           String mechType,
+           Class _javaType,
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanSerializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           String mechType,
+           Class _javaType,
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+}

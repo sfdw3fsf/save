@@ -1,0 +1,281 @@
+def FAILED_STAGE
+
+pipeline {
+    agent {
+        node {
+            label 'dtc-onebss'
+        }
+    }
+    environment {
+        ENV_VERSION = '1.0.2'
+        WEBHOOK_URL = 'https://api.telegram.org/bot488971840:AAEFGkq4Dv4990OacTpn0pp4zlVhWOnZzpI/sendMessage'
+        WEBHOOK_FILE_URL = 'https://api.telegram.org/bot488971840:AAEFGkq4Dv4990OacTpn0pp4zlVhWOnZzpI/sendDocument'
+        TOKEN         = 'cXV5bmhodi5obmk6MTEyYzNkMDAwMjIzNzgzMGMyZWZhYmMwYjRmYWI0ZGExNg=='
+        USERID= '-577425048'
+        SERVICE_NAME= 'tichhop'
+        INFRA_GIT='git@scm.devops.vnpt.vn:erp.ptpm1.onebss/OneAPI/infra.git'        
+        JOB="ITKV3.onebss.tichhop"
+    }
+
+    stages {
+        stage('test') {
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+                sh "echo ${BRANCH_NAME}"
+                sh 'sleep 1'
+            }
+        }
+        }
+
+        stage('run sonarque test') {
+            when {
+            	branch 'develop'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+                //withSonarQubeEnv(installationName: 'VNPTIT.SHARED.SONARQUBE')
+                //{ 
+                //    sh 'export PATH=$PATH:/opt/sonar-scanner/bin && sonar-scanner -X'
+                //}
+                sh 'sleep 1'
+            }
+        }
+        }
+
+        stage('Quality Gate') {
+            when {
+            	branch 'develop'
+            }
+            steps {
+             script {
+                //timeout(time: 10, unit: 'MINUTES'){
+                //    waitForQualityGate abortedPipeline: true
+                //}
+                sh 'sleep 1'
+                
+            }
+        }
+        }
+
+
+        stage('unit test  ') {
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+                sh 'sleep 1'
+                //junit 'src/test/**/*.xml'
+            }
+        }
+        }
+
+
+        stage('build & push image branch master') {
+            when {
+            	branch 'master'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+                sh 'docker build -t  crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-prod:1.0.${BUILD_NUMBER} .'
+                sh 'docker push  crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-prod:1.0.${BUILD_NUMBER} '
+                
+             }
+        }
+        }
+
+        stage('build & push image branch demo') {
+            when {
+            	branch 'demo'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+
+                sh 'docker build -t crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER} .'
+                sh 'docker push crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER} '
+            
+        }
+            }
+        }
+
+        stage('build & push image branch develop') {
+            when {
+            	branch 'develop'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+                sh 'docker build -t crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER} .'
+                sh 'docker push crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER}'
+    
+        }
+            }
+        }
+
+        stage('Deployment tichhop branch master') {
+            when {
+            	branch 'master'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME  
+                sh "kubectl --kubeconfig ~/.kubeconfig/kubeconfig_onebss_prod-ntl.yaml -n vnpt-onebss-web set image deployment/${SERVICE_NAME} ${SERVICE_NAME}=crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-prod:1.0.${BUILD_NUMBER}" 
+                // sh "sleep 1"         
+            }
+            }
+            }   
+
+        stage('Deployment coretichhop branch demo') {
+            when {
+            	branch 'demo'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME  
+                sh "git clone ${INFRA_GIT}"
+                sh "git config --global user.email 'jenkinsit3@vnpt.vn'"
+                sh "git config --global user.name 'jenkins' "
+                dir("infra") {
+                sh " cd ./${SERVICE_NAME}/overlay/${BRANCH_NAME} && kustomize edit set image crelease.devops.vnpt.vn:10100/onebss/onebss-${SERVICE_NAME}-${BRANCH_NAME}:1.0.${BUILD_NUMBER} "
+                sh "git add . && git commit -m 'publish ${SERVICE_NAME}-${BRANCH_NAME}:1.0.${BUILD_NUMBER}' && git push origin master || echo 'no change'"
+                }      
+            }
+            }
+            } 
+
+        // stage('Deployment  coretichhop branch develop') {
+        //     when {
+        //     	branch 'develop'
+        //     }
+        //     steps {
+        //      script {
+        //         FAILED_STAGE=env.STAGE_NAME  
+        //         sh "git clone ${INFRA_GIT}"
+        //         sh "git config --global user.email 'jenkinsit3@vnpt.vn'"
+        //         sh "git config --global user.name 'jenkins' "
+        //         dir("infra") {
+        //         sh " cd ./${SERVICE_NAME}/overlay/${BRANCH_NAME} && kustomize edit set image crelease.devops.vnpt.vn:10100/onebss/onebss-${SERVICE_NAME}-${BRANCH_NAME}:1.0.${BUILD_NUMBER} "
+        //         sh "git add . && git commit -m 'publish ${SERVICE_NAME}-${BRANCH_NAME}:1.0.${BUILD_NUMBER}' && git push origin master || echo 'no change'"
+        //         }      
+        //     }
+        //     }
+        //     } 
+        stage('Deployment tichhop branch develop') {
+            when {
+            	branch 'develop'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME  
+                sh "kubectl --kubeconfig ~/.kubeconfig/kubeconfig-onebss-dev-ntl.yaml -n onebss-dev set image deployment/${SERVICE_NAME} ${SERVICE_NAME}=crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER}" 
+                  sh 'docker tag crelease.devops.vnpt.vn:10100/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER} artifact-devops.vnpt.vn:10105/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER}'
+ sh 'docker push artifact-devops.vnpt.vn:10105/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER}'
+ sh "kubectl --kubeconfig /kubeconfig/onebss_dev_k8sv2.yaml -n onebss-dev set image deployment/${SERVICE_NAME} ${SERVICE_NAME}=artifact-devops.vnpt.vn:10105/onebss/onebss-tichhop-${BRANCH_NAME}:1.0.${BUILD_NUMBER}"
+                // sh "sleep 1"         
+            }
+            }
+            } 
+
+        stage('Test  with katalon') {
+            when {
+            	branch 'demo'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME
+                sh 'sleep 1'
+                // archiveArtifacts artifacts: 'vnchain_katalon/Reports/**/*.html', allowEmptyArchive: true 
+                // junit 'vnchain_katalon/Reports/**/*.xml'
+                }
+            }
+            }
+
+        stage('run jmeter ') {
+            when {
+            	branch 'demo'
+            }
+            steps {
+             script {
+                FAILED_STAGE=env.STAGE_NAME                
+                sh 'sleep 1'
+            
+        }
+        }
+        }
+
+    }
+
+post {
+        success {
+            sh """
+                curl -X POST \
+                 -H 'Content-Type: application/json' \
+                 -d '{"chat_id": "${USERID}", "text": "✅ SUCCESS \nJob: ${JOB_NAME} \nBuild: ${BUILD_NUMBER} \nCommit: ${GIT_COMMIT}"}' \
+                 ${WEBHOOK_URL}
+            """
+        }
+
+
+failure {
+            script {
+                sh 'sleep 10'
+                try {
+
+                sh '''#!/bin/bash
+                set -euxo pipefail
+
+                curl -v \
+                --noproxy '*' \
+                --location "https://auto.devops.vnpt.vn/job/ERP.IT/job/${JOB}/job/${BRANCH_NAME}/${BUILD_NUMBER}/consoleText" \
+                --header "Authorization: Basic ${TOKEN}" \
+                -o "log-build-${BUILD_NUMBER}.txt"
+                '''
+                } catch (Exception e) {
+                    //echo "=== ERROR khi lấy log upload: ${e.toString()} ==="
+                    env.LINK = "FAILED_TO_UPLOAD"
+                }
+
+                sh """
+                            curl -X POST \
+                    -F 'chat_id=${USERID}' \
+                    -F 'caption=\ud83d\ude21 \ud83d\ude21 \ud83d\ude21 \nStatus:FAILURE \nJobname: ${JOB_NAME} \nBuild number: ${BUILD_NUMBER} \nStage: ${FAILED_STAGE} \nCommit: ${GIT_COMMIT} ' \
+                    -F 'document=@log-build-${BUILD_NUMBER}.txt' \
+                    ${WEBHOOK_FILE_URL}
+                        """
+            }
+        }
+
+
+        aborted {
+        sh """
+    curl -X POST \
+     -H 'Content-Type: application/json' \
+     -d '{"chat_id": "${USERID}", "text": " \u2620\ufe0f \u2620\ufe0f \u2620\ufe0f \nJobname: ${JOB_NAME} \nBuild number: ${BUILD_NUMBER} \nStatus: ABORTED \nStage: ${FAILED_STAGE} \nCommit: ${GIT_COMMIT} ", "disable_notification": true}' \
+     ${WEBHOOK_URL}
+        """
+
+        }
+
+        unstable {
+        sh """
+    curl -X POST \
+     -H 'Content-Type: application/json' \
+     -d '{"chat_id": "${USERID}", "text": " \ud83d\ude4a \ud83d\ude4a \ud83d\ude4a \nJobname: ${JOB_NAME} \nBuild number: ${BUILD_NUMBER} \nStatus: UNSTABLE \nStage: ${FAILED_STAGE} \nCommit: ${GIT_COMMIT} ", "disable_notification": true}' \
+     ${WEBHOOK_URL}
+        """
+        }
+
+
+
+        always {
+            script {
+                node {
+                    deleteDir()
+                }
+            }
+        }
+    }
+}
+

@@ -1,0 +1,878 @@
+/**
+ * ChangePackageAndMegaVNNRequest.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis2 version: 1.7.9  Built on : Nov 16, 2018 (12:06:07 GMT)
+ */
+package org.tempuri;
+
+
+/**
+ *  ChangePackageAndMegaVNNRequest bean class
+ */
+@SuppressWarnings({"unchecked",
+    "unused"
+})
+public class ChangePackageAndMegaVNNRequest implements org.apache.axis2.databinding.ADBBean {
+    /* This type was generated from the piece of schema that had
+       name = ChangePackageAndMegaVNNRequest
+       Namespace URI = http://tempuri.org/
+       Namespace Prefix = ns1
+     */
+
+    /**
+     * field for IPTVAccount
+     */
+    protected java.lang.String localIPTVAccount;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localIPTVAccountTracker = false;
+
+    /**
+     * field for PackageNo
+     */
+    protected java.lang.String localPackageNo;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localPackageNoTracker = false;
+
+    /**
+     * field for ServiceCD
+     */
+    protected java.lang.String localServiceCD;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localServiceCDTracker = false;
+
+    /**
+     * field for ServiceVAS
+     */
+    protected java.lang.String localServiceVAS;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localServiceVASTracker = false;
+
+    /**
+     * field for Reason
+     */
+    protected java.lang.String localReason;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localReasonTracker = false;
+
+    /**
+     * field for MegaMyTV
+     */
+    protected java.lang.String localMegaMyTV;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localMegaMyTVTracker = false;
+
+    /**
+     * field for Combo_FiberCD
+     */
+    protected java.lang.String localCombo_FiberCD;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localCombo_FiberCDTracker = false;
+
+    public boolean isIPTVAccountSpecified() {
+        return localIPTVAccountTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getIPTVAccount() {
+        return localIPTVAccount;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param IPTVAccount
+     */
+    public void setIPTVAccount(java.lang.String param) {
+        localIPTVAccountTracker = param != null;
+
+        this.localIPTVAccount = param;
+    }
+
+    public boolean isPackageNoSpecified() {
+        return localPackageNoTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getPackageNo() {
+        return localPackageNo;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param PackageNo
+     */
+    public void setPackageNo(java.lang.String param) {
+        localPackageNoTracker = param != null;
+
+        this.localPackageNo = param;
+    }
+
+    public boolean isServiceCDSpecified() {
+        return localServiceCDTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getServiceCD() {
+        return localServiceCD;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param ServiceCD
+     */
+    public void setServiceCD(java.lang.String param) {
+        localServiceCDTracker = param != null;
+
+        this.localServiceCD = param;
+    }
+
+    public boolean isServiceVASSpecified() {
+        return localServiceVASTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getServiceVAS() {
+        return localServiceVAS;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param ServiceVAS
+     */
+    public void setServiceVAS(java.lang.String param) {
+        localServiceVASTracker = param != null;
+
+        this.localServiceVAS = param;
+    }
+
+    public boolean isReasonSpecified() {
+        return localReasonTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getReason() {
+        return localReason;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param Reason
+     */
+    public void setReason(java.lang.String param) {
+        localReasonTracker = param != null;
+
+        this.localReason = param;
+    }
+
+    public boolean isMegaMyTVSpecified() {
+        return localMegaMyTVTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getMegaMyTV() {
+        return localMegaMyTV;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param MegaMyTV
+     */
+    public void setMegaMyTV(java.lang.String param) {
+        localMegaMyTVTracker = param != null;
+
+        this.localMegaMyTV = param;
+    }
+
+    public boolean isCombo_FiberCDSpecified() {
+        return localCombo_FiberCDTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getCombo_FiberCD() {
+        return localCombo_FiberCD;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param Combo_FiberCD
+     */
+    public void setCombo_FiberCD(java.lang.String param) {
+        localCombo_FiberCDTracker = param != null;
+
+        this.localCombo_FiberCD = param;
+    }
+
+    /**
+     *
+     * @param parentQName
+     * @param factory
+     * @return org.apache.axiom.om.OMElement
+     */
+    public org.apache.axiom.om.OMElement getOMElement(
+        final javax.xml.namespace.QName parentQName,
+        final org.apache.axiom.om.OMFactory factory)
+        throws org.apache.axis2.databinding.ADBException {
+        return factory.createOMElement(new org.apache.axis2.databinding.ADBDataSource(
+                this, parentQName));
+    }
+
+    public void serialize(final javax.xml.namespace.QName parentQName,
+        javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException,
+            org.apache.axis2.databinding.ADBException {
+        serialize(parentQName, xmlWriter, false);
+    }
+
+    public void serialize(final javax.xml.namespace.QName parentQName,
+        javax.xml.stream.XMLStreamWriter xmlWriter, boolean serializeType)
+        throws javax.xml.stream.XMLStreamException,
+            org.apache.axis2.databinding.ADBException {
+        java.lang.String prefix = null;
+        java.lang.String namespace = null;
+
+        prefix = parentQName.getPrefix();
+        namespace = parentQName.getNamespaceURI();
+        writeStartElement(prefix, namespace, parentQName.getLocalPart(),
+            xmlWriter);
+
+        if (serializeType) {
+            java.lang.String namespacePrefix = registerPrefix(xmlWriter,
+                    "http://tempuri.org/");
+
+            if ((namespacePrefix != null) &&
+                    (namespacePrefix.trim().length() > 0)) {
+                writeAttribute("xsi",
+                    "http://www.w3.org/2001/XMLSchema-instance", "type",
+                    namespacePrefix + ":ChangePackageAndMegaVNNRequest",
+                    xmlWriter);
+            } else {
+                writeAttribute("xsi",
+                    "http://www.w3.org/2001/XMLSchema-instance", "type",
+                    "ChangePackageAndMegaVNNRequest", xmlWriter);
+            }
+        }
+
+        if (localIPTVAccountTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "IPTVAccount", xmlWriter);
+
+            if (localIPTVAccount == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "IPTVAccount cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localIPTVAccount);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localPackageNoTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "PackageNo", xmlWriter);
+
+            if (localPackageNo == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "PackageNo cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localPackageNo);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localServiceCDTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "ServiceCD", xmlWriter);
+
+            if (localServiceCD == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "ServiceCD cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localServiceCD);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localServiceVASTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "ServiceVAS", xmlWriter);
+
+            if (localServiceVAS == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "ServiceVAS cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localServiceVAS);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localReasonTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "Reason", xmlWriter);
+
+            if (localReason == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "Reason cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localReason);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localMegaMyTVTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "MegaMyTV", xmlWriter);
+
+            if (localMegaMyTV == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "MegaMyTV cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localMegaMyTV);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localCombo_FiberCDTracker) {
+            namespace = "http://tempuri.org/";
+            writeStartElement(null, namespace, "Combo_FiberCD", xmlWriter);
+
+            if (localCombo_FiberCD == null) {
+                // write the nil attribute
+                throw new org.apache.axis2.databinding.ADBException(
+                    "Combo_FiberCD cannot be null!!");
+            } else {
+                xmlWriter.writeCharacters(localCombo_FiberCD);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        xmlWriter.writeEndElement();
+    }
+
+    private static java.lang.String generatePrefix(java.lang.String namespace) {
+        if (namespace.equals("http://tempuri.org/")) {
+            return "ns1";
+        }
+
+        return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+    }
+
+    /**
+     * Utility method to write an element start tag.
+     */
+    private void writeStartElement(java.lang.String prefix,
+        java.lang.String namespace, java.lang.String localPart,
+        javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException {
+        java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+
+        if (writerPrefix != null) {
+            xmlWriter.writeStartElement(writerPrefix, localPart, namespace);
+        } else {
+            if (namespace.length() == 0) {
+                prefix = "";
+            } else if (prefix == null) {
+                prefix = generatePrefix(namespace);
+            }
+
+            xmlWriter.writeStartElement(prefix, localPart, namespace);
+            xmlWriter.writeNamespace(prefix, namespace);
+            xmlWriter.setPrefix(prefix, namespace);
+        }
+    }
+
+    /**
+     * Util method to write an attribute with the ns prefix
+     */
+    private void writeAttribute(java.lang.String prefix,
+        java.lang.String namespace, java.lang.String attName,
+        java.lang.String attValue, javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException {
+        java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+
+        if (writerPrefix != null) {
+            xmlWriter.writeAttribute(writerPrefix, namespace, attName, attValue);
+        } else {
+            xmlWriter.writeNamespace(prefix, namespace);
+            xmlWriter.setPrefix(prefix, namespace);
+            xmlWriter.writeAttribute(prefix, namespace, attName, attValue);
+        }
+    }
+
+    /**
+     * Util method to write an attribute without the ns prefix
+     */
+    private void writeAttribute(java.lang.String namespace,
+        java.lang.String attName, java.lang.String attValue,
+        javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException {
+        if (namespace.equals("")) {
+            xmlWriter.writeAttribute(attName, attValue);
+        } else {
+            xmlWriter.writeAttribute(registerPrefix(xmlWriter, namespace),
+                namespace, attName, attValue);
+        }
+    }
+
+    /**
+     * Util method to write an attribute without the ns prefix
+     */
+    private void writeQNameAttribute(java.lang.String namespace,
+        java.lang.String attName, javax.xml.namespace.QName qname,
+        javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException {
+        java.lang.String attributeNamespace = qname.getNamespaceURI();
+        java.lang.String attributePrefix = xmlWriter.getPrefix(attributeNamespace);
+
+        if (attributePrefix == null) {
+            attributePrefix = registerPrefix(xmlWriter, attributeNamespace);
+        }
+
+        java.lang.String attributeValue;
+
+        if (attributePrefix.trim().length() > 0) {
+            attributeValue = attributePrefix + ":" + qname.getLocalPart();
+        } else {
+            attributeValue = qname.getLocalPart();
+        }
+
+        if (namespace.equals("")) {
+            xmlWriter.writeAttribute(attName, attributeValue);
+        } else {
+            registerPrefix(xmlWriter, namespace);
+            xmlWriter.writeAttribute(attributePrefix, namespace, attName,
+                attributeValue);
+        }
+    }
+
+    /**
+     *  method to handle Qnames
+     */
+    private void writeQName(javax.xml.namespace.QName qname,
+        javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException {
+        java.lang.String namespaceURI = qname.getNamespaceURI();
+
+        if (namespaceURI != null) {
+            java.lang.String prefix = xmlWriter.getPrefix(namespaceURI);
+
+            if (prefix == null) {
+                prefix = generatePrefix(namespaceURI);
+                xmlWriter.writeNamespace(prefix, namespaceURI);
+                xmlWriter.setPrefix(prefix, namespaceURI);
+            }
+
+            if (prefix.trim().length() > 0) {
+                xmlWriter.writeCharacters(prefix + ":" +
+                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                        qname));
+            } else {
+                // i.e this is the default namespace
+                xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                        qname));
+            }
+        } else {
+            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                    qname));
+        }
+    }
+
+    private void writeQNames(javax.xml.namespace.QName[] qnames,
+        javax.xml.stream.XMLStreamWriter xmlWriter)
+        throws javax.xml.stream.XMLStreamException {
+        if (qnames != null) {
+            // we have to store this data until last moment since it is not possible to write any
+            // namespace data after writing the charactor data
+            java.lang.StringBuffer stringToWrite = new java.lang.StringBuffer();
+            java.lang.String namespaceURI = null;
+            java.lang.String prefix = null;
+
+            for (int i = 0; i < qnames.length; i++) {
+                if (i > 0) {
+                    stringToWrite.append(" ");
+                }
+
+                namespaceURI = qnames[i].getNamespaceURI();
+
+                if (namespaceURI != null) {
+                    prefix = xmlWriter.getPrefix(namespaceURI);
+
+                    if ((prefix == null) || (prefix.length() == 0)) {
+                        prefix = generatePrefix(namespaceURI);
+                        xmlWriter.writeNamespace(prefix, namespaceURI);
+                        xmlWriter.setPrefix(prefix, namespaceURI);
+                    }
+
+                    if (prefix.trim().length() > 0) {
+                        stringToWrite.append(prefix).append(":")
+                                     .append(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                                qnames[i]));
+                    } else {
+                        stringToWrite.append(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                                qnames[i]));
+                    }
+                } else {
+                    stringToWrite.append(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            qnames[i]));
+                }
+            }
+
+            xmlWriter.writeCharacters(stringToWrite.toString());
+        }
+    }
+
+    /**
+     * Register a namespace prefix
+     */
+    private java.lang.String registerPrefix(
+        javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace)
+        throws javax.xml.stream.XMLStreamException {
+        java.lang.String prefix = xmlWriter.getPrefix(namespace);
+
+        if (prefix == null) {
+            prefix = generatePrefix(namespace);
+
+            javax.xml.namespace.NamespaceContext nsContext = xmlWriter.getNamespaceContext();
+
+            while (true) {
+                java.lang.String uri = nsContext.getNamespaceURI(prefix);
+
+                if ((uri == null) || (uri.length() == 0)) {
+                    break;
+                }
+
+                prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+            }
+
+            xmlWriter.writeNamespace(prefix, namespace);
+            xmlWriter.setPrefix(prefix, namespace);
+        }
+
+        return prefix;
+    }
+
+    /**
+     *  Factory class that keeps the parse method
+     */
+    public static class Factory {
+        private static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(Factory.class);
+
+        /**
+         * static method to create the object
+         * Precondition:  If this object is an element, the current or next start element starts this object and any intervening reader events are ignorable
+         *                If this object is not an element, it is a complex type and the reader is at the event just after the outer start element
+         * Postcondition: If this object is an element, the reader is positioned at its end element
+         *                If this object is a complex type, the reader is positioned at the end element of its outer element
+         */
+        public static ChangePackageAndMegaVNNRequest parse(
+            javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception {
+            ChangePackageAndMegaVNNRequest object = new ChangePackageAndMegaVNNRequest();
+
+            int event;
+            javax.xml.namespace.QName currentQName = null;
+            java.lang.String nillableValue = null;
+            java.lang.String prefix = "";
+            java.lang.String namespaceuri = "";
+
+            try {
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                currentQName = reader.getName();
+
+                if (reader.getAttributeValue(
+                            "http://www.w3.org/2001/XMLSchema-instance", "type") != null) {
+                    java.lang.String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "type");
+
+                    if (fullTypeName != null) {
+                        java.lang.String nsPrefix = null;
+
+                        if (fullTypeName.indexOf(":") > -1) {
+                            nsPrefix = fullTypeName.substring(0,
+                                    fullTypeName.indexOf(":"));
+                        }
+
+                        nsPrefix = (nsPrefix == null) ? "" : nsPrefix;
+
+                        java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(
+                                    ":") + 1);
+
+                        if (!"ChangePackageAndMegaVNNRequest".equals(type)) {
+                            //find namespace for the prefix
+                            java.lang.String nsUri = reader.getNamespaceContext()
+                                                           .getNamespaceURI(nsPrefix);
+
+                            return (ChangePackageAndMegaVNNRequest) org.tempuri.ExtensionMapper.getTypeObject(nsUri,
+                                type, reader);
+                        }
+                    }
+                }
+
+                // Note all attributes that were handled. Used to differ normal attributes
+                // from anyAttributes.
+                java.util.Vector handledAttributes = new java.util.Vector();
+
+                reader.next();
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "IPTVAccount").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "IPTVAccount" +
+                            "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setIPTVAccount(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "PackageNo").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "PackageNo" + "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setPackageNo(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "ServiceCD").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "ServiceCD" + "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setServiceCD(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "ServiceVAS").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "ServiceVAS" +
+                            "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setServiceVAS(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "Reason").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "Reason" + "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setReason(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "MegaMyTV").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "MegaMyTV" + "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setMegaMyTV(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "Combo_FiberCD").equals(reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "Combo_FiberCD" +
+                            "  cannot be null");
+                    }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setCombo_FiberCD(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement()) {
+                    // 2 - A start element we are not expecting indicates a trailing invalid property
+                    throw new org.apache.axis2.databinding.ADBException(
+                        "Unexpected subelement " + reader.getName());
+                }
+            } catch (javax.xml.stream.XMLStreamException e) {
+                throw new java.lang.Exception(e);
+            }
+
+            return object;
+        }
+    } //end of factory class
+}

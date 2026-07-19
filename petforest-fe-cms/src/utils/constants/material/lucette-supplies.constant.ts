@@ -1,0 +1,1 @@
+export const LUCETTE_SUPPLIES_DEFAULT_ITEM = ['121', '238', '162', '250'];

@@ -1,0 +1,12 @@
+const SocialKakaoIcon = ({ className }: { className?: string }): JSX.Element => (
+  <svg className={className} width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <path
+      fillRule='evenodd'
+      clipRule='evenodd'
+      d='M10 3C5.5815 3 2 5.76708 2 9.17983C2 11.3023 3.38525 13.1733 5.4947 14.2862L4.60715 17.5285C4.52873 17.815 4.85638 18.0433 5.10798 17.8773L8.99856 15.3096C9.32688 15.3412 9.66054 15.3597 10 15.3597C14.4182 15.3597 18 12.5928 18 9.17983C18 5.76708 14.4182 3 10 3Z'
+      fill='black'
+    />
+  </svg>
+);
+
+export default SocialKakaoIcon;

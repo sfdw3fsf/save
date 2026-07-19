@@ -1,0 +1,4 @@
+export enum AUTH_SOCIAL_PROVIDER {
+  KAKAO = 'KAKAO',
+  GOOGLE = 'GOOGLE',
+}

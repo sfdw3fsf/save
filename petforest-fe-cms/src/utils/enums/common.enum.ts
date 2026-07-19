@@ -1,0 +1,16 @@
+export enum ACTIVE_STATE {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
+export enum PAYMENT_METHOD {
+  CARD = 'CARD',
+  CASH = 'CASH',
+  ACCOUNT = 'ACCOUNT_AMOUNT',
+  PRE_PAY = 'PRE_PAY',
+}
+
+export enum COUPON_STATUS {
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
+}

@@ -1,0 +1,68 @@
+package vn.vnpt.vnptit.ecms.dto.hatang;
+
+public class PhieuYCK8sDto {
+    private Long id;
+    private Integer soThuTu;
+    private String tenHaTang;
+    private Integer donViVhId;
+    private Integer nguoiQtriId;
+    private Integer ipAddressId;
+    private Integer trangThaiThuHoi;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public Integer getSoThuTu() {
+        return soThuTu;
+    }
+
+    public void setSoThuTu(Integer soThuTu) {
+        this.soThuTu = soThuTu;
+    }
+
+    public String getTenHaTang() {
+        return tenHaTang;
+    }
+
+    public void setTenHaTang(String tenHaTang) {
+        this.tenHaTang = tenHaTang;
+    }
+
+    public Integer getDonViVhId() {
+        return donViVhId;
+    }
+
+    public void setDonViVhId(Integer donViVhId) {
+        this.donViVhId = donViVhId;
+    }
+
+    public Integer getNguoiQtriId() {
+        return nguoiQtriId;
+    }
+
+    public void setNguoiQtriId(Integer nguoiQtriId) {
+        this.nguoiQtriId = nguoiQtriId;
+    }
+
+    public Integer getIpAddressId() {
+        return ipAddressId;
+    }
+
+    public void setIpAddressId(Integer ipAddressId) {
+        this.ipAddressId = ipAddressId;
+    }
+
+    public Integer getTrangThaiThuHoi() {
+        return trangThaiThuHoi;
+    }
+
+    public void setTrangThaiThuHoi(Integer trangThaiThuHoi) {
+        this.trangThaiThuHoi = trangThaiThuHoi;
+    }
+}

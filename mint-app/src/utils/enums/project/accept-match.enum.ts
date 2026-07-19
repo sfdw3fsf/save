@@ -1,0 +1,5 @@
+export enum ACCEPT_MATCH_ENUM {
+  ACCEPT = 'ACCEPT',
+  REJECT = 'REJECT',
+  ERROR = 'ERROR',
+}
