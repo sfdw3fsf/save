@@ -1,0 +1,3 @@
+import ConvertFixedToCrossSellingIMS from './ConvertFixedToCrossSellingIMS'
+
+export default ConvertFixedToCrossSellingIMS

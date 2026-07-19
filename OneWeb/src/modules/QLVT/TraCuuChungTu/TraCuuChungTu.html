@@ -1,0 +1,667 @@
+<div>
+  <!-- <breadcrumb :header="header" /> -->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript:;" @click="TimKiem()">
+          <span class="icon one-search"></span>Tìm kiếm
+        </a>
+      </li>
+      <li @click="tsbtnDongY_Click()">
+        <a>
+          <span class="icon one-reload"></span>Chấp nhận
+        </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="lamMoiButton()">
+          <span class="icon one-reload"></span>Làm mới
+        </a>
+      </li>
+      <li @click="btnHoanThanh_Click()" :class="{ disabled:!enabledHoanThanh }">
+        <a>
+          <span class="icon one-file-check"></span>Hoàn thành
+        </a>
+      </li>
+      <li>
+        <a @click="exportExcelDSCT()">
+          <span class="icon one-excel"></span>Xuất Excel
+        </a>
+      </li>
+      <!-- <li>
+        <a>
+          <span class="icon one-circle-question"></span>Trợ giúp
+        </a>
+      </li> -->
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form ">
+      <div class="legend-title" style="font-weight: 600 !important">
+        <!-- <button type="button" data-toggle="collapse" data-target="#thongTinTCCT" aria-expanded="false"
+          aria-controls="thongTinTCCT" class="btn btn-info"><span class="icon fa fa-angle-up"></span></button> Thông tin
+        tra cứu chứng từ -->
+        <span :class="status_TTTCCT ? 'icon fa fa-angle-down' : 'icon fa fa-angle-up'"
+          @click="status_TTTCCT = !status_TTTCCT"></span> Thông tin
+        tra cứu chứng từ
+      </div>
+      <div class="row" v-if="status_TTTCCT">
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w120">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_soPhieu">
+                <span class="name">Số phiếu</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" :disabled="!chk_soPhieu" v-model="soPhieuText">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_LoaiCT">
+                <span class="name">Loại chứng từ</span>
+              </div>
+            </div>
+            <div class="value">
+              <div class="select-custom">
+                <b-form-select v-model="loaiCTSelected" :disabled="!chk_LoaiCT" class="form-control"
+                  :options="listLoaiCT" @change="changeLoaiCT">
+                </b-form-select>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_MucDich">
+                <span class="name">Mục đích</span>
+              </div>
+            </div>
+            <div class="value">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input ref="nvtc" readonly v-model="mucDichText" id="root" :disabled="!chk_MucDich"
+                        class="form-control bg-none" @click="onChangeCustomDropDown('#nvtc-pd')">
+                      </input>
+                    </div>
+                  </div>
+                </div>
+                <div class="vattu_tabled" id="nvtc-pd" v-show="false">
+                  <DataGrid2 v-bind:columns="[
+                          {fieldName: 'maMd', headerText: '', allowFiltering: true, allowSorting: false},
+                          {fieldName: 'mucDich', headerText: '', allowFiltering: true, allowSorting: false}]"
+                    v-bind:dataSource="mucDichLst" :showFilter="true" :showColumnCheckbox="false"
+                    dataKeyField="mucDichId" :defaultColumnCheckboxChecked="false" :selectedRow="0"
+                    @selectedRowChanged="onSelectMucDich" ref="tableNvt" :enablePagingServer="false" :allowPaging="true"
+                    :enabledSelectFirstRow="false">
+                  </DataGrid2>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="value">
+              <div class="select-custom">
+                <b-form-select v-model="mucDichSelected" :disabled="!chk_MucDich" class="form-control"
+                  :options="listMucDich">
+                </b-form-select>
+              </div>
+            </div> -->
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_TrangThaiCT">
+                <span class="name">Trạng thái CT</span>
+              </div>
+            </div>
+            <div class="value">
+              <div class="select-custom">
+                <b-form-select v-model="trangThaiCTSelected" :disabled="!chk_TrangThaiCT" class="form-control"
+                  :options="listTrangThaiCT">
+                </b-form-select>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_ngayYC">
+                <span class="name">Ngày YC từ</span>
+              </div>
+            </div>
+            <div class="value" v-if="chk_ngayYC">
+              <ejs-datepicker v-model="ngayYCtu" enabled="true" :format="'dd/MM/yyyy'" :allowEdit=false
+                :showClearButton=false>enabled="true"
+              </ejs-datepicker>
+            </div>
+            <div class="value" v-else>
+              <ejs-datepicker v-model="ngayYCtu" :disabled="!chk_ngayYC" :format="'dd/MM/yyyy'" :allowEdit=false
+                :showClearButton=false>
+              </ejs-datepicker>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_ChuaCoDauVao">
+                <span class="name">Chứng từ chưa có đầu vào</span>
+              </div>
+            </div>
+            <div class="key w120" style="text-align: right;">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_LSXCT">
+                <span class="name">LSXCT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_soCV">
+                <span class="name">Số CV</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="soCVText" :disabled="!chk_soCV">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_soHD">
+                <span class="name">Số HĐ</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="soHDText" :disabled="!chk_soHD">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_MaDA">
+                <span class="name">Mã DA</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="maDAText" :disabled="!chk_MaDA">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_DonviDK">
+                <span class="name">Đơn vị ĐK</span>
+              </div>
+            </div>
+            <div class="value">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input ref="nvtc" readonly v-model="dvdkText" id="root-2" :disabled="!chk_DonviDK"
+                        class="form-control bg-none" @click="onChangeCustomDropDown('#dvdk-pd')">
+                      </input>
+                    </div>
+                  </div>
+                </div>
+                <div class="vattu_tabled" id="dvdk-pd" v-show="false">
+                  <DataGrid
+                    v-bind:columns="[
+                          {fieldName: 'maDonVi', headerText: 'Mã đơn vị', allowFiltering: true, allowSorting: false, width:'50'},
+                          {fieldName: 'tenDonVi', headerText: 'Tên đơn vị', allowFiltering: true, allowSorting: false}]"
+                    v-bind:dataSource="dvDkLst" :showFilter="true" :showColumnCheckbox="false" dataKeyField="donViId"
+                    :defaultColumnCheckboxChecked="false" :selectedRow="0" @selectedRowChanged="onSelectDVDK"
+                    ref="tableNvt" :enablePagingServer="false" :allowPaging="true">
+                  </DataGrid>
+                  <!-- <div class="p-2">
+                    <button type="button" @click="onChangeCustomDropDown('#dvdk-pd')" class="btn btn-secondary btn-sm"
+                      aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+            <!-- <div class="value">
+              <div class="select-custom">
+                <b-form-select v-model="donViDKselected" :disabled="!chk_DonviDK" class="form-control"
+                  :options="listDonViDK">
+                </b-form-select>
+              </div>
+            </div> -->
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_VatTuDK">
+                <span class="name">Vật tư ĐK</span>
+              </div>
+            </div>
+            <div class="value" v-click-outside="hideVatTuDK">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input ref="vatTuDKId" :disabled="!chk_VatTuDK" v-model="vatTuDKSelected"
+                        :options="showlistVatTuDK" class="form-control" @click="showVatTuDK = !showVatTuDK">
+                      </input>
+                    </div>
+                  </div>
+                  <div class="li input-addon last">
+                    <button class="btn" :disabled="!chk_VatTuDK" @click="checkBlackedOutVatTuDKId()">
+                      <span class="one-reload"></span>
+                    </button>
+                  </div>
+                </div>
+                <!-- <div class="input-group" v-else>
+                  <div class="li input-text disabledInput">
+                    <div class="select-custom">
+                      <input v-model="vatTuDKSelected" :options="showlistVatTuDK" class="form-control">
+                      </input>
+                    </div>
+                  </div>
+                  <div class="li input-addon last disabledInput">
+                    <button class="btn">
+                      <span class="one-reload"></span>
+                    </button>
+                  </div>
+                </div> -->
+                <div class="vattu_tabled">
+                  <DataGrid2 v-if="showVatTuDK" v-bind:columns="[
+                  {fieldName: 'text', headerText: 'Tên vật tư', allowFiltering: true, allowSorting: false, width: '30px'},
+                  ]" v-bind:dataSource="listVatTuDK" :showFilter="true"
+                    @selectedRowChanged="gridVatTuDK_selectedRowChanged" :showColumnCheckbox="true"
+                    @selectedItemsChanged="gridVatTuDK_selectedData_checkbox" dataKeyField="value"
+                    :defaultColumnCheckboxChecked="false">
+                  </DataGrid2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_SPXK">
+                <span class="name">SPXK</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" :disabled="!chk_SPXK" v-model="SPXKText">
+            </div>
+          </div>
+          <div class="info-row" v-if="chk_LoaiCT">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_KieuPhieu">
+                <span class="name">Kiểu phiếu</span>
+              </div>
+            </div>
+            <div class="value">
+              <div class="select-custom">
+                <b-form-select name="" id="" :disabled="!chk_KieuPhieu" class="form-control" v-model="kieuPhieuSelected"
+                  :options="listKieuPhieu">
+                </b-form-select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_TuDonVi">
+                <span class="name">Từ đơn vị</span>
+              </div>
+            </div>
+            <div class="value" v-click-outside="hideTuDonVi">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input v-model="tuDonViSelected" :disabled="!chk_TuDonVi" :options="showTuDonVi"
+                        class="form-control" @click="showTuDonVi = !showTuDonVi">
+                      </input>
+                    </div>
+                  </div>
+                </div>
+                <div class="vattu_tabled" v-show="showTuDonVi">
+                  <DataGrid2 v-bind:columns="[
+                  {fieldName: 'maDonVi', headerText: 'Mã đơn vị', allowFiltering: true, allowSorting: false, width: '60px'},
+                  {fieldName: 'tenDonVi', headerText: 'Tên đơn vị', allowFiltering: true, allowSorting: false, width: '60px'}
+                  ]" v-bind:dataSource="listDonVi" :showFilter="true"
+                    @selectedRowChanged="gridTuDonVi_selectedRowChanged" :showColumnCheckbox="false"
+                    @selectedItemsChanged="gridTuDonVi_selectedData_checkbox" dataKeyField="donViId"
+                    :defaultColumnCheckboxChecked="false">
+                  </DataGrid2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_TuKho">
+                <span class="name">Từ kho</span>
+              </div>
+            </div>
+            <div class="value" v-click-outside="hideTuKho">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input ref="tuKho" v-model="khoDonViSelected" :disabled="!chk_TuKho" class="form-control"
+                        @click="showTuKho = !showTuKho">
+                      </input>
+                    </div>
+                  </div>
+                  <div class="li input-addon last">
+                    <button class="btn" :disabled="!chk_TuKho" @click="checkBlackedOutTuKhoId">
+                      <span class="one-reload"></span>
+                    </button>
+                  </div>
+                </div>
+                <div class="vattu_tabled" v-show="showTuKho">
+                  <DataGrid2 v-bind:columns="[
+                  {fieldName: 'maKho', headerText: 'Mã kho', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'tenKho', headerText: 'Tên kho', allowFiltering: true, allowSorting: false}
+                  ]" v-bind:dataSource="listKhoDonVi" :showFilter="true"
+                    @selectedRowChanged="gridTuKho_selectedRowChanged" :showColumnCheckbox="true"
+                    @selectedItemsChanged="gridTuKho_selectedData_checkbox" dataKeyField="khoID" ref="tuKhoTbl">
+                  </DataGrid2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_DenDonVi">
+                <span class="name">Đến đơn vị</span>
+              </div>
+            </div>
+            <div class="value" v-click-outside="hideDenDonVi">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input v-model="denDonViSelected" :disabled="!chk_DenDonVi" class="form-control"
+                        @click="showDenDonVi = !showDenDonVi">
+                      </input>
+                    </div>
+                  </div>
+                </div>
+                <div class="vattu_tabled">
+                  <DataGrid2 v-show="showDenDonVi" v-bind:columns="[
+                  {fieldName: 'maDonVi', headerText: 'Mã đơn vị', allowFiltering: true, allowSorting: false, width: '60px'},
+                  {fieldName: 'tenDonVi', headerText: 'Tên đơn vị', allowFiltering: true, allowSorting: false, width: '60px'}
+                  ]" v-bind:dataSource="listDonVi" :showFilter="true"
+                    @selectedRowChanged="gridDenDonVi_selectedRowChanged" :showColumnCheckbox="false"
+                    @selectedItemsChanged="gridDenDonVi_selectedData_checkbox" dataKeyField="donViId"
+                    :defaultColumnCheckboxChecked="false">
+                  </DataGrid2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_DenKho">
+                <span class="name">Đến kho</span>
+              </div>
+            </div>
+            <div class="value" v-click-outside="hideDenKho ">
+              <div class="vattu_box">
+                <div class="input-group">
+                  <div class="li input-text">
+                    <div class="select-custom">
+                      <input v-model="denKhoSelected" :disabled="!chk_DenKho" class="form-control"
+                        @click="showDenKho = !showDenKho">
+                      </input>
+                    </div>
+                  </div>
+                </div>
+                <div class="vattu_tabled">
+                  <DataGrid2 v-show="showDenKho" v-bind:columns="[
+                  {fieldName: 'maKho', headerText: 'Mã kho', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'tenKho', headerText: 'Tên kho', allowFiltering: true, allowSorting: false}
+                  ]" v-bind:dataSource="listDenKho" :showFilter="true"
+                    @selectedRowChanged="gridDenKho_selectedRowChanged" :showColumnCheckbox="false" dataKeyField="khoID"
+                    :defaultColumnCheckboxChecked="false">
+                  </DataGrid2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="chk_denNgay">
+                <span class="name">Đến ngày</span>
+              </div>
+            </div>
+            <div class="value" v-if="chk_denNgay">
+              <ejs-datepicker v-model="denNgay" enabled="true" :format="'dd/MM/yyyy'" :allowEdit=false
+                :showClearButton=false>
+              </ejs-datepicker>
+            </div>
+            <div class="value" v-else>
+              <ejs-datepicker v-model="denNgay" :disabled="!chk_denNgay" :format="'dd/MM/yyyy'" :allowEdit=false
+                :showClearButton=false>
+              </ejs-datepicker>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="chk_CuonCap">
+                    <span class="name">Cuộn cáp</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <input type="text" :disabled="!chk_CuonCap" class="form-control" v-model="cuonCapText">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="chk_LoHang">
+                    <span class="name">Lô hàng</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <input type="text" :disabled="!chk_LoHang" class="form-control" v-model="loHangText">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="chk_lenhVB">
+                    <span class="name">Lệnh VB</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <input type="text" :disabled="!chk_lenhVB" class="form-control" v-model="lenhVBText">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="chk_idg">
+                    <span class="name">IDG</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <input type="text" :disabled="!chk_idg" class="form-control" v-model="idgText">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title" style="font-weight: 600 !important">
+        <div>Danh sách chứng từ <a href="#" @click.prevent="exportExcelDSCT"
+            class="link one-excel-outline text-main f16 marl5"></a></div>
+      </div>
+      <div class="table-content" v-if="chk_LSXCT">
+        <DataGrid v-bind:columns="[
+            {fieldName: 'CHUNGTU_ID', headerText: 'ID', allowFiltering: true, allowSorting: true, freeze: 'left', width:'100px'},
+            {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true},
+            {fieldName: 'KIEUPHIEU', headerText: 'Kiểu phiếu', allowFiltering: true},
+            {fieldName: 'LOAI_CT', headerText: 'Loại chứng tư', allowFiltering: true},
+            {fieldName: 'NGAY_CT', headerText: 'Ngày yêu cầu', allowFiltering: true},
+            {fieldName: 'TEN_DV_GIAO', headerText: 'Từ đơn vị', allowFiltering: true},
+            {fieldName: 'TEN_KHO_GIAO', headerText: 'Từ kho', allowFiltering: true},
+            {fieldName: 'TEN_DV_NHAN', headerText: 'Đến đơn vị', allowFiltering: true},
+            {fieldName: 'TEN_KHO_NHAN', headerText: 'Đến kho', allowFiltering: true},
+            {fieldName: 'TEN_MUCDICH', headerText: 'Mục đích', allowFiltering: true},
+            {fieldName: 'ND_GIAO', headerText: 'Nội dung', allowFiltering: true},
+            {fieldName: 'NGAYGUI_TT', headerText: 'Ngày xuất', allowFiltering: true},
+            {fieldName: 'NGAYNHAN_TT', headerText: 'Ngày nhận', allowFiltering: true},
+            {fieldName: 'NGAY_HT', headerText: 'Ngày HT', allowFiltering: true},
+            {fieldName: 'MA_PDA', headerText: 'MA_PDA', allowFiltering: true},
+            {fieldName: 'MA_HD_PSIS', headerText: 'Mã HĐ PSIS', allowFiltering: true},
+            {fieldName: 'MA_DH_PSIS', headerText: 'Mã DH PSIS', allowFiltering: true},
+            {fieldName: 'MA_GH_PSIS', headerText: 'Mã GH PSIS', allowFiltering: true},
+            {fieldName: 'SOLAN_IN', headerText: 'Đã in', allowFiltering: true, width:'120px'},
+            {fieldName: 'NGAY_CN', headerText: 'Ngày xóa', allowFiltering: true, width:'120px', freeze: 'right'},
+            {fieldName: 'NGUOI_CN', headerText: 'Người xóa', allowFiltering: true, width:'120px', freeze: 'right'},
+            {fieldName: 'TT_IMS', headerText: 'TT_IMS', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: 'TT_FMIS', headerText: 'TT_FMIS', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: 'NGUOI_HT', headerText: 'Người HT', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: 'NGUOI_CN', headerText: 'Người lập', allowFiltering: true, freeze: 'right', width:'120px'},
+        ]" v-bind:dataSource="listTraCuuChungTu" :showFilter="true"
+          @selectedRowChanged="gridTraCuuChungTu_selectedRowChanged" :showColumnCheckbox="false"
+           dataKeyField="CHUNGTU_ID" :defaultColumnCheckboxChecked="false"
+          :enablePagingServer="false" :allowPaging="true">
+        </DataGrid>
+      </div>
+      <div class="table-content" v-else>
+        <DataGrid v-bind:columns="[
+            {fieldName: 'CHUNGTU_ID', headerText: 'ID', allowFiltering: true, allowSorting: true, freeze: 'left', width:'100px'},
+            {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true},
+            {fieldName: 'KIEUPHIEU', headerText: 'Kiểu phiếu', allowFiltering: true},
+            {fieldName: 'LOAI_CT', headerText: 'Loại chứng tư', allowFiltering: true},
+            {fieldName: 'NGAY_CT', headerText: 'Ngày yêu cầu', allowFiltering: true},
+            {fieldName: 'TEN_DV_GIAO', headerText: 'Từ đơn vị', allowFiltering: true},
+            {fieldName: 'TEN_KHO_GIAO', headerText: 'Từ kho', allowFiltering: true},
+            {fieldName: 'TEN_DV_NHAN', headerText: 'Đến đơn vị', allowFiltering: true},
+            {fieldName: 'TEN_KHO_NHAN', headerText: 'Đến kho', allowFiltering: true},
+            {fieldName: 'SOPHIEU_IN', headerText: 'Phiếu xuất kho', allowFiltering: true},
+            {fieldName: 'TEN_MUCDICH', headerText: 'Mục đích', allowFiltering: true},
+            {fieldName: 'ND_GIAO', headerText: 'Nội dung', allowFiltering: true},
+            {fieldName: 'ND_DANGKY', headerText: 'ND đăng ký', allowFiltering: true},
+            {fieldName: 'NGAYGUI_TT', headerText: 'Ngày xuất', allowFiltering: true},
+            {fieldName: 'NGAYNHAN_TT', headerText: 'Ngày nhận', allowFiltering: true},
+            {fieldName: 'NGAY_HT', headerText: 'Ngày HT', allowFiltering: true},
+            {fieldName: 'MA_PDA', headerText: 'MA_PDA', allowFiltering: true},
+            {fieldName: 'MA_HD_PSIS', headerText: 'Mã HĐ PSIS', allowFiltering: true},
+            {fieldName: 'MA_DH_PSIS', headerText: 'Mã DH PSIS', allowFiltering: true},
+            {fieldName: 'MA_GH_PSIS', headerText: 'Mã GH PSIS', allowFiltering: true},
+            {fieldName: 'SOLAN_IN', headerText: 'Đã in', allowFiltering: true, width:'120px'},
+            {fieldName: 'TT_IMS', headerText: 'TT_IMS', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: 'TT_FMIS', headerText: 'TT_FMIS', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: 'NGUOI_HT', headerText: 'Người HT', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: 'NGUOI_CN', headerText: 'Người lập', allowFiltering: true, freeze: 'right', width:'120px'},
+            {fieldName: '', headerText: 'Trạng thái', allowFiltering: true, allowSorting: false, width: 105, template: statusTemplate, freeze: 'right', cssClass: 'text-center'}
+        ]" v-bind:dataSource="listTraCuuChungTu" :showFilter="true"
+          @selectedRowChanged="gridTraCuuChungTu_selectedRowChanged" :showColumnCheckbox="false"
+          @pageChanged="pageChanged_DSTraCuuChungTu" dataKeyField="CHUNGTU_ID" :defaultColumnCheckboxChecked="false"
+          :enablePagingServer="true" :allowPaging="true" :totalRecords="pageInfo.totalElement">
+        </DataGrid>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title" style="font-weight: 600 !important">
+        <div>Danh sách vật tư <a href="#" @click.prevent="exportExcel"
+            class="link one-excel-outline text-main f16 marl5"></a></div>
+      </div>
+      <div class="tabs nav tab-over">
+        <a href="#tableVT" data-toggle="tab" :class="{active:!isTab}" @click="changeTab(0)">Danh sách vật tư trong chứng
+          từ</a>
+        <a href="#tableTB" data-toggle="tab" :class="{active:isTab}" @click="changeTab(1)">Danh sách thiết bị</a>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tableVT" v-show="!isTab">
+          <div class="table-content relative">
+            <DataGrid v-bind:columns="[
+            {fieldName: 'CTCT_ID', headerText: 'CTCT_ID', allowFiltering: true, allowSorting: true, freeze: 'left'},
+            {fieldName: 'MA_HD', headerText: 'Mã HĐ', allowFiltering: true},
+            {fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true},
+            {fieldName: 'DUAN', headerText: 'Dự án', allowFiltering: true},
+            {fieldName: 'MA_VT', headerText: 'Mã vật tư', allowFiltering: true},
+            {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true},
+            {fieldName: 'LOAI_TBI', headerText: 'Loại Tbi', allowFiltering: true},
+            {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true},
+            {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true},
+            {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, type: 'number', format:'N1'},
+            {fieldName: 'TIEN', headerText: 'Thành tiền', allowFiltering: true, type: 'number', format: 'N1'},
+            {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+            {fieldName: 'GHICHU_HD', headerText: 'Ghi chú HD', allowFiltering: true},
+            {fieldName: 'VAT', headerText: 'VAT', allowFiltering: true, type: 'number', format: 'N1'},
+            {fieldName: 'SOPHIEU_IN', headerText: 'Số phiếu in', allowFiltering: true},
+            {fieldName: 'NGAYIN_PXK', headerText: 'Ngày in PXK', allowFiltering: true},
+            {fieldName: 'TINHTRANG', headerText: 'Trạng thái', allowFiltering: true},
+            {fieldName: 'TK_KHO', headerText: 'TK Kho', allowFiltering: true},
+            {fieldName: 'TK_DOIUNG', headerText: 'TKDU', allowFiltering: true},
+            {fieldName: 'LOAIKHO_TEXT', headerText: 'Loại kho', allowFiltering: true},
+            {fieldName: 'MAKHOTD_TEXT', headerText: 'Mã kho TD', allowFiltering: true},
+            {fieldName: 'CHATLUONG_TEXT', headerText: 'Chất lượng', allowFiltering: true},
+            ]" v-bind:dataSource="listChungTuVatTu" :showFilter="true" :panelDataHeight='"400"'
+              @selectedRowChanged="gridChungTuVatTu_selectedRowChanged" :showColumnCheckbox="false"
+              dataKeyField="CTCT_ID" :defaultColumnCheckboxChecked="false" :enablePagingServer="false"
+              :allowPaging="true">
+            </DataGrid>
+          </div>
+        </div>
+        <div class="tab-pane active" id="tableTB" v-show="isTab">
+          <div class="table-content relative">
+            <DataGrid v-bind:columns="[
+            {fieldName: 'CTCT_ID', headerText: 'CTCT_ID', allowFiltering: true, allowSorting: true, freeze: 'left'},
+            {fieldName: 'THIETBI_ID', headerText: 'THIETBI_ID', allowFiltering: true, freeze: 'left'},
+            {fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true},
+            {fieldName: 'MA_VT', headerText: 'Mã vật tư', allowFiltering: true},
+            {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true},
+            {fieldName: 'MA_TBI', headerText: 'Mã thiết bị', allowFiltering: true},
+            {fieldName: 'SERIAL', headerText: 'Serial', allowFiltering: true},
+            {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true},
+            {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true},
+            {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true},
+            {fieldName: 'TIEN', headerText: 'Thành tiền', allowFiltering: true, type: 'number', format: 'N1'},
+            {fieldName: 'VAT', headerText: 'VAT', allowFiltering: true, type: 'number', format: 'N1'},
+            {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+            {fieldName: 'SERIAL_GP', headerText: 'Serial GP', allowFiltering: true},
+            {fieldName: 'ID_CHITIET', headerText: 'ID Chi tiết', allowFiltering: true}
+            ]" v-bind:dataSource="listThietBi" :showFilter="true" :panelDataHeight='"400"' :showColumnCheckbox="false"
+              dataKeyField="CTCT_ID" :defaultColumnCheckboxChecked="false" :enablePagingServer="false"
+              :allowPaging="true">
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ejs-dialog :visible='false' ref="popupNhapXuatVT" showCloseIcon=true :enableResize='true' :allowDragging='true'
+    width='95%' height="90%" :isModal='true' zIndex='999999' :cssClass="'popup-box'" style="top:30px; bottom:30px"
+    header='<div class="main-title">Nhập/xuất/điều chuyển vật tư</div>'>
+    <NhapXuatVT ref="frmNhapXuatVT"></NhapXuatVT>
+  </ejs-dialog>
+</div>

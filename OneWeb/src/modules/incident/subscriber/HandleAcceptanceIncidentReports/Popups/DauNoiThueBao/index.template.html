@@ -1,0 +1,490 @@
+<div>             
+    <Modal :tramTbiId="obj.tramTbiId" :KyHieuKC_New="KetCuoiNew.KYHIEU" :chonTramTbiTheoTB="obj.chonTramTbiTheoTB" :choPhepDoiTramTbi="obj.choPhepDoiTramTbi" :CurrentThueBao="thuebao" :modalShow="modalShow" @closeModal="closeModal" @selected="selected"/>    
+    <ModalChonToaDoExt ref="ModalChonToaDoExt" idModalChonToaDo="ModalChonToaDoExt"></ModalChonToaDoExt>     
+    <ModalLichSuCap ref="ModalLichSuCap" idModal="ModalLichSuCap"></ModalLichSuCap> 
+    <ModalThueBaoCungDoiCap ref="ModalThueBaoCungDoiCap" idModal="ModalThueBaoCungDoiCap"></ModalThueBaoCungDoiCap> 
+    <b-modal ref="popupSearchAccount" size="xl" title="Tra cứu danh bạ" hide-footer body-class="modal-body p-0"
+        modal-class="bss-modal bss-modal-tracuu-danhba">
+        <SearchAccount @form-close="searchAccount_Close" :isPopup="true" />
+    </b-modal>
+    <b-modal id="modal-ChonThueBao" title="Chọn thuê bao" hide-footer size="xl" modal-class="bss-modal" @ok="chonThueBao">
+        <template #default="{ ok }">
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li>
+                        <button :disabled="DsThueBao.length==0" class="btn btn-link" @click="ok()"><span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận</button>
+                    </li>
+                </ul>
+            </div>
+            <popupChonThueBao :dataSource="DsThueBao" @selectedRowChanged="popupChonThueBao_selectedRowChanged"></popupChonThueBao>
+        </template>
+    </b-modal>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#/ecms/tracuu-lylich-daymay">
+                    <span class="icon one-print"></span>In lý lịch
+                </a>
+            </li>
+            <li :class="{'disable-btn' : disablebtnLichSuCap}" >
+                <a href="javascript:void(0)" @click="lichSuCap">
+                    <span class="icon one-cap"></span>Lịch sử cáp
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">Tìm kiếm thuê bao</div>
+                <div class="pull-right">
+                    <div class="list-checks">
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" class="check"  :checked="kieu1==1"  @click="onClickOption1">
+                                <span class="name">Danh bạ</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" class="check"   :checked="kieu2==1" @click="onClickOption2">
+                                <span class="name">Hợp đồng</span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="info-row">
+                <div class="key w110">Số máy/Account</div>
+                <div class="value">
+                    <div class="input-more-button">
+                        <button class="btn" @click="chonThueBaoTuDanhBa">
+                            <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <input ref="ma_tb" type="text" class="form-control highlight" v-model.trim="ma_tb" v-on:keyup.enter="onEnterMaTB">
+                    </div>
+                </div>
+            </div>
+        </div>                  
+        <div class="box-form">
+            <div class="legend-title">Thông tin thuê bao</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w100">Tên thuê bao</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="true" :value="thuebao.TEN_TB">
+                        </div>
+                    
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Loại hình</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="true" :value="thuebao.LOAIHINH_TB">
+                        </div>
+                    
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Trạng thái</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="true" :value="thuebao.TRANGTHAI_TB || thuebao.TRANGTHAI_HD">
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-9 col-12">
+                    <div class="info-row">
+                        <div class="key w100">Địa chỉ lắp đặt</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="true" :value="thuebao.DIACHI_LD">
+                        </div>
+                    
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Tọa độ</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <div class="input-text">
+                                    <div class="input-icon-right">
+                                        <input type="text" class="form-control" :disabled="true" :value="getToaDo">                                        
+                                        <a href="javascript:void(0)" :disabled="!Object.keys(thuebao).length" @click="chonToaDo">
+                                            <span class="icon one-map-location text-main"></span>
+                                        </a>                                       
+                                    </div>
+                                </div>
+                                <div class="input-addon">
+                                    <button class="btn" :disabled="!Object.keys(thuebao).length" @click="luuToaDo">
+                                        <span class="-ap  icon-checkmark f12"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w100">Tổ quản lý</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="true" :value="thuebao.TEN_TOQL">
+                        </div>
+                    
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Trạm thiết bị</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="true" :value="thuebao.TEN_TRAMTBI">
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            <template v-if="!thuebao.IS_THUEBAO===1">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Loại hợp đồng</div>
+                            <div class="value">
+                                <input type="text" class="form-control" :disabled="true" :value="thuebao.LOAI_HD">
+                            </div>
+                        
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Kiểu lắp đặt</div>
+                            <div class="value">
+                                <input type="text" class="form-control" :disabled="true" :value="thuebao.KIEU_LD">
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            </template>            
+            <div class="info-row">
+                <div class="key w100">Ghi chú</div>
+                <div class="value">
+                    <div class="top marb5">
+                        <button :disabled="thuebao==null || (thuebao && thuebao.THUEBAO_ID==null)" @click="onClickGhiChu" class="btn btn-main noradius">{{getMessage}}</button>                        
+                        <span  class="text-success">{{GhiChu.MSG}}</span>
+                    </div>
+                    <textarea ref="ghichu" name="" id="" cols="30" rows="10" class="form-control" style="height: 100px;resize: vertical;" v-model="thuebao.GHICHU" :disabled="!updateGhiChu"></textarea>
+                </div>            
+            </div>                        
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Nhập thông tin cáp mới
+                        </div>
+                        <div class="pull-right normal">
+                            <span class="text">Cự ly</span>
+
+                            <!-- <bss-error-marker :has-error="$v.CuLy_New.$error">
+                                <vue-numeric v-bind:min="1" v-bind:max="9999" v-model="$v.CuLy_New.$model"></vue-numeric>  
+                                <span class="text fw6"> (Mét)</span>
+                            </bss-error-marker>    -->
+
+                            <ejs-numerictextbox width=130 floatLabelType="Auto" :showSpinButton="false" format='####' v-model="CuLy_New" :min="1" :max="9999"></ejs-numerictextbox>                            
+                            <span class="text fw6"> (Mét)</span>
+                            <div class="check-action marl10">
+                                <input type="checkbox" class="check" v-model="isAON">
+                                <span class="name">AON</span>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="info-row">                                                
+                        <div class="key w150 normal nowrap" v-if="!isAON">Kết cuối / Vị trí</div>
+                        <div class="key w150 normal nowrap" v-else="!isAON">Kết cuối/ Vị trí 1/ Vị trí 2</div>                                         
+                        <div class="value">
+                            <div class="row">                                
+                                <template v-if="isAON">
+                                    <div class="col-sm-6 col-12">
+                                        <!-- <div class="select-custom">                                       
+                                            <select name="cboKyHieuKC_New" id="#cboKyHieuKC_New" class="form-control" v-model="KyHieuKC_New" @click="modalShow=!modalShow">
+                                                <option :value="KetCuoiNew.KETCUOI_ID">{{KetCuoiNew.KYHIEU}}</option>                                                                                     
+                                            </select>
+                                        </div> -->
+                                        <bss-error-marker :has-error="$v.KyHieuKC_New.$error">
+                                            <div class="select-custom">                                               
+                                                    <select :disabled="ReadOnly.cboKyHieuKC_New"  name="cboKyHieuKC_New" id="#cboKyHieuKC_New" class="form-control" v-model="$v.KyHieuKC_New.$model" @click="modalShow=!modalShow">
+                                                        <option :value="KetCuoiNew.KETCUOI_ID">{{KetCuoiNew.KYHIEU}}</option>     
+                                                    </select>
+                                            </div>     
+                                        </bss-error-marker>    
+                                    </div>
+                                    <div class="col-sm-3 col-12">
+                                        <!-- <div class="select-custom">
+                                            <select name="cboViTri1_New" id="#cboViTri1_New" class="form-control" v-model="ViTri1_New" @change="onClickViTri1_New()">    
+                                                <option value=""></option>                                            
+                                                <option v-for="item in PortKetCuoiRoi" :value="item.ID">{{item.ID}}</option>
+                                            </select>
+                                        </div> -->
+                                        <bss-error-marker :has-error="$v.ViTri1_New.$error">
+                                            <div class="select-custom">                                               
+                                                    <select :disabled="ReadOnly.cboViTri1_New"  name="cboViTri1_New" id="#cboViTri1_New" class="form-control" v-model="$v.ViTri1_New.$model" @change="onClickViTri1_New()">
+                                                        <option value=""></option>
+                                                        <option v-for="item in PortKetCuoiRoi" :value="item.ID">{{item.ID}}</option>
+                                                    </select>
+                                            </div>     
+                                        </bss-error-marker>    
+                                    </div>
+                                    <div class="col-sm-3 col-12">
+                                        <bss-error-marker :has-error="$v.ViTri2_New.$error">
+                                            <div class="select-custom">                                               
+                                                    <select :disabled="ReadOnly.cboViTri2_New" name="cboViTri2_New" id="#cboViTri2_New" class="form-control" v-model="$v.ViTri2_New.$model" @change="onClickViTri2_New()">
+                                                        <option value=""></option>
+                                                        <option v-for="item in PortKetCuoiRoi" :value="item.ID">{{item.ID}}</option>
+                                                    </select>
+                                            </div>     
+                                        </bss-error-marker>    
+                                        <!-- <div class="select-custom">
+                                            <select name="cboViTri2_New" id="#cboViTri2_New" class="form-control" v-model="ViTri2_New" @change="onClickViTri2_New()">
+                                                <option value=""></option>
+                                                <option v-for="item in PortKetCuoiRoi" :value="item.ID">{{item.ID}}</option>
+                                            </select>
+                                        </div> -->
+                                    </div>
+                                </template>      
+                                <template v-else="isAON">
+                                    <div class="col-sm-6 col-12">
+                                        <!-- <div class="select-custom">                                       
+                                            <select name="cboKyHieuKC_New" id="#cboKyHieuKC_New" class="form-control" v-model="KyHieuKC_New" @click="modalShow=!modalShow">
+                                                <option :value="KetCuoiNew.KETCUOI_ID">{{KetCuoiNew.KYHIEU}}</option>                                                                                     
+                                            </select>
+                                        </div> -->
+
+                                        <bss-error-marker :has-error="$v.KyHieuKC_New.$error">
+                                            <div class="select-custom">                                               
+                                                    <select :disabled="ReadOnly.cboKyHieuKC_New" name="cboKyHieuKC_New" id="#cboKyHieuKC_New" class="form-control" v-model="$v.KyHieuKC_New.$model" @click="modalShow=!modalShow">
+                                                        <option :value="KetCuoiNew.KETCUOI_ID">{{KetCuoiNew.KYHIEU}}</option>     
+                                                    </select>
+                                            </div>     
+                                        </bss-error-marker>    
+
+                                    </div>
+                                    <div class="col-sm-6 col-12">
+                                        <!-- <div class="select-custom">
+                                            <select name="cboViTri1_New" id="#cboViTri1_New" class="form-control" v-model="ViTri1_New" @change="onClickViTri1_New()">     
+                                                <option value=""></option>                                           
+                                                <option v-for="item in PortKetCuoiRoi" :value="item.ID">{{item.ID}}</option>
+                                            </select>
+                                        </div> -->
+                                        <bss-error-marker :has-error="$v.ViTri1_New.$error">
+                                            <div class="select-custom">                                               
+                                                    <select :disabled="ReadOnly.cboViTri1_New" name="cboViTri1_New" id="#cboViTri1_New" class="form-control" v-model="$v.ViTri1_New.$model" @change="onClickViTri1_New()">
+                                                        <option value=""></option>
+                                                        <option v-for="item in PortKetCuoiRoi" :value="item.ID">{{item.ID}}</option>
+                                                    </select>
+                                            </div>     
+                                        </bss-error-marker>    
+                                    </div>                                   
+                                </template>                             
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w150 normal nowrap" v-if="!isAON">Cáp gốc / Sợi</div>
+                        <div class="key w150 normal nowrap" v-else="!isAON">Cáp gốc / Sợi 1 / Sợi 2</div>                                                              
+                        <div class="value">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <input name="txtKyHieuCapGoc_New" type="text" class="form-control" :disabled="true" :value="KyHieuCapGoc_New">
+                                </div>                               
+                                <template v-if="isAON">
+                                    <div class="col-sm-3 col-12">
+                                        <input name="txtSoiGoc1_New" type="text" class="form-control" :disabled="true" :value="SoiGoc1_New">
+                                    </div>
+                                    <div class="col-sm-3 col-12">
+                                        <input  name="txtSoiGoc2_New" type="text" class="form-control" :disabled="true" :value="SoiGoc2_New">
+                                    </div>
+                                </template>
+                                <template v-else="isAON">
+                                    <div class="col-sm-6 col-12">
+                                        <input name="txtSoiGoc1_New" type="text" class="form-control" :disabled="true" :value="SoiGoc1_New">
+                                    </div>                               
+                                </template>  
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="title-bg-main padt2 padb2">
+                        <div class="pull-left title mart7">
+                            Sơ đồ tuyến cáp và chi tiết đấu nối sợi
+                        </div>
+                        <div class="pull-right normal">
+                            <!-- <div class="select-custom inline w60">
+                                <select name="" id="" class="form-control">
+                                    <option value=""></option>
+                                </select>
+                            </div> -->
+
+                            <div class="select-custom inline w60">
+                                <select name="" id="" class="form-control" v-model="soi_new" :disabled="!isAON">
+                                    <option value=1>1</option>
+                                    <option value=2>2</option>
+                                </select>
+                            </div>
+
+
+                            <div class="check-action marl10">
+                                <input type="checkbox" class="check">
+                                <span class="name">Gửi yêu cầu đổi port</span>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>                
+                        <!-- <ejs-grid  ref="grid1" height='260'  width='auto' gridLines='Both'  :allowFiltering='true' :dataSource="DanDoCapNew.dando_rutgon" :dataBound='dataBound'  :allowPaging="true" :pageSettings='pageSettings' :allowResizing='true' :allowScrolling='true'>
+                            <e-columns>                                
+                                <e-column field='STT' headerText='STT' textAlign='Left' width=50 :customAttributes="customAttributes" ></e-column>
+                                <e-column field='LOAI_DT' headerText='Loại đối tượng' width=120 isPrimaryKey='true' :customAttributes="customAttributes" ></e-column>
+                                <e-column field='KYHIEU' headerText='Ký hiệu' textAlign='Left'  width=90 :customAttributes="customAttributes" ></e-column>
+                                <e-column field='DUNGLUONG' headerText='Dung lượng' textAlign='Left' width=90 :customAttributes="customAttributes" ></e-column>
+                                <e-column field='MAT' headerText='Hướng' textAlign='Left' width=90 :customAttributes="customAttributes" ></e-column>
+                                <e-column field='VITRI' headerText='Vị trí/Sợi' textAlign='Left' width=90 :customAttributes="customAttributes" ></e-column>
+                                <e-column field='TEN_CHA' headerText='Kết cuối | Địa chỉ' textAlign='Left'  width=90 :customAttributes="customAttributes" ></e-column>                           
+                            </e-columns>
+                        </ejs-grid>     -->
+                        <DataGrid id="grid1" ref="grid1" 
+                        v-bind:columns="
+                        [                                                                            
+                            {fieldName: 'STT', width : 65 , headerText: 'STT', allowFiltering: true},                             
+                            {fieldName: 'LOAI_DT', width : 130 , headerText: 'Loại đối tượng', allowFiltering: true},
+                            {fieldName: 'KYHIEU', width : 120 , headerText: 'Ký hiệu', allowFiltering: true},
+                            {fieldName: 'DUNGLUONG', width : 120 , headerText: 'Dung lượng', allowFiltering: true},
+                            {fieldName: 'MAT', width : 100 , headerText: 'Hướng', allowFiltering: true},
+                            {fieldName: 'VITRI', width : 100 , headerText: 'Vị trí/Sợi', allowFiltering: true},
+                            {fieldName: 'TEN_CHA', width : 250 , headerText: 'Kết cuối | Địa chỉ', allowFiltering: true}
+                        ]"                                  
+                        v-bind:dataSource="getDanDoCapNew" :showFilter="true"  :allowResizing="true" :allowSorting="false"                         
+                        :enable-paging-server="false"   
+                        @queryCellInfo="queryCellInfo1"           
+                        :allowPaging="false">
+                    </DataGrid>                     
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Thông tin cáp hiện tại
+                        </div>
+                        <div class="pull-right normal">
+                            <span class="text">Cự ly</span>
+                            <!-- <vue-numeric :read-only="true" :value="ThongTinCap.CULY"></vue-numeric> -->
+                            <ejs-numerictextbox readonly="true" width=130 :showSpinButton="false" floatLabelType="Auto" format='####':value="ThongTinCap.CULY"></ejs-numerictextbox>
+                            <!-- <div class="input-number-custom inline w70">
+                                <input type="number" :disabled="true" class="form-control fw6 text-main" :value="ThongTinCap.CULY">
+                            </div> -->
+                            <span class="text fw6"> (Mét)</span>
+                            
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w150 normal nowrap" v-if="ThongTinCap.VITRI_2===null">Kết cuối/ Vị trí</div>
+                        <div class="key w150 normal nowrap" v-else="ThongTinCap.VITRI_2===null">Kết cuối/ Vị trí 1/ Vị trí 2</div>     
+                        <div class="value">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <input type="text" class="form-control" :disabled="true" :value="ThongTinCap.KYHIEU_KC" >
+                                </div>
+                                <template v-if="ThongTinCap.VITRI_2">
+                                    <div class="col-sm-3 col-12">
+                                        <input type="text" class="form-control" :disabled="true" :value="ThongTinCap.VITRI">
+                                    </div>
+                                    <div class="col-sm-3 col-12">
+                                        <input type="text" class="form-control" :disabled="true" :value="ThongTinCap.VITRI_2">
+                                    </div>
+                                </template>      
+                                <template v-else="ThongTinCap.VITRI_2">
+                                    <div class="col-sm-6 col-12">
+                                        <input type="text" class="form-control" :disabled="true" :value="ThongTinCap.VITRI">
+                                    </div>                                  
+                                </template>                             
+                            </div>                           
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="key w150 normal nowrap" v-if="ThongTinCap.VITRI_2===null">Cáp gốc/ Sợi</div> 
+                        <div class="key w150 normal nowrap" v-else="ThongTinCap.VITRI_2===null">Cáp gốc / Sợi 1 / Sợi 2</div>    
+                        <div class="value">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <input type="text" class="form-control" :value="ThongTinCap.KYHIEU_CAPGOC" :disabled="true">
+                                </div>                              
+                                <template v-if="ThongTinCap.VITRI_2">
+                                    <div class="col-sm-3 col-12">
+                                        <input type="text" class="form-control" :value="ThongTinCap.DOICAP" :disabled="true">
+                                    </div>
+                                    <div class="col-sm-3 col-12">
+                                        <input type="text" class="form-control" :value="ThongTinCap.DOICAP_2" :disabled="true">
+                                    </div>
+                                </template>      
+                                <template v-else="ThongTinCap.VITRI_2">
+                                    <div class="col-sm-6 col-12">
+                                        <input type="text" class="form-control" :value="ThongTinCap.DOICAP" :disabled="true">
+                                    </div>                                  
+                                </template>     
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="title-bg-main padt2 padb2">
+                        <div class="pull-left title mart7">
+                            Sơ đồ tuyến cáp và chi tiết đấu nối sợi
+                        </div>
+                        <div class="pull-right normal">
+                            <div class="select-custom inline w60">
+                                <select name="" id="" class="form-control" v-model="soi" :disabled="ThongTinCap.KYHIEU_KC===null || ThongTinCap.VITRI_2===null">
+                                    <option value=1>1</option>
+                                    <option value=2>2</option>
+                                </select>
+                            </div>
+                            <div class="check-action marl10">
+                                <input type="checkbox" class="check" :disabled="ThongTinCap.KYHIEU_KC===null" v-model="hideDaynhaytrong">
+                                <span class="name">Ẩn dây nhảy trong</span>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>                                                    
+                    <DataGrid id="grid2" ref="grid2" 
+                        v-bind:columns="
+                        [                                                                            
+                            {fieldName: 'STT', width : 65 , headerText: 'STT', allowFiltering: true},                             
+                            {fieldName: 'LOAI_DT', width : 130 , headerText: 'Loại đối tượng', allowFiltering: true},
+                            {fieldName: 'KYHIEU', width : 120 , headerText: 'Ký hiệu', allowFiltering: true},
+                            {fieldName: 'DUNGLUONG', width : 120 , headerText: 'Dung lượng', allowFiltering: true},
+                            {fieldName: 'MAT', width : 100 , headerText: 'Hướng', allowFiltering: true},
+                            {fieldName: 'VITRI', width : 100 , headerText: 'Vị trí/Sợi', allowFiltering: true},
+                            {fieldName: 'TEN_CHA', width : 250 , headerText: 'Kết cuối | Địa chỉ', allowFiltering: true}
+                        ]"                                  
+                        v-bind:dataSource="getDanDoCapCu" :showFilter="true"  :allowResizing="true" :allowSorting="false"                         
+                        :enable-paging-server="false"   
+                        @queryCellInfo="queryCellInfo2"           
+                        :allowPaging="false">
+                    </DataGrid>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

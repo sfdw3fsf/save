@@ -1,0 +1,139 @@
+<div class="">
+    <!-- <breadcrumb :header="header" /> -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onTaoDsClick" :class="{'disabled': !tsbtnGhiLaiEnabled}">
+                    <span class="icon one-file-plus-1"></span>Tạo DS
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onGhiLaiClick" :class="{'disabled': !tsbtnGhiLaiEnabled}">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onXuatFileClicked">
+                    <span class="icon one-download"></span>Xuất file
+                </a>
+                <appModalXuatDuLieu id="modal-xuat-dulieu" :thuocTinh="columnsDsKhachHangXuatFile" :data="pDtDSKHL"/>
+            </li>
+            <!-- <li>
+                <a href="javascript: void(0)" @click="getDsLanTao">
+                    <span class="icon one-download"></span>Test
+                </a>
+            </li> -->
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                Điều kiện lọc thông tin
+            </div>
+            <div class="row">
+                <div class="col-sm-8 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Kỳ phân hạng
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <b-form-select  
+                                    v-model="pCboKyPhanLoai"
+                                    :options="kyPhanLoai"
+                                    value-field="ID"
+                                    text-field="text" 
+                                    class="form-control">
+                                </b-form-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <app-ky-cuoc  @handleChangeKyCuoc="handleKyHoaDon" :isTextBold="true" :disabled="true"></app-ky-cuoc>
+                    <!-- <app-ky-cuoc  @handleChangeKyCuoc="handleKyHoaDon" :isTextBold="true" :isReadonly="false"></app-ky-cuoc> -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-8 col-12">
+                    <div class="box-form mart10">
+                        <div class="legend-title">Danh sách khách hàng</div>
+                        <div class="table-content">
+                            <DataGrid v-bind:columns='[
+                                    { fieldName: "MA_KH", headerText: "Mã KH", allowSorting: true, allowFiltering: true, }, 
+                                    { fieldName: "TEN_KH", headerText: "Tên KH", allowSorting: true, allowFiltering: true }, 
+                                    { fieldName: "DIACHI_KH", headerText: "Địa chỉ KH", allowSorting: true, allowFiltering: true }, 
+                                    { fieldName: "BINHQUAN_DT", headerText: "Bình quân DT", allowSorting: true, allowFiltering: true, cssClass: "text-currency" }, 
+                                    { fieldName: "MA_PLKH", headerText: "Phân loại KH", allowSorting: true, allowFiltering: true }, 
+                                    { fieldName: "THOIGIAN_SD", headerText: "Thời gian SD (năm)", allowSorting: true, allowFiltering: true }, 
+                                    { fieldName: "TONGDIEM", headerText: "Điểm", allowSorting: true, allowFiltering: true }, 
+                                    { fieldName: "PHANHANGKH_ID", headerText: "Phân hạng", allowSorting: true, allowFiltering: true },
+                                    { headerText: "Thao tác", freeze: "right", allowFiltering: false, allowSorting: false, template:columnHuyKhachHangTemplate, cssClass: "center"}
+                                ]'
+                                :showColumnCheckbox="true"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                                dataKeyField="STT"
+                                ref="gridDsKhachHang"
+                                :dataSource="pDtDSKHL" :showFilter="true"
+                                @dataGridCellCreated="gridDsLanTaoCellCreated"
+                                :defaultColumnCheckboxChecked="true"
+                                @commandClick="gridDsKhachHangCommand">
+                            </DataGrid> 
+                                <!-- <ejs-grid
+                                ref='grid-phieudieu-xuly' 
+                                ref-value='grid-phieudieu-xuly'
+                                class="table-result"
+                                locale='vi-VN'
+                                gridLines='Both' 
+                                
+                                :selectionSettings="{enableToggle: false}"
+                                :dataSource="pDtDSKHL"
+                                :allowFiltering='true'
+                                :allowResizing='true'
+                                >
+                                <e-columns>
+                                    <e-column headerText='' textAlign="Center" width="20" freeze='Left' :allowResizing="false" :allowFiltering="false" :template='columnTemplate'></e-column>
+                                    <e-column field='MA_KH' headerText='Mã KH' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='TEN_KH' headerText='Tên KH' headerTextAlign='Center' textAlign='Right'width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='DIACHI_KH' headerText='Địa chỉ KH' headerTextAlign='Center' width="200" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='BINHQUAN_DT' headerText='Bình quân DT' headerTextAlign='Center' width="100" :filterBarTemplate='filterBarTemplate' :template='currencyTemplate'></e-column>
+                                    <e-column field='MA_PLKH' headerText='Phân loại KH' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='THOIGIAN_SD' headerText='Thời gian SD (năm)' headerTextAlign='Center' textAlign='Right' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='DIEM_DT' headerText='Điểm' headerTextAlign='Center' textAlign='Right' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='PHANHANGKH_ID' headerText='Phân hạng' headerTextAlign='Center' textAlign='Right' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='THAOTAC' headerText='Ghi chú XL' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                </e-columns>
+                            </ejs-grid> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="box-form mart10">
+                        <div class="legend-title">Danh sách lần tạo</div>
+                        <div class="table-content">
+                            <DataGrid v-bind:columns='[
+                                    { fieldName: "NGAY_CN", headerText: "Ngày tạo", allowSorting: true, allowFiltering: true, width: 130 }, 
+                                    { fieldName: "KY_PH", headerText: "Kỳ PH", allowSorting: true, allowFiltering: true, width: 130 }, 
+                                    { fieldName: "SOLUONG", headerText: "Số lượng", allowSorting: true, allowFiltering: true, width: 130, cssClass: "font-weight-bold", textAlign: "right" },
+                                    { headerText: "Thao tác", freeze: "right", allowFiltering: false, allowSorting: false, template:columnHuyLanTaoTemplate, cssClass: "center"}
+                                ]'
+                                ref="gridDsLanTao"
+                                dataKeyField="STT"
+                                :enablePagingServer="false"
+                                :dataSource="pDsLanTao" :showFilter="true" 
+                                :allowPaging="true"
+                                @rowDoubleClicked="gridDsLanTaoRowDoubleClicked"
+                                @commandClick="gridDsLanTaoCommand">
+                            </DataGrid> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <appYesNoModal content="Bạn thật sự muốn tạo danh sách phân hạng KH?" idModal='popup-confirmGhiLai' @onOk="onGhiLaiConfirm" />
+    <appYesNoModal content="Bạn thật sự muốn xóa danh sách này không?" idModal='popup-confirmXoaLanTao' @onOk="xoaLanTaoConfirm" />
+    <!-- <appYesNoModal content="Bạn chắc chắn muốn xóa danh sách khách hàng lớn đã tạo không?" idModal='popup-confirmXoaLanTao' @onOk="xoaLanTaoConfirm" /> -->
+    <frmChiTietTaoDL ref="frmChiTietTaoDL"></frmChiTietTaoDL>
+</div>

@@ -1,0 +1,294 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="btnLayTT">
+                    <span class="icon one-file-attach"></span> Lấy TT
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnLayTT">
+                    <span class="icon nc-icon-glyph arrows-1_simple-left"></span> Thu lại
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnNewClicked" :class="{disabled:!btnNewEnable}">
+                    <span class="icon one-file-plus"></span> Nhập mới
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnUpdateClicked" :class="{disabled:!btnUpdateEnable}">
+                    <span class="icon  one-reload1"></span> Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnHuyBoClicked" :class="{disabled:!btnHuyBoEnable}">
+                    <span class="icon  ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+                </a>
+            </li>
+            <li>
+                <a href="#" :class="{disabled:!btnXoaFileEnable}" @click.prevent="btnDeleteClicked">
+                    <span class="icon one-trash"></span> Xoá file
+                </a>
+            </li>
+            <li>
+                <a href="#" :class="{disabled:!btnXoaTBEnable}" @click.prevent="btnDeleteTBClicked">
+                    <span class="icon  one-trash"></span> Xoá TB
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon one-book1"></span> Hướng dẫn
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="grid-stack-box clearboxform">
+            <div class="row max-width">
+                <div class="col-md-2 pr-1 equal" id="boxLeft">
+                        <div class="box-form" style="border: 1px solid #E0E0E0;">
+                            <div class="legend-title">
+                                Danh sách đối tượng hồ sơ <a href="#" class="link" @click.prevent="btnLayTT"><span
+                                        class="arrows-1_refresh-69 nc-icon-glyph"></span></a>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">
+                                            Từ ngày
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <date-picker :format="dateFormat" :time-title-format="dateFormat"
+                                                    v-model="from_date" @change="refreshTree"></date-picker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">
+                                            Đến ngày
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <date-picker :format="dateFormat" :time-title-format="dateFormat"
+                                                    v-model="to_date" @change="refreshTree"></date-picker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-more-button -right">
+                                <div class="input-icon-left">
+                                    <span class="icon nc-icon-outline ui-2_filter"></span>
+                                    <input type="text" class="form-control" v-model="txtDoiTuong" v-on:keyup.enter="searchHoso">
+                                </div>
+                                <a href="#" @click.prevent="sortTree" class="btn one-sort btn-line">
+                                </a>
+                            </div>
+                            <div class="tree-plus">
+                                <ejs-treeview
+                                cssClass='depts-tree-view' id='treeview' :fields="this.fields" 
+                                ref="treeview" :showCheckBox='false' :sortOrder="sortOrder" 
+                                :expandAll="true" @nodeSelected='treeClicked' 
+                                :index="treemenu_index" :treemenu_index="treemenu_index" :expandedNodes="expandedNodes"
+                                :selectedNodes="selectedNodes"
+                                ></ejs-treeview>
+                            </div>
+                        </div>
+                </div>
+                <div class="col-md-5 pr-1 equal" id="boxMid">
+                    <div class="box-form" style="border: 1px solid #E0E0E0;">
+                            <div class="legend-title">Thông tin file</div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="info-row" :class="{disabled: !listbox.danhsach_nhom_file_hoso.isEnabled}">
+                                        <div class="key w80">Nhóm file</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select2 :options="listbox.danhsach_nhom_file_hoso.list"
+                                                    v-model="listbox.ds_file_hs.value.nhomfile_id" @change="loadLoaiFile">
+                                                    <option disabled value="0">Select one</option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="info-row" :class="{disabled: !listbox.danhsach_loai_file_hoso.isEnabled}">
+                                        <div class="key w80">Loại file</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select2 :options="listbox.danhsach_loai_file_hoso.list"
+                                                    v-model="listbox.ds_file_hs.value.loaifile_id">
+                                                    <option disabled value="0">Select one</option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row" :class="{disabled: !listbox.danhsach_kieu_file_hoso.isEnabled}">
+                                        <div class="key w80">Kiểu file</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select2 :options="listbox.danhsach_kieu_file_hoso.list"
+                                                    v-model="listbox.ds_file_hs.value.kieu">
+                                                    <option disabled value="0">Select one</option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row" :class="{disabled: !listbox.ds_file_hs.isEnabled}">
+                                        <div class="key w80">Đường dẫn</div>
+                                        <div class="value">
+                                            <div class="input-more-button -right">
+                                                <label class="btn" for="upload-file">
+                                                    <span class="-ap icon-more_horiz"></span>
+                                                    <input type="file" ref="files" class="hidden" id="upload-file"
+                                                        :accept="formAllowFileType" @click="handleFileInputClick" @change="UploadFileHoSo">
+                                                </label>
+                                                <input type="text" class="form-control highlight" v-model="listbox.ds_file_hs.value.url">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Mã TB</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control highlight"
+                                                    v-model="listbox.ds_file_hs.value.ma_tb" v-on:keyup.enter="onMaTBEnter">
+                                                <span class="nc-icon-outline ui-1_zoom icon" @click="onMaTBEnter"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row" :class="{disabled: !listbox.ds_file_hs.isEnabled}">
+                                        <div class="key w80">Ghi chú</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="listbox.ds_file_hs.value.ghichu">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="title-bg-main mart10 padt4 padb5">
+                                    <div class="title mart3">Danh sách file trong hồ sơ</div>
+                                    <div class="actions">
+                                        <a href="#" @click.prevent="btnRefresh" class="btn btn-main pad3 lh14">
+                                            <span class="icon nc-icon-outline arrows-1_refresh-69"></span>
+                                        </a>
+                                        <a href="#" @click.prevent="btnFilter" class="btn btn-main pad4 lh14">
+                                            <span class="icon nc-icon-outline ui-2_filter"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="table-content">
+                                    <DataGrid ref="grid" v-bind:columns="listbox.ds_file_hs.header"
+                                        v-bind:dataSource="listbox.ds_file_hs.list" :enable-paging-server="false"
+                                        :enablePagingServer="false" :allowSorting='true' :allowPaging="true" :allowResizing='true'
+                                        :showFilter="true" @selectedRowChanged="fileHSChanged" :key="listbox.ds_file_hs.tableKey">
+                                    </DataGrid>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="col-md-5 equal flex" id="boxRight">
+                        <div class="box-form" style="border: 1px solid #E0E0E0;">
+                            <div class="legend-title">Thông tin khách hàng</div>
+                            <div class="info-row">
+                                <div class="key w100">{{lblMa_GD_TB}}</div>
+                                <div class="value">
+                                    <input type="text" class="highlight form-control" value="Thi công"
+                                        v-model="txtMaGD_txtMa_TB" v-on:keyup.enter="txtMaGD_txtMa_TB_Enter">
+                                </div>
+                                <div class="value w30 nowrap padt5">
+                                    <div class="list-checks">
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="checkbox" v-model="hopdongmoi" class="check">
+                                                <span class="name">Lắp đặt</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check" v-model="baohong">
+                                                <span class="name">Báo hỏng</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Mã KH</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <input type="text" class="form-control highlight" v-model="ma_kh"
+                                            v-on:keyup.enter="onMaKHEnter">
+                                        <span class="icon nc-icon-outline ui-1_zoom" @click="btnMaKH_Click"></span>
+                                    </div>
+                                </div>
+                                <div class="value w100 nowrap">
+                                    <button class="btn btn-second" @click="onTimNhanhHoSoClick">Tìm nhanh hồ sơ</button>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Tên KH</div>
+                                <div class="value">
+                                    <input type="text" class="form-control"
+                                        v-model="listbox.danhsach_thuebao_theo_makh.value.ten_kh">
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Địa chỉ KH</div>
+                                <div class="value">
+                                    <input type="text" class="form-control"
+                                        v-model="listbox.danhsach_thuebao_theo_makh.value.diachi_kh">
+                                </div>
+                            </div>
+                            <div class="title-bg-main mart12">
+                                <span class="title">Danh sách thuê bao</span>
+                            </div>
+                            <DataGrid v-bind:columns="listbox.danhsach_thuebao_theo_makh.header"
+                                v-bind:dataSource="listbox.danhsach_thuebao_theo_makh.list" :enablePagingServer="false"
+                                :allowSorting='true' :allowPaging="true" :allowResizing='true' :showFilter="true">
+                            </DataGrid>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal id="popupComponents" size="xl" hide-footer :title="popupTitle" body-class="modal-body p-0">
+        <component :is="popupComponent" ref="popupComponent" :vma_tb="ma_kh" :vdichvuvt_id="'0'" isPopup="true"
+            @form-close="chapNhanFormSearchAcount"></component>
+        <!--v-dynamic-events="popupComponentEvents"-->
+    </b-modal>
+    <b-modal class="main-wrapper1" id="DSBienDong-modal" size="xl" hide-footer title="Danh sách biến động"
+        body-class="modal-body p-0">
+        <DSBienDong :data="listbox.ds_bien_dong.list" @chapNhanFormDSBienDong="chapNhanFormDSBienDong"
+            @thoatFormDSBienDong="thoatFormDSBienDong"></DSBienDong>
+    </b-modal>
+    <b-modal ref="searchEProfile-modal" id="searchEProfile-modal" size="xl" hide-footer body-class="modal-body p-0">
+        <SearchEProfile :matb="txtMaTBSearchEProfile" @XacnhanHoso="XacnhanHoso" :ispopup="true" @displayEvent="FIND_NODE_FILE"></SearchEProfile>
+    </b-modal>
+</div>
+<!-- cha_id: "HS_523418"
+children: []
+display: true
+ghichu: null
+hoso_id: 523418
+hs: "HS"
+id: "549909"
+isfile: 1
+level: 7
+loai_file: "Hợp đồng/Phụ lục"
+name: "cmt_637493474890198956.jpg"
+ngay_cn: "19/10/2021 05:10"
+nguoi_th: "null"
+trangthai_hs: "Online"
+url: "http://10.70.52.164:8081/FILES/HPG/HOSO/ -->

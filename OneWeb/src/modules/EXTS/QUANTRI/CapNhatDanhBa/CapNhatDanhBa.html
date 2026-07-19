@@ -1,0 +1,2262 @@
+<!--  -->
+<div class="main-wrapper">
+ 
+  <div class="list-actions-top">
+    
+    <ul class="list">
+      <li @click="onNhapMoi">
+        <a href="#" :class="{'disable-btn': isDisableNhapMoi}">
+          <span class="icon one-file-plus"></span>Nhập mới (F5)
+        </a>
+      </li>
+      <li @click="onGhiLai">
+        <a href="javascript:void(0)" :class="{'disable-btn': isDisableBtnGhiLai}">
+          <span class="icon one-sav"></span>Ghi lại (F9)
+        </a>
+      </li>
+      <li @click="onHuyBo">
+        <a href="#" :class="{'disable-btn': isDisableHuyBo}">
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+        </a>
+      </li>
+      <li>
+        <a class='btn' @click="onTTLienHe">
+          <span class="icon nc-icon-glyph business_contacts"></span>Liên hệ
+        </a>
+        <b-modal id="modal-ttlh" modal-class="modal-ttlh" hide-footer hide-header no-close-on-backdrop>
+        <thong-tin-lien-he
+        :khachHangId="khachhang.khachhang_id"
+        :thanhToanId="thanhtoan.thanhtoan_id"
+        :thueBaoId="thuebao.thuebao_id"
+         v-on:close="onClickHideModalTTLH">
+        </thong-tin-lien-he>
+    </b-modal>
+      </li>
+      <li>
+        <a class='btn' @click="onTTEmail">
+          <span class="icon one-email"></span>Email
+        </a>
+            <b-modal id="modal-email" modal-class="modal-ttlh" hide-footer hide-header no-close-on-backdrop>
+            <Email  :khachHangId="khachhang.khachhang_id"  v-on:close="onClickHideModalEmail"></Email>
+          </b-modal>
+
+      </li>
+      <li>
+        <a class='btn' @click="onTTVatTu">
+          <span class="icon one-vt"></span>Vật tư
+        </a>
+        <TraCuuVatTuThueBao ref="popupTraCuuVatTu"/>
+      </li>
+      <li>
+        <a class='btn' @click="onTTToaNha">
+          <span class="icon one-building"></span>Toà nhà
+        </a>
+            <popupToaNha ref="popupToaNha" />
+      </li>
+    </ul>
+
+  </div>
+<!-- kết thúc menu -->
+  <div class="page-content">
+    <div class="nav tabs tab-over">
+      <a href="#tab1" data-toggle="tab" :class="[ activetab == 1 ? 'active' : '' ]">Thông tin khách hàng</a>
+      <a href="#tab2" data-toggle="tab" :class="[ activetab == 2 ? 'active' : '' ]">Thông tin thuê bao</a>
+    </div>
+    <div class="tab-content nocorner bor0 pad0 bg-none" style="box-shadow: none;">
+      <div id="tab1" class="tab-pane active">
+        <div class="tab-content">
+          <div class="box marb20">
+            <div class="legend-title">Thông tin khách hàng</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Mã hợp đồng</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.ma_hd">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Ngày lập HĐ</div>
+                      <div class="value">
+                        <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :format="date.dateFormat"
+                          v-model="khachhang.ngay_lap_hd" :readonly="true">
+                        </ejs-datepicker>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Mã KH <span style="color: red;">*</span></div>
+                        
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn" @click="onTraCuuMaKH">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <input type="text" class="form-control highlight" v-model.trim='khachhang.ma_kh' ref='r_makh' autofocus
+                            @keypress='maKH_keyPress' >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Tên khách hàng <span style="color: red;">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model.trim="khachhang.ten_kh" ref="r_tenkh">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Địa chỉ KH <span style="color: red;">*</span></div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn" @click="isShowDiaChiKH=!isShowDiaChiKH">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <input type="text" class="form-control " v-model.trim="khachhang.diachi_kh" ref="r_diachi">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Điểm TN</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.diem_tn">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Loại GT <span style="color: red;">*</span></div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt v-model="khachhang.loaigt_id"  :dataSource="dsLoaiGT" ref="r_loaigt"
+                          dataTextField="LOAI_GT" dataValueField="LOAIGT_ID" />
+                        
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Số GT <span style="color: red;">*</span></div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model.trim="khachhang.so_gt" ref="r_sogt" required pattern="^[a-zA-Z0-9\-\_\s]+$" title="Số giấy tờ gồm các ký tự từ 0->9a->z.">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Ngày cấp <span style="color: red;">*</span></div>
+                      <div class="value" ref="r_ngaycap">
+                        <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :value="date.dateVal"
+                          :format="date.dateFormat" v-model.trim="khachhang.ngay_cap" >
+                        </ejs-datepicker>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Nơi cấp</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.noi_cap">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Ngày hết hạn</div>
+                      <div class="value">
+                        <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :format="date.dateFormat"
+                          v-model="khachhang.ngay_hethan">
+                        </ejs-datepicker>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Ngày sinh<span style="color: red;">*</span></div>
+                      <div class="value" ref="r_ngaysinh">
+                        <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :format="date.dateFormat" @change="ngaySinhChanged"
+                          v-model="khachhang.ngay_sinh">
+                        </ejs-datepicker>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Giới tính</div>
+                      <div class="value">
+                        <div class="list-checks mart7">
+                          <div class="item">
+                            <div class="check-action">
+                              <input name="chkGT" type="radio" value="rdoNo" v-model="khachhang.gioi_tinh">
+                              <span class="name">Không</span>
+                            </div>
+                          </div>
+                          <div class="item">
+                            <div class="check-action">
+                              <input name="chkGT" type="radio" value="rdoF" v-model="khachhang.gioi_tinh">
+                              <span class="name">Nam</span>
+                            </div>
+                          </div>
+                          <div class="item">
+                            <div class="check-action">
+                              <input name="chkGT" type="radio" value="rdoM" v-model="khachhang.gioi_tinh">
+                              <span class="name">Nữ</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Quốc tịch</div>
+                      <div class="value w20 padt7">
+                        <div class="check-action">
+                          <input type="checkbox" class="check" v-model="qt_checked">
+                          <span class="name"></span>
+                        </div>
+                      </div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt v-model="khachhang.quoctich_id" :disabled="!qt_checked" :dataSource="dsQuocTich"
+                          dataTextField="TENQUOCTICH" dataValueField="QUOCTICH_ID" />                        
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Ngành nghề</div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn" @click="onChiTietNganhNghe">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <div class="select-custom" ref="comboNN">
+                            <ComboboxGrid
+                              :columns="[
+                                                                        {fieldName: 'TENNGANHNGHE', headerText: 'Tên ngành nghề', allowFiltering: true},
+                                                                        {fieldName: 'MANGANH', headerText: 'mã ngành nghề', allowFiltering: true}]"
+                              :dataSource="dsNganhNghe" textField="TENNGANHNGHE" valueField="NGANHNGHE_ID"
+                              v-model="khachhang.nganhnghe_id" @selectedChanged="NganhNghe_selectedChanged">
+                            </ComboboxGrid>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Dân tộc</div>
+                      <div class="value w20 padt7">
+                        <div class="check-action">
+                          <input type="checkbox" class="check" v-model="dt_checked">
+                          <span class="name"></span>
+                        </div>
+                      </div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt v-model="khachhang.dantoc_id" :disabled="!dt_checked" :dataSource="dsDanToc"
+                          dataTextField="TENDANTOC" dataValueField="DANTOC_ID" />
+                
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Loại KH</div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn" @click="showModalLoaiKH=!showModalLoaiKH">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <div class="value">
+                            <treeselect v-model="khachhang.loaikh_id" :multiple="false" :options="loai_kh_tree" :disable-branch-nodes="true" @select="clickComboLoaiKH" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">PL KH</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.phanloai_kh">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Người đại diện</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.nguoi_dd">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Chức vụ</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.chuc_vu">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Địa chỉ NĐD</div>
+                  <div class="value">
+                    <div class="input-more-button">
+                      <button class="btn" @click="isShowDiaChiNDD=!isShowDiaChiNDD">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                      <input type="text" class="form-control" v-model="khachhang.diachi_ndd">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Điện thoại</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.dien_thoai">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Fax</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.so_fax">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Hộ khẩu</div>
+                  <div class="value">
+                    <div class="input-more-button">
+                      <button class="btn" @click="isShowDiaChiHK=!isShowDiaChiHK">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                      <input type="text" class="form-control" v-model="khachhang.ho_khau">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Nơi cấp HK</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.noicap_hk">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Ngày cấp HK</div>
+                      <div class="value">
+                        <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :value="date.dateVal"
+                          :format="date.dateFormat" v-model="khachhang.ngay_cap_hk">
+                        </ejs-datepicker>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Ngân hàng</div>
+                  <div class="value w20 padt7">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="nh_checked" @click="nh_checked=!nh_checked">
+                      <span class="name"></span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <div class="select-custom" ref="comboNH">
+                      <SelectExt v-model="khachhang.nganhang_id" :disabled="!nh_checked" :dataSource="dsNganHang"
+                        dataTextField="TEN_NH" dataValueField="NGANHANG_ID" />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Mã số thuế</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.mst">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Tài khoản</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="khachhang.so_tk">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Đặc trưng</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="khachhang.dac_trung">
+                  </div>
+                </div>
+              </div>
+              </div>
+              <div class="info-row">
+              <div class="key w120">Ghi chú</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="khachhang.ghi_chu">
+              </div>
+            </div>
+          </div>
+          <div class="box">
+            <div class="legend-title">Thông tin thanh toán</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Mã thanh toán</div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <input type="text" class="form-control " v-model="thanhtoan.ma_tt">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Mã đại diện</div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt v-model="thanhtoan.matb_dd" :dataSource="dsThueBaoDD" dataTextField="MA_TB"
+                            dataValueField="MA_TB" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Tên thanh toán</div>
+                  <div class="value">
+                    <input type="text" class="form-control " v-model="thanhtoan.ten_tt">
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Địa chỉ TT</div>
+                  <div class="value">
+                    <div class="input-more-button">
+                      <button class="btn" @click="isShowDiaChiTT=!isShowDiaChiTT">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                      <input type="text" class="form-control " v-model="thanhtoan.diachi_tt">
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Địa chỉ CT</div>
+                  <div class="value">
+                    <div class="input-more-button">
+                      <button class="btn" @click="isShowDiaChiCT=!isShowDiaChiCT">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                      <input type="text" class="form-control " v-model="thanhtoan.diachi_ct">
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w120">Địa chỉ BC</div>
+                  <div class="value">
+                    <div class="input-more-button">
+                      <button class="btn" @click="isShowDiaChiBC=!isShowDiaChiBC">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                      <input type="text" class="form-control " v-model="thanhtoan.diachi_bc">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="row">
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w120">Mã in ghép</div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn">
+                            <span class="-ap icon-more_horiz" @click="onMaInGhep"></span>
+                          </button>
+                          <input type="text" class="form-control " v-model="thanhtoan.main_ghep">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w120">Hình thức TT <span style="color: red;">*</span></div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt v-model="thanhtoan.httt_id" :dataSource="dsHTTT" dataTextField="HINHTHUC_TT" ref="r_hinhthuctt"
+                            dataValueField="HTTT_ID" />
+
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w120">Ngân hàng</div>
+                      <div class="value w20 padt7">
+                        <div class="check-action">
+                          <input type="checkbox" class="check" v-model="nhtt_checked"
+                            @click="nhtt_checked=!nhtt_checked">
+                          <span class="name"></span>
+                        </div>
+                      </div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button  class="btn" :class="{disabled: !nhtt_checked}" @click.prevent="$bvModal.show('modal-nganhangnn');">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          
+                              <b-modal id="modal-nganhangnn" modal-class="modal-nganhangnn" hide-footer hide-header no-close-on-backdrop> 
+                                <div class="modal-content popup-box"> 
+                                    <div class="popup-header"> 
+                                        <div class="title"><span class="icon one-notepad"></span> Chi tiết MLNS</div> 
+                                        <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide('modal-nganhangnn')"> 
+                                        </div> 
+                                    </div> 
+                                    <div class="list-actions-top"> 
+                                        <ul class="list"> 
+                                            <li> 
+                                                <a href="#" @click.prevent="$bvModal.hide('modal-nganhangnn')"> 
+                                                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Chấp nhận 
+                                                </a> 
+                                            </li> 
+                                        </ul> 
+                                    </div> 
+                                    <div class="popup-body"> 
+                                        <div class="box-form"> 
+                                            <div class="info-row">
+                                                <div class="key">Đơn vị QHNS</div>
+                                                <div class="value">
+                                                    <input type="text" v-model="thanhtoan.ma_dv_qhns" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="key">Mã chương</div>
+                                                <div class="value">
+                                                    <input type="text" v-model="thanhtoan.ma_chuong" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="key">Mã ngành KT</div>
+                                                <div class="value">
+                                                    <input type="text" v-model="thanhtoan.ma_nguon_kt" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="key">Mã nội dung KT</div>
+                                                <div class="value">
+                                                    <input type="text" v-model="thanhtoan.ma_ndkt" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="key">Mã nguồn NSNN</div>
+                                                <div class="value">
+                                                    <input type="text" v-model="thanhtoan.ma_nguon_ngansach" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="key">Tiền định mức</div>
+                                                <div class="value">
+                                                    <vue-numeric class="form-control tright" separator="," v-model="thanhtoan.tien_dm" placeholder="0" output-type="Number"></vue-numeric>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div> 
+                                </div> 
+                            </b-modal>
+
+                          <div class="select-custom">
+
+                            <SelectExt v-model="thanhtoan.nganhang_id" :disabled="!nhtt_checked"
+                              :dataSource="dsNganHang" dataTextField="TEN_NH" dataValueField="NGANHANG_ID" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w120">Chủ tài khoản</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="thanhtoan.chu_tk">
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w120">Ghi chú</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="thanhtoan.ghi_chu">
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w120">Email</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="thanhtoan.email">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Đơn vị QL</div>
+                      <div class="value">
+                        <div class="select-custom">
+
+                          <SelectExt v-model="thanhtoan.donvi_id" :dataSource="dsDonViQLDM" dataTextField="TEN_DV"
+                            dataValueField="DONVI_ID" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w90">Mã NV/TC<span style="color: red;">*</span></div>
+                      <div class="value">
+                        
+                        <div class="input-more-button">
+                          <button class="btn" @click="onMaNhanVienThuCuoc">
+                            <span class="-ap icon-more_horiz"></span>                          
+                          <PopupTimKiemNhanVienThuCuoc ref="dlgTimKiemNVTC" :vkieu="2" :vdonvi="thanhtoan.donvi_id" :vnvtc="thanhtoan.manv_tc"  @chonNVTC="chonNVTCHandler"></PopupTimKiemNhanVienThuCuoc>
+                          </button>
+                          <div class="row">
+                            <div class="col-sm-6 col-12">
+                              <input type="text" class="form-control highlight" v-model="thanhtoan.manv_tc" ref="r_manvtc">
+                            </div>
+                            <div class="col-sm-6 col-12">
+                              <input type="text" class="form-control highlight" v-model="thanhtoan.ma_tuyen">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w90">Tài khoản</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="thanhtoan.stk">
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w90">Mã số thuế</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="thanhtoan.mst">
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w90">Mã NVQL</div>
+                      <div class="value">
+                        <input type="text" class="form-control highlight" v-model="thanhtoan.manv_ql">
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w90">SĐT</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="thanhtoan.so_dt">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="box-form">
+          <div class="row">
+            <div class="col-sm-9 col-12">
+              <div class="legend-title">
+                <div class="pull-left mart7">Danh sách thanh toán</div>
+                <div class="pull-right red">
+                  <span class="inline">
+                    Mã TT CCBS:
+                  </span>
+                  <div class="inline">
+                    <input type="text" class="form-control">
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+              </div>
+              <div class="table-content" style="height: 260px;">
+                <DataGrid :dataSource="dsThanhToan" :columns="[
+                                                    {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting:false}
+                                                    ]" :showFilter="true" @rowClicked="MaTTChange" ref="danhsach"  :enable-paging-server="false":allow-paging="true">
+                </DataGrid>
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="legend-title mart12">Dịch vụ khác</div>
+              <textarea name="" class="form-control" style="height: 300px;resize: none;"
+                v-model="sudung_dvkhac_tt"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tab2" class="tab-pane ">
+        <div class="tab-content">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-7 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Loại HĐ</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="thuebao.loaihd_id" 
+                          :disabled="true"
+                          :dataSource="dsLoaiHD" dataTextField="TEN_LOAIHD"
+                          dataValueField="LOAIHD_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Dịch vụ</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="thuebao.dichvuvt_id" id="dsdichvuvt" 
+                          :disabled="true"
+                          :dataSource="dsDichVuVT"
+                          dataTextField="TEN_DVVT" dataValueField="DICHVUVT_ID" />
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Kiểu lắp đặt</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="thuebao.kieuld_id" 
+                          :disabled="true"
+                          :dataSource="dsKieuLD" dataTextField="TEN_KIEULD"
+                          dataValueField="KIEULD_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Mức cước TB</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="thuebao.muccuoctb_id" :dataSource="dsMucCuocTB"
+                          dataTextField="MUCCUOC" dataValueField="MUCUOCTB_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Số máy/Acc</div>
+                    <div class="value">
+                      <input type="text" class="form-control highlight" v-model="thuebao.ma_tb" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Thanh toán</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="thuebao.thanhtoan_id" :dataSource="dsThanhToan" dataTextField="MA_TT"
+                          dataValueField="THANHTOAN_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Tên thuê bao</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="thuebao.ten_tb">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Trạng thái TB</div>
+                    <div class="value">
+                      <input type="text" class="form-control italic red" v-model="thuebao.trangthai_tb" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Loại hình</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="thuebao.loaitb_id" ref="dsdichvuvt" 
+                          :disabled="true"
+                          :dataSource="dsLoaiHinhTB"
+                          dataTextField="LOAIHINH_TB" dataValueField="LOAITB_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Khu vực</div>
+                    <div class="value">
+                      <div class="input-more-button">
+                        <button class="btn" @click="onKhuVuc">
+                          <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <input type="text" class="form-control " v-model="thuebao.khuvuc" readonly="true">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Đối tượng</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="thuebao.doituong_id" :dataSource="dsDoiTuong" dataTextField="TEN_DT"
+                          dataValueField="DOITUONG_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Số ảo</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="thuebao.ma_lt">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">
+                      <a href="#" @click="hienThiKhuyenMai()" class="link underline">Danh sách khuyến mãi đặt cọc</a>
+                    </div>
+
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Ngày sinh<span style="color: red;">*</span></div>
+                    <div class="value">
+                      <ejs-datepicker class="form-control bg-none h24 bor0" v-model="thuebao.ngay_sinh" @change="ngaySinhChanged"
+                        :format="date.dateFormat">
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Địa chỉ TB</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="isShowDiaChiTB=!isShowDiaChiTB">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" class="form-control" v-model="thuebao.diachi_tb" >
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Địa chỉ LĐ</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="isShowDiaChiLD=!isShowDiaChiLD">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" class="form-control " v-model="thuebao.diachi_ld" >
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-7 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Đơn vị QL</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="thuebao.donvi_id" :dataSource="dsDonViQLTC" dataTextField="TEN_DV"
+                          dataValueField="DONVI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Mã ĐH Vip</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="thuebao.ma_dhvip" readonly="true">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Ghi chú</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="thuebao.ghi_chu">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-7 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Số tháng CK</div>
+                    <div class="value w40">
+                      <input type="text" class="form-control" v-model="thuebao.sothang_ck" readonly="true">
+                    </div>
+                    <div class="key w90 padl10">Ngày TKCK</div>
+                    <div class="value">
+                      <ejs-datepicker class="form-control bg-none h24 bor0" v-model="thuebao.ngay_kt_ck" readonly="true"
+                        :format="date.dateFormat">
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">DV khác</div>
+
+                    <div class="value">
+                      <textarea name="" v-model="sudung_dvkhac_tb" class="form-control" style="height: 100px;resize: none;" readonly="true"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                  <div class="info-row">
+                    <div class="key w90">DV cộng thêm</div>
+                    <div class="value">
+                      <textarea name="" class="form-control" style="height: 135px;resize: none;" readonly="true"
+                        v-model="sudungdvgt"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+
+              <!-- trường số liệu chung -->
+              <div class="row">
+                <div class="col-sm-8 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Ngày sử dụng</div>
+                    <div class="value">
+                      <div class="input-icon-right">
+                        <ejs-datepicker class="form-control bg-none h24 bor0" v-model="thuebao.ngay_sudung"
+                          :format="date.dateFormat">
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Cước TB</div>
+                    <div class="value">
+                      <input type="number" class="form-control tright" v-model="thuebao.cuoc_tb">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Trang bị</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="db_con.trangbi_id"                           
+                          :dataSource="dsTrangBi" 
+                          dataTextField="TENTRANGBI"
+                          dataValueField="TRANGBI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Gói KT</div>
+                    <div class="value">
+                      <input type="text" class="form-control" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cước DV</div>
+                    <div class="value">
+                      <input type="number" class="form-control">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Số lượng</div>
+                    <div class="value">
+                      <input type="number" class="form-control" readonly="true">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- thông tin về dịch vụ cố định -->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===1">
+                <div class="col-sm-8 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Trạm VT</div>
+                    <div class="value">
+                      <div class="input-icon-right">
+                        <SelectExt v-model="db_con.donvi_id" 
+                          :disabled="true"
+                          :dataSource="dsTramVT" dataTextField="TEN_HIENTHI"
+                          dataValueField="DONVI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Trạm NE</div>
+                    <div class="value">
+                      <input type="text" class="form-control" readonly="true">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-8">
+                      <div class="info-row">
+                        <div class="key w90">Loại cáp</div>
+                        <SelectExt v-model="thuebao.loaicap_id" 
+                          :disabled="true"
+                          :dataSource="dsLoaiCap" dataTextField="LOAICAP"
+                          dataValueField="LOAICAP_ID" />
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Tủ cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_goc" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Đôi cáp gốc</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_goc" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_goc" readonly="true">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-8">
+                      <div class="info-row">
+                        <div class="key w90">Hộp cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.hopcap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Tủ cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Đôi cáp ngọn</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_ngon" readonly="true">
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Số Chính</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.so_chinh" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">NE</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.ne" readonly="true">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Mã TN</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.matn" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Tuyến cáp</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.tuyencap" readonly="true">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Liên tủ</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.lientu" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cự ly</div>
+                    <div class="value">
+                      <input type="number" class="form-control" v-model="db_con.culy" readonly="true">
+                    </div>
+                  </div>
+
+
+                </div>
+
+                <!--Kết thúc dịch vụ cố định-->
+              </div>
+
+              <!-- thông tin về dịch vụ IMS-->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===11">
+                <div class="col-sm-8 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Trạm VT</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="db_con.donvi_id" 
+                          :disabled="true"  
+                          :dataSource="dsTramVT" 
+                          dataTextField="TEN_HIENTHI"
+                          dataValueField="DONVI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Bras</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="db_con.bras_id" 
+                          :disabled="true"  
+                          :dataSource="dsBras" dataTextField="TENBRAS"
+                          dataValueField="BRAS_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-8">
+                      <div class="info-row">
+                        <div class="key w80">Username</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.username" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Slot</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.slot" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Port</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.port" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Loại cáp</div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <SelectExt v-model="db_con.loaicap_id" 
+                              :disabled="true"  
+                              :dataSource="dsLoaiCap" dataTextField="LOAICAP"
+                              dataValueField="LOAICAP_ID" />
+
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Tủ cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_goc" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Đôi cáp gốc</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_goc" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_goc" readonly="true">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-8">
+                      <div class="info-row">
+                        <div class="key w90">Passwword</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.password" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Rack</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.rack" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Vpi</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.vpi" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Hộp cáp ngọn</div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <input type="text" class="form-control" v-model="db_con.hopcap_ngon" readonly="true">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Tủ cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Đôi cáp ngọn</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_ngon" readonly="true">
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Thiết bị</div>
+                    <div class="select-custom">
+                      <SelectExt v-model="db_con.thietbi_id" 
+                      :disabled="true"  
+                      :dataSource="dsThietBiIMS" dataTextField="TEN_TBI"
+                        dataValueField="THIETBI_ID" />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Dslam</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.tendslam" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">System</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.system" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Shelf</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.shelf" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">VCI</div>
+                    <div class="value">
+                      <input type="number" class="form-control" v-model="db_con.vci" readonly="true">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w90">Tuyến cáp</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.tuyencap" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Liên tủ</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.lientu" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Cự ly</div>
+                    <div class="value">
+                      <input type="number" class="form-control" v-model="db_con.culy" readonly="true">
+                    </div>
+                  </div>
+
+
+                </div>
+
+                <!--Kết thúc dịch vụ IMS-->
+              </div>
+              <!-- thông tin về dịch vụ di động -->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===2">
+                <div class="col-sm-12 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Số Simcard</div>
+                    <div class="value">
+                      <div class="input-icon-right">
+                        <input type="text" class="form-control tright" v-model="db_con.simcard">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Số dư TK</div>
+                    <div class="value">
+                      <input type="text" class="form-control tright" v-model="db_con.sodu_tk">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Gói cước</div>
+                    <div class="select-custom">
+                      <SelectExt v-model="db_con.goicuoc_id" 
+                        :disabled="true"
+                        :dataSource="dsGoiCuocDD" dataTextField="TENGOICUOC"
+                        dataValueField="GOICUOC_ID" />
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <!--Kết thúc dịch vụ di động-->
+              </div>
+
+              <!-- thông tin về dịch vụ gphone -->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===10">
+                <div class="col-sm-12 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Trạm VT</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="db_con.donvi_id" :dataSource="dsTramVT" dataTextField="TEN_HIENTHI"
+                          dataValueField="DONVI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Số Simcard</div>
+                    <div class="value">
+                      <div class="value">
+                        <input type="text" class="form-control tright">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Cell</div>
+                    <div class="value">
+                      <input type="text" class="form-control tright">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Tọa độ</div>
+                    <div class="value">
+                      <input type="text" class="form-control tright">
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <!--Kết thúc dịch vụ gpone-->
+              </div>
+
+              <!-- thông tin về dịch vụ băng rộng -->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===4||thuebao.dichvuvt_id===12">
+                <div class="col-sm-8 col-12">
+                  <div class="row">
+                    <div class="col-sm-6 col-8">
+                      <div class="info-row">
+                        <div class="key w80">Email</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.email">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Tốc độ</div>
+                        <div class="value">
+                          <SelectExt v-model="db_con.tocdo_id" :dataSource="dsTocDo" dataTextField="THUONGHIEU"
+                            dataValueField="TOCDO_ID" />
+
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Tổ thi công</div>
+                        <div class="value">
+                          <SelectExt v-model="db_con.donvi_id" :dataSource="dsToTC" dataTextField="TEN_HIENTHI"
+                            dataValueField="DONVI_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">IP Dslam</div>
+                        <div class="value">
+                          <input type="text" class="form-control" vm-model="db_con.ipdslam" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">System</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.system"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Rack</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.rack"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Slot</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.slot"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">VPI/SVLAN</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.vpi"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Loại cáp</div>
+                        <div class="value">
+                          <SelectExt v-model="db_con.loaicap_id" 
+                            :disabled="true"
+                            :dataSource="dsLoaiCap" dataTextField="LOAICAP"
+                            dataValueField="LOAICAP_ID" />
+
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Tủ cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_goc"  readonly="true">
+                        </div>
+                      </div>
+
+                      <div class="info-row">
+                        <div class="key w80">Đôi cáp gốc</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_goc"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_goc" readonly="true">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-8">
+                      <div class="info-row">
+                        <div class="key w90">Mức cước</div>
+                        <div class="value">
+                          <SelectExt v-model.number="db_con.muccuoc_id" :dataSource="dsMucCuoc" dataTextField="TENMUC"
+                            dataValueField="MUCCUOC_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Tốc độ thực</div>
+                        <div class="value">
+                          <SelectExt v-model="db_con.tocdothuc_id" :dataSource="dsTocDo" dataTextField="THUONGHIEU"
+                            dataValueField="TOCDO_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">BRAS</div>
+                        <div class="value">
+                          <div class="input-more-button">
+                            <button class="btn">
+                              <span class="-ap icon-info f20"></span>
+                            </button>
+                            <div class="select-custom">
+                              <SelectExt v-model.number="db_con.bras_id" 
+                                :disabled="true"
+                                :dataSource="dsBras" dataTextField="TENBRAS"
+                                dataValueField="BRAS_ID" />
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">DSLAM</div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <SelectExt v-model.number="db_con.dslam_id" 
+                              :disabled="true"
+                              :dataSource="dsDslam" dataTextField="TENDSLAM"
+                              dataValueField="DSLAM_ID" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Shelf</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.shelf"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Port</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.port"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">VCI/CVLAN</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.vci"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Hộp cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.hopcap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Tủ cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Đôi cáp ngọn</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_ngon" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Địa chỉ Mac</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.diachi_mac">
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Ma TN</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.matn">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Username</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.username">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Passwword</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.password">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">IP tỉnh</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.iptinh"  readonly="true">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">NastportID</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.nasportid" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Port Mdf</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.portmdf" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">ADSL port</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.adslport" readonly="true">
+                    </div>
+                    <div class="check-action">
+                      <input type="checkbox" class="check">
+                      <span class="name">VMP</span>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Onu Pass</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.onupass" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Tuyến cáp</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.tuyencap" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Liên tủ</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.lientu" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cự ly</div>
+                    <div class="value">
+                      <input type="number" class="form-control" v-model="db_con.culy" readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Công nghệ</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.congnghe" readonly="true">
+                    </div>
+                  </div>
+
+                </div>
+
+                <!--thông tin về dịch vụ băng rộng-->
+              </div>
+              <!-- thông tin về dịch vụ megwan, metronet  -->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===7 || thuebao.dichvuvt_id===8">
+                <div class="col-sm-8 col-12">
+                  <div class="row">
+                    <div class="col-sm-7 col-8">
+                      <div class="info-row">
+                        <div class="key w80">Vệ tinh</div>
+                        <div class="select-custom">
+                          <SelectExt v-model="db_con.donvi_id" :disabled="true" :dataSource="dsTramVT" dataTextField="TEN_HIENTHI"
+                            dataValueField="DONVI_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Chủ quản</div>
+                        <div class="select-custom">
+                          <SelectExt v-model.number="db_con.chuquan_id" :disabled="true" :dataSource="dsChuQuan" dataTextField="TEN_TAT"
+                            dataValueField="CHUQUAN_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Loại node</div>
+
+                          <div class="select-custom">
+                            <SelectExt v-model.number="db_con.loainode_id" :disabled="true" :dataSource="dsLoaiNode" dataTextField="TEN_NODE"
+                              dataValueField="LOAINODE_ID" />
+                          </div>                        
+                        </div>
+                      <div class="info-row">
+                        <div class="key w80">VRF/VFI</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.vrfvfi" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Tốc độ CIR</div>
+                        <div class="value">
+                          <SelectExt v-model.number="db_con.tocdocir_id" :disabled="true" :dataSource="dsTocDoKenh"
+                            dataTextField="TOC_DO" dataValueField="TOCDO_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Hướng KN</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.huong_kn" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Địa chỉ POP</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.diachi_pop" readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">
+                          <div class="check-action">
+                            <input type="checkbox" class="check" @click="doitac_checked=!doitac_checked"  readonly="true">
+                            <span class="name">Đối tác</span>
+                          </div>
+                        </div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <SelectExt v-model="db_con.doitac_id" :disabled="!doitac_checked" :dataSource="dsDoiTac"
+                              dataTextField="TEN_DT" dataValueField="DOITAC_ID" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Mã HĐ/ĐT</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.mahd_dt">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Loại cáp</div>
+                        <div class="value">
+                          <SelectExt v-model="db_con.loaicap_id" 
+                            :disabled="true"
+                            :dataSource="dsLoaiCap" dataTextField="LOAICAP"
+                            dataValueField="LOAICAP_ID" />
+
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Tủ cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_goc" readonly="true">
+                        </div>
+                      </div>
+
+                      <div class="info-row">
+                        <div class="key w80">Đôi cáp gốc</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_goc"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Cáp gốc</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_goc"  readonly="true">
+                        </div>
+                        <div class="key w80">Công nghệ</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.congnghe"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w80">Cước ISP</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cuoc_isp"  readonly="true">
+                        </div>
+                        <span class="name"></span>
+                        <div class="key w80">Cước NIX</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cuoc_nix"  readonly="true">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-5 col-8">
+                      <div class="info-row">
+                        <div class="key w90">Mã TN</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.matn"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Modem</div>
+                        <div class="value">
+                          <SelectExt v-model.number="db_con.loaimd_id" :disabled="true" :dataSource="dsLoaiModem" dataTextField="LOAI_MD"
+                            dataValueField="LOAIMD_ID" />
+
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Thời hạn</div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <SelectExt v-model="db_con.thoihan_id" :disabled="true" :dataSource="dsThoiHan" dataTextField="TENTHOIHAN"
+                              dataValueField="THOIHAN_ID" />
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="info-row">
+                        <div class="key w100">
+                          <div class="check-action">
+                            <input type="checkbox" class="check" @click="pir_checked=!pir_checked"  readonly="true">
+                            <span class="name">Tốc độ PIR</span>
+                          </div>
+                        </div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <SelectExt v-model.number="db_con.tocdopir_id" :disabled="!pir_checked"
+                              :dataSource="dsTocDoKenh" dataTextField="TOC_DO" dataValueField="TOCDO_ID" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Site ID</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.site_id"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Q.gia POP</div>
+                        <div class="value">
+                          <SelectExt v-model.number="db_con.quoctich_id" :disabled="true" :dataSource="dsQuocTich"
+                            dataTextField="TENQUOCTICH" dataValueField="QUOCTICH_ID" />
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cước TKĐT</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cuoc_tkdt">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cước TCĐT</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cuoc_ctdt">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Hộp cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.hopcap_ngon"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Tủ cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.tucap_ngon"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Đôi cáp ngọn</div>
+                        <div class="value">
+                          <input type="number" class="form-control" v-model="db_con.doicap_ngon"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cáp ngọn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cap_ngon"  readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key w90">Cước IP</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="db_con.cuoc_ip"  readonly="true">
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w100">
+                      <div class="check-action">
+                        <input type="checkbox" class="check"  readonly="true">
+                        <span class="name"></span>
+                      </div>
+                    </div>
+                    <div class="value">
+                      Luồn giữa kênh
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Loại kênh</div>
+                    <div class="value">
+                      <SelectExt v-model.number="db_con.loaikenh_id" :disabled="true" :dataSource="dsLoaiKenh" dataTextField="LOAI_KENH"
+                        dataValueField="LOAIKENH_ID" />
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Cước TC</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tc">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cước TK</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tk">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Cước HT</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_ht">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Hướng ƯT</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.huong_ut"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cước TBi</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tbi">
+                    </div>
+                    <div class="check-action">
+                      <input type="checkbox" class="check"  readonly="true">
+                      <span class="name">VMP</span>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Adsl port</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.adslport"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Port MDF</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.portmdf"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Tuyến cáp</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.tuyencap"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Liên tủ</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.lientu"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cự ly</div>
+                    <div class="value">
+                      <input type="number" class="form-control" v-model="db_con.culy"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w100">
+                      <div class="check-action">
+                        <input type="checkbox" class="check" v-model="db_con.capngoai"  readonly="true">
+                        <span class="name"></span>
+                      </div>
+                    </div>
+                    <div class="value">
+                      Cáp ngoài VNPT
+                    </div>
+                  </div>
+                </div>
+
+                <!--thông tin về dịch vụ megwan, metronet -->
+              </div>
+
+              <!-- thông tin về dịch vụ TSL -->
+
+              <div class="row" v-show="thuebao.dichvuvt_id===9">
+                <div class="col-sm-8 col-12">
+
+                  <div class="info-row">
+                    <div class="key w90">Loại kênh</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="db_con.loaikenh_id" :dataSource="dsLoaiKenh"
+                          dataTextField="LOAI_KENH" dataValueField="LOAIKENH_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Loại thiết bị</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model.number="db_con.thietbi_id" :disabled="true" :dataSource="dsThietBiTSL" dataTextField="TEN_TBI"
+                          dataValueField="THIETBIDC_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Cước TK</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tk">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Cước TC</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tc">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">
+                      <div class="check-action">
+                        <input type="checkbox" class="check" @click="doitac_checked=!doitac_checked">
+                        <span class="name">Đối tác</span>
+                      </div>
+                    </div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="db_con.doitac_id" :disabled="!doitac_checked" :dataSource="dsDoiTac"
+                          dataTextField="TEN_DT" dataValueField="DOITAC_ID" />
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="info-row">
+                    <div class="key w100">Mã HĐ đối tác</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.mahd_dt">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">ĐC đầu</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.diachi_dau">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Đơn vị đầu</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="db_con.donvi_id_dau" :disabled="true" :dataSource="dsDonViQLTC" dataTextField="TEN_DV"
+                          dataValueField="DONVI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">ĐC cuối</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.diachi_cuoi">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w90">Đơn vị cuối</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt v-model="db_con.donvi_id_cuoi" :disabled="true" :dataSource="dsDonViQLTC" dataTextField="TEN_DV"
+                          dataValueField="DONVI_ID" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Tốc độ kênh</div>
+                    <div class="value">
+                      <SelectExt v-model.number="db_con.tocdokenh_id" :disabled="true" :dataSource="dsTocDoKenh" dataTextField="TOC_DO"
+                        dataValueField="TOCDO_ID" />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Chủ quản</div>
+                    <div class="value">
+                      <SelectExt v-model.number="db_con.chuquan_id" :disabled="true" :dataSource="dsChuQuan" dataTextField="TEN_TAT"
+                        dataValueField="CHUQUAN_ID" />
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Cước HT</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_ht">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cước TBi</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tbi">
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="key w80">Cước TKĐT</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tkdt">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Cước TCĐT</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.cuoc_tcdt">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">KV đầu</div>
+                    <div class="value">
+                      <div class="input-more-button">
+                        <button class="btn">
+                          <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <input type="text" class="form-control " v-model="db_con.khuvuc_dau"  readonly="true">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Site ID đầu</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.site_id_dau"  readonly="true">
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">KV cuối</div>
+                    <div class="value">
+                      <div class="input-more-button">
+                        <button class="btn">
+                          <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <input type="text" class="form-control " v-model="db_con.khuvuc_cuoi"  readonly="true">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Site ID cuối</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="db_con.site_id_cuoi"  readonly="true">
+                    </div>
+                  </div>
+                </div>
+
+                <!--Kết thúc dịch vụ TSL-->
+              </div>
+
+
+
+              <!--Kết thúc dịch vụ khác-->
+              <div class="row"
+                v-show="thuebao.dichvuvt_id===15 ||thuebao.dichvuvt_id===14||thuebao.dichvuvt_id===13||thuebao.dichvuvt_id===16">
+                <div class="table-content" id="table-scroll">
+                  <table id="db_cntt" class="table-result">
+                    <tbody>
+                      <tr v-for="(tt,i) in dsThuocTinhHDTB_CNTT" :key="i">
+                        <td style="display:none;" id="tt.FIELD_NAME" ref="tt.FIELD_NAME">
+
+                        </td>
+                        <td>
+                          {{tt.CAPTION}}
+                          <!--<span style="color: red">*</span>-->
+                        </td>
+                        <td class="padt0 padb0" colspan="2">
+                          <!--                                  :class="{ 'is-invalid': $v.dataSelected.loaiBeCapId.$error }"-->
+                          <div class="select-custom" v-if="tt.DATA_TYPE===1 && tt.DS!=='[]'">
+                            <select class="form-control bg-none h24 bor0" :disabled="true" v-model="tt.FIELD_VALUE">
+                              <option v-for="item in tt.DS" :value=item[tt.PARENT_KEYFIELD]>
+                                {{item[tt.PARENT_DESCFIELD]}}</option>
+                            </select>
+                          </div>
+                          <div class="value" v-else-if="tt.DATA_TYPE===2">
+                            <ejs-datepicker class="form-control bg-none h24 bor0"  readonly="true" v-model="tt.FIELD_VALUE"
+                              :format="date.dateFormat">
+                            </ejs-datepicker>
+                          </div>
+                          <div class="value" v-else>
+                            <input type="text" class="form-control bg-none h24 bor0" v-model="tt.FIELD_VALUE"  readonly="true">
+                          </div>
+                        </td>
+                      </tr>
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!--Kết thúc dịch vụ khác-->
+              <!-- kết thức panel phải-->
+            </div>
+
+          </div>
+        </div>
+        <div class="box-form">
+          <div class="legend-title">
+            <div class="pull-left">Danh sách thuê bao</div>
+            <div class="pull-right">
+              <div class="check-action normal red">
+                <input type="checkbox" class="check" v-model="thuebao.chuyenmang">
+                <span class="name">Từ NCC khác chuyến sang</span>
+              </div>
+
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="table-content">
+            <DataGrid :dataSource="dsThueBao" :columns="[
+                                                    {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting:false,freeze:'left'},
+                                                    {fieldName: 'MA_TB', headerText: 'Số máy/Account', allowFiltering: true, allowSorting:false, freeze:'left'},
+                                                    {fieldName: 'MA_LT', headerText: 'Số ảo', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'NGAY_SDDV', headerText: 'Ngày sử dụng', allowFiltering: true, allowSorting:false, align:'right'},
+                                                    {fieldName: 'CHUQUAN', headerText: 'Chủ quản', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'TEN_KC', headerText: 'Splitter', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'MA_DHVIP', headerText: 'Mã VIP', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: '', headerText: 'Tiên CKSĐ', allowFiltering: true, allowSorting:false},
+                                                    {fieldName: 'SOTHANG_CK', headerText: 'Số tháng CKSĐ', allowFiltering: true, allowSorting:false}
+                                                    ]" :showFilter="true" @rowClicked="MaTBChange" ref="gdsthuebao" :enable-paging-server="false":allow-paging="true">
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </div>  
+  
+  <loai-khach-hang @onCloseModalLoaiKH="onCloseModalLoaiKH" :isShow="showModalLoaiKH"></loai-khach-hang>
+  <chonDiaChi v-if="isShowDiaChiKH||isShowDiaChiTT||isShowDiaChiCT||isShowDiaChiBC||isShowDiaChiTB||isShowDiaChiLD||isShowDiaChiNDD||isShowDiaChiHK"
+    :isShow="isShowDiaChiKH||isShowDiaChiTT||isShowDiaChiCT||isShowDiaChiBC||isShowDiaChiTB||isShowDiaChiLD||isShowDiaChiNDD||isShowDiaChiHK"
+    :chiTietDiaChi="getChiTietDiaChi" :diaChi="query" @closeModalDiaChi="closeModalDiaChi" />
+  <KhuyenMai :isShow="isShowKhuyenMai" :thuebao_id="thuebao.thuebao_id" @closeModalKhuyenMai="closeModalKhuyenMai">
+  </KhuyenMai>
+  <ChiTietNganhNghe id="popupChiTietNganhNghe" :objChiTietNganhNghe="objChiTietNganhNghe" @objTNC="getTNC"></ChiTietNganhNghe> 
+    <popupMaInGhep id="dlgMaIG" ref="dlgMaIG"  :khachhang_id="khachhang.khachhang_id"      
+    :tucthi="1"
+    :kyhoadon="kyHoaDon"
+    @close="closeMaInGhep"
+    />
+    <b-modal id="popupSearchAccount" size="xl"
+  hide-footer
+  hide-header
+  hide-header-close
+  body-class="modal-body p-0">
+<SearchAccount modalId="popupSearchAccount" ref="popupSearchAccount"  @form-close="acceptSearchAccount" isPopup="true"/>
+</b-modal>
+<b-modal id="frmKhuVuc" ref="frmKhuVuc" modal-class="modal-ttlh" hide-footer hide-header>
+  <frmKhuVuc
+  :dulieu="popupComponentData"      
+  @form-close="khuVuc_Dong"
+  @chapnhan="khuVuc_ChapNhan"
+  >
+  </frmKhuVuc>
+</b-modal>  
+</div>

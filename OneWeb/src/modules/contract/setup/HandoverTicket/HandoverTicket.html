@@ -1,0 +1,304 @@
+<div>
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="btnTimKiem" :class="{disabled:!tsbtnTimKiem}">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnGiaoPhieu" :class="{disabled:!tsbtnGiaoPhieu}">
+                    <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnHuyGiao" :class="{disabled:!tsbtnHuyGiao}">
+                    <span class="icon one-cancel"></span>Hủy giao
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnCapNhatDV" :class="{disabled:!tsbtnCapNhatDV}"> 
+                    <span class="icon one-reload1"></span>Cập nhật ĐV
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="btnXuatFile">
+                    <span class="icon one-download"></span>Xuất file
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w100">Mã giao dịch</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="showPopupSearchContract">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                               
+                                <input type="text" class="form-control " v-model = "txtMaGD" v-on:keyup.enter="onMaGDEnter">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Ngày giao</div>
+                        <div class="value" width=100%>
+                            <div class="input-icon-right" width=100%>
+                               <!-- <flat-pickr class="form-control" :config="dateconfig" v-model="ngaygiao_tk" @on-change ="ngaygiaoChange" @onChange ="onFocusOut"/> -->
+                                <date-picker input-class="form-control" :format="dateFormat" :value-type="'format'" v-model="ngaygiao_tk" @change ="ngaygiaoChange" ></date-picker> 
+                                <!-- <span class="icon one-calendar"></span>  -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key">Trạng thái phiếu</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.trangthaiphieu.list" v-model="listbox.trangthaiphieu.value.id" @change="HienThi_DanhSach"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="timtheohd">
+                                <span class="name">Loại HĐ</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.loaihd.list" v-model="listbox.loaihd.value.LOAIHD_ID" @change="DichVuChange" :disabled="!isTimTheoLoaiHD"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="timtheodichvu" :disabled="!isTimTheoLoaiHD">
+                                <span class="name">Dịch vụ</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.dichvu.list" v-model="listbox.dichvu.value.DICHVUVT_ID" @change="DichVuChange" :disabled="!isTimTheoDichVu"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="timtheoquytrinh" :disabled="!isTimTheoDichVu || !isTimTheoLoaiHD">
+                                <span class="name">Quy trình:</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.quytrinh.list" v-model="listbox.quytrinh.value.quytrinh_id" @change="LoadHuongGiao" :disabled="!isTimTheoQuyTrinh"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-title mart20">Thông tin giao phiếu</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w100">Hướng giao</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.huonggiao.list" v-model="listbox.huonggiao.value.huonggiao_id" @change="HuongGiaoChange"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key">Mã giao dịch</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtMaGDChon" readonly="true">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w70">Ngày giao</div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <date-picker input-class="form-control" :format="dateFormat" :value-type="'format'" v-model="ngaygiao" ref="ngaygiao"></date-picker> 
+                               <!--  <flat-pickr class="form-control" :config="dateconfig" v-model="ngaygiao" ref="ngaygiao"/>
+                                <span class="icon one-calendar"></span> -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w100">Số máy/Acc</div>
+                        <div class="value">
+                            <input type="text" class="form-control highlight" v-model="txtMaTBChon" readonly="true">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w80">Số QĐ</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtSoPhieu" ref="txtSoPhieu" >
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key">Đơn vị nhận</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.donvinhan.list" v-model="listbox.donvinhan.value.donvi_id" ref = "donvinhan"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-3 col-6">
+                    
+                    <div class="info-row">
+                        <div class="key">Đơn vị nhận</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt :options="listbox.donvinhan.list" v-model="listbox.donvinhan.value.donvi_id" ref = "donvinhan"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-3 col-6">
+                    
+                    <div class="info-row">
+                        <div class="key">Đơn vị phối hợp</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <SelectExt :options="listbox.donviphoihop.list" v-model="listbox.donviphoihop.value.donvi_id" ref = "donviphoihop"> 
+                                    <option disabled value="0">Select one</option> 
+                                </SelectExt>  -->
+
+                                <div class="value select-custom">
+                                    <ejs-multiselect
+                                      v-model="listbox.donviphoihop.value"
+                                      id="ds_donviphoihop"
+                                      :dataSource="listbox.donviphoihop.list"
+                                      placeholder="Chọn đơn vị phối hợp"
+                                      selectAllText="Chọn tất cả"
+                                      :showSelectAll="true"
+                                      locale="vi-VN"
+                                      :showDropDownIcon="true"
+                                      unSelectAllText="Bỏ chọn tất cả"
+                                      mode="CheckBox"
+                                      :fields="{ text: 'ten_dv', value: 'donvi_id' }"
+                                    >
+                                    </ejs-multiselect>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key w100">Nội dung giao</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtNoiDung" ref="txtNoiDung">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    
+                    <div class="info-row">
+                        <div class="key">Địa chỉ TC</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtDiaChiTC" readonly="true">
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="legend-title mart20">
+            <div class="pull-left">
+                Danh sách phiếu yêu cầu
+            </div>
+            <div class="pull-right red">
+                
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <!-- dataKeyField="phieu_id" -->
+        <div class="table-content">
+            <table class="table-result table-gachle">
+                <div>
+                    <DataGrid
+                      v-bind:columns="listbox.ds_phieuyeucau.header"                    
+                      v-bind:dataSource="listbox.ds_phieuyeucau.list"
+                      :enable-paging-server="false"                                        
+                      :allowPaging="true"
+                      :showFilter="true"
+                      :showColumnCheckbox="true"
+                      ref="nvdaGan"
+                      @selectedRowChanged="gridChanged"
+                      @selectedItemsChanged="selectedItems_click"
+                      @rowClicked = "rowClicked" 
+                      >
+                  </DataGrid>  
+              </div>
+            </table>
+        </div>
+        <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract"/>
+    </div>
+    
+</div>

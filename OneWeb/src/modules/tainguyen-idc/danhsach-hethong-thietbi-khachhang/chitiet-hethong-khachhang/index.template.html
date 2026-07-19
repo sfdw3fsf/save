@@ -1,0 +1,328 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChiTietHeThongKhachHang"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        {{ currentMode == 'VIEW' ? ' Chi tiết hệ thống: ' + (item && item.TEN ? item.TEN : 'Chưa có tên') : currentMode
+        == 'EDIT' ? ' Chỉnh sửa hệ thống: ' + (item && item.TEN ? item.TEN : 'Chưa có tên') : ' Thêm mới hệ thống' }}
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2">
+      <div class="nav tab-over tabs">
+        <a
+          href="#tabCauHinhThietBi"
+          v-on:click="onChangeTab(1)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 1}"
+          >Hệ thống</a
+        >
+        <a
+          href="#tabLichSuThayDoi"
+          v-on:click="onChangeTab(2)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 2}"
+          >Lịch sử thay đổi</a
+        >
+      </div>
+      <div class="tab-content">
+        <div class="tab-content">
+          <!-- TAB 1: CẤU HÌNH THIẾT BỊ -->
+          <div class="tab-pane" id="tabCauHinhThietBi" :class="{active: tab_index == 1}">
+            <!-- SECTION 1: THÔNG TIN HỆ THỐNG -->
+            <div class="">
+              <div class="legend-title">Thông tin hệ thống</div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Mảng thiết bị <bss-required-marker /></div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="currentItem.MANGTBI_ID"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :class="controls.selectMangThietBi.invalid ? 'is-invalid' : ''"
+                        :dataSource="mangThietBiList"
+                        :disabled="currentMode == 'VIEW'"
+                        placeholder="Chọn Mảng thiết bị"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Loại khách hàng <bss-required-marker /></div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="currentItem.LOAIKH_ID"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :class="controls.selectLoaiKhachHang.invalid ? 'is-invalid' : ''"
+                        :dataSource="loaiKhachHangList"
+                        :disabled="currentMode == 'VIEW'"
+                        placeholder="Chọn Loại khách hàng"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w130">ID Hệ thống</div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="controls.txtIdHeThong.invalid ? 'is-invalid' : ''"
+                        :disabled="true"
+                        v-model="currentItem.HETHONGTBI_ID"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Tên hệ thống <bss-required-marker /></div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="controls.txtTenHeThong.invalid ? 'is-invalid' : ''"
+                        :disabled="currentMode == 'VIEW'"
+                        v-model="currentItem.TEN"
+                        placeholder="Nhập tên hệ thống"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Phạm vi IDC <bss-required-marker /></div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="currentItem.IDC_ID"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :class="controls.selectIDC.invalid ? 'is-invalid' : ''"
+                        :dataSource="idcList"
+                        :disabled="currentMode == 'VIEW'"
+                        placeholder="Chọn IDC"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Thời điểm lắp đặt <bss-required-marker /></div>
+                    <div class="value" v-if="showModal">
+                      <ejs-datepicker
+                        format="dd/MM/yyyy"
+                        v-model="currentItem.NGAY_LD"
+                        :class="controls.txtNgayLapDat.invalid ? 'is-invalid' : ''"
+                        :placeholder="''"
+                        :disabled="currentMode == 'VIEW'"
+                      ></ejs-datepicker>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Căn cứ lắp đặt <bss-required-marker /></div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="controls.txtCanCuLapDat.invalid ? 'is-invalid' : ''"
+                        :disabled="currentMode == 'VIEW'"
+                        v-model="currentItem.CANCU_YC"
+                        placeholder="Nhập căn cứ lắp đặt"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="info-row">
+                    <div class="key w130">Mô tả</div>
+                    <div class="value">
+                      <textarea
+                        class="form-control"
+                        :class="controls.txtMoTa.invalid ? 'is-invalid' : ''"
+                        :disabled="currentMode == 'VIEW'"
+                        v-model="currentItem.MOTA"
+                        placeholder="Nhập mô tả chi tiết về hệ thống"
+                        rows="3"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="info-row">
+                    <div class="key w130">Ghi chú</div>
+                    <div class="value">
+                      <textarea
+                        class="form-control"
+                        :class="controls.txtGhiChu.invalid ? 'is-invalid' : ''"
+                        :disabled="currentMode == 'VIEW'"
+                        v-model="currentItem.GHICHU"
+                        placeholder="Nhập ghi chú thêm"
+                        rows="2"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: THÔNG TIN QUẢN LÝ -->
+            <div class="" style="margin-top: 30px;">
+              <div class="legend-title">Thông tin quản lý</div>
+              
+              <div class="row">
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Trạng thái tài sản <bss-required-marker /></div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="currentItem.TRANGTHAI_TS_ID"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :class="controls.selectTrangThaiTaiSan.invalid ? 'is-invalid' : ''"
+                        :dataSource="trangThaiTaiSanList"
+                        :disabled="currentMode == 'VIEW'"
+                        placeholder="Chọn trạng thái tài sản"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Trạng thái vận hành <bss-required-marker /></div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="currentItem.TRANGTHAI_VH_ID"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :class="controls.selectTrangThaiVanHanh.invalid ? 'is-invalid' : ''"
+                        :dataSource="trangThaiVanHanhList"
+                        :disabled="currentMode == 'VIEW'"
+                        placeholder="Chọn trạng thái vận hành"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Ngày tạo</div>
+                    <div class="value" v-if="showModal">
+                      <ejs-datepicker
+                        format="dd/MM/yyyy"
+                        v-model="currentItem.NGAY_CN"
+                        :class="controls.txtNgayTao.invalid ? 'is-invalid' : ''"
+                        :placeholder="''"
+                        :disabled="currentMode == 'VIEW'"
+                      ></ejs-datepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Khách hàng <bss-required-marker /></div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="controls.txtKhachHang.invalid ? 'is-invalid' : ''"
+                        :disabled="true"
+                        v-model="currentItem.KHACH_HANG_TEN"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Số hợp đồng <bss-required-marker /></div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="controls.txtSoHopDong.invalid ? 'is-invalid' : ''"
+                        :disabled="true"
+                        v-model="currentItem.SO_HOP_DONG"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w130">Mã thuê bao <bss-required-marker /></div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="controls.txtMaThueBao.invalid ? 'is-invalid' : ''"
+                        :disabled="true"
+                        v-model="currentItem.MA_THUE_BAO"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="tabLichSuThayDoi" :class="{active: tab_index == 2}">
+            <div class="" v-if="currentMode != 'ADD'">
+              <div class="legend-title">Lịch sử tác động</div>
+              <TabHistory
+                :tenBang="'HETHONG_THIETBI'"
+                :tenCot="''"
+                :khoaDuLieu="currentItem.HETHONGTBI_ID ? currentItem.HETHONGTBI_ID : 0"
+                ref="tabHistory"
+              ></TabHistory>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

@@ -1,0 +1,125 @@
+<div v-bind:class="[isPopup != true ? 'main-wrapper' : '', '']">
+  <breadcrumb :header="header" v-if="isPopup != true" />
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a @click="clearData"> <span class="icon one-file-plus"></span>Nhập mới </a>
+      </li>
+      <li>
+        <a :class="{disabled: !enableSave}" @click="showGhepMaModal"> <span class="icon one-folder-code"></span>Ghép mã </a>
+      </li>
+      <li>
+        <a @click="showLichSuGhepModal"> <span class="icon one-history"></span>Lịch sử </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-move-select-table">
+      <div class="box-col box-form" id="boxLeft">
+        <div class="legend-title">Khách hàng gốc</div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w70">Mã KH</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="searchContractKHGoc">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" v-model="KHGoc.maKH" class="form-control highlight" v-on:keyup.enter="searchContractDetailsKHGoc" ref="maKHGocInput" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w70">Ngày LHĐ</div>
+              <div class="value">
+                <div class="input-icon-right">
+                  <input type="text" class="form-control" v-model="KHGoc.ngayLHD" />
+                  <span class="icon one-calendar"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w70">Tên KH</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="KHGoc.tenKH" />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w70">Địa chỉ KH</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="KHGoc.diaChiKH" />
+          </div>
+        </div>
+        <div class="legend-title mart20">Danh sách thuê bao</div>
+        <DataGrid ref="tableDSTBKHGoc" v-bind:columns="headerGridboxDSTBKHGoc" v-bind:dataSource="KHGoc.gridDSTB.list" :showColumnCheckbox="false" :enablePagingServer="false" :allowPaging="true" :showFilter="true" :allowTextWrap="true" />
+      </div>
+      <div class="box-col box-form" id="boxRight">
+        <div class="legend-title">Khách hàng ghép</div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w70">Mã KH</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="searchContractKHGhep">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" v-model="KHGhep.maKH" class="form-control highlight" v-on:keyup.enter="searchContractDetailsKHGhep" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w70">Ngày LHĐ</div>
+              <div class="value">
+                <div class="input-icon-right">
+                  <input type="text" class="form-control" v-model="KHGhep.ngayLHD" />
+                  <span class="icon one-calendar"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w70">Tên KH</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="KHGhep.tenKH" />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w70">Địa chỉ KH</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="KHGhep.diaChiKH" />
+          </div>
+        </div>
+        <div class="legend-title mart20">Danh sách hoá đơn</div>
+        <DataGrid ref="tableDSTBKHGhep" v-bind:columns="headerGridboxDSHDKHGhep" v-bind:dataSource="KHGhep.gridDSHD.list" :showColumnCheckbox="true" :enablePagingServer="false" :allowPaging="true" :showFilter="true" @selectedItemsChanged="grdChangedDSHDKHGhep" :defaultColumnCheckboxChecked="true" />
+
+        <div class="legend-title mart20">Danh sách thuê bao</div>
+        <DataGrid ref="tableDSTBKHGhep" v-bind:columns="headerGridboxDSTBKHGhep" v-bind:dataSource="KHGhep.gridDSTB.list" :showColumnCheckbox="false" :enablePagingServer="false" :allowPaging="true" :showFilter="true" :allowTextWrap="true" />
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <b-modal ref="searchAccountModalKHGoc" size="xl" body-class="modal-body p-0" scrollable hide-footer hide-header hide-header-Close>
+    <div slot="modal-title">
+      <span class="icon one-notepad"></span>
+      Tra cứu danh bạ
+    </div>
+    <SearchAccount :isPopup="true" @form-close="searchAccountCloseKHGoc" />
+  </b-modal>
+  <b-modal ref="searchAccountModalKHGhep" size="xl" body-class="modal-body p-0" scrollable hide-footer hide-header hide-header-Close>
+    <div slot="modal-title">
+      <span class="icon one-notepad"></span>
+      Tra cứu danh bạ
+    </div>
+    <SearchAccount :isPopup="true" @form-close="searchAccountCloseKHGhep" />
+  </b-modal>
+  <LichSuGhepModal :visible="lichSuGhepModalVisible" @set-visible="lichSuGhepModalVisible = $event" :maKHGoc="KHGoc.maKH"></LichSuGhepModal>
+</div>

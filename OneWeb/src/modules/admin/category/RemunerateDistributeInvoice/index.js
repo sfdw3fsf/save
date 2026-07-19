@@ -1,0 +1,2 @@
+import RemunerateDistributeInvoice from './RemunerateDistributeInvoice.vue'
+export default RemunerateDistributeInvoice

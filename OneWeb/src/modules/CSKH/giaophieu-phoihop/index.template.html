@@ -1,0 +1,173 @@
+<ejs-dialog class="popup-content" ref="popupGiaoPhieuPhoiHop" showCloseIcon=true :visible='false' :allowDragging='true'
+    :target='dialog.target' :width='dialog.width' :header='"GIAO PHIẾU PHỐI HỢP"'
+    :animationSettings='dialog.animationSettings' :open="openDialog" :close="closePopup" :position='dialog.position'>
+    <div class="modal-content popup-box">
+
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript:void(0)" @click="btnTimKiem_Click" title="Tìm kiếm">
+          <span class="icon one-search"></span> Tìm kiếm
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnGiaoPhieu_Click" title="Giao phiếu">
+          <span class="icon one-file-arrow-right1"></span> Giao phiếu
+        </a>
+      </li>
+      <!-- <li>
+        <a href="javascript:void(0)" @click="btnHuyGiao_Click" title="Hủy giao">
+          <span class="icon nc-icon-glyph ui-2_ban"></span> Hủy giao
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnCapNhatDonVi_Click" title="Cập nhật đơn vị">
+          <span class="icon nc-icon-glyph arrows-1_refresh-69"></span> Cập nhật đơn vị
+        </a>
+      </li> -->
+    </ul>
+  </div>
+  <div class="popup-body">
+    <div class="box-form">
+      <div class="legend-title">Thông tin hỗ trợ</div>
+      <div class="row">
+        <div class="col-sm-4 col-12">
+          <div class="info-row">
+            <div class="key w90">Mã hỗ trợ</div>
+            <div class="value">
+              <input type="text" class="form-control" :value="currentItem.MA_HT" readonly>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Mã TB</div>
+            <div class="value">
+              <input type="text" class="form-control" :value="currentItem.MA_TB" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Ngày tiếp nhận</div>
+            <div class="value">
+              <ejs-datepicker :enabled="false" format="dd/MM/yyyy"
+                :value="currentItem.NGAY_TN"></ejs-datepicker>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-sm-5 col-12">
+          <div class="info-row">
+            <div class="key w70">Tên TB</div>
+            <div class="value">
+              <input type="text" class="form-control" disabled :value="currentItem.TEN_TB">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w70">Địa chỉ TB</div>
+            <div class="value">
+              <input type="text" class="form-control" disabled :value="currentItem.DIACHI">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="legend-title mart20">Thông tin giao phiếu</div>
+      <div class="row">
+        <div class="col-sm-12 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w90">Hướng giao</div>
+                <div class="value">
+                  <SelectExt ref="comboboxHuongGiao" :dataSource="dsHuongGiao" v-model="huongGiaoID"
+                    dataTextField="HUONGGIAO" dataValueField="HUONGGIAO_ID" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w100">Công văn giao</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model.trim="txtCongVan">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nội dung giao</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model.trim="txtNoiDung" :class="{ 'is-invalid': this.$v.txtNoiDung.$invalid }">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="box-form">
+          <div class="box-move-select-table">
+              <div class="box-col">
+                  <div class="legend-title">Danh sách phiếu đã giao</div>
+                  <DataGrid ref="gridDonViDaGiao" :dataSource="donViDaGiao_grid.items" :columns="[
+                  {fieldName: 'ND_GIAO', headerText: 'Nội dung giao'},
+                  {fieldName: 'HUONGGIAO', headerText: 'Hướng giao'},
+                  {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', width: 150},
+                  {fieldName: 'NGUOIGIAO', headerText: 'Người giao'},
+                  {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', width: 120},
+                  {fieldName: 'DV_NHAN', headerText: 'Đơn vị nhận'},
+                  {fieldName: 'NGAY_TH', headerText: 'Ngày thực hiện', width: 150},
+                  {fieldName: 'NGUOI_TH', headerText: 'Người thực hiện'},
+                  {fieldName: 'ND_XACMINH', headerText: 'Nội dung thực hiện'},
+                  {fieldName: 'NGAYTRA', headerText: 'Ngày trả', width: 150},
+                  {fieldName: 'ND_TRA', headerText: 'Nội dung trả'},
+                  {fieldName: 'LYDO_TON', headerText: 'Lý do tồn'},
+                ]"
+                                      :commands="[
+                                          {name: 'DELETE', cssClass: 'btn-danger nc-icon-outline ui-1_trash', width: 20}
+                                          ]" :commandColumn="{headerText: 'Xóa', width: 50, firstColumn: true, show: true}"
+                                          @commandClicked="gridDsDonViDaGiao_onCommandClicked"
+
+                                       />
+              </div>
+              <div class="actions">
+
+                </div>
+              <!-- @selectedItemsChanged="itemSelectedChangedDaGiao"
+                <div class="actions">
+                <button class="btn" @click="move()">
+                  <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button class="btn" @click="unmove()">
+                  <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+              </div> -->
+
+              <div class="box-col">
+
+                  <div class="legend-title">Danh sách đơn vị chưa giao</div>
+                  <!-- <DataGrid ref="gridDonViCanGiao" :dataSource="donViChuaGiao_grid.items" :columns="[
+                                          {fieldName: 'MA_DV', headerText: 'Mã đơn vị', width: 120},
+                                          {fieldName: 'TEN_DV', headerText: 'Tên đơn vị' },
+                                          {fieldName: 'SO_DT', headerText: 'Số điện thoại', width: 130},
+                                          {fieldName: 'DONVI_ID', headerText: 'DONVI_ID', visible: false},
+                                          {fieldName: 'DONVI_CHA', headerText: 'Tên Đơn vị', visible: false ,isGroupedColumn: true},
+                                        ]" :showColumnCheckbox="true"
+                                        :enabledSelectFirstRow="false"
+                                        @selectedItemsChanged="itemSelectedChangedChuaGiao"
+                                        panelDataHeight="200px"
+                                        dataKeyField="DONVI_ID" :key="0"/> -->
+                  <div class="input-more-button -right">
+                    <div class="input-icon-right">
+                      <input type="text" class="form-control" v-model="searchDonViValue" @change="searchDonVi">
+                      <span class="icon nc-icon-outline ui-1_zoom"></span>
+                    </div>
+                  </div>
+                  <div class="tree-plus-ext tree-icon" style="height: 500px;overflow: auto;">
+                    <ejs-treeview id="treeview" ref="gridDonViCanGiao"  :fields='fieldsDonVi' :showCheckBox='true'
+                    :dataBound="onTreeDataBound"></ejs-treeview>
+                  </div>
+              </div>
+            </div>
+      </div>
+
+  </div>
+</div>
+</ejs-dialog>

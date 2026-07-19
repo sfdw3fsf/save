@@ -1,0 +1,214 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">{{title_page}}</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a ><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ </a></li>
+            <li class="breadcrumb-item"><a >Thanh toán</a></li>
+            <li class="breadcrumb-item active">Phát hành biên lai thu tiền</li>
+        </ul>
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="btnTimKiem_Click">
+                    <span class="icon one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li>
+                <a v-if="tag == 1 || tag ==2 " ref="tsbtnPhatHanh" @click="tsbtnPhatHanh_Click">
+                    <span class="icon ui-1_check-circle-08 nc-icon-glyph"></span>Phát hành
+                </a>
+            </li>
+            <li>
+                <a v-if="tag ==3 || tag == 2" ref="tsbtnGan" @click="tsbtnGan_Click">
+                    <span v-if="tag==3" class="icon one-save"></span>
+                    <span v-if="tag==2" class="icon one-file-plus"></span>{{tsbtnGan.Text}}
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="page-content">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="legend-title">Thông tin Biên Lai</div>
+                    <div class="info-row">
+                        <div class="key w80">Loại biên lai</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="loaibienlai_id"
+                                :allowFiltering="true" 
+                                ref="cboLoaiBL"
+                                :dataSource="options.cboLoaiBL" 
+                                @change="onChangeLoaiBL($event)"                                 
+                                dataValueField="loaibienlai_id"
+                                dataTextField="ten_loaibl"
+                                 >
+                                </SelectExt>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w80">Lượt tạo</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="luottao_id"
+                                :allowFiltering="true" 
+                                ref="cboLuotTao"
+                                :dataSource="options.cboLuotTao" 
+                                @change="onChangeLuotTao($event)"                                 
+                                dataValueField="luottao_id"
+                                dataTextField="luottao"
+                                 >
+                                </SelectExt>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w80">Biên lai</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="bienlai_id"
+                                :allowFiltering="true" 
+                                ref="cboBienLai"
+                                :dataSource="options.cboBienLai" 
+                                @change="onChangeLBienLai($event)"                                
+                                dataValueField="bienlai_id"
+                                dataTextField="so_bl"
+                                 >
+                                </SelectExt>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="legend-title">Thông tin tìm kiếm hợp đồng</div>
+                    <div class="info-row">
+                        <div class="key w100">Loại hợp đồng</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <ejs-multiselect v-model="listbox.cboLoaiHD.valueitems"
+                                :dataSource='listbox.cboLoaiHD.list'
+                                mode="CheckBox"
+                                popupWidth="350px"
+                                popupHeight="250px"
+                                :showSelectAll='true'
+                                selectAllText="Chọn tất cả"
+                                unSelectAllText="Bỏ chọn tất cả"
+                                :fields="{ text: 'ten_loaihd', value: 'loaihd_id' }">
+                            </ejs-multiselect>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row mb-0">
+                                <div class="key w95">
+                                    <div class="check-action">
+                                        <input type="checkbox" ref="chkTuNgay" v-model="chkTuNgay" class="check">
+                                        <span class="name">Từ ngày</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <vue-date :disable="!chkTuNgay" :format="'DD/MM/YYYY'" v-model="dtpTuNgay" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row mb-0">
+                                <div class="key w95">
+                                    <div class="check-action">
+                                        <input type="checkbox" ref="chkDenNgay" v-model="chkDenNgay" class="check">
+                                        <span class="name">Đến ngày</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <vue-date :disable="!chkDenNgay" :format="'DD/MM/YYYY'" v-model="dtpDenNgay" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">
+                                    Mã khách hàng
+                                </div>
+                                <div class="value">
+                                    <input type="text" v-on:keyup.enter="searchByMaKH" ref="txtMaKH" v-model="txtMaKH" class="form-control highlight">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">
+                                    Mã GD
+                                </div>
+                                <div class="value">
+                                    <input type="text" v-on:keyup.enter="searchByMaGD" v-model="txtMa_GD" class="form-control highlight">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-move-select-table">
+            <div class="box-col box-form">
+                <div class="legend-title">Hợp đồng đã gán</div>
+                <div class="table-content">
+                    <DataGrid
+                    v-bind:dataSource="dsGan.list"
+                    v-bind:columns="dsGan.cols"
+                    :allowPaging="true"
+                    ref="dgvDaGan"
+                    :showFilter="true"
+                    :enablePagingServer="false"
+                    :enabledSelectFirstRow="false"
+                    :panelDataHeight= "'300'"
+                    @rowSelected="selectedItems_click1" @rowDeselected="deselectedItems_click1" 
+                    :showColumnCheckbox = "true"
+                    /> 
+                </div>
+
+            </div>
+            <div class="actions">
+                <button  class="btn" @click="btnGo_Click">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button  class="btn" @click="btnGan_Click">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+            </div>
+            <div class="box-col box-form">
+                <div class="legend-title">Hợp đồng chưa gán</div>
+                <div class="table-content">
+                    <DataGrid
+                    v-bind:dataSource="ds.list"
+                    v-bind:columns="ds.cols"
+                    :selectionSettings= "{ type: 'Multiple' }"
+                    :allowPaging="true"
+                    :panelDataHeight="'300'"
+                    ref="dgvChuaGan"
+                    :showFilter="true"
+                    :showColumnCheckbox = "true"
+                    :enablePagingServer="false"
+                    :enabledSelectFirstRow="false"
+                    @queryCellInfo='queryCellInfo'
+                    @rowSelected="selectedItems_click" 
+                    @rowDeselected="deselectedItems_click" 
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+    
+</div>

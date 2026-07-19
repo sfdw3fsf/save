@@ -1,0 +1,182 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header"/>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" @click.prevent="btnTimKiem_Click" id='btnTimKiem'>
+          <span class="icon one-search"></span> {{ txtTimkiem }}
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="tsbtnBoQua_Click" id='tsbtnBoQua'>
+          <span class="nc-icon-glyph ui-1_circle-remove text-red"></span> Bỏ qua phiếu
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="onXuatFileClicked" id='tsbtnXuatFile'>
+          <span class="icon one-download"></span> Xuất file
+        </a>
+        <ModalXuatDuLieu id="modal-xuat-dulieu" :thuocTinh="dsThuocTinh" :data="gridDanhSach"/>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="tsbtnXuatExcel_Click" id='tsbtnXuatExcel'>
+          <span class="icon one-excel"></span> Xuất Excel
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="tsbtnChiTiet_Click" id='tsbtnChiTiet'>
+          Chi tiết hợp đồng
+        </a>
+        <ModalDSBD :list_bd="ds_bd" @get_dsbd="search_get_dsbd"></ModalDSBD>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="" id='btnDemNangSuat'>
+          <span class="icon one-history"></span> Năng xuất ngày
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="tsBtn_GiaoViecNV_Click" id='tsBtn_GiaoViecNV'>
+          <span class="icon one-file-edit2"></span> Giao việc
+        </a>
+      </li>
+
+      <li>
+        <a :href="lichSuKSUrl" target="_blank" data-toggle="tooltip" title="Lịch sử KS" id='tsBtn_LichSuKS'>
+          <span class="icon one-file-history"></span>Lịch sử KS
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="tsbtnDieuLai_Click" id='tsbtnDieuLai'>
+          <span class="icon nc-icon-glyph arrows-1_curved-next"></span> Điều lại
+        </a>
+      </li>
+    </ul>
+   </div>
+
+<div class="page-content">
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="box-form">
+          <div class="legend-title">Chọn đơn vị</div>
+          <div class="tree-plus donvi" style="overflow: auto;height: 400px">
+            <treeselect v-model="donviVaule"
+                        :multiple="true"
+                        :options="listItemDonViGoc"
+                        v-on:select="onChangeTreeSelect"
+                        noResultsText="Không có dữ liệu"
+                        placeholder="Vui lòng chọn đơn vị"
+                        :normalizer="removeNoChildren"
+                        :defaultExpandLevel="2"
+                        :always-open="true"
+                        :clearable="true"
+                        :limit="3"
+                        :show-count="false"
+                        noChildrenText="''"
+                        noOptionsText=''
+                        value-consists-of="ALL"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="box-form">
+          <div class="legend-title">Tìm kiếm theo điều kiện</div>
+          <div class="row">
+            <div class="col-sm-12 col-md-12">
+              <div class="info-row">
+                <div class="key w80">Trạng thái</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ejs-dropdownlist
+                      :allowFiltering="true"
+                      v-model="cboTrangThaiPhieu"
+                      placeholder="Chọn"
+                      :dataSource="DSTrangthai"
+                      :fields="{value:'ID', text: 'TRANGTHAI'}"
+                      :change="onChangeTrangThai"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-6">
+              <div class="info-row">
+                <div class="key w80">Từ ngày</div>
+                <div class="value">
+                  <ejs-datepicker v-model="dtpStartDate" :value="dtpStartDate" :max="today" :format="'dd/MM/y'"></ejs-datepicker>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-12 col-md-12 col-lg-6">
+              <div class="info-row">
+                <div class="key w80">Đến ngày</div>
+                <div class="value">
+                  <ejs-datepicker v-model="dtpEndDateSearch" :value="dtpEndDateSearch" :max="today" :format="'dd/MM/y'"></ejs-datepicker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-5">
+        <div class="box-form">
+          <div class="legend-title" style="font-weight:600 !important">Giao việc nhân viên</div>
+          <div class="table-content" style='height: 400px'>
+            <DataGrid
+              v-bind:columns="gridColumnsNVGiaoViec"
+              :gridLines="'Both'"
+              ref="gridNVGiaoViec"
+              dataKeyField="STT"
+              :dataSource="gridNVGiaoViec"
+              :showFilter="true"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :enabledSelectFirstRow="false"
+              @rowSelected="gridNVGiaoViecSelected"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='row'>
+      <div class='col-sm-12'>
+        <div class="box-form">
+          <div class="legend-title" style="font-weight:600 !important">Danh sách phiếu cần xử lý</div>
+          <div class="table-content">
+            <DataGrid
+              v-bind:columns="gridColumnsDanhSach"
+              ref="gridDanhSach"
+              dataKeyField="STT"
+              :dataSource="gridDanhSach"
+              :showFilter="true"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :enabledSelectFirstRow="false"
+              :allowExcelExport="true"
+              :contextMenuItems='getContextMenuItemsSuCoTmp()'
+              @rowSelected="gridDSDuLieuSelected"
+              @actionComplete="gridDSDuLieuComplete"
+              @pageChanged="gridDSDuLieuPageChanged"
+              @contextMenuClick='onContextMenuClick'
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

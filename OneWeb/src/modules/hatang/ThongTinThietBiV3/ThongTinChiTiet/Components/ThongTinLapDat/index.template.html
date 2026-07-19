@@ -1,0 +1,208 @@
+<div class="vtld-containner">
+  <div v-if="deviceTypeInfo.isTuDia" class="row vtri-ldat-loai-tu-dia">
+    <div class="legend-title d-flex justify-content-between align-items-center">
+      <div class="pull-left">Danh sách vị trí của tủ đĩa</div>
+      <button class="btn btn-sm btn-outline-primary" @click="onXemTrenSoDoRack">
+        Xem trên sơ đồ rack
+      </button>
+    </div>
+    <div class="table-content">
+      <DataGrid
+        v-bind:columns="[
+            { fieldName: 'stt', headerText: 'STT', textAlign: 'Left', allowFiltering: true, width: 80 },
+            { fieldName: 'loaiThietBiName', headerText: 'Loại thiết bị', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'maThietBi', headerText: 'Mã thiết bị', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'idcName', headerText: 'IDC', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'phongName', headerText: 'Phòng', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'rackName', headerText: 'Rack', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'khongGian', headerText: 'Không gian', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'uTren', headerText: 'Vị trí u trên', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'uDuoi', headerText: 'Vị trí u dưới', textAlign: 'Left', allowFiltering: true, width: 200 },
+            { fieldName: 'ACTIONS', headerText: 'Vị trí mặt rack', textAlign: 'Center', template: templateViTriMatRack(), width: 250 }
+          ]"
+        :dataSource="viTriTuDiaList"
+        :showFilter="true"
+        :allowPaging="true"
+        :enablePagingServer="false"
+        :enabledSelectFirstRow="true"
+        dataKeyField="ID"
+        ref="grdViTriTuDia"
+      />
+    </div>
+  </div>
+  <div v-if="!deviceTypeInfo.isTuDia" class=" row vi-tri-lap-dat">
+    <div class="col-12">
+      <div class="legend-title d-flex justify-content-between align-items-center">
+        <span>Thông tin lắp đặt</span>
+        <button class="btn btn-sm btn-outline-primary" @click="onLapDatRack">
+          Lắp đặt trên sơ đồ rack
+        </button>
+      </div>
+    </div>
+    <div class="col-md-6 col-12">
+      <div class="row">
+        <div class="col-12 info-row">
+          <div class="key w150">Đơn vị IDC<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="donViIDCList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="viTriLapDat.donViIDCId"
+              :disabled="!controls.select_donvi_idc_id.enabled"
+              @change="onDonViIDCChange"
+              :class="{ invalidBox: controls.select_donvi_idc_id.invalid }"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">IDC đặt thiết bị<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="IDCList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="viTriLapDat.idcId"
+              :disabled="!controls.select_idc_id.enabled"
+              :class="{ invalidBox: controls.select_idc_id.invalid }"
+              @change="onIDCChange"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">Toà nhà<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="IDCBuildingList"
+              dataTextField="TEN"
+              dataValueField="ID_TOANHA"
+              v-model="viTriLapDat.toaNhaId"
+              :disabled="!controls.select_building_id.enabled"
+              :class="{ invalidBox: controls.select_building_id.invalid }"
+              @change="onBuildingChange"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">Mặt sàn <bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="IDCFloorList"
+              dataTextField="DIEN_TICH"
+              dataValueField="ID"
+              v-model="viTriLapDat.matSanId"
+              :class="{invalidBox: controls.select_floor_id.invalid}"
+              :disabled="!controls.select_floor_id.enabled"
+              @change="onFloorChange"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">Vị trí mặt Rack<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value d-flex flex-wrap align-items-center gap-3 mt-1">
+            <div>
+              <label
+                ><input
+                  type="checkbox"
+                  v-model="viTriLapDat.matTruoc"
+                  :disabled="!controls.select_rack_pos_front.enabled"
+                />
+                Mặt trước</label
+              >
+            </div>
+            <div>
+              <label
+                ><input
+                  type="checkbox"
+                  v-model="viTriLapDat.matSau"
+                  :disabled="!controls.select_rack_pos_back.enabled"
+                />
+                Mặt sau</label
+              >
+            </div>
+            <div>
+              <label
+                ><input
+                  type="checkbox"
+                  v-model="viTriLapDat.canhTrai"
+                  :disabled="!controls.select_rack_pos_left.enabled"
+                />
+                Bên trái</label
+              >
+            </div>
+            <div>
+              <label
+                ><input
+                  type="checkbox"
+                  v-model="viTriLapDat.canhPhai"
+                  :disabled="!controls.select_rack_pos_right.enabled"
+                />
+                Bên phải</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-12">
+      <div class="row">
+        <div class="col-12 info-row">
+          <div class="key w150">Phòng/Zone<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="IDCZoneList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="viTriLapDat.phongId"
+              :disabled="!controls.select_zone_id.enabled"
+              :class="{ invalidBox: controls.select_zone_id.invalid }"
+              @change="onZoneChange"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">Rack<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="rackList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="viTriLapDat.rackId"
+              :disabled="!controls.select_rack_id.enabled"
+              :class="{ invalidBox: controls.select_rack_id.invalid }"
+              @change="onRackChange"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">U trên<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="UpperUList"
+              dataTextField="VITRI"
+              dataValueField="ID"
+              v-model="viTriLapDat.uTrenId"
+              :disabled="!controls.select_up_unit_id.enabled"
+              :class="{ invalidBox: controls.select_up_unit_id.invalid }"
+              @change="onUTrenChange"
+            />
+          </div>
+        </div>
+        <div class="col-12 info-row">
+          <div class="key w150">U dưới<bss-required-marker v-if="mode() == 'ADD' || mode() == 'EDIT'"/></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="LowerUList"
+              dataTextField="VITRI"
+              dataValueField="ID"
+              v-model="viTriLapDat.uDuoiId"
+              :disabled="!controls.select_down_unit_id.enabled"
+              :class="{ invalidBox: controls.select_down_unit_id.invalid }"
+              @change="onUDuoiChange"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

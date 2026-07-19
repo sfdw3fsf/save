@@ -1,0 +1,374 @@
+<div>
+  <breadcrumb :header="header"/>
+  <vue-nav>
+    <ul class="list">
+      <li
+        v-for="action in actions"
+        :key="action.id"
+        @click="onClickAction(action)"
+        :class="{ disabled: action.disabled }"
+        v-show="action.visible"
+      >
+        <a style="cursor: pointer;" :class="{ 'disabled-color': action.disabled }">
+          <span class="icon" :class="action.icon_class"></span> {{ action.name }}
+        </a>
+      </li>
+    </ul>
+  </vue-nav>
+
+  <div class="page-content">
+    <vue-card>
+      <b-row>
+        <vue-card label="Thông tin phiếu" :noborder="true">
+          <b-row>
+            <b-col sm="6" cols="12">
+              <b-row>
+                <b-col sm="6" cols="12">
+                  <div class="info-row">
+                    <div class="key w90">Mã giao dịch</div>
+                    <div class="value">
+                      <div class="input-more-button">
+                        <button class="btn" @click="btnLayMaGD_Click">
+                          <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <b-modal
+                          ref="popupFrmTraCuuHopDong"
+                          size="xl"
+                          title="Tra cứu hợp đồng, phụ lục"
+                          hide-footer
+                          body-class="modal-body p-0"
+                          modal-class="bss-modal bss-modal-tracuu-danhba"
+                        >
+                          <search-contract
+                            :loaihd_id="searchContractProp.loai_hd_id"
+                            :tthd_id="searchContractProp.trangthai_hd"
+                            :ngay_yc="searchContractProp.ngay_yc"
+                            :donviDLId="searchContractProp.donvi_dl_id"
+                            :kieu="1"
+                            :isPopup="1"
+                            @accept="acceptSearchContract"
+                          />
+                        </b-modal>
+                        <input
+                          type="text"
+                          class="form-control highlight fw6"
+                          ref="maGiaoDichRef"
+                          v-model.trim="txtMaGD"
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </b-col>
+
+                <b-col sm="6" cols="12">
+                  <div class="info-row">
+                    <div class="key w90">Ngày yêu cầu</div>
+                    <div class="value">
+                      <div class="input-icon-right">
+                        <div class="input-icon-right">
+                          <k-date-picker v-model.trim="dtpNgayHT" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </b-col>
+              </b-row>
+
+              <b-row>
+                <b-col sm="6" cols="12">
+                  <vue-input labelWidth="90" label="Mã KH" v-model.trim="txtMaKH" />
+                </b-col>
+                <b-col sm="6" cols="12">
+                  <vue-input labelWidth="90" label="Tên KH" v-model.trim="txtTenKH" />
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col sm="12" cols="12">
+                  <vue-input labelWidth="90" label="Địa chỉ KH" v-model.trim="txtDiaChiKH" />
+                </b-col>
+              </b-row>
+            </b-col>
+
+            <b-col sm="6" cols="12">
+              <b-row>
+                <b-col sm="6" cols="12">
+                  <div class="info-row">
+                    <div class="key w90">Dịch vụ VT</div>
+                    <div class="value">
+                      <div class="select-custom" ref="cboDichVuVTRef">
+                        <SelectExt
+                          dataValueField="DICHVUVT_ID"
+                          dataTextField="TEN_DVVT"
+                          v-model.number="cboDichVuVTId"
+                          :settings="{ dropdownParent: $refs['cboDichVuVTRef'] }"
+                          :dataSource="cboDichVuVT"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </b-col>
+                <b-col sm="6" cols="12">
+                  <div class="info-row">
+                    <div class="key w90">Loại TB</div>
+                    <div class="value">
+                      <div class="select-custom" ref="cboLoaihinhTBRef">
+                        <SelectExt
+                          dataValueField="LOAITB_ID"
+                          dataTextField="LOAIHINH_TB"
+                          v-model.number="cboLoaihinhTBId"
+                          :settings="{ dropdownParent: $refs['cboLoaihinhTBRef'] }"
+                          :dataSource="cboLoaihinhTB"
+                          :disabled="true"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col sm="12" cols="12">
+                  <div class="info-row">
+                    <div class="key w90">Kiểu yêu cầu</div>
+                    <div class="value">
+                      <div class="select-custom" ref="cboKieuLDRef">
+                        <SelectExt
+                          dataValueField="kieuld_id"
+                          dataTextField="ten_kieuld"
+                          v-model.number="cboKieuLDId"
+                          :settings="{ dropdownParent: $refs['cboKieuLDRef'] }"
+                          :dataSource="cboKieuLD"
+                          :disabled="true"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col sm="12" cols="12">
+                  <vue-input labelWidth="90" label="Ghi chú" v-model="txtGhiChu" />
+                </b-col>
+              </b-row>
+            </b-col>
+          </b-row>
+        </vue-card>
+      </b-row>
+
+      <b-row class="mt-4">
+        <b-col sm="6" cols="12">
+          <vue-card label="Thông tin thuê bao" :noborder="true">
+            <b-row>
+              <b-col sm="12" cols="12">
+                <div class="info-row">
+                  <div class="key w90">Account</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control highlight fw6"
+                      ref="txtMaTBRef"
+                      v-model.trim="txtMaTB"
+                    >
+                  </div>
+                </div>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="12" cols="12">
+                <vue-input labelWidth="90" label="Tên thuê bao" v-model.trim="txtTenTB" />
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="12" cols="12">
+                <vue-input labelWidth="90" label="Địa chỉ LĐ" v-model.trim="txtDiaChiLD" />
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="6" cols="12">
+                <vue-input labelWidth="90" label="Trang bị cũ" v-model.trim="txtTrangBiCu" />
+              </b-col>
+              <b-col sm="6" cols="12">
+                <vue-input labelWidth="90" label="Trang bị mới" v-model.trim="txtTrangBiMoi" />
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="6" cols="12">
+                <vue-input labelWidth="90" label="Loại Tbị cũ" v-model.trim="txtLoaiTbiCu" />
+              </b-col>
+              <b-col sm="6" cols="12">
+                <vue-input labelWidth="90" label="Loại Tbị mới" v-model.trim="txtLoaiTbiMoi" />
+              </b-col>
+            </b-row>
+          </vue-card>
+        </b-col>
+
+        <b-col sm="6" cols="12">
+          <vue-card :noborder="true" label="Danh sách nhân viên thực hiện">
+            <b-row>
+              <b-col sm="6" cols="12">
+                <div class="info-row">
+                  <div class="key w90">Ngày GV</div>
+                  <div class="value w20 padt7">
+                    <div class="check-action">
+                      <input
+                        type="checkbox"
+                        ref="chkNgayGVRef"
+                        class="check"
+                        v-model="chkNgayGV"
+                      >
+                      <span class="name"></span>
+                    </div>
+                  </div>
+                  <vue-date
+                    ref="dtpNgayGVRef"
+                    type="datetime"
+                    labelWidth="90"
+                    v-model="dtpNgayGV"
+                    :disable="disabledNgayGV"
+                    :format="'DD/MM/YYYY HH:mm:ss'"
+                    :checkbox="false"
+                  />
+                </div>
+              </b-col>
+              <b-col sm="6" cols="12">
+                <div class="info-row">
+                  <div class="key w90">Ngày HT</div>
+                  <div class="value w20 padt7">
+                    <div class="check-action">
+                      <input
+                        type="checkbox"
+                        ref="chkNgayBGRef"
+                        class="check"
+                        v-model="chkNgayBG"
+                      >
+                      <span class="name"></span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <vue-date
+                      type="datetime"
+                      labelWidth="90"
+                      v-model.trim="dtpNgayBG"
+                      :disable="disabledNgayBG"
+                      :format="'DD/MM/YYYY HH:mm:ss'"
+                      :checkbox="false"
+                    />
+                  </div>
+                </div>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="12" cols="12">
+                <div class="info-row">
+                  <div class="key w90">Người GV</div>
+                  <div class="value">
+                    <div class="select-custom" ref="cboNguoiGVRef">
+                      <SelectExt
+                        dataValueField="nhanvien_id"
+                        dataTextField="ten_nv"
+                        v-model.number="cboNguoiGVId"
+                        :settings="{ dropdownParent: $refs['nguoiGV'] }"
+                        :dataSource="cboNguoiGV"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="12" cols="12">
+                <DataGrid
+                  :columns="gridGiaoviec.headers"
+                  :dataSource="gridGiaoviec.dataSources"
+                  :showColumnCheckbox="false"
+                  :enable-paging-server="false"
+                  :allowPaging="true"
+                  :showFilter="true"
+                />
+              </b-col>
+            </b-row>
+          </vue-card>
+        </b-col>
+      </b-row>
+    </vue-card>
+
+    <vue-card label="Danh sách thuê bao">
+      <DataGrid
+        :columns="dtgDanhSach.headers"
+        :dataSource="dtgDanhSach.dataSources"
+        :showColumnCheckbox="false"
+        :enable-paging-server="false"
+        :allowPaging="true"
+        :showFilter="true"
+        @selectedRowChanged="onSelectedRowChanged"
+      />
+    </vue-card>
+  </div>
+
+  <ejs-dialog
+    :enableResize="true"
+    :visible="false"
+    ref="giaoPhieuModalRef"
+    :header='"Giao phiếu nhân viên"'
+    showCloseIcon=true
+    :target="'.main-wrapper'"
+    width="60%"
+    height="800"
+  >
+    <GiaoPhieuNhanVien
+      ref="formGiaoPhieuRef"
+      :ngaygiao="giaoViecProp.ngaygiao"
+      :nguoigv_id="giaoViecProp.nguoigv_id"
+      :phieu_id="giaoViecProp.phieu_id"
+      :ma_tb="giaoViecProp.ma_tb"
+      :hdtb_id="giaoViecProp.hdtb_id"
+      :huonggiao_id="giaoViecProp.huonggiao_id"
+      @giaoviec_success="giaoViecSuccess"
+    />
+  </ejs-dialog>
+
+  <b-modal
+    v-model="showModalTraphieu"
+    size="xl"
+    hide-footer
+    title="Trả phiếu"
+    body-class="modal-body p-0"
+    @hidden="hiddenTraPhieu"
+  >
+    <TraPhieu
+      :ngaytra="modelTraPhieu.ngaytra"
+      :ngaygiao="modelTraPhieu.ngaygiao"
+      :ma_gd="modelTraPhieu.maGd"
+      :ma_tb="modelTraPhieu.ma_tb"
+      :kieu="modelTraPhieu.kieugoiId"
+      :loaihd_id="modelTraPhieu.loaihdId"
+      :dichvuvt_id="modelTraPhieu.dichvuvtId"
+      :nhanvien_id="modelTraPhieu.nhanvienId"
+    />
+  </b-modal>
+
+  <chuyen-to ref="popupChuyenToRef" @closeChuyenTo="closePopupChuyenTo" />
+  <CapVatTuTB ref="popupVatTuTBRef" :input-data="modelVatTu"/>
+  <ton-phieu
+    ref="popupTonPhieuRef"
+    :trangthaiId="trangThaiHopDongId"
+    :phieuId="phieu_id"
+    @close="closePopupTonPhieu"
+  />
+  <b-modal
+    id="popupComponents"
+    size="xl"
+    hide-footer
+    hide-header
+    hide-header-close
+    body-class="modal-body p-0">
+    <component
+      :is="popupComponent"
+      ref="generalPopup"
+      :dulieu="popupComponentData"
+      v-bind="popupComponentAttr"
+      isPopup="true"
+      v-on="popupComponentEvts"
+    ></component>
+  </b-modal>
+  <InBienBan ref="popupInBBRef" :params="modelIn" />
+</div>

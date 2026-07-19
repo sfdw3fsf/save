@@ -1,0 +1,242 @@
+<div v-bind:class="[isPopup != true ? 'main-wrapper' : '', '']">
+  <breadcrumb :header="header" v-if="isPopup != true" />
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a :class="{disabled: !enableTiemKiemBnt}" @click="TiemKiemBnt"> <span class="icon one-search"></span>Tìm kiếm</a>
+      </li>
+      <li>
+        <a :class="{disabled: !enableThayDoiTTBnt}" @click="ThayDoiTTBnt"> <span class="icon one-edit"></span>Thay đổi TT</a>
+      </li>
+      <li>
+        <a :class="{disabled: !enableXuatFileBnt}" @click="XuatFileBnt"> <span class="icon one-download"></span>Xuất File</a>
+      </li>
+      <li>
+        <a :class="{disabled: !enableXuatExcelBnt}" @click="XuatExcelBnt"> <span class="icon one-excel"></span>Xuất Excel</a>
+      </li>
+      <li>
+        <a :class="{disabled: !enableNhanTinBnt}" @click="NhanTinBnt"> <span class="icon one-email"></span>Nhắn tin</a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="row">
+        <div class="col-sm-2 col-12"></div>
+        <div class="col-sm-2 col-12"></div>
+        <div class="col-sm-2 col-12"></div>
+        <div class="col-sm-2 col-12"></div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key w90">Kỳ hóa đơn</div>
+            <div class="value">
+              <div class="input-icon-right">
+                <flat-pickr class="form-control" :config="kyHoaDon.dateconfig" v-model="kyHoaDon.value" />
+                <span class="icon one-calendar"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key w90">Chu kỳ</div>
+            <div class="value">
+              <ejs-dropdownlist :dataSource="chuky.data" placeholder="" :fields="{ text: 'chuky' }" v-model="chuky.selected"></ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="height: 530px;">
+      <div class="col-sm-2 col-12">
+        <div class="box-form">
+          <div class="legend-title">
+            <div class="info-row">
+              <div class="key w90">Chọn đơn vị</div>
+              <div class="value">
+                <div class="select-custom">
+                  <!-- <Select2 ref="comboBoxlyDo" v-model="comboBox.lyDo.selected" :options="comboBox.lyDo.data" /> -->
+                  <ejs-dropdownlist :dataSource="LoaiDV.data" placeholder="" :fields="{ text: 'trangthai_bh', value: 'ttbh_id' }" v-model="LoaiDV.selected"></ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="input-more-button -right">
+            <button class="btn" @click="DonViXulySortTree">
+              <span class="one-sort f20"></span>
+            </button>
+            <div class="input-icon-right">
+              <ejs-textbox v-model="DonViXuly.search" @change="searchDonVi"></ejs-textbox>
+              <span class="icon nc-icon-outline ui-1_zoom"></span>
+            </div>
+          </div> -->
+          <div class="tree-plus" style="height: 425px; overflow: auto;">
+            <ejs-treeview id="treeviewComplaintProcess" ref="tree" cssClass="depts-tree-view" @nodeClicked="DonViXulyNodeClicked" :fields="DonViXuly.fields" @nodeSelected="DonViXulyNodeSelected" @nodeChecked="DonViXulyNodeChecked" :showCheckBox="DonViXuly.checkbox" :allowMultiSelection="false" />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-5">
+        <div class="box-form">
+          <div class="legend-title">Thông tin tìm kiếm</div>
+          <div class="info-row">
+            <div class="key">Loại khiếu nại</div>
+            <div class="value">
+              <div class="select-custom">
+                <!-- <Select2 ref="comboBoxlyDo" v-model="comboBox.lyDo.selected" :options="comboBox.lyDo.data" /> -->
+                <multiselect ref="TTTKComboBoxLoaiKN" v-model="TTTK.loaiKN.selected" :options="TTTK.loaiKN.data" placeholder="Chọn" :allowEmpty="false" label="ten_loai" track-by="loai_id">
+                  <template #noResult>
+                    Không tìm thấy thông tin
+                  </template>
+                </multiselect>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Trạng thái</div>
+            <div class="value">
+              <div class="select-custom">
+                <!-- <Select2 ref="comboBoxlyDo" v-model="comboBox.lyDo.selected" :options="comboBox.lyDo.data" /> -->
+                <multiselect ref="TTTKComboBoxTrangThai" v-model="TTTK.trangThai.selected" :options="TTTK.trangThai.data" placeholder="Chọn" :allowEmpty="false" label="trangthai_bh" track-by="ttbh_id">
+                  <template #noResult>
+                    Không tìm thấy thông tin
+                  </template>
+                </multiselect>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="TTTK.isEnabledDate" />
+                    <span class="name">Ngày TN Từ</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <flat-pickr class="form-control" :config="TTTK.dateconfig" v-model="TTTK.fromDate" :disabled="!TTTK.isEnabledDate" />
+                    <span class="icon one-calendar"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w60">Đến ngày</div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <flat-pickr class="form-control" :config="TTTK.dateconfig" v-model="TTTK.toDate" :disabled="!TTTK.isEnabledDate" />
+                    <span class="icon one-calendar"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="box-form">
+          <div class="legend-title">Thông tin thuê bao</div>
+          <div class="info-row">
+            <div class="key w90">Số máy/Acc</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="TTTB.SoMay" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Tên thuê bao</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="TTTB.TenTB" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Địa chỉ TB</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="TTTB.DiaChiTB" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nội dung KN</div>
+            <div class="value">
+              <textarea type="text" class="form-control" v-model="TTTB.NoiDungKn" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nội dung GQ</div>
+            <div class="value">
+              <textarea type="text" class="form-control" v-model="TTTB.NoiDungGQ" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-5">
+        <div class="box-form">
+          <div class="legend-title">Danh sách tiến trình xử lý</div>
+          <DataGrid
+            ref="gridboxDSTTXL"
+            v-bind:columns="gridboxDSTTXL.columns"
+            v-bind:dataSource="gridboxDSTTXL.data"
+            :showColumnCheckbox="false"
+            :enablePagingServer="false"
+            :allowPaging="true"
+            :showFilter="true"
+            @selectedItemsChanged="selectedItemsChangedGridboxDSTTXL"
+            :defaultColumnCheckboxChecked="false"
+            :enabledSelectFirstRow="true"
+            :panelDataHeight="'285px'"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box-form">
+        <div class="legend-title">Danh sách phiếu yêu cầu</div>
+        <DataGrid
+          ref="gridboxDSPYC"
+          v-bind:columns="gridboxDSPYC.columns"
+          v-bind:dataSource="gridboxDSPYC.data"
+          :showColumnCheckbox="false"
+          :enablePagingServer="false"
+          :allowPaging="true"
+          :showFilter="true"
+          @selectedItemsChanged="selectedItemsChangedGridboxDSPYC"
+          :defaultColumnCheckboxChecked="false"
+          :enabledSelectFirstRow="true"
+        />
+      </div>
+    </div>
+    <!-- Modal -->
+    <ejs-dialog :enableResize="true" :allowDragging="true" :visible="false" ref="popupGuiSmsRef" header="Gửi SMS tiến trình báo hỏng" showCloseIcon="true" width="60%" height="900" target=".main-wrapper">
+      <popup-gui-sms ref="guiSmsRef" :maTB="smsProp.maTB" :noiDung="smsProp.noiDung" @onClose="onClosePopupGuiSMS" />
+    </ejs-dialog>
+
+    <b-modal ref="popupNhapTienTrinhKhieuNai" size="m" body-class="p-0" centered scrollable hide-footer>
+      <div slot="modal-title">
+        <span class="icon one-notepad"></span>
+        Nhập nội dung tiến trình khiếu nại
+      </div>
+      <PopupNhapTienTrinhKhieuNai :isPopup="true" :inputData="popupNhapTienTrinhKhieuNaiData" @onSuccess="onSuccessPopupNhapTienTrinhKhieuNai" />
+    </b-modal>
+    <b-modal ref="popupThayDoiThongTinKhieuNai" size="xl" body-class="p-0" centered scrollable hide-footer>
+      <div slot="modal-title">
+        <span class="icon one-notepad"></span>
+        Thay đổi thông tin khiếu nại
+      </div>
+      <PopupThayDoiThongTinKhieuNai :isPopup="true" :inputData="gridboxDSPYC.selected" @onSuccess="onSuccessPopupThayDoiThongTinKhieuNai" />
+    </b-modal>
+    <b-modal ref="popupThayDoiThongTinKhieuNaiV2" size="xl" body-class="p-0" centered scrollable hide-footer>
+      <div slot="modal-title">
+        <span class="icon one-notepad"></span>
+        Thay đổi thông tin khiếu nại
+      </div>
+      <PopupThayDoiThongTinKhieuNaiV2 :isPopup="true" :inputData="gridboxDSPYC.selected" @onSuccess="onSuccessPopupThayDoiThongTinKhieuNaiV2" />
+    </b-modal>
+    <b-modal ref="popupChonNVSMS" size="xl" body-class="p-0" centered scrollable hide-footer>
+      <div slot="modal-title">
+        <span class="icon one-notepad"></span>
+        Chọn nhân viên nhắn tin SMS
+      </div>
+      <PopupChonNVSMS :isPopup="true" :inputData="gridboxDSPYC.selected" @onSuccess="onSuccessPopupChonNVSMS" />
+    </b-modal>
+  </div>
+</div>

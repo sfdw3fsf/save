@@ -1,0 +1,708 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li title="Lay thong tin" :class="{'disabled': !btnStatus.btnLayttEnabled}">
+                <a href="#" @click="listData()">
+                    <span class="icon one-reload1"></span>Lấy TT
+                </a>
+            </li>
+            <li title="Ghi lại thông tin hợp đồng" :class="{'disabled': !btnStatus.btnCapnhatEnabled}">
+                <a href="#" @click="saveData()">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li title="Thực hiện phân giao" :class="{'disabled': !btnStatus.btnPhangiaoEnabled}">
+                <a href="#" @click="Phangiao()">
+                    <span class="icon one-file-arrow-right1"></span>Thực hiện phân giao
+                </a>
+            </li>
+        <!--     <li title="Export DS phân giao" :class="{'disabled': !btnStatus.btnExportphangiaoEnabled}">
+                <a href="#">
+                    <span class="icon one-upload"></span>Export phân giao
+                </a>
+            </li> -->
+            <li title="Import phân giao" :class="{'disabled': !btnStatus.btnImportphangiaoEnabled}">
+                <a href="javascript: void(0)" @click="openDialog" title="Import phân giao">
+                    <span class="icon one-book"></span>Import phân giao
+                </a>
+                <PopupDocFilePhangiao ref="dlgDocFilePhangiao" />
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="nav tabs tab-over">
+            <a href="#" @click="switchTab('tab1')" :class="{ 'active': currentTab === 'tab1' }">Phân giao(F2)</a>
+            <a href="#" @click="switchTab('tab2')" :class="{ 'active': currentTab === 'tab2' }">Cấu hình định
+                mức(F3)</a>
+            <a href="#" @click="switchTab('tab3')" :class="{ 'active': currentTab === 'tab3' }">Cấu hình hệ số(F4)</a>
+            <a href="#" @click="switchTab('tab4')" :class="{ 'active': currentTab === 'tab4' }">Điều chỉnh phân
+                giao(F5)</a>
+            <a href="#" @click="switchTab('tab5')" :class="{ 'active': currentTab === 'tab5' }">Xác nhận điều
+                chỉnh(F6)</a>
+        </div>
+
+        <div class="tab-content bor0  pad0" style="box-shadow: none;">
+        <div v-show="currentTab === 'tab1'" id="tab1" class="tab-pane tab-content active">
+                <div class="box-form padt8 padb8">
+                    <div class="legend-title">Thông tin phân giao dự kiến gia hạn trả trước BRCĐ</div>
+                    <div class="row">
+                        <div id="boxLeft" class="box-col col-sm-6 col-6">
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Chương trình</div>
+                                        <div class="value">
+                                            <ejs-combobox Id='Chuongtrinh' :dataSource='chuongtrinhData'
+                                                v-model="ChuongtrinhT1_Id" :fields='chuongtrinhFields'
+                                                :placeholder='chuongtrinhWaterMark'></ejs-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Tháng KT</div>
+                                        <div class="value">
+                                            <div id="wrapper">
+                                                <ejs-datepicker id="datepicker" :value="thangnam.value"
+                                                    :start="thangnam.start" v-model="txtthangnam"
+                                                    :depth="thangnam.depth" :format="thangnam.format"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Tổ</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="cboDonViTo.value"
+                                                    :dataSource="cboDonViTo.dataSource" :allowFiltering="true"
+                                                    @change="getdsNhanVien('1')"
+                                                    :fields="{ value: 'donvi_id', text: 'ten_dv' }">
+                                                </ejs-dropdownlist>
+                                                <!-- :change='getdsNhanVien()' -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="boxRight" class="box-col col-sm-6 col-12">
+                            <div class="row">
+                                <div<div class="col-sm-2 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80 nowrap fw6">Nhóm ưu tiên</div>
+                                        <div class="value w20 padt7">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check" v-model="uutien">
+                                                <span class="name"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="box-col col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w30 nowrap fw6">Tên nhân viên</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <ejs-multiselect v-model="cboDsNhanVien.value" mode="CheckBox"
+                                                :dataSource="cboDsNhanVien.dataSource"
+                                                :showSelectAll='cboDsNhanVien.value' selectAllText="Chọn tất cả"
+                                                unSelectAllText="Bỏ chọn"
+                                                :fields="{ value: 'nhanvien_id', text: 'manv_ten' }" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row marb0">
+                                    <div class="key w10 nowrap fw6">Số lượng</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" style="width: 50px;"
+                                            id="selected_Nhanvien_Count" v-model="selected_Nhanvien_Count" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="box-form">
+                <div class="legend-title">Danh sách giao chỉ số dự kiến các đơn vị</div>
+                <ejs-grid id="DsPhangiaoDukien" :dataSource="DsPhangiaoDukien.dataSource" :allowPaging='true'
+                    :allowSorting='true'>
+                    <e-columns>
+                        <e-column field='thang_kt' headerText='Tháng KT' textAlign='left' width=120></e-column>
+                        <e-column field='ma_phong' headerText='Mã phòng' textAlign='left' width=120></e-column>
+                        <e-column field='ten_phong' headerText='Tên phòng' textAlign='left' width=300></e-column>
+                        <e-column field='sl_tb' headerText='SL tổng TB' textAlign='left' width=120></e-column>
+                        <e-column field='sl_qd' headerText='SL tổng quy đổi' textAlign='left' width=150></e-column>
+                        <e-column field='sl_giao' headerText='Tổng SL giao dự kiến' textAlign='left' width=200></e-column>
+                        <e-column field='sl_chua_giao' headerText='Tổng SL chưa giao' textAlign='left' width=180></e-column>
+                        <e-column field='sl_1dv' headerText='Loại 1 DV' textAlign='left' width=150></e-column>
+                        <e-column field='sl_2dv' headerText='Loại 2 DV' textAlign='left' width=150></e-column>
+                        <e-column field='sl_3dv' headerText='Loại 3 DV' textAlign='left' width=150></e-column>
+                        <e-column field='sl_qd_1dv' headerText='Hệ số loại 1' textAlign='left' width=150></e-column>
+                        <e-column field='sl_qd_2dv' headerText='Hệ số loại 2' textAlign='left' width=150></e-column>
+                        <e-column field='sl_qd_3dv' headerText='Hệ số loại 3' textAlign='left' width=150></e-column>
+                    </e-columns>
+                </ejs-grid>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Thông tin dữ liệu giao nhân viên</div>
+                      <ejs-grid id="DsThongtingiaoNv" :dataSource="DsThongtingiaoNv.dataSource" :allowPaging='true'
+                        :allowSorting='true'>
+                        <e-columns>
+                            <e-column field='thang_kt' headerText='Tháng KT' textAlign='left' width=120></e-column>
+                            <e-column field='ma_phong' headerText='Mã phòng' textAlign='left' width=120></e-column>
+                            <e-column field='ten_phong' headerText='Tên phòng' textAlign='left' width=300></e-column>
+                            <e-column field='ten_to' headerText='Tổ thực hiện' textAlign='left' width=200></e-column>
+                            <e-column field='nhom_uutien' headerText='Nhóm ưu tiên' textAlign='left' width=200></e-column>
+                            <e-column field='sl_nv_giao' headerText='SL nhân viên đã giao' textAlign='left' width=200></e-column>
+                            <e-column field='sl_tb_giao' headerText='Sl thuê bao đã giao' textAlign='left' width=200></e-column>
+                            <e-column field='ten_nv_capnhat' headerText='Tên NV cập nhật' textAlign='left' width=200></e-column>
+                            <e-column field='ngay_cap_nhat' headerText='Ngày cập nhật' textAlign='left' width=200></e-column>
+                        </e-columns>
+                    </ejs-grid>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách phân giao</div>
+                <!-- <button @click="exportToExcel" class="icon one-download" >Xuất Excel</button> -->
+                <ejs-grid id="DsThongtinPhangiao" ref="gridEr" :dataSource="DsThongtinPhangiao.dataSource" :allowPaging='true'
+                    :allowResizing='true' :allowExcelExport="true">
+                    <e-columns>
+                        <e-column field='ma_tb' headerText='Mã TB' textAlign='left'  width=120></e-column>
+                        <e-column field='ten_tb' headerText='Tên TB' textAlign='left' width=300></e-column>
+                        <e-column field='sdt_lh' headerText='SĐT LH' textAlign='left' width=120></e-column>
+                        <e-column field='datcoc_csd' headerText='Đặt cọc CSD' textAlign='left' width=200></e-column>
+                        <e-column field='tengoi' headerText='Tên gói' textAlign='left' width=200></e-column>
+                        <e-column field='ngay_bddc' headerText='Ngày BĐĐC' textAlign='left' width=200></e-column>
+                        <e-column field='ngay_ktdc' headerText='Ngày KTĐC' textAlign='left' width=200></e-column>
+                        <e-column field='sothang_dc' headerText='Số tháng ĐC' textAlign='left' width=200></e-column>
+                        <e-column field='solan_dc' headerText='Số lần ĐC' textAlign='Right' width=200></e-column>
+                        <e-column field='ten_km' headerText='Tên KM' textAlign='left' width=200></e-column>
+                        <e-column field='so_cv' headerText='SỐ CV' textAlign='left' width=200></e-column>
+                        <e-column field='manv_o' headerText='Mã NV ô' textAlign='left' width=200></e-column>
+                        <e-column field='manv_th' headerText='Mã NV thực hiện' textAlign='left' width=200></e-column>
+                        <e-column field='manv_giao' headerText='Mã NV giao' textAlign='left' width=200></e-column>
+                        <e-column field='diemtinnhiem' headerText='Điểm tín nhiệm' textAlign='left' width=200></e-column>
+                        <e-column field='ma_dltc' headerText='Mã ĐLTC' textAlign='left' width=200></e-column>
+                        <e-column field='ten_nvtc' headerText='Tên NVTC' textAlign='left' width=200></e-column>
+                        <e-column field='to_dltc' headerText='Tổ ĐLTC' textAlign='left' width=200></e-column>
+                        <e-column field='manv_nv' headerText='Mã NV nghiệp vụ' textAlign='left' width=200></e-column>
+                        <e-column field='ten_da' headerText='Tên dự án' textAlign='left' width=200></e-column>
+                        <e-column field='doituong_kh' headerText='Đối tượng KH' textAlign='left' width=200></e-column>
+                        <e-column field='heso' headerText='Hệ số' textAlign='left' width=200></e-column>
+                        <e-column field='km' headerText='Khuyến mãi' textAlign='left' width=200></e-column>
+                        <e-column field='sl_dichvu' headerText='Số lượng DV' textAlign='left' width=200></e-column>
+                        <e-column field='sl_thuebao' headerText='Số lượng TB' textAlign='left' width=200></e-column>
+                    </e-columns>
+                </ejs-grid>
+            </div>
+        </div>
+        <div v-show="currentTab === 'tab2'" class="tab-pane tab-content active" id="tab2">
+            <div class="box-form padt8 padb8">
+                <div class="row">
+                    <div id="boxLeft" class="box-col col-sm-6 col-6">
+                        <div class="box-form">
+                            <div class="legend-title">Thông tin phân giao</div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120 nowrap fw6">Chương trình</div>
+                                        <div class="value">
+                                            <ejs-combobox Id='Chuongtrinh' :dataSource='chuongtrinhData'
+                                                v-model="ChuongtrinhT2_Id" :fields='chuongtrinhFields'
+                                                :placeholder='chuongtrinhWaterMark'></ejs-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120 nowrap fw6">Tháng KT</div>
+                                        <div class="value">
+                                            <div id="wrapper">
+                                                <ejs-datepicker id="datepicker" :value="thangnam.value"
+                                                    :start="thangnam.start" v-model="txtthangnam2"
+                                                    :depth="thangnam.depth" :format="thangnam.format"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120 nowrap fw6">Tổ</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="cboDonViToT2.value"
+                                                    :dataSource="cboDonViTo.dataSource" :allowFiltering="true"
+                                                    @change="getNVDinhmucT2"
+                                                    :fields="{ value: 'donvi_id', text: 'ten_dv'}">
+                                                </ejs-dropdownlist>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120 nowrap fw6">SL Mã TT</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control text fw6" :value=txtSlMatt>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120 nowrap fw6">SL tổng TB</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control text fw6" :value=txtSlMatb />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120 nowrap fw6">Tổng quy đổi</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control text fw6" :value=txtSlQuydoi />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                        </div>
+                    </div>
+                    <div id="boxRight" class="box-col col-sm-6 col-12">
+                        <div class="box-form">
+                            <div class="legend-title">Danh sách nhân viên cần cấu hình định mức</div>
+                            <div class="table-content">
+                                <table class="table-result table-gachle">
+                                    <tbody>
+                                        <tr>
+                                            <ejs-grid ref="cboDsNhanVien" id="cboDsNhanVien"
+                                                :dataSource="cboDsNhanVienT2.dataSource" :allowPaging='true'
+                                                :allowSorting='true' :allowFiltering='true' :pageSettings='pageSettings'
+                                                :editSettings='editSettings' @actionComplete="onActionBegin">
+                                                <e-columns>
+                                                    <!-- <e-column type='checkbox' width='10'></e-column> -->
+                                                    <e-column field='ma_nv' headerText='Mã nhân viên' textAlign='left'
+                                                        width=1̀50 :allowEditing='false'></e-column>
+                                                    <e-column field='ten_nv' headerText='Tên nhân viên' textAlign='left'
+                                                        width=250 :allowEditing='false'></e-column>
+                                                    <e-column field="thang_kt" headerText="Tháng KT" width=120
+                                                        :allowEditing='false'></e-column>
+                                                    <e-column field="dinhmuc" headerText="Định mức">
+                                                    </e-column>
+                                                </e-columns>
+                                            </ejs-grid>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--  -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-show="currentTab === 'tab3'" class="tab-pane active" id="tab3">
+            <div class="box-form padt8 padb8">
+                <div class="tab-content" v-if="currentTab != 'tab1' && currentTab != 'tab2'">
+                    <div class="row">
+                        <div class="col-sm-12 col-12">
+                            <div class="legend-title">Cấu hình hệ số quy đổi</div>
+                        </div>
+                    </div>
+                    <div class="row" v-for="(hs, index) of dsHeso">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div v-if="index<2" class="key w120 nowrap fw6">Hệ số loại {{index+1}} dịch vụ</div>
+                                <div v-else class="key w120  fw6">Hệ số loại {{index+1}} dịch vụ trở lên</div>
+                                <div class="value">
+                                    <input type="text" id="index" class="form-control" v-model="hs.heso">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120 nowrap fw6">Mô tả quy đổi</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model=hs.ten_heso >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div v-show="currentTab === 'tab4'" class="tab-pane active" id="tab4">
+            <div class="box-form padt8 padb8">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="box-form">
+                            <div class="row">
+                                <!-- box 1 -->
+                                <div class="legend-title">Thông tin nhân viên điều chỉnh</div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="input-container">
+                                            <div class="info-row">
+                                                <div class="key w120">Chương trình
+                                                    <span class="required">*</span>
+                                                </div>
+                                                <div class="value">
+                                                    <div class="select-custom">
+                                                        <ejs-combobox Id='Chuongtrinh' :dataSource='chuongtrinhData'
+                                                            v-model="ChuongtrinhT4_Id" :fields='chuongtrinhFields'
+                                                            :placeholder='chuongtrinhWaterMark'></ejs-combobox>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row marb0">
+                                            <div class="key w10 nowrap">Tháng giao</div>
+                                            <div class="value">
+                                                <div id="wrapper">
+                                                    <ejs-datepicker id="datepicker" :value="thangnam.value"
+                                                        :start="thangnam.start" v-model="txtthangnam"
+                                                        :depth="thangnam.depth"
+                                                        :format="thangnam.format"></ejs-datepicker>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="info-row">
+                                    <div class="input-container">
+                                        <div class="info-row">
+                                            <div class="key w120"> Tổ
+                                                <span class="required">*</span>
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <ejs-dropdownlist locale="vi-VN" v-model="cboDonViToT4.value"
+                                                        :dataSource="cboDonViTo.dataSource" :allowFiltering="true"
+                                                        @change="getdsNhanVien('4')"
+                                                        :fields="{ value: 'donvi_id', text: 'ten_dv' }">
+                                                    </ejs-dropdownlist>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="info-row">
+                                    <div class="input-container">
+                                        <div class="info-row">
+                                            <div class="key w120">Nhân viên điều chỉnh
+                                                <span class="required">*</span>
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <!-- <ejs-multiselect v-model="cboDsNhanVienT4.value"
+                                                        :dataSource="cboDsNhanVienT4.dataSource"
+                                                        :fields="{ value: 'nhanvien_id', text: 'manv_ten' }" /> -->
+                                                    <ejs-dropdownlist locale="vi-VN" v-model="cboDsNhanVienT4.value"
+                                                        :dataSource="cboDsNhanVienT4.dataSource" :allowFiltering="true"
+                                                        :fields="{ value: 'nhanvien_id', text: 'manv_ten' }">
+                                                    </ejs-dropdownlist>
+
+                                                    <!-- <ejs-dropdownlist locale="vi-VN" v-model="cboDonViToT4.value"
+                                                        :dataSource="cboDonViTo.dataSource" :allowFiltering="true"
+                                                        @change="getdsNhanVien('4')"
+                                                        :fields="{ value: 'donvi_id', text: 'ten_dv' }">
+                                                    </ejs-dropdownlist> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--  -->
+                            </div>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="col-sm-6 col-12">
+                        <div class="box-form">
+                            <div class="row">
+                                <div class="legend-title">Thông tin nhân viên tiếp nhận
+                                    <div class="check-action pull-right bold">
+                                        <input type="checkbox" class="check">
+                                        <span class="name">Chuyển địa bàn quản lý</span>
+                                    </div>
+                                </div>
+                                <!-- box 2 -->
+                                <div class="row">
+                                    <div class="col-sm-6 col-12">
+                                        <div class="value">
+                                            <div class="input-more-button -right">
+                                                <div class="input-icon-right">
+                                                    <div class="info-row">
+                                                        <div class="key w120">Từ ngày
+                                                            <span class="red"> *</span>
+                                                        </div>
+                                                        <div v-if="ChuongtrinhT4_Id == 1" class="value">
+                                                            <div class="mx-datepicker" style="width: 100%;"
+                                                                :class="{'disabled': !btnStatus.txtTungayEnabled}">
+                                                                <ejs-datepicker id="datepicker"
+                                                                    :value="ngaythangnam.value"
+                                                                    style="background: white; color: #495057"
+                                                                    :format="ngaythangnam.format">
+                                                                </ejs-datepicker>
+                                                            </div>
+                                                        </div>
+                                                        <div v-else class="value">
+                                                            <div class="mx-datepicker" style="width: 100%;"
+                                                                :class="{'disabled': btnStatus.txtTungayEnabled}">
+                                                                <ejs-datepicker id="datepicker"
+                                                                    :value="ngaythangnam.value"
+                                                                    :format="ngaythangnam.format"></ejs-datepicker>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-12">
+                                        <div class="value">
+                                            <div class="input-more-button -right">
+                                                <div class="input-icon-right">
+                                                    <div class="info-row">
+                                                        <div class="key w120">Đến ngày
+                                                            <span class="red"> *</span>
+                                                        </div>
+                                                        <div v-if="ChuongtrinhT4_Id == 1" class="value">
+                                                            <div class="mx-datepicker" style="width: 100%;"
+                                                                :class="{'disabled': !btnStatus.txtDenngayEnabled}">
+                                                                <ejs-datepicker id="datepicker"
+                                                                    :value="ngaythangnam.value"
+                                                                    :format="ngaythangnam.format"></ejs-datepicker>
+                                                            </div>
+                                                        </div>
+                                                        <div v-else class="value">
+                                                            <div class="mx-datepicker" style="width: 100%;"
+                                                                :class="{'disabled': btnStatus.txtDenngayEnabled}">
+                                                                <ejs-datepicker id="datepicker"
+                                                                    :value="ngaythangnam.value"
+                                                                    :format="ngaythangnam.format"></ejs-datepicker>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="info-row">
+                                <div class="input-container">
+                                    <div class="info-row">
+                                        <div class="key w120"> Phòng
+                                            <span class="required">*</span>
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="cboPhongbhT4.value"
+                                                    :dataSource="cboPhongbhT4.dataSource" :allowFiltering="true"
+                                                    @change="getDsTo" :fields="{ value: 'donvi_id', text: 'ten_dv' }" />
+                                            </div>
+                                            <!--placeholder="Chon Phòng bán hàng khu vực..." -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="input-container">
+                                    <div class="info-row">
+                                        <div class="key w120"> Tổ
+                                            <span class="required">*</span>
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="cboDsTo.value"
+                                                    :dataSource="cboDsTo.dataSource" :allowFiltering="true"
+                                                    @change="getDsNhanvienTiepnhan"
+                                                    :fields="{ value: 'donvi_id', text: 'ten_dv' }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="info-row">
+                                <div class="input-container">
+                                    <div class="info-row">
+                                        <div class="key w120"> Nhân viên tiếp nhận
+                                            <span class="required">*</span>
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="DsNhanVienTiepnhan.value"
+                                                    :dataSource="DsNhanVienTiepnhan.dataSource" :allowFiltering="true"
+                                                    :fields="{ value: 'nhanvien_id', text: 'manv_ten' }">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                        </div>
+                    </div>
+                </div> <!--div row  -->
+                <!--  -->
+                <div class="row">
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="table-content" style="height: 500px;">
+                                <div class="legend-title">Danh sách thuê bao của nhân viên điều chỉnh</div>
+                                <DataGrid class="table-result table-gachle" panelDataHeight="400"
+                                    :columns="gridDieuChinh.header" :dataSource="gridDieuChinh.list"
+                                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                    :showColumnCheckbox="true" :enabledSelectFirstRow="false"
+                                    :defaultColumnCheckboxChecked="false" ref="gridDieuChinh"
+                                    :allowExcelExport='true'
+                                    @selectedItemsChanged=" dataCheckedsGan($event) "/>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn" @click="boGan()">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+                            <!-- <button class="btn" @click="boGanAll()">
+                                <span class="fa fa-angle-double-right"></span>
+                            </button> -->
+                            <button class="btn" @click="gan()">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+                            <!-- <button class="btn" @click="ganAll()">
+                                <span class="fa fa-angle-double-left"></span>
+                            </button> -->
+                        </div>
+
+                        <div class="box-col">
+                            <div class="table-content" style="height: 500px;">
+                                <DataGrid class="table-result table-gachle" panelDataHeight="400"
+                                    :columns="gridTiepNhan.header" :dataSource="gridTiepNhan.list"
+                                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                    :showColumnCheckbox="true" :enabledSelectFirstRow="false" ref="gridTiepNhan"
+                                    @selectedItemsChanged="dataCheckedsChuaGan($event)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- dong div row -->
+        </div>
+        <div v-show="currentTab === 'tab5'" class="tab-pane active" id="tab5">
+            <div class="box-form">
+                <div class="legend-title">Xác nhận điều chỉnh phân giao</div>
+                <div class="row">
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row marb0">
+                            <div class="key w10 nowrap fw6">Tháng giao</div>
+                            <div class="value">
+                                <div id="wrapper">
+                                    <ejs-datepicker id="datepicker" :value="thangnam.value" :start="thangnam.start"
+                                        v-model="txtthangnam" :depth="thangnam.depth"
+                                        @change="getDsNhanvienYeucauChuyen" :format="thangnam.format"></ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row marb0">
+                            <div class="key w10 nowrap fw6">Nhân viên điều chỉnh</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist locale="vi-VN" v-model="DsNhanVienChuyen.value"
+                                        :dataSource="DsNhanVienChuyen.dataSource" :allowFiltering="true"
+                                        :fields="{ value: 'nhanvien_id', text: 'manv_ten' }">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row marb0">
+                            <div class="key w30 nowrap fw6">Kết quả :</div>
+                            <div class="value">
+                                <ejs-combobox Id='ketqua' :dataSource='ketquaData' :fields='ketquaFields'
+                                    v-model="cboKetqua" :placeholder='ketquaWaterMark'></ejs-combobox>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row marb0">
+                            <div class="key w30 nowrap fw6">Lý do từ chối :</div>
+                            <div v-if="cboKetqua == 1" class="value">
+                                <!-- <input type="text" class="form-control" :value="lydotuchoi" @change="v => lydotuchoi = v.target.value"> -->
+                                <input type="text" value="" class="form-control" v-model="pLyDoTuChoi" :disabled="1" />
+                            </div>
+                            <div v-else class="value">
+                                <input type="text" value="" class="form-control" v-model="pLyDoTuChoi" :disabled="!1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row marb0">
+                <div class="box-form">
+                    <div class="legend-title">Danh sách thuê bao gán cho nhân viên tiếp nhận</div>
+                    <div class="table-content">
+                        <table class="table-result table-gachle">
+                            <tbody>
+                                <tr>
+                                    <ejs-grid ref="DsTbNvTiepNhan"
+                                        :dataSource="DsTbNvTiepNhan.dataSource" 
+                                        :allowPaging='true' :allowSorting='true'
+                                        :pageSettings='pageSettings'>
+                                        <e-columns>
+                                            <e-column field='ma_tb' headerText='Mã thuê bao' textAlign='left'
+                                                width=100></e-column>
+                                            <e-column field='ten_tb' headerText='Tên thuê bao' textAlign='left'
+                                                width=140></e-column>
+                                            <e-column field='thoigian_tiepnhan' headerText='Thời gian tiếp nhận'
+                                                textAlign='left' width=80></e-column>
+                                            <e-column field='ten_nv_chuyen' headerText='Nhân viên chuyển'
+                                                textAlign='left' width=100></e-column>
+                                            <e-column field='ten_nv_nhan' headerText='Nhân viên nhận' textAlign='left'
+                                                width=100></e-column>
+                                            <e-column field='diachi_ld' headerText='Địa chỉ lắp đặt' textAlign='left'
+                                                width=160></e-column>
+                                        </e-columns>
+                                    </ejs-grid>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- khoa div tab5 -->
+</div>
+</div>
+</div> <!-- class="page-content" -->
+
+</div>

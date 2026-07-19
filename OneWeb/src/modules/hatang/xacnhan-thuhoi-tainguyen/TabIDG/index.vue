@@ -1,0 +1,19 @@
+<template src="./index.html"></template>
+
+<script src="./TabIDG.js"></script>
+<style>
+.check-action {
+  top: 3px;
+}
+
+.e-rowcell .check-action input[type='checkbox']:checked:disabled + .name:before {
+  background: #fff;
+  border-color: #0176ff;
+  color: #0176ff;
+}
+
+.e-rowcell .check-action input[type='checkbox']:disabled + .name:before {
+  background: #fff;
+  border-color: #0176ff;
+}
+</style>

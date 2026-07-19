@@ -1,0 +1,368 @@
+<div class="">
+    <!-- action header -->
+    <div class="list-action-top">
+        <vue-bread-crumb :header="header" />
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="javascript:;" @click.prevent="clickButton('load')">
+                        <span class="icon one-refresh"></span>Lấy TT
+                    </a>
+                </li>
+                <li>
+                    <a href="/static/files/MauFile_Import_DS_Chien_Dich.xlsx" download>
+                        <span class="icon one-upload"></span>File Excel mẫu
+                    </a>
+                </li>
+                <li>
+                    <a :class="{disabled: disabledExportError}" @click.prevent="xuatExcel">
+                        <span class="icon one-xlsx-import"></span>Xuất file lỗi
+                    </a>
+                </li>
+                <!-- <li>
+                  <a @click='exportDataGrid'>
+                    <span class="icon one-download"></span> Xuất Excel lưới
+                  </a>
+                </li> -->
+                <li>
+                    <a href="javascript:;" @click.prevent="btnNgayTongDongLuc_Click()">
+                        <span class="fa fa-calendar"></span> Cấu hình ngày tổng lực
+                    </a>
+                </li>
+                <!-- <li>
+                    <a href="#" @click.prevent="clickButton('load')">
+                        <span class="icon one-file-attach"></span>Nạp lại
+                    </a>
+                </li>
+                <li>
+                    <a href="#" :class="{ disabled: disabledCreate }" @click.prevent="clickButton('create')">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li>
+                    <a href="#" @click.prevent="clickButton('save')">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li>
+                    <a href="#" @click.prevent="clickButton('cancel')">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ
+                    </a>
+                </li>
+                <li>
+                    <a href="#" @click.prevent="clickButton('delete')">
+                        <span class="icon one-trash"></span>Xóa chiến dịch
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+    </div>
+    <!-- content page -->
+    <div class="page-content">
+        <!-- Thông tin tìm kiếm -->
+
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="title-main">Thông tin tìm kiếm</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-12">
+                    <div class="row">
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Chiến dịch</div>
+                                <div class="value">
+                                    <SelectExt v-model="tt_tim_kiem.selectedChienDich" :allowFiltering="true"
+                                        data-text-field="chien_dich" data-value-field="chien_dich_id"
+                                        :dataSource="tt_tim_kiem.chien_dich" @select="onChangeCD"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w20">
+                                    <input type="checkbox" name="staff-search-type" v-model="chkTuDen" />
+                                </div>                                
+                                <vue-date v-model="tt_tim_kiem.ThoiHanTu" :format="dateFormat" type="Date" labelWidth="90" label="Thời hạn từ" :disable="!chkTuDen"></vue-date>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <vue-date v-model="tt_tim_kiem.Den" :format="dateFormat" type="Date" labelWidth="60" label="Đến" :disable="!chkTuDen"></vue-date>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w100"><input type="checkbox" name="staff-search-type" v-model="chkTinhTrang" /> &nbsp; Tình trạng</div>
+                                <div class="value">
+                                    <SelectExt :disabled="!chkTinhTrang" v-model="tt_tim_kiem.selectedTinhTrang" :allowFiltering="true" data-text-field="tinhtrang" data-value-field="tinhtrang_id" :dataSource="tt_tim_kiem.cboTinhTrang"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Thông tin chiến dịch -->
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="title-main">Thông tin chiến dịch</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-9 col-12">
+                    <div class="row">
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Mã chiến dịch(*)</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.ma_cd" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Tên chiến dịch(*)</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.ten_cd" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <vue-date v-model="tt_chien_dich.ngayApdung" :format="dateFormat" type="Date"
+                                    labelWidth="90" label="Áp dụng từ(*)"></vue-date>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <vue-date v-model="tt_chien_dich.ngayDen" :format="dateFormat" type="Date"
+                                    labelWidth="60" label="đến(*)"></vue-date>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Kênh tiếp cận(*)</div>
+                                <div class="value">
+                                    <SelectExt v-model="tt_chien_dich.selectedKenhTiepCan" :allowFiltering="true"
+                                        data-text-field="kenh_tc" data-value-field="kenhtc_id"
+                                        :dataSource="tt_chien_dich.kenhtiepcan" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Loại chiến dịch(*)</div>
+                                <div class="value">
+                                    <SelectExt v-model="tt_chien_dich.selectedLoaiChienDich" :allowFiltering="true"
+                                        data-text-field="ten" data-value-field="id"
+                                        :dataSource="tt_chien_dich.loaichiendich" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Độ ưu tiên(*)</div>
+                                <div class="value">
+                                    <SelectExt v-model="tt_chien_dich.selectedDoUuTien" :allowFiltering="true"
+                                        data-text-field="ten" data-value-field="id"
+                                        :dataSource="tt_chien_dich.douutien" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Tình trạng(*)</div>
+                                <div class="value">
+                                    <SelectExt v-model="tt_chien_dich.selectedTinhTrang" :allowFiltering="true"
+                                        data-text-field="tinhtrang" data-value-field="tinhtrang_id"
+                                        :dataSource="tt_chien_dich.tinh_trang" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Nội dung</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.noidung" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Gán nhãn</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.gannhan" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Link công văn</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.linkcv" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Mã SRV(*)</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.soSrv" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Số eoffice</div>
+                                <div class="value">
+                                    <input v-model="tt_chien_dich.soEoffice" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="row">
+                        <div class="col-sm-12 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Nội dung</div>
+                                <div class="value">
+                                    <textarea class="form-control textarea resize-ta" style="height: auto;resize: none;"
+                                        v-model="tt_chien_dich.noidung"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="row">
+                        <div class="col-sm-12 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Ghi chú</div>
+                                <div class="value">
+                                    <textarea class="form-control textarea resize-ta" style="height: auto;resize: none;"
+                                        v-model="tt_chien_dich.ghichu"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="row">
+                        <ejs-tab id="tab" ref="element" :selected='selected'>
+                            <e-tabitems>
+                                <e-tabitem :header="headerText0" :content="content0"></e-tabitem>
+                                <e-tabitem :header="headerText1" :content="content1"></e-tabitem>
+                                <e-tabitem :header="headerText2" :content="content2"></e-tabitem>
+                            </e-tabitems>
+                        </ejs-tab>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- Danh sách thuê bao -->
+        <div class="box-form">
+            <div class="legend-title"></div>
+            <div class="table-content mart10">
+                <div class="nav tabs tab-over">
+                    <a href="#tabDanhsach" @click="currentTab = 0" data-toggle="tab" :class="{active: currentTab === 0}">Danh
+                        sách thuê bao</a>
+                    <a href="#tabLoi" @click="currentTab = 1" data-toggle="tab" :class="{active: currentTab === 1}"
+                        title="Danh sách">File Excel</a>
+                </div>
+                <div class="tab-content">
+                    <div id="tabDanhsach" class="tab-pane" :class="{active: currentTab === 0}">
+                        <div class="legend-title">
+                            <div class="pull-left">
+                            </div>
+                            <div class="pull-right">
+                                <button class="btn btn-default" :disabled="disabledXuatDsTB" @click.prevent="onPhanGiaoDaGiaoExportClicked" style="border: 1px solid #ffff">
+                                    <a href="#" class="link"> <span class="icon one-excel"></span>
+                                        Xuất DS TB </a>
+                                </button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <br>
+                        <DataGrid v-bind:columns="ds_chien_dich.columns" v-bind:dataSource="ds_chien_dich.list"
+                            ref='gridReport' @selectedItemsChanged="SelectionChanged"
+                            :enablePagingServer="false" :allowPaging="true" :allowExcelExport="true">
+                        </DataGrid>
+                    </div>
+                    <div id="tabLoi" class="tab-pane" :class="{active: currentTab === 1}">
+                        <div class="row">
+                            <div class="col-sm-2 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        <div class="check-action">
+                                            <input type="checkbox" name="staff-search-type" v-model="phangiaoTuDong" />
+                                            <span class="name">Giao tự động</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w150">Đối tượng phân giao</div>
+                                    <div class="value" style="display: flex;">
+                                        <SelectExt class="" style="flex-grow: 1;"
+                                            v-model="doiTuongPhanGiao.selected" :dataSource="doiTuongPhanGiao.list" dataTextField="name"
+                                            dataValueField="value"></SelectExt>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w90" style="color: black;">
+                                        Đường dẫn
+                                    </div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button class="btn" @click="uploadFile">
+                                                <span class="-ap icon-more_horiz"></span>
+                                                <input ref="fileInput" type="file" id="upload" style="display:none" @change="importExcel"
+                                                    accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                                            </button>
+                                            <input type="text" v-model="file_excel.duong_dan" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12 row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Mã tập</div>
+                                        <div class="value">
+                                            <input v-model="file_excel.ma_tap" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Tên tập</div>
+                                        <div class="value">
+                                            <input v-model="file_excel.ten_tap" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <DataGrid v-bind:columns="file_excel.columns" :panelDataHeight='"300"'
+                            v-bind:dataSource="file_excel.list" :enablePagingServer="false"
+                            :showFilter="true" :allowPaging="true" :allowExcelExport="true"
+                            :showColumnCheckbox="true">
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <popupNgayTongLuc ref="popupNgayTongDongLuc"></popupNgayTongLuc>
+</div>

@@ -1,0 +1,408 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="GhiLai" :disabled="!buttons.btnSave.enabled">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onCancel" :disabled="!buttons.btnSave.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="Sua" :disabled="!buttons.btnEdit.enabled">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+        </b-link>
+      </li>
+      <li>
+        <b-link @click="XacNhan" :disabled="!buttons.btnEdit.enabled">
+          <span class="icon one-notepad"></span> Xác nhận cấp phát
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin chung</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key ">Số phiếu</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.SoPhieu" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key">Backup tập trung</div>
+                    <div class="value padt4">
+                      <div class="check-action">
+                        <input
+                          type="checkbox"
+                          class="check"
+                          v-model="currentItem.TapTrung"
+                          :true-value="1"
+                          :false-value="0"
+                          disabled
+                        /><span class="name"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row pointer-events" style="display: inline-flex; align-items: center;">
+                    <a
+                      style="display: block; font-weight: 300;padding-top: 8px;color: #007bff;"
+                      @click.prevent="triggerFileInput"
+                    >
+                      <span class="icon one-book">
+                        File đính kèm
+                      </span>
+                    </a>
+                    <a
+                      v-if="fileName || currentItem.urlFile"
+                      style="padding-top: 8px;color: #007bff; padding-left: 40px;"
+                      @click.prevent="downloadFile()"
+                    >
+                      <span class="icon one-download">Tải file</span>
+                    </a>
+                    <a
+                      v-if="(fileName || currentItem.urlFile) && !buttons.btnEdit.enabled"
+                      style="padding-top: 8px; padding-left: 5px;color: #d32f2f"
+                      @click.prevent="deleteFile()"
+                    >
+                      <span class="icon one-trash"></span>
+                    </a>
+                    <input ref="fileInput" type="file" id="upload" class="hidden" @change="onChangeFile" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key ">Kho hạ tầng backup</div>
+                <!-- <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.Kho" disabled />
+                </div> -->
+                <div class="value">
+                  <SelectExt
+                    :dataSource="dsKhoBackup"
+                    dataTextField="TEN"
+                    dataValueField="ID"
+                    v-model="currentItem.Kho"
+                    :disabled="!controls.cboKhoBackup.enabled"
+                    :allowFiltering="true"
+                    @change="onSelectKhoBackup($event)"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class=" key ">Nguồn yêu cầu</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="currentItem.NguonYeuCau" disabled />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class=" key ">Phiếu yêu cầu</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="currentItem.PhieuYeuCau" disabled />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key ">Tần suất backup</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.TanXuat" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key ">Trạng thái backup</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.TrangThai" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Dung lượng cần backup</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.DungLuong" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Sản phẩm dịch vụ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.SPDV" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row" style="margin-bottom: -3px !important;">
+                <div class="key" style="padding-top: 0px !important;">Dung lượng tăng trưởng mỗi tháng</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.DungLuongTangTruong" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row" style="margin-bottom: -3px !important;">
+                <div class=" key ">Hạ tầng mạng</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.HaTangMang" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Vị trí dữ liệu</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.ViTriDuLieu" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Mục đích sử dụng</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.MucDichSuDung" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Số bản bkp cần lưu</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.SoBanCanLuu" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class=" key ">Ngày tạo</div>
+                    <div class="value">
+                      <!-- <input type="text" class="form-control" v-model="currentItem.NgayTao" disabled/> -->
+                      <ejs-datepicker
+                        ref="refChonNgay"
+                        class="form-control bg-none bor0 fw6 text"
+                        :format="'dd/MM/yyyy'"
+                        :showClearButton="false"
+                        v-model="currentItem.NgayTao"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class=" key ">Ngày hết hạn</div>
+                    <div class="value">
+                      <!-- <input type="text" class="form-control" v-model="currentItem.NgayHetHan" disabled/> -->
+                      <ejs-datepicker
+                        ref="refChonNgay"
+                        class="form-control bg-none bor0 fw6 text"
+                        :format="'dd/MM/yyyy'"
+                        :showClearButton="false"
+                        v-model="currentItem.NgayHetHan"
+                        :enabled="controls.NgayHetHan.enabled"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">Có đẩy ra thiết bị lưu trữ ngoài không ?</div>
+                <div class="value padt4">
+                  <div class="check-action">
+                    <input
+                      type="checkbox"
+                      class="check"
+                      v-model="currentItem.LuuTruNgoai"
+                      :true-value="1"
+                      :false-value="0"
+                      disabled
+                    /><span class="name"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class=" key ">Người cập nhật</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model="currentItem.NguoiCapNhat" disabled />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class=" key ">Ngày cập nhật</div>
+                    <div class="value">
+                      <!-- <input type="text" class="form-control" v-model="currentItem.NgayCapNhat" disabled/> -->
+                      <ejs-datepicker
+                        ref="refChonNgay"
+                        class="form-control bg-none bor0 fw6 text"
+                        :format="'dd/MM/yyyy'"
+                        :showClearButton="false"
+                        v-model="currentItem.NgayCapNhat"
+                        :enabled="controls.NgayCapNhat.enabled"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class=" key ">Ghi chú</div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                v-model="currentItem.GhiChu"
+                :disabled="!controls.GhiChu.enabled"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin quản lý</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Đơn vị vận hành</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.DonViVanHanh" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Đơn vị được cấp</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.DonViDuocCap" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Phòng/Tổ vận hành</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.PhongVanHanh" disabled />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Người sử dụng <span class="red">*</span></div>
+                <!-- <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.NguoiSuDung" disabled/>
+                </div> -->
+                <div class="value">
+                  <SelectExt
+                    :dataSource="dsNguoiSuDung"
+                    dataTextField="TENND"
+                    dataValueField="ID"
+                    :disabled="!controls.cboNguoiSuDung.enabled"
+                    v-model="currentItem.NguoiSuDungId"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class=" key ">Cá nhân</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.CaNhan" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách phiếu cấp phát hạ tầng backup</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <DataGrid
+                ref="grdItems"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                v-bind:columns="[
+                                {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'SPDV', headerText: 'Sản phẩm dịch vụ', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'TEN_KHO', headerText: 'Kho hạ tầng backup', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'PL_BACKUP', headerText: 'Phân loại backup', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'TT_CAPPHAT', headerText: 'Trạng thái cấp phát', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'HATANGMANG', headerText: 'Hạ tầng mạng', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'NGUOICAPNHAT', headerText: 'Người cấp', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'TEN_NGUOISUDUNG', headerText: 'Người sử dụng', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'NGAYCAPNHAT', headerText: 'Ngày cấp',type: 'date',format: 'dd/MM/yyyy', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'DONVIDUOCCAP', headerText: 'Đơn vị được cấp', allowFiltering: true, allowSorting: false},
+                                ]"
+                v-bind:dataSource="DSPhieu"
+                @rowSelected="grdItems_RowSelected"
+                @rowDeselected="grdItems_RowDeselected"
+              >
+              </DataGrid>
+              <!-- @rowDeselected="grdItems_RowDeselected"      -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

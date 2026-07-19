@@ -1,0 +1,3 @@
+import SearchContactsCrossSellContracts from './SearchContactsCrossSellContracts'
+
+export default SearchContactsCrossSellContracts

@@ -1,0 +1,831 @@
+<b-modal
+    :id="modalID"
+    size="lg"
+    no-close-on-backdrop
+    hide-footer
+    hide-header-close
+    hide-header
+    @hidden="hiddenModal"
+    @shown="shownModal">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span>  Quản lý cáp
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="closeModal()">
+            </div>
+        </div>
+
+        <div class="list-actions-top">
+            <ul class="list">
+                <li v-if="readOnly==false">
+                    <a class="btn" @click="ghiLai()">
+                        <span class="icon one-save"></span> Ghi lại
+                    </a>
+                </li>
+                <li v-if="dataSelected.kieudc_id==2 && readOnly==false">
+                    <a v-b-modal.popupChuiCap><span class="icon -ap icon-image" ></span> Chui qua cống</a>
+                </li>
+                <li v-if="dataSelected.kieudc_id==3 && readOnly==false">
+                    <a v-b-modal.popupTreoCap ><span class="icon -ap icon-image" ></span> Treo lên cột</a>
+                </li>
+            </ul>
+        </div>
+        <ModalCsht modalId="popupCsht" @xacnhan="getMaCsht"/>
+        <ModalIMS modalId="popupIMS" @xacnhan="getMaIMS"/>
+        <ModalNVQLCap :doiTuong="doiTuongNVQLCap" :id="idPopupNVQLCap" :modalShow="modalNVQLCapShow" @closeModal="closeModalNVQLCap"/>
+        <ModalChuiCap modalId="popupChuiCap" :data="dataSend"/>
+        <ModalTreoCap modalId="popupTreoCap" :data="dataSend"/>
+        <div class="popup-body" ref="xxx">
+            <div class="box-form tab-content">
+                <div class="table-content">
+                    <table class="table-result table-gachle tree-grid-2" ref="tableCap">
+                        <tbody>
+                            <tr class="highlight">
+                                <td colspan="5" class="fw6">
+                                    <div class="tree-arrow" @click="category.dinhdanh ++"></div> Định danh
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dinhdanh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td>
+                                    Cáp ID
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <input type="text" v-model="dataSelected.cap_id" class="form-control bg-none h24 bor0" disabled>
+                                </td>
+
+                            </tr>
+
+                            <tr  v-show="category.dinhdanh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td>
+                                    Mã cáp
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <input type="text" v-model="dataSelected.ma_cap" class="form-control bg-none h24 bor0">
+                                </td>
+
+                            </tr>
+
+                            <tr  v-show="category.dinhdanh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td>
+                                    <b>Ký hiệu</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.kyhieu.$error">
+                                        <input @change="onChangeKyHieu" ref="kyhieu" type="text" v-model="$v.dataSelected.kyhieu.$model" class="form-control bg-none h24 bor0">
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr  v-show="category.dinhdanh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td>
+                                    <b>Tên cáp</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.ten_cap.$error">
+                                        <input type="text" v-model="$v.dataSelected.ten_cap.$model" class="form-control bg-none h24 bor0">
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+                            <tr  v-show="category.dinhdanh %2 ==0">
+                                <td class="tree-first w30 bg-white last">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td>
+                                    Ghi chú
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <input type="text" v-model="dataSelected.ghichu" class="form-control bg-none h24 bor0">
+                                </td>
+                            </tr>
+                            <tr class="highlight">
+                                <td colspan="5" class="fw6">
+                                    <div class="tree-arrow" @click="category.dactinh ++"></div> Đặc tính
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">
+                                    <b>Kích cỡ</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.kichco_id.$error">
+                                        <div class="select-custom" ref="KICHCO_CAP">
+                                            <SelectExt
+                                                v-model.trim="dataSelected.kichco_id"
+                                                :settings="{dropdownParent: $refs['KICHCO_CAP']}"
+                                                :dataSource="modalData.KICHCO_CAP"
+                                                dataTextField="KICHCO"
+                                                dataValueField="KICHCO_ID"/>
+                                        </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">Khoảng cách cột
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <!-- <div class="value">
+                                        <vue-numeric class="form-control" :precision="0" :empty-value="1"  maxlength="10"  v-model="dataSelected.kc_cot" :minus="false" :separator="','"></vue-numeric>
+                                    </div> -->
+                                    <div class="input-number-custom h24">
+                                        <input type="number" v-model="dataSelected.kc_cot" class="form-control bg-none bor0" onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))">
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">Trở kháng
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <div class="input-number-custom h24">
+                                        <input type="number" v-model="dataSelected.trokhang" class="form-control bg-none bor0" onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))">
+                                    </div>
+                                    <!-- <div class="value">
+                                        <vue-numeric class="form-control" :precision="4" :decimal-separator="'.'"  empty-value="0" maxlength="6" v-model="dataSelected.trokhang" :minus="false" :separator="','"></vue-numeric>
+                                    </div> -->
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">Suy hao
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <div class="input-number-custom h24">
+                                        <input type="number" v-model="dataSelected.suyhao" class="form-control bg-none bor0" onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))">
+                                    </div>
+                                    <!-- <div class="value">
+                                        <vue-numeric class="form-control" empty-value="0"  :precision="4" :decimal-separator="'.'"   maxlength="6" v-model="dataSelected.suyhao" :minus="false" :separator="','"></vue-numeric>
+                                    </div> -->
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class=""><b>Dung lượng</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.sodoiday.$error">
+                                        <div class="input-number-custom h24">
+                                            <input onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))" type="number" v-model="$v.dataSelected.sodoiday.$model" class="form-control bg-none bor0">
+                                        </div>
+                                        <!-- <div class="value">
+                                            <vue-numeric class="form-control" empty-value="1"  v-model="$v.dataSelected.sodoiday.$model" :min="1" :max="99999" :minus="false" :separator="','"></vue-numeric>
+                                        </div> -->
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">Đánh STT đôi dây từ
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <div class="input-number-custom h24">
+                                        <input onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))" type="number" v-model="dataSelected.soi_bd" class="form-control bg-none bor0">
+                                    </div>
+                                    <!-- <div class="value">
+                                        <vue-numeric class="form-control"  empty-value="1"  v-model="$v.dataSelected.soi_bd.$model" :min="1" :max="99999" :minus="false" :separator="','"></vue-numeric>
+                                    </div> -->
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">
+                                    <b>Điện cao thế</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.dienct_id.$error">
+                                        <div class="select-custom" ref="DM_DIENCT">
+                                            <SelectExt
+                                                v-model.trim="$v.dataSelected.dienct_id.$model"
+                                                :settings="{dropdownParent: $refs['DM_DIENCT']}"
+                                                :dataSource="modalData.DM_DIENCT"
+                                                dataTextField="DIEN_CT"
+                                                dataValueField="DIENCT_ID"/>
+                                                        </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class=""><b>Chiều dài(m)</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.chieudai.$error">
+                                        <div class="input-number-custom h24">
+                                            <input type="number" v-model="$v.dataSelected.chieudai.$model" class="form-control bg-none bor0" onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))">
+                                        </div>
+                                        <!-- <div class="value">
+                                            <vue-numeric class="form-control" empty-value="1"  v-model="$v.dataSelected.chieudai.$model" :min="1" :max="99999" :minus="false" :separator="','"></vue-numeric>
+                                        </div> -->
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">Chiều dài thiết kế(m)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                        <div class="input-number-custom h24">
+                                            <input type="number" v-model="dataSelected.chieudai_tk" class="form-control bg-none bor0" onkeydown="javascript: return event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key))">
+                                        </div>
+                                        <!-- <div class="value">
+                                            <vue-numeric class="form-control" empty-value="0"  v-model="dataSelected.chieudai_tk" :min="1" :max="99999" :minus="false" :separator="','"></vue-numeric>
+                                        </div> -->
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">
+                                    <b>Nơi sản xuất</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.noisx_id.$error">
+                                        <div class="select-custom" ref="NOI_SX">
+                                            <SelectExt
+                                                v-model.trim="$v.dataSelected.noisx_id.$model"
+                                                :settings="{dropdownParent: $refs['NOI_SX']}"
+                                                :dataSource="modalData.NOI_SX"
+                                                dataTextField="NOI_SX"
+                                                dataValueField="NOISX_ID"/>
+                                                        </div>
+                                    </bss-error-marker>
+
+                                </td>
+                            </tr>
+                            <tr v-show="category.dactinh %2 ==0">
+                                <td class="tree-first w30 bg-white last">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">
+                                    <b>Trạng thái sử dụng</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.ttsd_id.$error">
+                                        <div class="select-custom" ref="TRANGTHAI_SD">
+                                            <SelectExt
+                                                v-model.trim="$v.dataSelected.ttsd_id.$model"
+                                                :settings="{dropdownParent: $refs['TRANGTHAI_SD']}"
+                                                :dataSource="modalData.TRANGTHAI_SD"
+                                                dataTextField="TRANGTHAI_SD"
+                                                dataValueField="TTSD_ID"/>
+                                                        </div>
+                                    </bss-error-marker>
+
+                                </td>
+                            </tr>
+
+
+
+                            <tr class="highlight">
+                                <td colspan="5" class="fw6">
+                                    <div class="tree-arrow" @click="category.ngaythang ++"></div> Ngày lắp đặt & sử dụng
+                                </td>
+                            </tr>
+                            <tr v-show="category.ngaythang %2 ==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">
+                                    Ngày lắp đặt
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :value="dateVal" :format="dateFormat" v-model="dataSelected.ngay_ld"></ejs-datepicker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.ngaythang %2 ==0">
+                                <td class="tree-first w30 bg-white last">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20">
+                                    <span class=""></span>
+                                </td>
+                                <td class="">
+                                    Ngày sử dụng
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :value="dateVal" :format="dateFormat" v-model="dataSelected.ngay_sd"></ejs-datepicker>
+                                </td>
+                            </tr>
+
+                            <tr class="highlight">
+                                <td colspan="5" class="fw6">
+                                    <div class="tree-arrow" @click="category.phanloai++"></div> Phân loại
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.phanloai%2==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w201">
+                                    <span class=""></span>
+                                </td>
+                                <td>
+                                    <b>Loại cáp</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.loaicap_id.$error">
+                                        <div  class="value" ref="LOAI_CAP">
+                                            <SelectExt v-model="$v.dataSelected.loaicap_id.$model"
+                                            :settings="{dropdownParent: $refs['LOAI_CAP']}"
+                                                :dataSource="modalData.LOAI_CAP"
+                                                dataTextField="LOAI_CAP"
+                                            dataValueField="LOAICAP_ID"/>
+                                        </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.phanloai%2==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td class="">
+                                    <b>Lớp mạng cáp</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.lopmc_id.$error">
+                                        <div  class="value" ref="LOP_MC">
+                                            <SelectExt disabled v-model="$v.dataSelected.lopmc_id.$model"
+                                            :settings="{dropdownParent: $refs['LOP_MC']}"
+                                            :dataSource="modalData.LOP_MC"
+                                            dataTextField="LOP_MC"
+                                            dataValueField="LOPMC_ID"/>
+                                        </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.phanloai%2==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td class="">
+                                    <b>Nhóm lớp mạng cáp</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.nhomlc_id.$error">
+                                        <div  class="value" ref="NHOM_LC">
+                                            <SelectExt v-model="$v.dataSelected.nhomlc_id.$model"
+                                            :settings="{dropdownParent: $refs['NHOM_LC']}"
+                                            :dataSource="modalData.NHOM_LC"
+                                            dataTextField="NHOM_LC"
+                                            dataValueField="NHOMLC_ID"/>
+                                        </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.phanloai%2==0">
+                                <td class="tree-first w30 bg-white">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td class=""><b>Kiểu đi cáp</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.kieudc_id.$error">
+                                        <div  class="value" ref="KIEU_DC">
+                                            <SelectExt v-model="$v.dataSelected.kieudc_id.$model"
+                                            :settings="{dropdownParent: $refs['KIEU_DC']}"
+                                                :dataSource="modalData.KIEU_DC"
+                                                dataTextField="KIEU_DC"
+                                                        dataValueField="KIEUDC_ID"/>
+                                            </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+
+                            <tr v-show="category.phanloai%2==0">
+                                <td class="tree-first w30 bg-white last">
+                                    <div class="tree-line"></div>
+                                    <div class="tree-indent"></div>
+                                </td>
+                                <td class="w20 ">
+                                </td>
+                                <td class=""><b>Kiểu cáp</b>&nbsp;(<span style="color: red;">*</span>)
+                                </td>
+                                <td class="padt0 padb0" colspan="2">
+                                    <bss-error-marker :has-error="$v.dataSelected.kieucap_id.$error">
+                                        <div  class="value" ref="KIEU_CAP">
+                                            <SelectExt disabled  v-model="$v.dataSelected.kieucap_id.$model"
+                                            :settings="{dropdownParent: $refs['KIEU_CAP']}"
+                                                :dataSource="modalData.KIEU_CAP"
+                                                dataTextField="KIEU_CAP"
+                                                        dataValueField="KIEUCAP_ID"/>
+                                            </div>
+                                    </bss-error-marker>
+                                </td>
+                            </tr>
+                            <tr class="highlight">
+                            <td colspan="5" class="fw6">
+                                <div class="tree-arrow" @click="category.vitri ++"></div> Vị trí
+                            </td>
+                        </tr>
+
+                        <tr v-show="category.vitri %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20 ">
+                            </td>
+                            <td>
+                                Cáp gốc
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <input type="text" v-model="dataSelected.capgoc_kyhieu" class="form-control bg-none h24 bor0" disabled='true'>
+                            </td>
+                        </tr>
+
+                        <tr  v-show="category.vitri %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20 ">
+                            </td>
+                            <td>
+                                Trạm thiết bị nguồn
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <input type="text" v-model="dataSelected.tram_nguon" class="form-control bg-none h24 bor0" disabled='true'>
+                            </td>
+                        </tr>
+
+                        <tr  v-show="category.vitri %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20 ">
+                            </td>
+                            <td>
+                                Trạm thiết bị đích
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <input type="text" v-model="dataSelected.tram_dich" class="form-control bg-none h24 bor0" disabled='true'>
+                            </td>
+                        </tr>
+                        <tr  v-show="category.vitri %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20 ">
+                            </td>
+                            <td>
+                                Kết cuối nguồn
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <input type="text" v-model="dataSelected.ketcuoi_n_kyhieu" class="form-control bg-none h24 bor0" disabled='true'>
+                            </td>
+
+                        </tr>
+                        <tr  v-show="category.vitri %2 ==0">
+                            <td class="tree-first w30 bg-white last">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20 ">
+                            </td>
+                            <td>
+                                Kết cuối đích
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <input type="text" v-model="dataSelected.ketcuoi_d_kyhieu" class="form-control bg-none h24 bor0" disabled='true'>
+                            </td>
+                        </tr>
+                        <tr class="highlight" >
+                            <td colspan="5" class="fw6">
+                                <div class="tree-arrow"  @click="category.kiemke ++"></div> Kiểm kê tài sản
+                            </td>
+                        </tr>
+                        <tr v-show="category.kiemke %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td class="">
+                                Mã dự án
+                            </td>
+                            <td class="padt0 padb0">
+                                <div class="select-custom" ref="DUAN">
+                                    <SelectExt
+                                    v-model.trim="dataSelected.duan_id"
+                                    :settings="{dropdownParent: $refs['DUAN']}"
+                                    :dataSource="modalData.DUAN"
+                                        dataTextField="MA_CT"
+                                    dataValueField="DUAN_ID"/>
+                                    </div>
+                            </td>
+                            <td style="text-align: right; width: 5px;">
+                                <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaMaDA()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-show="category.kiemke %2 ==0">
+                            <td class="tree-first w30 bg-white last">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td class="">
+                                Mã tài sản
+                            </td>
+                            <td class="padt0 padb0">
+                                <div class="select-custom" ref="TAISAN">
+                                    <SelectExt
+                                    v-model.trim="dataSelected.taisan_id"
+                                    :settings="{dropdownParent: $refs['TAISAN']}"
+                                    :dataSource="modalData.TAISAN"
+                                        dataTextField="MA_TS"
+                                    dataValueField="TAISAN_ID"/>
+                                </div>
+                                </td>
+                                <td style="text-align: right; width: 5px;">
+                                <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaMaTS()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+
+                            </td>
+                        </tr>
+                        <tr class="highlight">
+                            <td colspan="5" class="fw6">
+                                <div class="tree-arrow" @click="category.chuquan ++"></div> Quản lý
+                            </td>
+                        </tr>
+                        <tr v-show="category.chuquan %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td class="">
+                                Chủ quản
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <div class="select-custom" ref="CHUQUAN">
+                                    <SelectExt
+                                    v-model.trim="dataSelected.chuquan_id"
+                                    :settings="{dropdownParent: $refs['CHUQUAN']}"
+                                    :dataSource="modalData.CHUQUAN"
+                                    dataTextField="TENCHUQUAN"
+                                    dataValueField="CHUQUAN_ID"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-show="category.chuquan %2 ==0">
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td class="">
+                                Tổ quản lý
+                            </td>
+                            <td class="padt0 padb0">
+                                <div class="select-custom" ref="TOQL">
+                                    <SelectExt
+                                    v-model.trim="dataSelected.toql_id"
+                                    :settings="{dropdownParent: $refs['TOQL']}"
+                                    :dataSource="modalData.TOQL"
+                                    dataTextField="TEN_DV"
+                                    dataValueField="DONVI_ID"/>
+                                    </div>
+                            </td>
+                            <td style="text-align: right; width: 5px;">
+                                <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaTOQL()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-show="category.macsht %2 ==0">
+                            <td class="tree-first w30 bg-white last">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td >Nhân viên quản lý</td>
+                            <td class="padt0 padb0">
+                                <div class="input-more-button -right">
+                                    <input type="text" v-model="dataSelected.ds_nhanvien_ql" class="form-control bg-none bor0 h24" disabled='true'>
+                                </div>
+                            </td>
+                            <td style="text-align: right; width: 5px;">
+                                <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="showNVQLCap()">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="highlight">
+                            <td colspan="5" class="fw6">
+                                <div class="tree-arrow" @click="category.macsht ++"></div> Liên kết tới hệ thống QL tài sản tập đoàn
+                            </td>
+                        </tr>
+                        <tr v-show="category.macsht %2 ==0">
+                            <!-- <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td >
+                                ID chi tiết
+                            </td>
+                            <td class="padt0 padb0" colspan="2">
+                                <div class="input-more-button -right">
+                                    <input type="text" v-model="dataSelected.ims_id" class="form-control bg-none bor0 h24">
+                                </div>
+                            </td>                             -->
+                            <td class="tree-first w30 bg-white">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td >
+                                ID chi tiết
+                            </td>
+                            <td class="padt0 padb0">
+                                <div class="input-more-button -right">
+                                    <button class="btn btn-main pad4 w-auto lh14 h-auto"v-b-modal.popupIMS>
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                    <input type="text" v-model="dataSelected.ims_id" class="form-control bg-none bor0 h24">
+                                </div>
+                            </td>
+                            <td style="text-align: right; width: 5px;">
+                                <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaMaIMS()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-show="category.macsht %2 ==0">
+                            <td class="tree-first w30 bg-white last">
+                                <div class="tree-line"></div>
+                                <div class="tree-indent"></div>
+                            </td>
+                            <td class="w20">
+                                <span class=""></span>
+                            </td>
+                            <td >
+                                Mã CSHT
+                            </td>
+                            <td class="padt0 padb0">
+                                <div class="input-more-button -right">
+                                    <button class="btn btn-main pad4 w-auto lh14 h-auto"v-b-modal.popupCsht>
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                    <input type="text" v-model="dataSelected.ma_csht" class="form-control bg-none bor0 h24">
+                                </div>
+                            </td>
+                            <td style="text-align: right; width: 5px;">
+                                <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaMaCSHT()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</b-modal>

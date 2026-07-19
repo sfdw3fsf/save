@@ -1,0 +1,463 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="onClickDanhSach">
+                    <span class="icon nc-icon-glyph design_bullet-list-67"></span> Danh sách
+                </a>
+            </li>
+            <li v-show="gridTab == 2">
+                <a href="#" @click.prevent="onClickLuotDaGiao">
+                    <span class="icon one-luotgiao"></span> Lượt đã giao
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="onClickExport">
+                    <span class="icon one-xlsx-import"></span> Xuất Excel
+                </a>
+            </li>
+            <li v-show="gridTab == 1">
+                <a href="#" @click.prevent="onClickGiaoPhieu">
+                    <span class="icon one-file-arrow-right1"></span> Giao phiếu
+                </a>
+            </li>
+            <li v-show="gridTab == 2">
+                <a href="#" @click.prevent="onCickHuyGiao">
+                    <span class="icon one-cancel"></span>Hủy giao
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb8">
+            <div class="pull-right custom-kycuoc">
+                <app-ky-cuoc :disabled="true" @handleChangeKyCuoc="handleKyHoaDon"></app-ky-cuoc>
+              </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-10 col-12">
+                    <div class="row">
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Nhân viên thu</div>
+                                <div class="value">
+                                    <div class="vattu_box">
+                                        <div class="input-group">
+                                            <div class="li input-text">
+                                                <div class="select-custom">
+                                                    <input ref="nvtc" readonly v-model="form.nvtc.text" id="root" placeholder="Chọn nhân viên thu cước"
+                                                        class="form-control bg-none" @click="onChangeCustomDropDown('#nvtc-pd')">
+                                                    </input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="vattu_table" id="nvtc-pd" :class="{ displayNone: hideTable }">
+                                            <DataGrid3
+                                                v-bind:columns="[
+                                                {fieldName: 'MA_NV', headerText: 'Mã nhân viên', allowFiltering: true, allowSorting: false},
+                                                {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, allowSorting: false},
+                                                {fieldName: 'TIEN_DC', headerText: 'Tiền ký quỹ gốc', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number', textAlign: 'Right'},
+                                                {fieldName: 'TIEN_DC_THANG', headerText: 'Tiền ký quỹ tháng', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number', textAlign: 'Right'}]"
+                                                v-bind:dataSource="dsNVTC" :showFilter="true" :showColumnCheckbox="false"
+                                                :allowPaging='true' :enablePagingServer="false" :enabledSelectFirstRow="false"
+                                                dataKeyField="NHANVIEN_ID" :defaultColumnCheckboxChecked="false" :selectedRow="-1"
+                                                @selectedRowChanged="onSelectNVTC"
+                                                ref="tableNvt">
+                                            </DataGrid3>
+                                            <div class="p-2">
+                                                <button type="button" @click="onChangeCustomDropDown('#nvtc-pd')" class="btn btn-secondary btn-sm"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <div class="key w80">Loại KH</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select ref="comboLyDo" v-model="form.loaiKHId" class="form-control">
+                                            <option v-for="dv in dsLoaiKhachHang" v-bind:value="dv.loaikh_id">{{dv.loaikh}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w80">
+                                    <div class="check-action">
+                                        <input type="checkbox" v-model="form.cbkHtg" class="check">
+                                        <span class="name">HT giao</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="vattu_box">
+                                        <div class="input-group">
+                                            <div class="li input-text">
+                                                <div class="select-custom">
+                                                    <input ref="htg" :disabled="!form.cbkHtg" readonly v-model="form.htg.text" id="root3"
+                                                        class="form-control bg-none" @click="onChangeCustomDropDown('#htg-pd')">
+                                                    </input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="select-table w-100" id="htg-pd" :class="{ displayNone: hideHtGiao }">
+                                            <multi-select-demo :data="dsHtGiao" v-on:onOk="onOkHtg" v-on:onCancel="onCancel('#htg-pd')">
+                                            </multi-select-demo>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w100">
+                                    <div class="check-action">
+                                        <input type="checkbox" v-model="form.cbkTongPhieu" class="check">
+                                        <span class="name">Tổng phiếu</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-number-custom">
+                                        <input type="number" v-model="form.tongPhieuTu" :disabled="!form.cbkTongPhieu" class="form-control tright" value="0">
+                                    </div>
+                                </div>
+                                <div class="key w40 padl5">
+                                    đến
+                                </div>
+                                <div class="value">
+                                    <div class="input-number-custom">
+                                        <input type="number" v-model="form.tongPhieuDen" :disabled="!form.cbkTongPhieu" class="form-control tright" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Ngày giao</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker class="form-control bg-none bor0 fw6"
+                                            :format="'dd/MM/yyyy'" :showClearButton="false" v-model="form.ngayGiao" :enabled="false">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-12">
+                            <div class="info-row">
+                                <div class="key w80">
+                                    <div class="check-action">
+                                        <input type="checkbox" v-model="form.cbkKhLon" class="check">
+                                        <span class="name">KH lớn</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="vattu_box">
+                                        <div class="input-group">
+                                            <div class="li input-text">
+                                                <div class="select-custom">
+                                                    <input ref="khl" :disabled="!form.cbkKhLon" readonly v-model="form.khhl.text" id="root2"
+                                                        class="form-control bg-none" @click="onChangeCustomDropDown('#khl-pd')">
+                                                    </input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="select-table w-100" id="khl-pd" :class="{ displayNone: hideDropCustom }">
+                                            <multi-select-demo :data="dsKHLon" v-on:onOk="onOk" v-on:onCancel="onCancel('#khl-pd')" v-on:onChoseItem="onChoseItem">
+                                            </multi-select-demo>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w80">
+                                    Loại phiếu
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select v-model="form.idLoaiPhieu" @change="onChangeLoaiPhieu" class="form-control">
+                                        <option v-for="dv in dsLoaiPhieu" v-bind:value="dv.LOAIPHIEU_ID">{{dv.LOAIPHIEU}}
+                                        </option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="value w120">
+                                    <div class="select-custom">
+                                        <select class="form-control" v-model="form.loaiTien">
+                                            <option value="1">Tiền nợ</option>
+                                            <option value="2">Tiền hoá đơn</option>
+                                            <option value="3">Tiền phát sinh</option>
+                                            <option value="4">Tiền đầu kỳ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="value w64">
+                                    <div class="select-custom">
+                                        <select class="form-control" v-model="form.loaiPhieuPlus">
+                                            <option value=">0">>0</option>
+                                            <option value="<>0"><>0</option>
+                                            <option value="<=0"><=0</option>
+                                            <option value="<=>0"><=>0</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w100">
+                                    <div class="check-action">
+                                        <input type="checkbox" v-model="form.ckbDenHen" class="check">
+                                        <span class="name">Đến hẹn</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="check-action mart7">
+                                        <input type="checkbox"  v-model="form.ckbTienHd" class="check">
+                                        <span class="name">Tiền HĐ #Tiền nợ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" :disabled="true" v-model="form.ckbTienDc" class="check">
+                                <span class="name">Tiền ĐC</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-number-custom d-inline-flex w-100 input-contain" id="input-contain">
+                                <input type="text" :value="form.tienDc | currency" class="form-control tright input-1" id="input-1"
+                                @input="$event => {
+                                  $event.target.value = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(\..*?)\..*/g, '$1');
+                                  form.tienDc = $event.target.value;}">
+                                <input type="number" class="input-2" @change="changeNumber($event)" id="input-2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" v-model="form.ckbTongTien" class="check">
+                                <span class="name">Tổng tiền</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <!-- <input-number-custom :data="form.tongTien"></input-number-custom> -->
+                            <!-- <div class="input-number-custom">
+                                <input type="number" v-model="form.tongTien" :disabled="!form.ckbTongTien" class="form-control tright" value="0">
+                            </div> -->
+                            <div class="input-number-custom d-inline-flex w-100 input-contain" id="input-contain-tt">
+                                <input type="text" :value="form.tongTien | currency" :disabled="!form.ckbTongTien" class="form-control tright input-1" id="input-1-tt"
+                                @input="$event => {
+                                  $event.target.value = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(\..*?)\..*/g, '$1');
+                                  form.tongTien = $event.target.value;}">
+                                <input type="number" class="input-2" :disabled="!form.ckbTongTien" @change="changeNumberTT($event)" id="input-2-tt">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="check-action">
+                        <input type="checkbox" v-model="form.ckbIn" class="check">
+                        <span class="name">In ngày sau khi giao</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-12">
+                <div class="box-form">
+                    <div class="nav tabs tab-over">
+                        <a href="#tabDG" data-toggle="tab" class="active">
+                            Đợt giao
+                        </a>
+                        <a href="#tabTT" data-toggle="tab">
+                            Tuyến thu
+                        </a>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tabDG">
+                            <div class="tree-plus" style="height: 400px;overflow: auto;">
+                                <ul class="" v-if="form.nvtc.id">
+                                    <li class="haschild open">
+                                        <a href="javascript:void(0)"><span class="icon nc-icon-glyph text-main">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check"
+                                                :checked="true"
+                                                v-bind:value="form.nvtc.id"
+                                                @click="onChangeTreeCb($event)"> <span class="name"></span>
+                                            </div>
+                                            </span>{{form.nvtc.text.split(' - ')[1]}}
+                                        </a>
+                                        <ul>
+                                            <li v-for="item in dsDotGiao" v-if="dsDotGiao.length > 0">
+                                                <a ><span class="icon nc-icon-glyph text-main">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" class="check" :checked="dsDotGiaoIdSelected.includes(item.DOTGIAO_ID)"
+                                                        v-bind:value="item.DOTGIAO_ID"  @click="onChangeTreeItem($event, item.DOTGIAO_ID)"> <span class="name"></span>
+                                                    </div>
+                                                    </span>{{item.DOTGIAO}}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="check-action mart10">
+                                <input type="checkbox" :checked="true" class="check">
+                                <span class="name">Tuyến thuộc nhân viên</span>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tabTT">
+                            <div class="tree-plus" style="height: 400px;overflow: auto;">
+                                <ul class="" v-if="form.nvtc.id">
+                                    <li class="haschild open">
+                                        <a href="javascript:void(0)"><span class="icon nc-icon-glyph text-main">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check"
+                                                :checked="true"
+                                                v-bind:value="form.nvtc.id"
+                                                @click="onChangeTreeCbTT($event)"> <span class="name"></span>
+                                            </div>
+                                            </span>{{form.nvtc.text.split(' - ')[1]}}
+                                        </a>
+                                        <ul>
+                                            <li v-for="item in dsTuyenThu" v-if="dsTuyenThu.length > 0">
+                                                <a ><span class="icon nc-icon-glyph text-main">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" class="check" :checked="dsTuyenThuIdSelected.includes(item.TUYENTHU_ID)"
+                                                        v-bind:value="item.TUYENTHU_ID"  @click="onChangeTreeItemTT($event, item.TUYENTHU_ID)"> <span class="name"></span>
+                                                    </div>
+                                                    </span>{{item.TENTUYEN}}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="check-action mart10">
+                                <input type="checkbox" class="check">
+                                <span class="name">Tuyến thuộc nhân viên</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12">
+                <div class="box-form">
+                    <div class="tab-gachle padr36">
+                        <div class="tab-right tabs nav no1">
+                            <a href="#tab1" data-toggle="tab" @click="gridTab = 1" class="active">Phiếu chưa giao</a>
+                            <a href="#tab2" data-toggle="tab" @click="gridTab = 2">Phiếu đã giao</a>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab1">
+                                <div class="table-fix-head table-chua-giao">
+                                    <DataGrid3
+                                        v-bind:columns="columns"
+                                        v-bind:dataSource="dsHoaDon" :showFilter="true" :showColumnCheckbox="true"
+                                        v-bind:aggregates="[
+                                            {field: 'MA_TT', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggCountPhieuCG},
+                                            {field: 'TIEN', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuCGTIEN},
+                                            {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuCGTIEN_HD},
+                                            {field: 'TIENHD_PS', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuCGTIENHD_PS},
+                                            {field: 'TIENHD_DK', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuCGTIENHD_DK}
+                                        ]"
+                                        :selectionSettings="selectionSettings"
+                                        :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false" :allowExcelExport='true'
+                                        dataKeyField="MA_TT" :defaultColumnCheckboxChecked="false"
+                                        @checkBoxChange="checkBoxCGChange" @rowSelected="dsPhieuCGRowSelected" @rowDeselected="dsPhieuCGRowDeselected" @dataBound="dsPhieuCGDatabound"
+                                        :totalRecords="pageinfoDSHDChuaGiao.totalElement" :pageSize="pageinfoDSHDChuaGiao.maxSize" :pageIndex="pageinfoDSHDChuaGiao.page" :key="keyChuaGiao"
+                                        ref="table01" @keyPressed="keyPressedHandlerPhieuCG"
+                                        >
+                                    </DataGrid3>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab2">
+                                <div class="table-fix-head table-da-giao">
+                                    <DataGrid3
+                                    v-bind:columns="[
+                                    {fieldName: 'MA_TT', headerText: 'Mã Thanh toán', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MA_LT', headerText: 'Số ảo', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number', textAlign: 'Right'},
+                                    {fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number', textAlign: 'Right'},
+                                    {fieldName: 'TIENHD_PS', headerText: 'Tiền phát sinh', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number', textAlign: 'Right'},
+                                    {fieldName: 'TIENHD_DK', headerText: 'Tiền đầu kỳ', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number', textAlign: 'Right'},
+                                    {fieldName: 'SDT_LH', headerText: 'Số DT liên hệ', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SO_SERI', headerText: 'Số seri', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'DIACHI_BC', headerText: 'Địa chỉ phát', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'LUOTGIAO', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'STK', headerText: 'Số tài khoản', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TEN_LOAIKH', headerText: 'Đối tượng', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TEN_LKHL', headerText: 'Loại kh lớn', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'DS_DVKHAC', headerText: 'Dịch vụ khác', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'NHANVIEN_CSKH', headerText: 'CSKH', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'DOTGIAO_ID', headerText: 'Đợt giao', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'CNRR', headerText: 'CNRR', allowFiltering: true, allowSorting: false},
+                                    ]"
+                                    v-bind:dataSource="dsHoaDonDaGiao" :showFilter="true" :showColumnCheckbox="true"
+                                    v-bind:aggregates="[
+                                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggCountPhieuDG},
+                                        {field: 'TIEN', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuDGTIEN},
+                                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuDGTIEN_HD},
+                                        {field: 'TIENHD_PS', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuDGTIENHD_PS},
+                                        {field: 'TIENHD_DK', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggPhieuDGTIENHD_DK}
+                                    ]"
+                                    :selectionSettings="selectionSettings"
+                                    :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false" :allowExcelExport='true'
+                                    dataKeyField="MA_TT" :defaultColumnCheckboxChecked="false"
+                                    @checkBoxChange="checkBoxDGChange" @rowSelected="dsPhieuDGRowSelected" @rowDeselected="dsPhieuDGRowDeselected" @dataBound="dsPhieuDGDatabound"
+                                    :totalRecords="pageinfoDSHDDaGiao.totalElement" :pageSize="pageinfoDSHDDaGiao.maxSize" :pageIndex="pageinfoDSHDDaGiao.page" :key="keyDaGiao"
+                                    ref="table02" @keyPressed="keyPressedHandlerPhieuDG">
+                                    </DataGrid3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <PopupLuotGiao :input="luotGiao_Input" @select="onSelectLuotGiao" ref="dlgLuotGiao" />
+    <!--
+    <b-modal id="modal-luot-da-giao" modal-class="modal-luot-da-giao" hide-footer hide-header no-close-on-backdrop size="lg">
+        <div>
+           <luot-da-giao
+           v-on:close="onCloseModal"
+           v-on:select="onChonLuotGiao"
+           :data="this.form.nvtc"
+           :kyCuoc="kyCuoc"
+            ></luot-da-giao>
+        </div>
+    </b-modal>
+    -->
+</div>

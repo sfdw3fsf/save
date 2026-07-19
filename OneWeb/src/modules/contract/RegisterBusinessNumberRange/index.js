@@ -1,0 +1,2 @@
+import RegisterBusinessNumberRange from './RegisterBusinessNumberRange'
+export default RegisterBusinessNumberRange

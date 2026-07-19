@@ -1,0 +1,289 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ThongTinChiTietThietBi"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="85%"
+  height="auto"
+  :target="target"
+  @close="closeModal"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        <span v-if="isCardModuleMode">
+          {{ cardModuleTitle }}
+          <span v-if="cardModuleInfo.parentDeviceInfo" style="color: #666; font-size: 0.9em;">
+            - Thiết bị cha: {{ cardModuleInfo.parentDeviceInfo.ten || 'Chưa có tên' }}
+          </span>
+        </span>
+        <span v-else>
+          {{ currentMode == 'VIEW' ? ' Chi tiết thiết bị: ' + (currentItem && currentItem.ten ? currentItem.ten : 'Chưa có tên') : currentMode
+          == 'EDIT' ? ' Chỉnh sửa thiết bị: ' + (currentItem && currentItem.ten ? currentItem.ten : 'Chưa có tên') : ' Thêm mới thiết bị' }}
+        </span>
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-save"></span>{{ saveButtonText }}
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal" :disabled="currentMode == 'VIEW'">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Huỷ bỏ
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2 ">
+      <!-- TAB NAVIGATION -->
+      <div class="">
+        <div class="nav tab-over tabs">
+          <a
+            href="#tabThongTinChung"
+            v-on:click="onChangeTab(1)"
+            data-toggle="tab"
+            class="tab"
+            :class="{active: tab_index == 1}"
+            >Thông tin chung</a
+          >
+          <a
+            href="#tabDacTinhThietBi"
+            v-on:click="onChangeTab(2)"
+            data-toggle="tab"
+            class="tab"
+            :class="{active: tab_index == 2}"
+            >Đặc tính thiết bị</a
+          >
+          <a
+            href="#tabThongTinLapDat"
+            v-on:click="onChangeTab(3)"
+            data-toggle="tab"
+            v-if="currentMode != 'ADD' && !isCardModuleMode"
+            class="tab"
+            :class="{active: tab_index == 3}"
+            >Thông tin lắp đặt</a
+          >
+          <a
+            href="#tabThongTinKiemKe"
+            v-on:click="onChangeTab(4)"
+            data-toggle="tab"
+            v-if="!isCardModuleMode && isSelectedDeviceType"
+            class="tab"
+            :class="{active: tab_index == 4}"
+            >Thông tin kiểm kê quản lý tài sản</a
+          >
+          <a
+            href="#tabCongThietBi"
+            v-on:click="onChangeTab(5)"
+            data-toggle="tab"
+            v-if="!isDiskShelf && isSelectedDeviceType"
+            class="tab"
+            :class="{active: tab_index == 5}"
+            >Thông tin Port</a
+          >
+          <a
+            href="#tabThongTinCard"
+            v-on:click="onChangeTab(6)"
+            data-toggle="tab"
+            v-if="!isDiskShelf && !cardModuleInfo.isCardModuleMode && isSelectedDeviceType && !isOther"
+            class="tab"
+            :class="{active: tab_index == 6}"
+            >Thông tin Card</a
+          >
+          <a
+            href="#tabThongTinKheCam"
+            v-on:click="onChangeTab(9)"
+            data-toggle="tab"
+            v-if="!isDiskShelf && !cardModuleInfo.isCardModuleMode && isSelectedDeviceType && !isOther"
+            class="tab"
+            :class="{active: tab_index == 9}"
+            >Thông tin khe cắm</a
+          >
+          <a
+            href="#tabThongTinMoRong"
+            v-on:click="onChangeTab(7)"
+            data-toggle="tab"
+            v-if="currentMode != 'ADD' && !isCardModuleMode"
+            class="tab"
+            :class="{active: tab_index == 7}"
+            >Thông tin mở rộng</a
+          >
+          <a
+            href="#tabLichSuThietBi"
+            v-on:click="onChangeTab(8)"
+            data-toggle="tab"
+            v-if="currentMode != 'ADD' && !isCardModuleMode"
+            class="tab"
+            :class="{active: tab_index == 8}"
+            >Lịch sử thay đổi</a
+          >
+        </div>
+      </div>
+      <div class="tab-content">
+        <!-- Tab 1: Thông tin chung -->
+        <div v-show="tab_index == 1">
+          <ThongTinChung
+            ref="thongTinChung"
+            :currentItem="currentItem"
+            :controls="thongTinChungControls"
+            :deviceTypeList="deviceTypeList"
+            :customerTypeList="customerTypeList"
+            :equipmentCategoryList="chungLoaiThietBiList"
+            :discTypeList="discTypeList"
+            :IPAddressList="IPAddressList"
+            :parentDeviceList="parentDeviceList"
+            :isServer="isServer"
+            :isNetwork="isNetwork"
+            :isDiskShelf="isDiskShelf"
+            :isIDC="isIDC"
+            :isOther="isOther"
+            @device-type-changed="onDeviceTypeChanged"
+            @equipment-category-changed="onEquipmentCategoryChanged"
+          />
+        </div>
+        
+        <!-- Tab 2: Đặc tính thiết bị -->
+        <div v-show="tab_index == 2">
+          <DacTinhThietBi
+            ref="dacTinhThietBi"
+            :currentItem="currentItem"
+            :controls="dacTinhThietBiControls"
+            :manufacturerList="manufacturerList"
+            :supplierList="supplierList"
+            :usageStatusList="usageStatusList"
+            :deviceRoleList="deviceRoleList"
+            :OSList="OSList"
+            :isServer="isServer"
+            :isNetwork="isNetwork"
+            :isDiskShelf="isDiskShelf"
+            :isIDC="isIDC"
+            :isOther="isOther"
+          />
+        </div>
+        
+        <!-- Tab 3: Thông tin lắp đặt -->
+        <div v-show="tab_index == 3">
+          <ThongTinLapDat
+            ref="thongTinLapDat"
+            :currentItem="currentItem"
+            :controls="thongTinLapDatControls"
+            :IDCList="IDCList"
+            :alterBuildingList="IDCBuildingList"
+            :alterFloorList="IDCFloorList"
+            :alterZoneList="IDCZoneList"
+            :alterRackList="rackList"
+            :UpperUList="UpperUList"
+            :LowerUList="LowerUList"
+            @idc-changed="onIDCChanged"
+            @building-changed="onBuildingChanged"
+            @floor-changed="onFloorChanged"
+            @zone-changed="onZoneChanged"
+          />
+        </div>
+        
+        <!-- Tab 4: Thông tin kiểm kê quản lý tài sản -->
+        <div v-show="tab_index == 4">
+          <ThongTinKiemKe
+            ref="thongTinKiemKe"
+            :currentItem="currentItem"
+            :controls="thongTinKiemKeControls"
+            :donViQuanLyList="donViQuanLyList"
+            :phongBanQuanLyList="phongBanQuanLyList"
+            :nguoiQuanLyList="nguoiQuanLyList"
+            @don-vi-quan-ly-changed="onDonViQuanLyChanged"
+            @phong-ban-quan-ly-changed="onPhongBanQuanLyChanged"
+          />
+        </div>
+        
+        <!-- Tab 5: Cổng thiết bị -->
+        <div v-show="tab_index == 5">
+          <ThongTinPort
+            ref="portType"
+            :deviceData="currentItem"
+            :interfaceList="interfaceList"
+            :powerList="powerList"
+            :consoleList="consoleList"
+            :portInterfaceList="portInterfaceList"
+            :portTypeInterfaceList="portTypeInterface"
+            :portPowerList="portPowerList"
+            :portTypePowerList="portTypePower"
+            :portConsoleList="portConsoleList"
+            :portTypeConsoleList="portTypeConsole"
+            :loaiCongList="loaiCongList"
+            :mucDichList="mucDichList"
+            :bangThongList="bangThongList"
+            :thongtinModuleList="thongtinModuleList"
+            :cardModuleInfo="cardModuleInfo"
+          />
+        </div>
+        
+        <!-- Tab 6: Thông tin Card (for Network devices) -->
+        <div v-show="tab_index == 6">
+          <ThongTinCard
+            v-show="!cardModuleInfo.isCardModuleMode"
+            :deviceData="currentItem"
+            :interfaceList="interfaceList"
+            :powerList="powerList"
+            :consoleList="consoleList"
+            :portInterfaceList="portInterfaceList"
+            :portTypeInterfaceList="portTypeInterface"
+            :portPowerList="portPowerList"
+            :portTypePowerList="portTypePower"
+            :portConsoleList="portConsoleList"
+            :portTypeConsoleList="portTypeConsole"
+            :loaiCongList="loaiCongList"
+            :mucDichList="mucDichList"
+            :bangThongList="bangThongList"
+            @add-card="(type) => $emit('add-card', type)"
+          />
+        </div>
+
+        <!-- Tab 7: Thông tin mở rộng -->
+        <div v-show="tab_index == 7">
+          <DeviceRelationInfo
+            v-show="!isDiskShelf"
+            :connectorList="connectorList"
+            :infraList="infraList"
+            :colocationList="colocationList"
+            @view-device-detail="onViewDeviceDetail"
+          />
+          
+          <div v-if="isDiskShelf">
+            <AllocationInfo
+              :VMList="VMList"
+              :NFSList="NFSList"
+              :controllerList="controllerList"
+              :shelvesList="shelvesList"
+            />
+          </div>
+        </div>
+        
+        <!-- Tab 8: Lịch sử thiết bị -->
+        <div v-show="tab_index == 8">
+          <LichSuThietBi
+            :deviceRelationHistory="deviceRelationHistory"
+          />
+        </div>
+
+        <!-- Tab 9: Thông tin khe cắm -->
+        <div v-show="tab_index == 9">
+          <ThongTinKheCam
+            :deviceData="currentItem"
+            :kheCamList="kheCamList"
+            @view-card-detail="onViewCardDetail"
+            @insert-card="onInsertCard"
+            @change-card="onChangeCard"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

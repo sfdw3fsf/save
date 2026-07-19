@@ -1,0 +1,176 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    @shown="focusMyElement"
+    @hidden="hiddenForm"
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span>  Vận hành khoản mục
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+
+        <div class="list-actions-top">
+            <ul class="list">
+              <li>
+                    <a href="javascript:void(0)" class="btn" @click="tsbtnChapNhan_Click" :class="{'disabled': isDisableBtnChapNhan}">
+                        <span class="nc-icon-glyph ui-1_check-circle-08"></span> Chấp Nhận
+                    </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" class="btn" @click="tsbtnNhapMoi_Click()" :class="{'disabled': isDisableBtnNhapMoi}">
+                    <span class="icon one-file-plus"></span> Nhập mới
+                </a>
+             </li>
+             <li>
+                <a href="javascript:void(0)" class="btn" @click="tsbtnGhiLai_Click()">
+                    <span class="icon one-save"></span> Ghi Lại
+                </a>
+             </li>
+             <li>
+                <a href="javascript:void(0)" class="btn" @click="tsbtnHuyBo_Click()">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy 
+                </a>
+             </li>
+             <li>
+                <a href="javascript:void(0)" class="btn" @click="tsbtnXoa_Click()" :class="{'disabled': isDisableBtnXoa}">
+                    <span class="icon one-trash"></span> Xóa 
+                </a>
+             </li>
+            </ul>          
+        </div>
+
+        <div class="popup-body">
+            <div class="box-form">
+
+                <div class="info-row">
+                    <div class="key w80">
+                        Khoản mục
+                    </div>
+                    <div class="value">
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="select-custom">
+                                    <div class="select-custom" >
+                                        <SelectExt v-model="khoanmuc_id" 
+                                        :dataSource="dsKhoanMuc" 
+                                        dataTextField="KHOANMUC"
+                                        dataValueField="KHOANMUC_ID"  />
+                                      </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <input type="text" v-model="txtSoLuong" class="tright highlight form-control" @keypress="txtSoLuong_press($event)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">
+                        Thành tiền
+                    </div>
+                    <div class="value">
+                        <input type="text" v-model="txtThanhtien" class="form-control highlight tright" @keypress="txtThanhtien_press($event)">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">
+                        Ghi chú
+                    </div>
+                    <div class="value">
+                        <textarea name="" v-model="txtGhiChu" id="" cols="30" rows="10" class="form-control" style="height: 120px;resize: vertical;"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                Tháng
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <div class="select-custom" >
+                                        <SelectExt v-model="thang" 
+                                        :dataSource="dsThang" 
+                                        :disabled='isDisableThang'
+                                        dataTextField="TEN_THANG"
+                                        dataValueField="THANG_ID"  />
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                   
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                Từ giờ
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-datetimepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" 
+                                    :format="dateFormat" v-model="tugio" ></ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                Đến giờ
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-datetimepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" 
+                                    :format="dateFormat" v-model="dengio" ></ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    Vận hành khoản mục
+                </div>
+                <div class="table-content">
+                    <DataGrid ref="grid-khoanmuc" v-bind:columns="[
+                  {fieldName: 'KHOANMUC', headerText: 'Khoản mục', allowFiltering: true},
+                  {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true,template: cTemplateSoLuong },    
+                  {fieldName: 'THANHTIEN', headerText: 'Thành tiền', allowFiltering: true , template: cTemplateThanhTien },
+                  {fieldName: 'TUGIO', headerText: 'Từ giờ', allowFiltering: true,template: cTemplateTuGio},    
+                  {fieldName: 'DENGIO', headerText: 'Đến giờ', allowFiltering: true,template: cTemplateDenGio},
+                  {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},                                     
+                   ]"
+                  v-bind:dataSource="dsVH_KM" :enablePagingServer="false"  :allowPaging ="true"
+                  :aggregates="aggregates"
+                   :showFilter="true" @rowSelected="gridThietBi_rowSelected"></DataGrid>
+                </div>
+            </div>
+       
+       
+        </div>                  
+    </div>
+     <!-- Modal -->
+     <b-modal ref="modal" v-model="modalThongBaoXoaVH" title="Thông báo" size="sm"  @ok="xacNhan">
+        <div class="d-block text-center">
+            <span>Bạn có chắc chắn muốn xóa Vận hành - khoản mục! </span>
+          </div>
+          <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="$refs['modal'].hide()">Không đồng ý</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+       </template>
+    </b-modal>
+</b-modal>
+
+           

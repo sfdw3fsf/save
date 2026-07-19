@@ -1,0 +1,562 @@
+<div>
+  <div class="management-agent main-wrapper">
+    <div class="breadcrumb-top">
+      <div class="main-title">quản lý hợp đồng đại lý</div>
+      <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="#"
+            ><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+          </a>
+        </li>
+        <li class="breadcrumb-item"><a href="#">Quản lý đại lý</a></li>
+        <li class="breadcrumb-item active">Hợp đồng đại lý</li>
+      </ul>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li style="cursor: pointer">
+          <a @click="search"> <span class="icon one-search"></span>Tìm kiếm </a>
+        </li>
+        <li v-if="!isEditing" style="cursor: pointer">
+          <a @click="taoDaiLy">
+            <span class="icon one-file-edit2"></span>Lập HĐ
+          </a>
+        </li>
+        <li v-if="isEditing" style="cursor: pointer">
+          <a @click="cancelSelect">
+            <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ bỏ
+          </a>
+        </li>
+        <li style="cursor: pointer">
+          <a @click="onClickResetPassword">
+            <span class="icon one-reload-next"></span>Reset MK
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="page-content">
+      <div class="box-form">
+        <div class="legend-title">
+          <div class="pull-left">
+            Thông tin về hợp đồng đại lý
+          </div>
+          <div class="pull-right">
+            <div class="check-action">
+              <input type="checkbox" class="check" />
+              <span class="name">Tìm chính xác</span>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 col-12">
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="info-row">
+                  <div class="key w130">
+                    Số TB/User web: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="input-more-button">
+                      <button class="btn" @click="search">
+                        <span class="one-search f20"></span>
+                      </button>
+                      <input
+                        type="text"
+                        class="form-control highlight"
+                        :class="{ 'is-invalid':
+                $v.hopDongDaiLy.ELOADMSISDN.$error }"
+                        v-model=" $v.hopDongDaiLy.ELOADMSISDN.$model"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="info-row">
+                  <div class="key w80">
+                    Ngày tạo:
+                  </div>
+                  <div class="value">
+                    <div class="input-icon-right">
+                      <date-picker
+                        input-class="form-control"
+                        format="DD/MM/YYYY"
+                        :value-type="'format'"
+                        v-model="hopDongDaiLy.CREATEDATE"
+                      ></date-picker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="info-row">
+                  <div class="key w130">
+                    Mã đại lý:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.MA_DAI_LY"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="info-row">
+                  <div class="key w80">
+                    Tên đại lý:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.TEN_DAI_LY"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w130">
+                    Tỉnh thành: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt
+                        :dataSource="dsTinhThanh"
+                        :allowFiltering="true"
+                        dataTextField="TENTINH_NEO"
+                        dataValueField="TINH_TT_NEO"
+                        :class="{ 'is-invalid':
+                $v.hopDongDaiLy.PROVINCEID.$error }"
+                        v-model=" $v.hopDongDaiLy.PROVINCEID.$model"
+                      ></SelectExt>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w80">
+                    Khu vực:<span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt
+                        :dataSource="dsKhuVuc"
+                        :allowFiltering="true"
+                        dataTextField="TEN_KHUVUC"
+                        dataValueField="KHUVUC_ID"
+                        :class="{ 'is-invalid':
+                $v.hopDongDaiLy.KHU_VUC.$error }"
+                        v-model=" $v.hopDongDaiLy.KHU_VUC.$model"
+                      ></SelectExt>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w80">
+                    Phạm vi: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt
+                        :dataSource="dsPhamVi"
+                        :allowFiltering="true"
+                        dataTextField="TEN_PV"
+                        dataValueField="PHAMVI_ID"
+                        :class="{ 'is-invalid':
+                $v.hopDongDaiLy.PHAM_VI.$error }"
+                        v-model=" $v.hopDongDaiLy.PHAM_VI.$model"
+                      ></SelectExt>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w130">
+                Tên đại diện:
+              </div>
+              <div class="value">
+                <input type="text" class="form-control" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w130">
+                    Ngày sinh: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="input-icon-right">
+                      <date-picker
+                        :input-class="{
+                          'form-control': true,
+                          'is-invalid':
+                $v.hopDongDaiLy.NGAY_SINH.$error
+                        }"
+                        format="DD/MM/YYYY"
+                        :value-type="'format'"
+                        v-model="$v.hopDongDaiLy.NGAY_SINH.$model"
+                      ></date-picker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w80">
+                    Chức vụ: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid':
+                $v.hopDongDaiLy.CHUC_VU.$error }"
+                      v-model=" $v.hopDongDaiLy.CHUC_VU.$model"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w130">Địa chỉ: <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': $v.hopDongDaiLy.ADDRESS.$error }"
+                  v-model=" $v.hopDongDaiLy.ADDRESS.$model"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w130">
+                    Số GPKD:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.SO_GPKD"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w80">
+                    HĐ Internet
+                  </div>
+                  <div class="value">
+                    <input type="text" class="form-control" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w130">
+                Ghi chú:
+              </div>
+              <div class="value">
+                <textarea
+                  v-model="hopDongDaiLy.COMMENTS"
+                  name=""
+                  class="form-control"
+                  style="height: 66px;resize: none;"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Số IMSI: <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': $v.hopDongDaiLy.SO_IMSI.$error }"
+                  v-model=" $v.hopDongDaiLy.SO_IMSI.$model"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Trạng thái:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.STATUS"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Eload NT:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.ELOAD_NHANTIEN"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Loại giấy tờ: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt
+                        :dataSource="dsLoaiGiayTo"
+                        :allowFiltering="true"
+                        dataTextField="TENLOAI_GT"
+                        dataValueField="LOAIGT_ID_NEO"
+                        :class="{ 'is-invalid':
+                $v.hopDongDaiLy.LOAI_GT.$error }"
+                        v-model=" $v.hopDongDaiLy.LOAI_GT.$model"
+                      ></SelectExt>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Số giấy tờ: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid':
+                $v.hopDongDaiLy.SO_GT.$error }"
+                      v-model=" $v.hopDongDaiLy.SO_GT.$model"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Ngày cấp: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="input-icon-right">
+                      <date-picker
+                        :input-class="{
+                          'form-control': true,
+                          'is-invalid':
+                $v.hopDongDaiLy.NGAY_CAP.$error
+                        }"
+                        format="DD/MM/YYYY"
+                        :value-type="'format'"
+                        v-model=" $v.hopDongDaiLy.NGAY_CAP.$model"
+                      ></date-picker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Nơi cấp: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid':
+                $v.hopDongDaiLy.NOI_CAP.$error }"
+                      v-model=" $v.hopDongDaiLy.NOI_CAP.$model"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Ngày ký: <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <div class="input-icon-right">
+                      <date-picker
+                        :input-class="{
+                          'form-control': true,
+                          'is-invalid':
+                $v.hopDongDaiLy.NGAY_KY_HD.$error
+                        }"
+                        format="DD/MM/YYYY"
+                        :value-type="'format'"
+                        v-model=" $v.hopDongDaiLy.NGAY_KY_HD.$model"
+                      ></date-picker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w90">Số HĐ: <span class="red">(*)</span></div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid':
+                $v.hopDongDaiLy.SO_HD.$error }"
+                      v-model=" $v.hopDongDaiLy.SO_HD.$model"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">
+                Mã số thuế:
+              </div>
+              <div class="value">
+                <input type="text" class="form-control" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Điện thoại:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.TEL"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Mail:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.MAIL"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Fax:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.FAX"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Website:
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      v-model="hopDongDaiLy.WEBSITE"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">
+                Mã pin (SMS):
+              </div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control red"
+                  value="Mặc định là 1234"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <b-tabs v-model="activeTab" lazy>
+        <b-tab title="Danh sách đại lý">
+          <TableDSDaiLy
+            class="table-result"
+            :dsDaiLy="dsDaiLy"
+            :selectedRow.sync="selectedHopDongDaiLy"
+          />
+        </b-tab>
+        <b-tab title="Lịch sử thao tác">
+          <TableLichSuThaoTacTB
+            class="table-result"
+            :selectedRow.sync="selectedHopDongDaiLy"
+          />
+        </b-tab>
+      </b-tabs>
+    </div>
+    <footer class="footer">
+      VNPT-IT &copy; 2021
+    </footer>
+  </div>
+
+  <!-- Modal popup -->
+  <PopupDoiMatKhau
+    :show.sync="showModal.doiMatKhau"
+    :row.sync="currentDaiLyOnAction"
+  />
+  <PopupDSThongTinThanhVienDangKy
+    :show.sync="showModal.thongTinThanhVienDangKy"
+    :row.sync="currentDaiLyOnAction"
+    :dsMemberTrangThai="dsMemberTrangThai"
+    :dsTinhThanh="dsTinhThanh"
+  />
+  <PopupPhanQuyenThaoTac
+    :show.sync="showModal.phanQuyenThaoTac"
+    :row.sync="currentDaiLyOnAction"
+  />
+  <PopupResetMatKhau
+    :show.sync="showModal.resetMatKhau"
+    :row.sync="currentDaiLyOnAction"
+  />
+</div>

@@ -1,0 +1,2 @@
+import SyncFixSubscribersToSwitchboard from './SyncFixSubscribersToSwitchboard'
+export default SyncFixSubscribersToSwitchboard

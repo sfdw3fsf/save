@@ -1,0 +1,466 @@
+<ejs-dialog 
+class="popup-box" 
+ref="popup_frmVatTuTrongKho" 
+:enableResize='true' 
+width='80%'
+height ="100%"
+:allowDragging='true'
+:visible='false' 
+:isModal='true'
+:animationSettings="{ effect: 'Zoom' }" 
+:header='"DANH SÁCH VẬT TƯ TỒN KHO"' 
+:showCloseIcon=true
+:closeOnEscape='true'
+:open="frmVatTuTrongKho_Load"
+zIndex='999'
+>
+<!-- :close="Close"  Đức bỏ close tránh lặp khi xác nhận--> 
+  <div>
+    <div class="list-actions-top">
+      <ul class="list" style="overflow: visible !important; z-index: 99999;">
+        <li>
+          <a @click='tsbtnHoanThanh_Click'>
+            <span class="icon ui-1_check-circle-08 nc-icon-glyph"></span> Xác nhận
+          </a>
+        </li>
+        
+        <li  class="dropdown">
+          <a data-toggle="dropdown">
+              <span class="icon one-excel"></span>Excel VT
+          </a>
+
+          <ul class="dropdown-menu">
+              <li @click="btnXuatExcel_Click">
+                  <a>
+                      <span class="icon one-excel"></span> Excel VT đã chọn
+                  </a>
+              </li>
+              <li @click="btnXuatExcelAll_Click">
+                  <a>
+                      <span class="icon one-clipart-1"></span> Excel VT tất cả
+                  </a>
+              </li>              
+          </ul>
+        </li>
+        <li  class="dropdown" v-if = "Visible.tsbtnXuatExcelTbi">
+          <a data-toggle="dropdown">
+              <span class="icon one-excel"></span>Excel Tbi
+          </a>
+
+          <ul class="dropdown-menu">
+              <li @click="tsbtnXuatExcelTbi_Click">
+                  <a>
+                      <span class="icon one-excel"></span> Excel Tbi đã chọn
+                  </a>
+              </li>
+              <li @click="tsbtnXuatExcelTbiAll_Click">
+                  <a>
+                      <span class="icon one-clipart-1"></span> Excel Tbi tất cả
+                  </a>
+              </li>              
+          </ul>
+        </li>
+        <!-- <li v-if = "Visible.tsbtnXuatExcelTbi">
+          <a @click='tsbtnXuatExcelTbi_Click'>
+            <span class="icon one-excel"></span> Excel Tbi
+          </a>
+        </li> -->
+        <li>
+          <a @click='tsbtnDangKy_Click'>
+            <span class="icon one-clipart-1"></span> DS Đăng ký
+          </a>
+        </li>
+        <li>
+          <a @click='tsbtnPhieuTT_Click' >
+            <span class="icon one-clipart-1"></span> DS đăng ký TT
+          </a>
+        </li>        
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w90">Từ kho <span class="red">*</span></div>
+              <div class="value">
+                <div class="input-group">
+                  <div class="input-text">
+                    <div class="select-custom">
+                      
+                      <ejs-dropdownlist
+                          class="form-control"
+                          ref="cboTuKho"
+                          locale='vi'
+                          v-model="params.p_TuKho"
+                          :dataSource='cboTuKho' 
+                          :fields="{value:'khoID', text: 'tenKho'}"
+                          :allowFiltering="true"
+                          :readonly='!Enabled.cboTuKho'
+                          @change='cboTuKho_EditValueChanged'
+                          :filtering='onFilteringTuKho'
+                          >
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+                  <div class="input-addon">
+                    <button class="btn" @click="cboTuKho_ButtonClick">
+                      <span class="one-back1"></span>
+                    </button>
+                  </div>
+                </div>
+               
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12" v-if="Visible.dtpNgayDK">
+            <div class="info-row">
+              <div class="key w90">Đến ngày <span class="red">*</span></div>
+              <div class="value">
+                <div class="input-icon-right">                 
+                  <ejs-datetimepicker 
+                      locale='vi'
+                      v-model="params.p_dtpNgayDK"
+                      :format="'dd/MM/yyyy HH:mm:ss'"
+                      :showClearButton='false' 
+                      :readonly='ReadOnly.dtpNgayDK'
+                      :allowEdit='false' >
+                  </ejs-datetimepicker>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12 d-flex d-flex justify-content-start align-items-center" v-if="Visible.ckbAllTbi">
+
+            <div class="check-action">
+              <input type="checkbox" class="check" v-model="params.p_ckbAllTbi">
+              <span class="name">Lấy tất cả thiết bị</span>
+            </div>
+            <!-- <div class="input-icon-right f20">
+              <input type="checkbox" class="check" v-model="params.p_ckbAllTbi">
+            </div>
+            <div class="mr-3">
+              <span class="name">Lấy tất cả thiết bị</span>
+              Lấy tất cả thiết bị
+            </div> -->
+          </div>
+
+          <div class="col-sm-3 col-12" v-if="Visible.popupFilter">
+            <div class="info-row">
+              <div class="key w30"></div>
+              <div class="value">
+                <div class="vattu_box" id="drd">
+                  <div class="input-group">
+                    <div class="li input-text">
+                      <div class="select-custom">
+                        <input value="Tiêu chí tìm kiếm bổ sung" class="form-control" @click="isShow = true">
+                        </input>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div class="select-custom" data-toggle="dropdown" >
+                    <div class="form-control btn padt5 padb5 tleft" @click="isShow = true"></div>>Tiêu chí tìm kiếm bổ sung</div>
+                  </div> -->
+                  <div class="vattu_table" style="width: 600px;" v-if="isShow">
+                    <div class="popup-header">
+                      <div class="title">&nbsp;</div>
+                      <div class="close -ap icon-close" @click="isShow = !isShow">
+                      </div>
+                    </div>
+                    <div class="popup-body">
+                      <div class="box-form">
+                        <div class="legend-title">
+                          <div class="pull-left">Điều kiện lọc</div>
+                          <div class="pull-right">
+                            <button class="btn btn-second" @click="btnFilter_Click">
+                              <span class="one-search"></span> Tìm kiếm
+                            </button>
+                          </div>
+                          <div class="clearfix"></div>
+                        </div>
+                        <div class="row">
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w110">
+                                <div class="check-action">
+                                  <input type="checkbox" class="check" v-model="params.p_ckbLinhVuc_TK" @change='ckbLinhVuc_TK_CheckedChanged'>
+                                  <span class="name">Lĩnh vực</span>
+                                </div>
+                              </div>
+                              <div class="value">
+                                <div class="select-custom">
+                                  <ejs-dropdownlist
+                                    class="form-control"
+                                    locale='vi'
+                                    v-model="params.p_LinhVuc_TK"
+                                    :dataSource='cboLinhVuc_TK' 
+                                    :fields="{value:'linhVucId', text: 'linhVuc'}"
+                                    :allowFiltering="true"
+                                    :readonly='!Enabled.cboLinhVuc_TK'
+                                    @change='cboLinhVuc_TK_EditValueChanged'
+                                    >
+                                  </ejs-dropdownlist>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w110">
+                                <div class="pl-3">
+                                  <span class="name">Hệ thống</span>
+                                </div>
+                              </div>
+                              <div class="value">
+                                <div class="select-custom">
+                                  <ejs-dropdownlist
+                                    class="form-control"
+                                    locale='vi'
+                                    v-model="params.p_HeThong_TK"
+                                    :dataSource='cboHeThong_TK' 
+                                    :fields="{value:'heThongId', text: 'tenHeThong'}"
+                                    :allowFiltering="true"
+                                    :readonly='!Enabled.cboHeThong_TK'
+                                    @change='cboHeThong_TK_EditValueChanged'
+                                    >
+                                  </ejs-dropdownlist>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w110">
+                                <div class="check-action">
+                                  <input type="checkbox" class="check" v-model="params.p_ckbHangSX_TK" @change='ckbHangSX_TK_CheckedChanged'>
+                                  <span class="name">Hãng SX</span>
+                                </div>
+                              </div>
+                              <div class="value">
+                                <div class="select-custom">
+                                  <ejs-dropdownlist
+                                    class="form-control"
+                                    locale='vi'
+                                    v-model="params.p_HangSX_TK"
+                                    :dataSource='cboHangSX_TK' 
+                                    :fields="{value:'hangSxId', text: 'tenHangSx'}"
+                                    :allowFiltering="true"
+                                    :readonly='!Enabled.cboHangSX_TK'
+                                    @change='cboHangSX_TK_EditValueChanged'
+                                    >
+                                  </ejs-dropdownlist>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w110">
+                                <div class="pl-3">
+                                  <span class="name">Dòng thiết bị</span>
+                                </div>
+                              </div>
+                              <div class="value">
+                                <div class="select-custom">
+                                  <ejs-dropdownlist
+                                    class="form-control"
+                                    locale='vi'
+                                    v-model="params.p_cboDongTbi_TK"
+                                    :dataSource='cboDongTbi_TK' 
+                                    :fields="{value:'dongTbiId', text: 'tenDongTbi'}"
+                                    :allowFiltering="true"
+                                    :readonly='!Enabled.cboDongTbi_TK'
+                                    >
+                                  </ejs-dropdownlist>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row col-md-12">
+        <div :class="Visible.splitContainer2.Panel2Collapsed ? 'col-md-12' : 'col-md-6'">
+          <div class="nav tabs tab-over mart10">
+            <a href="#tabA" class="active" data-toggle="tab">Danh sách vật tư</a>
+            <a href="#tabB" data-toggle="tab" v-if="Visible.xtraTabPage2">Danh sách thiết bị</a>
+          </div>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tabA">
+              <div class="table-content">
+                <DataGrid
+                  v-bind:columns="gridVatTu_Columns"
+                  v-bind:dataSource="gridVatTu"
+                  ref="gridViewVatTu"
+                  :showColumnCheckbox='true'
+                  :showFilter="true"
+                  :allowPaging="true"
+                  :enablePagingServer='false'
+                  :editSettings="{ allowEditing: true , mode:'Batch'}"
+                  @cellSaved='gridViewVatTu_CellValueChanged'
+                  @selectedItemsChanged='gridViewVatTu_MouseDown'                
+                  dataKeyField="KEY_ROW"
+                  :enabledSelectFirstRow='false'
+                  :selectionSettings="{enableToggle: false, checkboxOnly: true, persistSelection: true }"
+                  :aggregates="aggregates_gridVatTu"
+                  >
+                </DataGrid>
+                <!-- Đức đổi qua selectedItemsChanged để tránh lỗi các trang sau -->
+                <!-- @rowDeselected='gridViewVatTu_MouseDown' --> 
+              </div>
+              
+              <div class="legend-title mart10">
+                <div class="pull-left">
+                  Danh sách vật tư xuất kho
+                </div>
+                <div class="pull-right">
+                  <button class="btn btn-second pad4 lh16">
+                    <span class="-ap icon-close"></span>
+                  </button>
+                </div>
+                <div class="clearfix"></div>
+              </div>
+              <div class="table-content">
+                <DataGrid
+                    v-bind:columns="gridXuat_Columns"
+                    v-bind:dataSource="gridXuat"
+                    ref="gridviewXuat"
+                    :showColumnCheckbox='false'
+                    :showFilter="true"
+                    :allowPaging="false"
+                    :enablePagingServer='false'
+                    :editSettings="{ allowEditing: true , mode:'Batch'}"
+                    @cellSaved='gridviewXuat_CellValueChanged'
+                    :aggregates="aggregates_gridXuat"
+                    >
+                </DataGrid>
+              </div>
+              
+            </div>
+            <div class="tab-pane" id="tabB" v-if="Visible.xtraTabPage2" >
+                <DataGrid
+                  v-bind:columns="gridThietBi_Columns"
+                  v-bind:dataSource="gridThietBi"
+                  ref="gridViewThietBi"
+                  :showColumnCheckbox='false'
+                  :showFilter="true"
+                  :allowPaging="true"
+                  :enablePagingServer='false'
+                  :editSettings="{ allowEditing: true , mode:'Batch'}"
+                  :enabledSelectFirstRow='false'
+                  >
+                </DataGrid>
+                
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" v-if="!Visible.splitContainer2.Panel2Collapsed">
+          <div class="mart15 box-form" v-show="!Visible.ShowDKTT">
+            <div class="legend-title">
+              <div class="pull-left">
+                  Danh sách nhu cầu đăng ký
+              </div>
+              <div class="pull-right">
+                  <button class="btn btn-second pad4 lh16" @click="Visible.splitContainer2.Panel2Collapsed = !Visible.splitContainer2.Panel2Collapsed">
+                      <span class="nc-icon-outline arrows-1_tail-right"></span>
+                  </button>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+            <div>
+              <DataGrid
+                v-bind:columns="grcDSDangKy_Columns"
+                v-bind:dataSource="grcDSDangKy"
+                ref="grvDSDangKy"
+                :showColumnCheckbox='false'
+                :showFilter="true"
+                :editSettings="{ allowEditing: true , mode:'Batch'}"
+                :enabledSelectFirstRow="false"
+                :allowPaging="true"
+                :enablePagingServer='false'
+                @selectedRowChanged="grvDSDangKy_FocusedRowChanged"
+                >
+              </DataGrid>
+            </div>
+            <div class="mart15 legend-title">
+                Danh sách vật tư đăng ký
+            </div>
+
+            <DataGrid
+              v-bind:columns="grcDSVatTu_DaDK_Columns"
+              v-bind:dataSource="grcDSVatTu_DaDK"
+              ref="grvDSVatTu_DaDK"
+              :showColumnCheckbox='false'
+              :showFilter="true"
+              :editSettings="{ allowEditing: true , mode:'Batch'}"
+              :enabledSelectFirstRow="false"
+              :allowPaging="true"
+              :enablePagingServer='false'
+              >
+            </DataGrid>
+          </div>
+
+          <div class="mart15 box-form" v-show="Visible.ShowDKTT">
+            <div class="legend-title">
+              <div class="pull-left">
+                Danh sách nhu cầu đăng ký tổ
+              </div>
+              <div class="pull-right">
+                  <button class="btn btn-second pad4 lh16" @click="Visible.splitContainer2.Panel2Collapsed = !Visible.splitContainer2.Panel2Collapsed">
+                      <span class="nc-icon-outline arrows-1_tail-right"></span>
+                  </button>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+            <div>
+              <DataGrid
+                v-bind:columns="grcDK_TT_Columns"
+                v-bind:dataSource="grcDK_TT"
+                ref="grvDK_TT"
+                :showColumnCheckbox='false'
+                :showFilter="true"
+                :editSettings="{ allowEditing: true , mode:'Batch'}"
+                :enabledSelectFirstRow="false"
+                :allowPaging="true"
+                :enablePagingServer='false'
+                @selectedRowChanged="grvDSDangKy_FocusedRowChanged"
+                >
+              </DataGrid>
+            </div>
+            <div class="mart15 legend-title">
+              Danh sách chi tiết vật tư đăng ký
+            </div>
+
+            <DataGrid
+              v-bind:columns="grcCT_DK_Columns"
+              v-bind:dataSource="grcCT_DK"
+              ref="grvCT_DK"
+              :showColumnCheckbox='false'
+              :showFilter="true"
+              :editSettings="{ allowEditing: true , mode:'Batch'}"
+              :enabledSelectFirstRow="false"
+              :allowPaging="true"
+              :enablePagingServer='false'
+              >
+            </DataGrid>
+          </div>
+            
+  
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ejs-dialog>

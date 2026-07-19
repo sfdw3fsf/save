@@ -1,0 +1,21 @@
+export default {
+    getDSKhoGiao_Nhanvien: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_khogiao_by_nhanvien', data),
+    getDSKhoGiao: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_kho_loai_giao_tra', data),
+    getDSLoaiBienLai: (axios, data) => axios.get('/web-quantri/bienlai-thutien/sp_lay_ds_loai_bienlai', data),
+    getDSKhoNhan: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_kho_loai_giao_tra', data),
+    getDSBienLaiMoi: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_phieugiao_bl_by_kho', data),
+    getDSBienLaiTrongKho: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_phieugiao_bl_by_kho', data),
+    getDSBienLaiDaTra: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_phieugiao_bl_by_kho', data),
+    getDSBienLaiDaGiao: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_phieugiao_bl_by_kho', data),
+    getDSBienLaiDaTra: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_lay_ds_phieugiao_bl_by_kho', data),
+    Chuyen_Giao_Kho: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_next_chuyen_giao_kho', data),
+    Nhan_Bien_Lai: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_nhan_phieu_bienlai_v2', data),
+    Tra_Bien_Lai: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_next_chuyen_giao_kho', data),
+    Huy_Giao_Kho: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_huy_giao_kho_v2', data),
+    Huy_Tra_Kho: (axios, data) => axios.post('/web-quantri/bienlai-thutien/sp_huy_giao_kho_v2', data),
+    getDsNhanvien_giao: (axios, data) => axios.post('web-quantri/bienlai-thutien/sp_lay_danh_sach_luotgiao_bl', data),
+    getDsNhanvien_nhan: (axios, data) => axios.post('web-quantri/bienlai-thutien/sp_lay_danh_sach_luotgiao_bl', data),
+    getDs_Bienlai: (axios, data) => axios.post('web-quantri/bienlai-thutien/sp_lay_danh_sach_luotgiao_bl', data),
+    Danh_Dau_Bien_Lai_Hong: (axios, data) => axios.post('/web-quantri/bienlai-thutien/fn_capnhat_tinhtrang_bl_hong', data),
+  }
+  

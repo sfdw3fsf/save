@@ -1,0 +1,433 @@
+<div>
+    <!-- <breadcrumb :header="header" /> -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="btnLamMoi_Click">
+                    <span class="icon  one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li>
+                <a @click="btnLamMoi_Click_1">
+                    <span class="icon  one-file-attach1"></span> Lấy lại DS
+                </a>
+            </li>
+            <li>
+                <a @click="btnInTem">
+                    <span class="icon  one-print"></span> In tem
+                </a>
+            </li>
+            <li v-if="Visible.tsbtnMauEx">
+                <a @click="tsbtnMauEx_Click">
+                    <span class="icon one-excel"></span>File mẫu Excel
+                </a>
+            </li>
+            <li v-if="Visible.tsbtnExcelDK">
+                <b-form-file
+                    id="fileUpload"
+                    v-model="arrayImportFile.filexcel"
+                    ref="fileUpload"
+                    @change="this.onChange"
+                    accept=".xls, .xlsx"
+                    class="-ap icon-more_horiz"
+                    v-show="arrayImportFile.ok"
+                ></b-form-file>
+                <a @click="tsbtnExcelDK_Click">
+                    <span class="icon one-xlsx"></span>Nhập từ Excel
+                </a>
+            </li>
+            <li>
+                <a v-b-modal.ModalTroGiup>
+                    <span class="icon  one-circle-question"></span> Trợ giúp
+                </a>
+                <b-modal id="ModalTroGiup" title="Trợ giúp" ok-only>
+                    <p class="my-4 text-center">Hướng dẫn sử dụng</p>
+                </b-modal>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="nav tabs tab-over">
+            <a
+                href="#tab1"
+                data-toggle="tab"
+                class="active"
+                @click="tabSelected('tab1')"
+                >Công cụ dụng cụ</a
+            >
+            <a href="#tab2" data-toggle="tab" @click="tabSelected('tab2')"
+                >Tài sản cố định</a
+            >
+        </div>
+        <div class="box-form tab-content">
+            <div class="tab-pane active" id="tab1">
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="box-form">
+                            <div class="legend-title">Danh sách đơn vị</div>
+                            <div class="form-group">
+                                <div class="input-icon-left">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        v-model="params.p_txtLocDonVi"
+                                        v-on:keyup.enter="tmrLocDonVi_Tick"
+                                    />
+                                    <span
+                                        class="icon nc-icon-outline ui-2_filter"
+                                        @click="tmrLocDonVi_Tick"
+                                        v-b-tooltip.hover title="Tìm kiếm theo đơn vị"
+                                    ></span>
+                                </div>
+                            </div>
+                            <div
+                                class="tree-plus tree-icon"
+                                style="height: 795px;overflow:auto;"
+                            >
+                                <div class="tree-view-wrapper">
+                                    <ejs-treeview
+                                        ref="treeObj"
+                                        :fields="fields"
+                                        :selectedNodes="selectedNodes"
+                                        @nodeSelected="tvDonVi_FocusedNodeChanged"
+                                    ></ejs-treeview>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-9 col-12">
+                        <div class="box-form">
+                            <div class="legend-title">Danh sách nhân viên</div>
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">
+                                            Mã người dùng
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-left">
+                                                <input
+                                                    type="text"
+                                                    class="form-control highlight"
+                                                    v-model="params.p_txtLocMaND"
+                                                    @keyup.enter="txtLocMaND_KeyUp"
+                                                />
+                                                <span
+                                                    class="icon nc-icon-outline ui-2_filter"
+                                                    @click="txtLocMaND_KeyUp"
+                                                    v-b-tooltip.hover title="Tìm kiếm theo Mã người dùng"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Mã nhân viên
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-left">
+                                                <input
+                                                    type="text"
+                                                    class="form-control highlight"
+                                                    v-model="params.p_txtLocMaNV"
+                                                    @keyup.enter="txtLocMaNV_KeyUp"
+                                                />
+                                                <span
+                                                    class="icon nc-icon-outline ui-2_filter"
+                                                    @click="txtLocMaNV_KeyUp"
+                                                    v-b-tooltip.hover title="Tìm kiếm theo Mã nhân viên"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Tên nhân viên
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-left">
+                                                <input
+                                                    type="text"
+                                                    class="form-control highlight"
+                                                    v-model="params.p_txtLocTenNV"
+                                                    @keyup.enter="txtLocTenNV_KeyUp"
+                                                />
+                                                <span
+                                                    class="icon nc-icon-outline ui-2_filter"
+                                                    @click="txtLocTenNV_KeyUp"
+                                                    v-b-tooltip.hover title="Tìm kiếm theo Tên nhân viên"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="table-content"
+                                style="min-height: 300px;overflow-x: hidden;"
+                            >
+                                <DataGrid
+                                    ref="grvNhanVien"
+                                    class="table-result table-gachle"
+                                    v-bind:columns="[
+                                    {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true, freeze: 'Left', width:'70'},
+                                    {fieldName: 'MA_NV', headerText: 'Mã nhân viên', allowFiltering: true, allowSorting: true, freeze: 'Left'},
+                                    {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, allowSorting: true, freeze: 'Left'},
+                                    {fieldName: 'MA_DV', headerText: 'Mã đơn vị', allowFiltering: true, allowSorting: true,},
+                                    {fieldName: 'CHUCDANH', headerText: 'Chức danh', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'VITRI', headerText: 'Vị trí', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SO_DT', headerText: 'Điện thoại', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'DIACHI_NV', headerText: 'Địa chỉ', allowFiltering: true, allowSorting: true},
+                                    ]"
+                                    v-bind:dataSource="grcNhanVien"
+                                    :showFilter="true"
+                                    :showColumnCheckbox="false"
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"
+                                    :totalRecords="grcNhanVienPage.totalElement"
+                                    :pageSize="grcNhanVienPage.maxSize"
+                                    :pageIndex="grcNhanVienPage.page"
+                                    @pageChanged="grcNhanVienPageHandler"
+                                    @rowSelected="grvNhanVien_FocusedRowChanged"
+                                >
+                                </DataGrid>
+                                <!-- :enabledSelectFirstRow='true' -->
+                            </div>
+                        </div>
+                        <div class="box-form">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách công cụ tháng
+                                </div>
+                                <div class="pull-right">
+                                    <a
+                                        class="btn btn-main lh14 pad4"
+                                        @click="btnLocDSSC_Click"
+                                    >
+                                        <span
+                                            class="nc-icon-outline ui-2_filter"
+                                        ></span>
+                                    </a>
+                                    <a
+                                        class="btn btn-main lh14 pad4"
+                                        @click="btnNapDSSC_Click"
+                                    >
+                                        <span class="one-reload"></span>
+                                    </a>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="value padl0">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker
+                                                    class="form-control"
+                                                    :placeholder="'Chọn tháng'"
+                                                    :format="'MM/yyyy'"
+                                                    v-model="params.p_dtp"
+                                                >
+                                                </ejs-datepicker>
+                                            </div>
+                                        </div>
+                                        <div class="key w100 nowrap padl10">
+                                            <div class="check-action">
+                                                <input
+                                                    type="checkbox"
+                                                    class="check"
+                                                    v-model="params.p_ckbNhanVien"
+                                                    @change="ckbNhanVien_CheckedChanged"
+                                                />
+                                                <span class="name"
+                                                    >Theo nhân viên</span
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w60">
+                                            Ngày in <span class="red">*</span>
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker
+                                                    class="form-control"
+                                                    :placeholder="'Chọn ngày'"
+                                                    :format="'dd/MM/yyyy hh:mm'"
+                                                    v-model="params.p_dtpNgayIn"
+                                                >
+                                                </ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">
+                                            Số lần in
+                                        </div>
+                                        <div class="value">
+                                            <input
+                                                type="number"
+                                                class="form-control tright"
+                                                v-model="params.p_spMuc"
+                                            />
+                                        </div>
+                                        <div class="value padt7 w30">
+                                            lần
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-content">
+                                <DataGrid
+                                    v-bind:columns="[
+                                    { allowEditing: false ,fieldName: 'LOHANG' , headerText: 'Lô hàng', textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'MA_VT' , headerText: 'Mã vật tư', textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'TEN_VT' , headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'MA_TBI' , headerText: 'Mã thiết bị', textAlign: 'Left', allowFiltering: true,},
+                                    
+                                    { allowEditing: false ,fieldName: 'SERIAL' , headerText: 'Serial', textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'DVI_TINH' , headerText: 'ĐVT' , textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'SL_TON_THAT', headerText: 'Số lượng', textAlign: 'Right', allowFiltering: true,},
+                                    { allowEditing: true ,fieldName: 'SL_XUAT', headerText: 'SL Tem', textAlign: 'Right', allowFiltering: true,},
+
+                                    { allowEditing: false ,fieldName: 'DONGIA' , headerText: 'Đơn giá', format: 'N3', type: 'number',textAlign: 'Right', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'TIEN' , headerText: 'Thành tiền', format: 'N3', type: 'number', textAlign: 'Right', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'GHICHU' , headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'THANG_BD' , headerText: 'Tháng BĐ', textAlign: 'Left', allowFiltering: true,},
+
+                                    { allowEditing: false ,fieldName: 'THANG_KT' , headerText: 'Tháng KT', textAlign: 'Left', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'TIEN_PB' , headerText: 'Tiền phân bổ',format: 'N3', type: 'number', textAlign: 'Right', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'TIEN_CL', headerText: 'Giá trị còn lại',format: 'N3', type: 'number', textAlign: 'Right', allowFiltering: true,},
+                                    { allowEditing: false ,fieldName: 'TINHTRANG_TBI', headerText: 'Tình trạng', textAlign: 'Left', allowFiltering: true,},
+                                    ]"
+                                    v-bind:dataSource="gridThietBi"
+                                    ref="gridViewThietBi"
+                                    dataKeyField="STT"
+                                    :showColumnCheckbox="true"
+                                    :showFilter="true"
+                                    :editSettings="{ allowEditing: true , mode:'Batch'}"
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"
+                                    :selectedItemsChanged="gridThietBiSelectedItems"
+                                >
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab2">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách tài sản</div>
+                    <div class="pull-right">
+                        <div class="list-checks normal">
+                            <div class="item">
+                                <div class="check-action">
+                                    <input
+                                        type="checkbox"
+                                        class="check"
+                                        v-model="params.p_ckbMNV"
+                                    />
+                                    <span class="name">In tem MNV</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input
+                                        type="checkbox"
+                                        class="check"
+                                        v-model="params.p_ckbMirror"
+                                    />
+                                    <span class="name">In gương</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input
+                                        type="checkbox"
+                                        class="check"
+                                        v-model="params.p_ckbTietKiem"
+                                    />
+                                    <span class="name">In tiết kiệm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Số lần in</div>
+                    <div class="value w100">
+                        <input
+                            type="number"
+                            class="form-control tright"
+                            v-model="params.p_spMuc2"
+                        />
+                    </div>
+                    <div class="value w60 padl10 padt7">
+                        lần
+                    </div>
+                    <div class="value">
+                        <div class="list-checks red mart7">
+                            <b-form-radio-group
+                                v-model="params.p_rdioCKb"
+                                :options="RadioOptions"
+                            ></b-form-radio-group>
+                            <!-- <div class="item">
+                                <div class="check-action">
+                                    <input type="radio" class="check">
+                                    <span class="name">2.4 x 10 cm</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input type="radio" class="check">
+                                    <span class="name">1.8 x 10 cm</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input type="radio" class="check">
+                                    <span class="name">1.2 x 10 cm</span>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <DataGrid
+                    v-bind:columns="[
+                    {fieldName: 'ISCHECK',type: 'checkbox', headerText: '', textAlign: 'Left', allowFiltering: true,freeze: 'Left', width: '60'},
+
+                    {fieldName: 'SOTHE', headerText: 'Số thẻ', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'TEN_TS', headerText: 'Tên TSCĐ', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'MA_DV', headerText: 'Đơn vị', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'NAM_SD', headerText: 'Năm', textAlign: 'Right', allowFiltering: true,},
+
+                    {fieldName: 'BOPHAN', headerText: 'Bộ phận quản lý', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'THOIGIAN_KK', headerText: 'Thời gian KK', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'MA_CABMAN', headerText: 'Mã Cabman', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'SOLUONG', headerText: 'Số lượng', textAlign: 'Right', allowFiltering: true,},
+                    
+                    ]"
+                    v-bind:dataSource="grcDS_TS"
+                    ref="grvDS_TS"
+                    :showColumnCheckbox="false"
+                    :showFilter="true"
+                    :editSettings="{ allowEditing: true , mode:'Batch'}"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                >
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+</div>

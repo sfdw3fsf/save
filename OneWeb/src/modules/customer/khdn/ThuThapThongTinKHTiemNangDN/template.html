@@ -1,0 +1,213 @@
+<div>
+    <breadcrumb :header="header" />
+    <vue-nav>
+        <div class="d-flex flex-row align-items-center">
+            <ul class="list">
+                <li v-for="action in actions" v-show="action.visible" :key="action.id"
+                    @click="onClickAction(action.id)">
+                    <a style="cursor: pointer;" :class="action.enable ? '' : 'disabled'"> <span class="icon"
+                            :class="action.icon"></span> {{ action.name }} </a>
+                </li>
+            </ul>
+        </div>
+    </vue-nav>
+
+    <div class="page-content">
+
+        <!-- Thong Tin Thue bao -->
+        <div class="row">
+            <div class="box-col box-form">
+                <div class="legend-title">Thông tin khách hàng</div>
+                <div class="row">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Mã KH(*)</div>
+                                <div class="value">
+                                 <input type="text"  v-model="customerId" ref="inputMaKH"  class="form-control" :disabled="!isNew"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12" style="padding-left: 15px;">
+                            <div class="info-row">
+                                <div class="key w120">Tên KH (*)</div>
+                                <div class="value" >
+                                    <input type="text" v-model="customerName" ref="inputMaKH"   class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Mã số thuế</div>
+                                <div class="value" style="padding: left 10px;">
+                                    <div class="input-more-button">
+                                        <button class="btn" title="Mã số thuế" @click="handleOnclickSearchTaxCode" :disabled="!taxIdentification">
+                                            <span class="-ap icon-search"></span>
+                                        </button>
+                                        <input type="text" v-model="taxIdentification" class="form-control"  @keyup.enter="handleOnclickSearchTaxCode" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12" style="padding-left: 15px;">
+                            <div class="info-row">
+                                <div class="key w120">Địa chỉ KH (*)</div>
+                                <div class="value" style="padding: left 10px;">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="showPopupSearchAddress" title="Tìm kiếm mã giao dịch">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" @keypress="evt=>evt.preventDefault()" v-model="txtAddress" ref="refInputDiaChi" class="form-control" />
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="row">
+                            <div class="col-sm-6 col-12" style="padding-left: 10px;">
+                                <div class="info-row">
+                                    <div class="key w110">Khối KH (*)</div>
+                                    <div class="value">
+                                        <SelectExt dataValueField="value" dataTextField="text" v-model="dropdownKhoiKH.value"
+                                        :dataSource="dropdownKhoiKH.options" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngành nghề (*) </div>
+                                    <div class="value" style="padding-right: 8px;" >
+                                        <SelectExt dataValueField="nganhnghe_id" dataTextField="tennganhnghe"
+                                        v-model="cboNganhNghe.value" :dataSource="cboNganhNghe.dataSource" />
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12" style="padding-left: 10px;">
+                        <div class="info-row">
+                            <div class="key w120">Lĩnh vực HD (*)</div>
+                            <div class="value" style="padding-right: 17px;padding-left: 0px;">
+                                <div class="select-custom">
+                                    <SelectExt dataValueField="linhvuc_id" dataTextField="linhvuc"
+                                    v-model="cboLinhVucHD.value" :dataSource="cboLinhVucHD.dataSource" />
+                                </div>
+                      
+                            
+                                <!-- <ejs-multiselect v-model="cboNganhNghe.value" 
+                                :dataSource='cboNganhNghe.dataSource'
+                                mode="CheckBox"
+                                :showSelectAll='false'
+                                selectAllText="Chọn tất cả"
+                                unSelectAllText="Bỏ chọn tất cả"
+                                :fields="{ text: 'tennganhnghe', value: 'nganhnghe_id' }" /> -->
+                            </div>
+                           
+                                
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="row">
+                            <div class="col-sm-6 col-12" style="padding-left: 10px;">
+                                <div class="info-row">
+                                    <div class="key w110">Quy mô (*)</div>
+                                    <div class="value">
+                                        <vue-numeric class="form-control tright tongtien" separator="." decimal-separator="," :precision="0" v-model="enterpriseSize" placeholder="0" output-type="Number"></vue-numeric>
+                                     </div>      
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Doanh thu (*)</div>
+                                    <div class="value" style="padding-right: 10px;">
+                                        <vue-numeric class="form-control tright tongtien" separator="." decimal-separator="," :precision="0" v-model="revenue" placeholder="0" output-type="Number"></vue-numeric>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="row">
+                            <div class="col-sm-6 col-12" style="padding-left: 10px;">
+                                <div class="info-row">
+                                    <div class="key w120">Khu vực HĐ (*)</div>
+                                    <div class="select-custom">
+                                        <SelectExt dataValueField="khuvuc_hoatdong_id" dataTextField="khuvuc_hoatdong"
+                                            v-model="dropdownKVHoatDong.value" :dataSource="dropdownKVHoatDong.options" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row right">
+                                    <div class="key w120">Ngày thành lập(*)</div>
+                                    <div class="value right" style="padding-right: 17px">
+                                        <date-picker format="DD/MM/YYYY" v-model="corporateDate" type="date">
+                                            <template #icon-calendar>
+                                                <span class="icon one-calendar"></span>
+                                            </template>
+                                        </date-picker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="row">
+                            <div class="col-sm-6 col-12" style="padding-left: 10px;">
+                                <div class="info-row">
+                                    <div class="key w110">Điện thoại(*)</div>
+                                    <div class="value">
+                                        <input type="text" v-model="phoneNumber" class="form-control" />
+                                     </div>                     
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Website</div>
+                                    <div class="value" style="padding-right: 10px;">
+                                        <input type="text" v-model="txtWebsite" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12" style="padding-left: 10px;">
+                        <div class="info-row">
+                            <div class="key w120">Ghi chú</div>
+                            <div class="value" style="padding-right:15px; padding-left: 3px;">
+                                <input type="text" v-model="txtGhiChu" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <DauMoiLienHe  :relevantInfo="relevantInfo" ref="refRelevantInfo"/>
+        <NhanSuQuyetDinh :officerDecideInfo="officerDecideInfo" ref="refOfficerDecideInfo"/>
+    </div>
+
+    <DiaChiKhachHangModal ref="diaChiKhachHangModal" :data="dataDiaChi" @accept="acceptDiaChiKH" />
+
+</div>
+
+
+</div>
+
+
+

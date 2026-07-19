@@ -1,0 +1,18 @@
+export default {
+    lay_loai_hd: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_LOAI_HD'),
+    lay_thongtin_hd_ca_biloi: async (axios, data) => axios.get(`/web-hopdong/thuhoi-chungthuca-loi/lay_thongtin_hd_ca_biloi?vhdtb_id=${data.vhdtb_id}`),
+    lay_ds_hd_vnptca: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/lay_ds_hd_vnptca', data),
+    lay_huonggiao_tiepnhan_dvcntt: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/lay_huonggiao_tiepnhan_dvcntt', data),
+    capnhat_hd_thuhoi_ca_loi: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/capnhat_hd_thuhoi_ca_loi', data),
+    lay_hdtb_thuhoi_ca_loi: async (axios, data) => axios.get(`/web-hopdong/thuhoi-chungthuca-loi/lay_hdtb_thuhoi_ca_loi?vhdtb_id=${data.vhdtb_id}`),
+    xoa_hdkh_v2: async (axios, data) => axios.post('/web-hopdong/khoiphucthanhly/xoa_hdkh_v2', data),
+    lay_hopdong_thuhoi_ca_loi_theoma_gd: async (axios, data) => axios.post('web-hopdong/thuhoi-chungthuca-loi/lay_hopdong_thuhoi_ca_loi_theoma_gd', data),
+    lay_hd_ca_genloi_theo_matb: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/lay_hd_ca_genloi_theo_matb', data),
+    kt_soluong_file_ca_v3: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/kt_soluong_file_ca_v3', data),
+    fn_lay_huonggiao_quytrinh: async (axios, data) => axios.post('/web-hopdong/thanhly/fn_lay_huonggiao_quytrinh', data),
+    lay_hdtb_cntt_theo_hdtb_id: async (axios, data) => axios.get(`/web-hopdong/thuhoi-chungthuca-loi/lay_hdtb_cntt_theo_hdtb_id?hdtb_id=${data.hdtb_id}`),
+    sp_lay_ds_donvi_quytrinh: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/sp_lay_ds_donvi_quytrinh', data),
+    sp_lay_ds_donvi_theo_loaidv: (axios, data) => axios.post('/web-thicong/thanhly-thuebao/sp_lay_ds_donvi_theo_loaidv', data),
+    sp_lay_ds_hdtb_dv_ca: async (axios, data) => axios.post('/web-hopdong/dichvu-ca/sp_lay_ds_hdtb_dv_ca', data),
+    capnhat_hdtb_dv_cntt: async (axios, data) => axios.post('/web-hopdong/thuhoi-chungthuca-loi/capnhat_hdtb_dv_cntt', data),
+}

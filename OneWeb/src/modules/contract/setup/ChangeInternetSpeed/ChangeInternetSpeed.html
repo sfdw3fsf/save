@@ -1,0 +1,818 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <breadcrumb :header="header" />
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li v-if="tsbtnNhapMoi.visible != '0'">
+                <a @click="tsbtnNhapMoi_Click" :class="{disabled:!tsbtnNhapMoi.enabled}">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li v-if="tsbtnGhiLai.visible != '0'">
+                <a @click="tsbtnGhiLai_Click" :class="{disabled:!tsbtnGhiLai.enabled}">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li v-if="tsbtnHuyBo.visible != '0'">
+                <a @click="tsbtnHuyBo_Click" :class="{disabled:!tsbtnHuyBo.enabled}">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+            <li v-if="tsbtnXoa.visible != '0'">
+                <a @click="clickXoaHD" :class="{disabled:!tsbtnXoa.enabled}">
+                    <span class="icon one-trash"></span>Xóa HĐ
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnDKGoiDaDV_Click">
+                    <span class="icon one-file-edit"></span>Gói đa DV
+                </a>
+            </li>
+            <li>
+                <a @click="btnInHD_Click">
+                    <span class="icon one-print"></span>In PL
+                </a>
+            </li>
+            <li v-if="button.visible_thanhtoan != '0'">
+                <a @click="tsbtnThanhToan_Click">
+                    <span class="icon nc-icon-glyph shopping_credit-card"></span>Thanh toán
+                </a>
+            </li>
+            <li v-if="tsbtnThemTB.visible != '0'">
+                <a @click="tsbtnThemTB_Click" :class="{disabled:!tsbtnThemTB.enabled}">
+                    <span class="icon one-mobile-plus"></span>Thêm TB
+                </a>
+            </li>
+            <li v-if="tsbtnXoaTB.visible != '0'">
+                <a @click="clickXoaTB" :class="{disabled:!tsbtnXoaTB.enabled}">
+                    <span class="icon one-phone-remove"></span>Xóa TB
+                </a>
+            </li>
+            <li v-if="button.visible_henld != '0'">
+                <a @click="tsbtnHen_Click">
+                    <span class="icon one-calendar"></span>Hẹn LĐ
+                </a>
+            </li>
+            <li v-if="button.visible_lienhe != '0'">
+                <a @click="tsbtnThongTinLH_Click">
+                    <span class="icon nc-icon-glyph business_contacts"></span>Liên hệ
+                </a>
+            </li>
+            <li v-if="button.visible_email != '0'">
+                <a href="#" @click.prevent="tsbtnEmail_Click">
+                    <span class="dropdown-icon one-email"></span> Email
+                </a>
+            </li>
+        </ul>
+        <!--  <div class="more dropdown">
+            <a href="#" data-toggle="dropdown">
+                <span class="icon -ap  icon-dots-three-vertical"></span>
+            </a>
+            <div class="dropdown-menu">
+               
+                <a @click.prevent="clickEmail">
+                    <span class="dropdown-icon one-email"></span> Email
+                </a>
+            </div>
+        </div> -->
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb8 fw6">
+            <div class="row">
+                <div class="col-sm-2 col-12">
+
+                </div>
+                <div class="col-sm-2 col-12">
+
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap">Mã dự án</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtMaDuAn">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap fw6">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="filterbox.ctv.ischecked"
+                                    @change="ShowPopupCTV()">
+                                <span class="name">Cộng tác viên</span>
+                            </div>
+                        </div>
+                        <div class="value" :class="{disabled:!filterbox.ctv.ischecked}">
+                            <input type="text" class="form-control" v-model="filterbox.ctv.value" :readonly="true">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap fw6">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="filterbox.nguoigt.ischecked"
+                                    @change="ShowPopupNguoiGT()">
+                                <span class="name">Người giới thiệu</span>
+                            </div>
+                        </div>
+                        <div class="value" :class="{disabled:!filterbox.nguoigt.ischecked}">
+                            <input type="text" class="form-control" v-model="filterbox.nguoigt.value" :readonly="true">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap">
+                            Tổng tiền
+                        </div>
+                        <div class="value">
+                            <vue-numeric class="form-control tright" separator="," v-model="txtTongTienHD"
+                                placeholder="0" output-type="Number"></vue-numeric>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="link_url" class="box-form">
+            <div class="legend-title">
+               <div class="key w140">D/S TB KH muốn đặt cọc trả trước: <span class="lable">{{txtMaTB}},{{matb_kt}}</span></div>
+            </div>
+          </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin phiếu yêu cầu</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã giao dịch</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="btnLayMaGD_Click">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract"
+                                            :loai_hd_id="8" :dichvu_id="parseInt(cboDichVuVT.value)"
+                                            :trangthai_hd="1" />
+                                        <input type="text" class="form-control highlight" v-model="txtMaGD"
+                                            @keypress.enter="txtMaGD_KeyPress" ref="inputMaGD">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày yêu cầu</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="dtpNgayYeuCau" :value="params.p_today"
+                                            :format="'dd/MM/yyyy HH:mm:ss'" :showClearButton="false" :placeholder="'Chọn ngày'"
+                                            :disabled="params.disable">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã HĐ/PL</div>
+                                <div class="value">
+                                    <input type="text" class="form-control fw6 text" v-model="txtMaHD" ref="inputMaHD"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày lập HĐ</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="dtpNgayLapHD" :value="params.p_today"
+                                            :format="'dd/MM/yyyy HH:mm:ss'" :showClearButton="false" :placeholder="'Chọn ngày'"
+                                            :disabled="params.disable">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Dịch vụ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt class="select-custom" v-model="cboDichVuVT.value"
+                                            :options="cboDichVuVT.data" @select="cboDichVuVT_SelectedValueChanged"
+                                            :disabled="!cboDichVuVT.enabled" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại hình</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt class="select-custom" v-model="cboLoaihinhTB.value"
+                                            :options="cboLoaihinhTB.data" @select="cboLoaihinhTB_SelectedValueChanged"
+                                            :disabled="!cboLoaihinhTB.enabled" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Kiểu yêu cầu</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt class="select-custom" v-model="cboKieuLD.value" :options="cboKieuLD.data"
+                                    @select="cboKieuLD_SelectedValueChanged" :disabled="!cboKieuLD.enabled"
+                                    placeholder="Vui lòng chọn kiểu yêu cầu" />
+                            </div>
+                        </div>
+                        <div class="value w30 nowrap padt7">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-on:click="checkTucThi()"
+                                    v-model="chkTucThi.checked" :disabled="!chkTucThi.enabled">
+                                <span class="name">Tức thì</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="box-form" style="min-height: 560px;">
+                    <div class="legend-title">Thông tin thuê bao</div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Account</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="bntLayMaKh_Click">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" v-model="txtMaTB" autofocus ref="inputMaTB"
+                                            class="form-control highlight" @keyup.enter="txtMaTB_KeyPress">
+                                    </div>
+                                </div>
+                                <div class="value w30">
+                                    <button class="btn btn-second fullw" @click.prevent="btnLayDSTB_Click">
+                                        <span class="-ap icon-plus2"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại thiết bị</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt class="select-custom" v-model="cboLoaiTBiADSL.value"
+                                            :options="cboLoaiTBiADSL.data" :disabled="!cboLoaiTBiADSL.enabled"
+                                            @select="cboLoaiTBiADSL_SelectedValueChanged" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Tên thuê bao</div>
+                        <div class="value">
+                            <input type="text" class="form-control fw6 text" v-model="txtTenTB" ref="inputTenTB"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Tốc độ mới</div>
+                                <div class="value">
+                                    <SelectExt class="select-custom" v-model="cboTocDoADSL.value"
+                                        :options="cboTocDoADSL.data" @select="cboTocDoADSL_SelectedValueChanged"
+                                        :disabled="!cboTocDoADSL.enabled" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Tốc độ thực mới</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt class="select-custom" v-model="cboTocDoThuc_Moi.value"
+                                            :options="cboTocDoThuc_Moi.data" :disabled="!cboTocDoThuc_Moi.enabled" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="cboCongNghe_Moi.visible === true">
+                                <div class="info-row">
+                                    <div class="key w120">Công nghệ mới</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="cboCongNghe_Moi.value" :options="cboCongNghe_Moi.data"
+                                                @select="cboCongNghe_Moi_SelectedValueChanged"
+                                                :disabled="!cboCongNghe_Moi.enabled" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <div class="info-row">
+                                    <div class="key w120">Mức cước mới</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="cboMucCuocMoi.value" :options="cboMucCuocMoi.data"
+                                                @select="cboMucCuocMoi_SelectedValueChanged"
+                                                :disabled="!cboMucCuocMoi.enabled" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Tốc độ cũ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboTocDoCu.value" :options="cboTocDoCu.data"
+                                            :disabled="params.disable" @select="cboTocDoCu_SelectedValueChanged" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Số tháng CK</div>
+                                <div class="value">
+                                    <input type="number" v-model="txtSoThangCK" class="form-control fw6 text"
+                                        ref="inputSoThangCK" style="text-align:right;" placeholder="0">
+                                </div>
+                            </div>
+                            <div v-if="cboCongNghe_Cu.visible === true">
+                                <div class="info-row">
+                                    <div class="key">Công nghệ cũ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="cboCongNghe_Cu.value" :options="cboCongNghe_Cu.data"
+                                                :disabled="true" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <div class="info-row">
+                                    <div class="key">Mức cước cũ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="cboMucCuocCu.value" :options="cboMucCuocCu.data"
+                                                :disabled="params.disable" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Loại IP</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <multiselect v-model="cboLoaiIP.valueitems"
+                                    :options="cboLoaiIP.data.map(lo=>({id:lo.loaiip_id,text:lo.loai_ip}))" label="text"
+                                    track-by="id" :multiple="true"
+                                    @input="()=>{cboLoaiIP.values = cboLoaiIP.valueitems.map(x=>x.id);}"
+                                    placeholder="Chọn loại IP">
+                                    <template #noOptions>
+                                        Không tìm thấy thông tin
+                                    </template>
+                                </multiselect>
+                                <!--   <SelectExt v-model="cboLoaiIP.value" :options="cboLoaiIP.data"
+                                @select="" /> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Tháng trả</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <SelectExt v-model="cboThangTra.value" :options="cboThangTra.data"
+                                                    :disabled="true"
+                                                    @select="cboThangTra_SelectedValueChanged" />
+                                                    <!-- :disabled="!cboThangTra.enabled" -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w60">Ngày trả</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker v-model="dtpNgayTra" :value="params.p_today"
+                                                    :format="'dd/MM/y HH:mm'" :showClearButton="false"
+                                                    :placeholder="'Chọn ngày'" :enabled="false" >
+                                                </ejs-datepicker>
+                                                <!-- :enabled="dtpNgayTra_enabled" -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Tiền trả trước</div>
+                                <div class="value">
+                                    <vue-numeric class="form-control tright" separator="," v-model="txtTienTra"
+                                        placeholder="0" output-type="Number" :disabled="true">
+                                    </vue-numeric>
+                                   <!--  :disabled="!txtTienTra_enabled" -->
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Đối tượng mới</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboDoiTuongMoi.value" :options="cboDoiTuongMoi.data"
+                                            @select="cboDoiTuongMoi_SelectedValueChanged"
+                                            :disabled="!cboDoiTuongMoi.enabled" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Mức cước TB mới</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboMucCuocTB.value" :options="cboMucCuocTB.data"
+                                            :disabled="!cboMucCuocTB.enabled " />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Khuyến mại</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="checkKhuyenMai"
+                                            :disabled="!cboKhuyenMai.enabled">
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" :disabled="!cboKhuyenMai.checked"
+                                            @click.prevent="ShowPopupChonKhuyenMai(0)">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <div class="select-custom">
+                                            <SelectExt class="select-custom" v-model="cboKhuyenMai.value"
+                                                :disabled="!cboKhuyenMai.checked" :options="cboKhuyenMai.data" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="value w30 nowrap">
+                                    <button class="btn btn-second" @click="btnChiTietKM_Click"
+                                        :disabled="!cboKhuyenMai.checked">
+                                        <span class="one-eye f16 inline vcenter"></span> Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Trả trước</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="checkTraTruoc"
+                                            :disabled="!cboTraTruoc.enabled">
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" :disabled="!cboTraTruoc.checked"
+                                            @click.prevent="ShowPopupChonKhuyenMai(1)">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <div class="select-custom">
+                                            <SelectExt class="select-custom" v-model="cboTraTruoc.value"
+                                                :disabled="!cboTraTruoc.checked" :options="cboTraTruoc.data" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="value w30 nowrap">
+                                    <button class="btn btn-second" :disabled="!cboTraTruoc.checked"
+                                        @click.prevent="btnChiTietTraTruoc_Click">
+                                        <span class="one-eye f16 inline vcenter"></span> Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Cước sử dụng</div>
+                                <div class="value">
+                                    <vue-numeric class="form-control tright" separator="," v-model="txtCuocSD.value"
+                                        placeholder="0" output-type="Number" :disabled="!txtCuocSD.enabled"
+                                        ref="inputCuocSD"></vue-numeric>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Cước thiết bị</div>
+                                <div class="value">
+                                    <vue-numeric class="form-control tright" separator="," v-model="txtCuoc_TBI.value"
+                                        placeholder="0" output-type="Number" :disabled="!txtCuoc_TBI.enabled"
+                                        ref="inputCuoc_TBI"></vue-numeric>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Đối tượng cũ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboDoiTuongCu.value" :options="cboDoiTuongCu.data"
+                                            :disabled="params.disable" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Mức cước TB cũ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboMucCuocTBCu.value" :options="cboMucCuocTBCu.data"
+                                            :disabled="params.disable" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Trang bị mới</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboTrangBiMoi.value" :options="cboTrangBiMoi.data"
+                                            @select="cboTrangBiMoi_SelectedValueChanged"
+                                            :disabled="!cboTrangBiMoi.enabled" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Trang bị cũ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="cboTrangBiCu.value" :options="cboTrangBiCu.data"
+                                            :disabled="true" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">Thông tin khách hàng</div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã khách hàng</div>
+                                <div class="value">
+                                    <input type="text" class="form-control fw6 text" v-model="txtMaKH" ref="inputMaKH"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày sinh</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <flat-pickr class="form-control" :config="dateconfig" v-model="txtNgaySN"
+                                            placeholder="__/__/____" :disabled="true" />  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Tên khách hàng</div>
+                        <div class="value">
+                            <input type="text" class="form-control fw6 text" v-model="txtTenKH" ref="inputTenKH"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Địa chỉ KH</div>
+                        <div class="value">
+                            <input type="text" class="form-control fw6 text" v-model="txtDiaChiKH" readonly>
+                        </div>
+                    </div>
+                    <!-- <div class="info-row">
+                        <div class="key w120">Thông tin TC</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="btnThongTinTC_Click" :disabled="!btnThongTinTC.enabled">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" class="form-control " v-model="txtTT_Cuoc.value"
+                                    :disabled="true" ref="inputTTCuoc">
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-on:click="checkTTTCVisa()"
+                                    v-model="chkTTTCVisa.checked" :disabled="!chkTTTCVisa.enabled">
+                                <span class="name">TTTC Visa</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <textarea v-model="txtTTCuocVisa" class="form-control" style="height: 100px;resize: none;"
+                                :disabled="true"></textarea>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">
+                            Ghi chú
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtGhiChu">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w120">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="checkThoiHan"
+                                            :disabled="!chkThoiHan.enabled">
+                                        <span class="name">Thời hạn</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="!chkThoiHan.checked"
+                                        v-model="txtSoThang">
+                                </div>
+                                <div class="value w30 nowrap padt3">
+                                    (tháng)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w60">
+                                    Từ ngày
+                                </div>
+                                <div class="value">
+                                    <div class="value">
+                                        <div class="input-icon-right">
+                                            <flat-pickr class="form-control" :config="dateconfig" v-model="dtpTuNgay"
+                                                :disabled="!chkThoiHan.checked" />
+                                            <span class="icon one-calendar"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w60">
+                                    Đến ngày
+                                </div>
+                                <div class="value">
+                                    <div class="value">
+                                        <div class="input-icon-right">
+                                            <flat-pickr class="form-control" :config="dateconfig" v-model="dtpDenNgay"
+                                                :disabled="!chkThoiHan.checked" />
+                                            <span class="icon one-calendar"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        Chi tiết tiền theo khoản mục
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Tiền</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click.prevent="btnTien_Click">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <vue-numeric class="form-control tright red fw6 disabled" separator=","
+                                    v-model="txtTien" placeholder="0" output-type="Number"></vue-numeric>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">
+                            VAT
+                        </div>
+                        <div class="value disabled">
+                            <vue-numeric class="form-control tright red fw6" separator="," v-model="txtTongVat"
+                                placeholder="0" output-type="Number"></vue-numeric>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">
+                            Tổng tiền
+                        </div>
+                        <div class="value disabled">
+                            <vue-numeric class="form-control tright red fw6" separator="," v-model="txtTongTien"
+                                placeholder="0" output-type="Number"></vue-numeric>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid-stack-box">
+			<div class="box-col box-form" id="LeftForm1" style="width: calc(50% - 8px);">
+                <div class="legend-title">
+                    <span class="icon fa fa-angle-up"></span> Dịch vụ cộng thêm
+                </div>
+                <div class="input-more-button">
+                    <button class="btn" @click="btnDichVuGT_Click">
+                        <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <!-- <textarea name="" class="form-control" style="height: 100px;resize: none;"></textarea> -->
+                    <ul class="form-control listview" style="height: 110px;resize: none; overflow: scroll;">
+                        <li :value="dv" v-for="dv in lbDichVuGT.list" @click="lbDichVuGT.value=dv"
+                            :class="{active:lbDichVuGT.value==dv}">{{dv.TEN_DVGT}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+		</div>
+        <div class="box-form">
+            <div class="legend-title">
+                Danh sách thuê bao
+            </div>
+            <div class="table-content">
+                <table class="table-result table-gachle">
+                    <DataGrid v-bind:columns="[
+                            {fieldName: 'stt', headerText: 'Stt', allowFiltering: true, allowSorting: false, textAlign: 'center'},
+                            {fieldName: 'ma_tb', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'ten_tb', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'diachi_ld', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'td_cu', headerText: 'Tốc độ cũ', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'td_moi', headerText: 'Tốc độ mới', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'muccuoc_cu', headerText: 'Mức cước cũ', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'muccuoc_moi', headerText: 'Mức cước mới', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'kieutra_cu', headerText: 'Kiểu trả cũ', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                            {fieldName: 'kieutra_moi', headerText: 'Kiểu trả mới', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                        ]" v-bind:dataSource="lvwThueBao" :showFilter="true"
+                        @selectedRowChanged="lvwThueBao_SelectedIndexChanged" :showColumnCheckbox="false"
+                        :defaultColumnCheckboxChecked="false" :allowPaging="true" :enablePagingServer="false"
+                        :enabled-select-first-row="true">
+                    </DataGrid>
+                </table>
+            </div>
+        </div>
+    </div>
+    <b-modal id="popupComponentMGs" size="huge" hide-header hide-header-close hide-footer body-class="modal-body p-0">
+        <component :is="popupComponent" isPopup="true" ref="popupComponent"
+            :dulieu="popupComponentData" v-bind="popupComponentAttr" v-on="popupComponentEvents">
+        </component>
+    </b-modal>
+
+    <b-modal ref="ThongTinEmail" id="ThongTinEmail" size="huge" title="Thông tin Email" hide-footer
+        body-class="p-0 thanhtoan-modal">
+        <ThongTinEmail :hdkh_id="hdkh_id" :khachhang_id="khachhang_id" />
+    </b-modal>
+    <!-- <ejs-dialog :enableResize='true' :allowDragging='true' :visible="false" ref="thongtinemail"
+        :header='"Thông tin Email"' showCloseIcon=true width='90%' height="600" target=".main-wrapper">
+        <ThongTinEmail :hdkh_id="hdkh_id" :khachhang_id="khachhang_id"/>
+    </ejs-dialog> -->
+    <popupTraCuuThueBao @chapnhan="frmTraCuuThueBao_chapnhan" ref="tracuuthuebao" />
+    <ThongTinHenKhachHang ref="popupThongTinHenKhachHang" :hdkh_id="hdkh_id" />
+    <b-modal ref="ThongTinLienHe" id="ThongTinLienHe" size="huge" title="Thông tin liên hệ" hide-footer
+        body-class="p-0 thanhtoan-modal">
+        <ThongTinLienHe :hdkh_id="hdkh_id" :khachhang_id="khachhang_id" />
+    </b-modal>
+    <!-- <ejs-dialog :enableResize='true' :visible="false" ref="thongtinlienhe" :header='"Thông tin liên hệ"'
+        :hdkh_id="hdkh_id" :khachhang_id="khachhang_id" showCloseIcon=true target=".main-wrapper" width='60%'
+        height="800">
+        <ThongTinLienHe />
+    </ejs-dialog> -->
+    <TuvanMyTv ref="dialogTuvanMytv" @onUpdate="onUpdateTuvanMyTV"/>
+    <frmDangKyGoiDaDVLM ref="frmDangKyGoiDaDVLM" />
+    <ChonCongTacVienModal ref="chonCongTacVienModal" @accept="acceptCTV" />
+    <ChonNguoiGTModal ref="chonNguoiGTModal" @accept="acceptNguoiGT" />
+    <ThueBaoCungMa id="thuebaocungma" ref="thuebaocungma"></ThueBaoCungMa>
+    <InHoSo ref="popupInHoSo" :params="popupInHopDong_Param" />
+    <ChiTietTienTheoKhoanMucModal ref="chiTietTienTheoKhoanMucModal" 
+    :loaihd_id="8" 
+    :ds_tien_caidat="ds_tien_khoanmuc"
+    @accept="acceptTienKM"/>
+   
+</div>

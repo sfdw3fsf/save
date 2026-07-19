@@ -1,0 +1,22 @@
+export default {
+    getDSHuongGiaoBHNhapThueBao: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-huong-giao-bh-nhap-tb/${data.nguoiDungId}`),
+    getDSHuongGiaoBH_Filter: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-huong-giao-bao-hanh`),
+    getDSTrangThaiBH: (axios, data) => axios.get('/web-qlvt/api/nhap-tbi-bao-hanh/ds-trang-thai-bao-hanh'),
+    getDSQuyenNguoiDung: (axios, data) => axios.get(`/web-qlvt/api/tra-cuu-ton-kho-user/ds-quyen-nd/${data.nguoiDungId}`),
+    getDSKhoGiaoTheoHG: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-kho-giao-huong-giao/${data.huongGiao}/${data.nhanVienId}`),
+    getDSKhoNhanTheoHG: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-kho-nhan-huong-giao/${data.huongGiao}/${data.nhanVienId}`),
+    getDSKhoNhanTheoKieu: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-kho-nhan-huong-giao-theo-kieu/${data.nhanVienId}/${data.khoGiaoId}`),
+    getDSKhoGiaoTheoTTBH: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-kho-giao-tt-bh/${data.ttbh}/${data.nhanVienId}`),
+    getDSKhoNhanTheoTTBH: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-kho-nhan-tt-bh/${data.ttbh}/${data.nhanVienId}`),
+    getDSGiaoPhieuBH: (axios, data) => axios.post(`/web-qlvt/api/nhap-tbi-bao-hanh/ds-phieu-giao-bh`,data),
+    KiemTraHanChungTu: (axios, data) => axios.post(`/web-qlvt/api/duyet-dang-ky-cap-phat/kiem-tra-han-chung-tu`,data),
+    getMucDichIDTheoMaMD: (axios, data) => axios.get(`/web-qlvt/api/giao-phieu-bao-hanh/ds-muc-dich-xuat-vat-tu/${data.maMd}`),
+    getThongTinTBCuaPhieuBH: (axios, data) => axios.get(`/web-qlvt/api/giao-phieu-bao-hanh/ds-tbi-bao-hanh-tra/${data.baoHanhId}`),
+    TaoChungTuTruyenDan: (axios, data) => axios.post(`/web-qlvt/api/nhap-tbi-bao-hanh/tao-ct-td-v3`,data),
+    getDSLuongThaoTac: (axios, data) => axios.get(`/web-qlvt/api/giao-phieu-bao-hanh/ds-luong-thao-tac/${data.nhomQtId}`),
+    getThamSoMacDinh: (axios, data) => axios.get(`/web-qlvt/api/tiep-nhan-thiet-bi-bao-hanh/tham-so-mac-dinh/${data.kieuId}`),
+    NhapKhoBaoHanh: (axios, data) => axios.post(`/web-qlvt/api/nhap-tbi-bao-hanh/xu-ly-nhap-kho-bh`,data),
+    NhapThietBiBaoHanh: (axios, data) => axios.post(`/web-qlvt/api/giao-phieu-bao-hanh/nhap-tbi-bao-hanh`,data),
+    getDSKhoBH: (axios, data) => axios.get(`/web-qlvt/api/nhap-tbi-bao-hanh/lay_dskho_nhap_bh/${data.huongGiaoId}/${data.trangThaiBH}`),
+  };
+  

@@ -1,0 +1,209 @@
+<div>
+  <!-- BEGIN TOOLBAR -->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" v-on:click.prevent="doSearch"><span class="icon one-file-attach1"></span>Lấy DS</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="doAdd" :class="{ disabled: isAdd }" ref="btnAdd"><span class="icon one-file-plus"></span>Nhập mới</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="doCancel" ref="btnCancel"><span class="icon ui-1_circle-remove nc-icon-glyph"></span>Hủy</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="doSave" ref="btnSave"><span class="icon one-save"></span>Ghi lại</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="doDelete" :class="{ disabled: isAdd }"><span class="icon one-trash"></span>Xóa</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="doExportExcel"><span class="icon one-excel"></span>Xuất Excel</a>
+      </li>
+    </ul>
+  </div>
+  <!-- BEGIN CONTENT -->
+  <div class="page-content">
+    <div class="box-form">
+      <div class="pull-right w120">
+        <app-ky-cuoc :isTextBold="true"></app-ky-cuoc>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="box-form">
+        <div class="legend-title">Thông tin tiếp nhận</div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="row">
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Mã TB<span class="required">*</span></div>
+                      <div class="value">
+                        <div class="input-more-button">
+                          <button class="btn" @click="popupTraCuuDanhBa">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <input v-model="params.p_ma_tb" ref="p_ma_tb" @keyup.enter="getDBThueBao" :disabled="!isAdd" type="text" class="form-control bold highlight">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Trạng thái TB</div>
+                      <div class="value">
+                        <input v-model="params.p_trangthai_tb" type="text" class="form-control bold red" :disabled='isAdd'>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Mã TT</div>
+                      <div class="value">
+                        <input v-model="params.p_ma_tt_tb" type="text" class="form-control bold" :disabled='isAdd'>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Kiểu YC<span class="required">*</span></div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <b-form-select
+                            v-model = "params.p_kieu_yc"
+                            :options = "params.p_kieu_yc_options"
+                            value-field = "ID"
+                            text-field = "TEXT"
+                            class="form-control">
+                          </b-form-select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key w90">Ngày YC<span class="required">*</span></div>
+                      <div class="value">
+                        <ejs-datepicker
+                          v-model="p_ngay_yc"
+                          :value="config.dateConfig.value"
+                          :format="config.dateConfig.format"
+                          :allowEdit=false
+                          :showClearButton=false
+                          :enabled='is_added'
+                          >
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Tên TT</div>
+                        <div class="value">
+                          <input v-model="params.p_ten_tt" type="text" class="form-control" :disabled='true'>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="key w90">Địa chỉ TT</div>
+                  <div class="value">
+                    <input v-model="params.p_diachi_tt" type="text" class="form-control":disabled='true'>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w90">Địa chỉ LĐ</div>
+                  <div class="value">
+                    <input v-model="params.p_diachi_lapdat" type="text" class="form-control" :disabled='true'>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w90">Đơn vị<span class="required">*</span></div>
+                  <div class="value">
+                    <ejs-dropdownlist :filtering='onFilteringDonVi' :allowFiltering="true" :dataSource='params.p_donvi_options' :fields="config.fieldsDonVi" v-model = "params.p_donvi" :placeholder="'Chọn đơn vị'"></ejs-dropdownlist>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w90">Nội dung YC<span class="required">*</span></div>
+                  <div class="value">
+                    <b-form-textarea
+                      v-model="params.p_noidung_yc"
+                      rows="3"
+                      max-rows="6"
+                      maxlength=500
+                      style="height: 100px;resize: vertical;"
+                    ></b-form-textarea>
+                  </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <DataGrid
+                v-bind:columns="[
+                  {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true},
+                  {fieldName: 'MA_TB', headerText: 'Số máy/ Acc', allowFiltering: true},
+                  {fieldName: 'TEN_DVVT', headerText: 'Loại hình', allowFiltering: true},
+                  {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+                  {fieldName: 'THANGNO', headerText: 'Tháng nợ', allowFiltering: true, type:'number', format:'N0'},
+                  {fieldName: 'TONGNO', headerText: 'Tổng nợ', allowFiltering: true, type:'number', format:'N0'},
+
+                  ]"
+                v-bind:dataSource="resultTTThueBao"
+                :showFilter="true"
+                :allowPaging="true"
+                :totalRecords="pageTTThueBao.totalElement"
+                :pageSize="pageTTThueBao.maxSize"
+                :pageIndex="pageTTThueBao.page"
+                :panelDataHeight='"200"'
+                @queryCellInfo="ttTBqueryCellInfo"
+                >
+              </DataGrid>
+            </div>
+        </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách thuê bao</div>
+      <div class="table-content">
+        <DataGrid
+            v-bind:columns="[
+              {fieldName: 'YEUCAU_ID', isPrimaryKey: true, visible: false},
+              {fieldName: 'THANHTOAN_ID', visible: false},
+              {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', allowFiltering: true, textAlign: 'Right', width: 120},
+              {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, width: 200},
+              {fieldName: 'MA_TB', headerText: 'Số máy/ Acc', allowFiltering: true, width: 150},
+              {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+              {fieldName: 'KIEU_YC', headerText: 'Kiểu YC', allowFiltering: true, width: 150},
+              {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true},
+              {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true},
+              {fieldName: 'NOIDUNG_YC', headerText: 'Nội dung YC', allowFiltering: true}
+              ]"
+            v-bind:dataSource="resultDSThueBao"
+            :showFilter="true"
+            :allowPaging="true"
+            :enablePagingServer="false"
+            :allowExcelExport="true"
+            :totalRecords="pageDSThueBao.totalElement"
+            :pageSize="pageDSThueBao.maxSize"
+            :pageIndex="pageDSThueBao.page"
+            @selectedRowChanged="selectedRowChanged"
+            @actionComplete="actionComplete"
+            ref="gridDSYeuCau"
+            >
+        </DataGrid>
+      </div>
+    </div>
+  </div>
+  <b-modal id="popupComponents" size="xl"  hide-footer  hide-header  hide-header-close body-class="modal-body p-0">
+      <component :is="popupComponent" ref="popupComponent" :dulieu="popupComponentData" :isPopup="true"
+      @form-close="popupClosed"
+      @close="popupClosed"
+      @acceptChange="popupClosed"
+      @acceptChangeCTV="popupClosed"
+      @acceptChangeNGT="popupClosed" >
+    </component> <!--v-dynamic-events="popupComponentEvents"-->
+  </b-modal>
+</div>

@@ -1,0 +1,3 @@
+import SearchHistorySubcriberInforVNP from './SearchHistorySubcriberInforVNP'
+
+export default SearchHistorySubcriberInforVNP

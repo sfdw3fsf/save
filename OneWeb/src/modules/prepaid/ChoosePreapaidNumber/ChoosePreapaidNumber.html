@@ -1,0 +1,335 @@
+<div class='main-wrapper'>
+  <breadcrumb :header="header"/>
+  <!--
+  <div class='breadcrumb-top'>
+    <div class='main-title'>Chọn số cho khách hàng</div>
+    <ul class='breadcrumb'>
+      <li class='breadcrumb-item'><a href='#'><span class='nc-icon-outline ui-1_home-simple'></span> Trang chủ
+        </a></li>
+      <li class='breadcrumb-item'><a href='#'>Quản lý trả trước</a></li>
+      <li class='breadcrumb-item active'>Chọn số trả trước</li>
+    </ul>
+  </div>
+  -->
+  <div class='list-actions-top'>
+    <ul class='list'>
+      <li>
+        <a href='#' @click.prevent='btnLayTT_Click' v-on:keyup.f2='btnLayTT_Click'>
+          <span class='icon one-search'></span>Tìm kiếm
+        </a>
+      </li>
+      <li>
+        <a href='#' @click.prevent='btnRefresh_Click' v-show="btnRefresh" v-on:keyup.f5='btnRefresh_Click'>
+          <span class='icon one-file-attach'></span>Lấy TT
+        </a>
+      </li>
+      <li>
+        <a href='#' v-show='tsbtnChonSo' @click.prevent='tsbtnChonSo_Click' v-on:keyup.f6='tsbtnChonSo_Click'>
+          <span class='icon one-file-check-1'></span>Chọn số
+        </a>
+      </li>
+      <li>
+        <!-- v-b-modal.my-modal v-on:keyup.f7="ShowNhapSo" -->
+        <a href='#' @click.prevent='btnNhapMoi_Click' v-show='btnNhapMoi'>
+          <span class='icon one-file-plus2'></span>Nhập số
+        </a>
+
+      </li>
+      <li>
+        <a href='javascript:void(0);' v-show=' btnXoaTB' @click.prevent='btnXoaTB_Click' v-on:keyup.f8='btnXoaTB_Click'>
+          <span class='icon one-trash'></span>Xoá DS
+        </a>
+      </li>
+      <li>
+        <a href='javascript:void(0);' v-show='btnCapNhat' @click.prevent='btnCapNhat_Click' v-on:keyup.f9='btnCapNhat_Click'>
+          <span class='icon one-user-add'></span>Đăng ký
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class='page-content'>
+    <div class='grid-box-ver'>
+      <div class='box-form box-col' id='boxTop'>
+        <div class='legend-title'>Thông tin tìm kiếm kho số</div>
+        <div class='row'>
+          <div class='col-sm-7 col-12'>
+            <div class='info-row'>
+              <div class='key w80'>Tìm kiếm</div>
+              <div class='value'>
+                <div class='row'>
+                  <div class='col-sm-3 col-12'>
+                    <Select2 v-model='cboPrefix' :options='DmDauSo' />
+                  </div>
+                  <div class='col-sm-9 col-12'>
+                    <input type='text' class='form-control' v-on:keyup.enter="btnLayTT_Click" v-model.trim='txtPrefix'>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class='col-sm-5 col-12'>
+            <div class='info-row'>
+              <div class='key w80'>Trạng thái</div>
+              <div class='value'>
+                <Select2 :disabled='cboTrangThai_ReadOnly' v-bind:class="{'disabled': cboTrangThai_ReadOnly}"  v-model='cboTrangThai' :options='DmTrangThaiKhoSo' />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='col-sm-7 col-12'>
+            <div class='info-row'>
+              <div class='key w80'>Kho số</div>
+              <div class='value'>
+                <SelectExt dataTextField='ten_kho' dataValueField='kho_id' v-model='cboKhoSo' :dataSource='DmKhoSo' />
+              </div>
+            </div>
+
+          </div>
+          <div class='col-sm-5 col-12'>
+            <div class='info-row'>
+              <div class='key w80'>Mã xác thực</div>
+              <div class='value'>
+                <input type='text' :readonly="txtMaXacThuc_ReadOnly" v-bind:class="{'disabled': txtMaXacThuc_ReadOnly}" class='form-control' v-model='txtMaXacThuc'>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='col-sm-12 col-12'>
+            <div class='info-row'>
+              <div class='key w80'>Kiểu số</div>
+              <div class='value'>
+                <Select2 :disabled='CboKieuSo_ReadOnly' :readonly='CboKieuSo_ReadOnly' v-bind:class="{'disabled': CboKieuSo_ReadOnly}" ref='refCboKieuSo' v-model='CboKieuSo' :options='DmKieuSo' />
+              </div>
+            </div>
+          </div>
+        </div>
+        <b-tabs class='nav tabs tab-over relative' style='z-index: 2;' v-model='TabKhoSoIndex'>
+          <b-tab :title='xTabKhoTQ_Text' v-if='xTabKhoTQ'>
+            <div style='width:100%;' role1="khoSoToanQuoc">
+              <DataGrid ref='khoSoToanQuoc' v-bind:columns='grcDSKhoSo.headers' v-bind:dataSource='grcDSKhoSo.data'
+                :showColumnCheckbox='true' v-on:pageIndex="page_num" :pageSize="page_sz" :enable-paging-server='true' :allowPaging='true' :showFilter='true'
+                :enabledSelectFirstRow='false' @rowClicked="grcDSKhoSo_rowClicked" :totalRecords="totalRecords"  @pageChanged="pageChanged" :rowIndex="rowIndex"
+                @selectedItemsChanged='grcDSKhoSo_selectedItems' @commandClicked='commandClicked1' :commands='commands1'
+                :commandColumn='commandColumn1' @rowDataBound="grcDSKhoSo_rowDataBound">
+              </DataGrid>
+            </div>
+          </b-tab>
+          <b-tab :title='xTabKhoTinh_Text' v-if='xTabKhoTinh'>
+            <DataGrid ref='khoSoVTT' v-bind:columns='grcDSAllKho.headers' v-bind:dataSource='grcDSAllKho.data'
+              :showColumnCheckbox='true' :enable-paging-server='false' :allowPaging='true' :showFilter='true'
+              :enabledSelectFirstRow='false' @rowClicked="grcDSAllKho_rowClicked" @commandClicked='commandClicked1'
+              :commands='commands2' :commandColumn='commandColumn2'>
+            </DataGrid>
+          </b-tab>
+          <b-tab title='GDV Chọn số toàn quốc' v-if='xTabKhoTQ_TraSau'>
+            <DataGrid ref='khoSoVTTTS' v-bind:columns='gcKHOTQTraSau.headers' v-bind:dataSource='gcKHOTQTraSau.data'
+              :showColumnCheckbox='true' :enable-paging-server='false' :allowPaging='true' :showFilter='true'
+              :enabledSelectFirstRow='false' @rowClicked="gcKHOTQTraSau_rowClicked" @commandClicked='commandClicked1'
+              :commands='commands3' :commandColumn='commandColumn1'>
+            </DataGrid>
+          </b-tab>
+        </b-tabs>
+
+
+      </div>
+      <div class='box-col' id='boxBottom'>
+        <div class='row'>
+          <div class='col-sm-6 col-12' v-show="!(vkieuform==1)">
+            <div class='box-form'>
+              <div class='legend-title'>Danh sách các số chờ đăng ký</div>
+              <DataGrid v-bind:columns='grcDS_ChuaDK.headers' v-bind:dataSource='grcDS_ChuaDK.data'
+                :showColumnCheckbox='true' :enable-paging-server='false' :allowPaging='true' :showFilter='true'
+                :enabledSelectFirstRow='false' @selectedItemsChanged='grcDS_ChuaDK_selectedItems'>
+              </DataGrid>
+
+            </div>
+          </div>
+          <div class='col-12' v-bind:class="{ 'col-sm-12': (vkieuform==1), 'col-sm-6':  (vkieuform==0) }">
+            <b-tabs class='nav tabs tab-over ' style='z-index: 2;'>
+              <b-tab title='Danh sách các số máy đã đăng ký'>
+                <div style='width:100%;'>
+                  <DataGrid v-bind:columns='grcDS_DaDK.headers' :commandColumn='commandColumn'
+                    v-bind:dataSource='UpperCasePropertyList(grcDS_DaDK.data)' :showColumnCheckbox='false' :commands='commands'
+                    :enable-paging-server='false' :allowPaging='true' @commandClicked='commandClicked'
+                    :showFilter='true' :enabledSelectFirstRow='false'  @rowClicked="grcDS_DaDK_rowClicked" >
+                  </DataGrid>
+                </div>
+              </b-tab>
+              <b-tab title='Danh sách các số máy đã khởi tạo'>
+                <DataGrid v-bind:columns='grcDSKhoiTao.headers' v-bind:dataSource='UpperCasePropertyList(grcDSKhoiTao.data)'
+                  :showColumnCheckbox='false' :enable-paging-server='false' :allowPaging='true' :showFilter='true'
+                  :enabledSelectFirstRow='false'  @rowClicked="grcDSKhoiTao_rowClicked"
+                  :commandColumn='commandColumn' :commands='commandsKT'
+                  @commandClicked='commandClicked2'>
+                </DataGrid>
+              </b-tab>
+
+            </b-tabs>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <b-modal id='my-modal' class='modal-dialog' hide-footer style='width: 100%; max-width: 600px;'>
+    <template #modal-title>
+      <div class='title'>Nhập danh sách số máy</div>
+    </template>
+    <input type='text' class='form-control' v-model.trim='txtNhapSo'>
+    <div class='group-buttons -bottom center'>
+      <button class='btn btn-main' @click.prevent='NhapSo'>Xác nhận</button>
+      <button class='btn btn-second' @click.prevent='CloseNhapSo'>Huỷ bỏ</button>
+    </div>
+  </b-modal>
+  <b-modal id='my-modal-khoi-tao' class='modal-dialog' hide-footer style='width: 100%; max-width: 700px;' no-close-on-backdrop>
+    <template #modal-title>
+      <div class='title'>Khởi tạo thuê bao</div>
+    </template>
+    <div class='list-actions-top'>
+      <ul class='list'>
+        <li>
+          <a href='javascript:void(0);' @click.prevent='LamMoiKhoiTaoThueBao'>
+            <span class='icon one-reload'></span>Làm mới
+          </a>
+        </li>
+        <li>
+          <!--          KhoiTaoThueBao-->
+          <a href='javascript:void(0);' @click.prevent='frmKhoiTaoTB_btnCapNhat_Click'>
+            <span class='icon files_folder-add nc-icon-glyph'></span> Khởi tạo (F9)
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class='popup-body'>
+      <div class='box-form'>
+        <div class='legend-title'>Thông tin thuê bao</div>
+        <div class='info-row'>
+          <div class='key w100'>Số máy<span class='red'>(*)</span></div>
+          <div class='value'>
+            <div class='input-more-button'>
+              <button class='btn fw6 text-desc' style='border-color: #ccc;'>
+                84
+              </button>
+              <input type='text' class='form-control' readonly="true" v-model='KhoiTao.SoMay'>
+            </div>
+          </div>
+        </div>
+        <div class='info-row'>
+          <div class='key w100'>Số MSIN<span class='red'>(*)</span></div>
+          <div class='value'>
+            <input type='text' ref="refKhoiTaoMSIN" :class="{ 'is-invalid': $v.KhoiTao.MSIN.$error }" class='form-control '
+              v-model='KhoiTao.MSIN'>
+          </div>
+        </div>
+        <div class='info-row'>
+          <div class='key w100'>Loại MSIN</div>
+          <div class='value'>
+            <div class='list-checks mart7'>
+              <div class='item'>
+                <div class='check-action'>
+                  <input type='radio' class='check' v-model='KhoiTao.LoaiMSIN' value='64'>
+                  <span class='name'>Sim 64k</span>
+                </div>
+              </div>
+              <div class='item'>
+                <div class='check-action'>
+                  <input type='radio' class='check' v-model='KhoiTao.LoaiMSIN' value='128'>
+                  <span class='name'>Sim 128k</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='info-row'>
+          <div class='key w100'>Loại TB</div>
+          <div class='value'>
+            <Select2 v-model='KhoiTao.LoaiTB' :options='DsLoaiTB' />
+          </div>
+        </div>
+        <div class='info-row'>
+          <div class='key w100'>Ghi chú</div>
+          <div class='value'>
+            <textarea name='' class='form-control' style='height: 100px;resize: none;'
+              v-model='KhoiTao.GhiChu'></textarea>
+          </div>
+        </div>
+        <div class='info-row' v-show='labelControl3'>
+          <div class='key w100'>Mã xác thực<span style='color: #dc3545'> (*)</span></div>
+          <div class='value' v-show='txtMaXT'>
+            <input type='text' name='' class='form-control' v-model='KhoiTao.MaXacThuc'> </input>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </b-modal>
+  <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="dialogObjCapCha"
+    :header='"Xác nhận"' showCloseIcon='true' width='700' :target='target'>
+    <div class="">
+      <div class="list-actions-top">
+        <ul class="list">
+          <!-- <li>
+            <a href="#" @click.prevent="XacNhanMaXacThuc">
+              <span class="icon one-search"></span> Xác nhận
+            </a>
+          </li> -->
+          <li>
+            <a href="javascript:void(0);" @click.prevent="ThoatMaXacThuc">
+              <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Thoát
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="popup-body">
+        <div class="box-form">
+          <div class="legend-title">Xác nhận mã bảo mật</div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Nhập mã <span style="color: #dc3545"> (*)</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" ref="txtMaCaptcha" v-model.trim="txtMaCaptcha" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <a href="javascript:void(0);" @click.prevent="XacNhanMaXacThuc" class="btn btn-secondary">
+                  <span class="icon one-search"></span> Xác nhận
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ejs-dialog>
+  <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="dialogObjKhoiTaoThuBao"
+    :header='"Khởi tạo thuê bao"' showCloseIcon='true' width='100%' :target='target'>
+    <div class="">
+      <div class="list-actions-top">
+        <ul class="list">
+          <li>
+            <a href="#" @click.prevent="XacNhanMaXacThuc">
+              <span class="icon one-search"></span> Xác nhận
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="ThoatMaXacThuc">
+              <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Thoát
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="popup-body">
+        <div class="box-form">
+          <div class="legend-title">Xác nhận mã xác thực</div>
+
+        </div>
+      </div>
+    </div>
+  </ejs-dialog>
+</div>

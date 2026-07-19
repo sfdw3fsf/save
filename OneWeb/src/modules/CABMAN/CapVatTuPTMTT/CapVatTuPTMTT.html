@@ -1,0 +1,622 @@
+
+<div>
+    <!-- breadcrumb -->
+    <!-- <breadcrumb :header="header"></breadcrumb> -->
+
+    <!-- menu -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="btnChiTiet_Click">
+                    <span class="icon one-refresh"></span> Lấy TT
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnNhapMoi_Click" v-if="Visible.btnNhapMoi" :class="{'disabled': !Enabled.btnNhapMoi}">
+                    <span class="icon one-slid"></span> Nhập mới
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnCapNhat_Click" v-if="Visible.btnCapNhat" :class="{'disabled': !Enabled.btnCapNhat}">
+                    <span class="icon one-save"></span> Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnHuyBo_Click" v-if="Visible.tsbtnHuyBo">
+                    <span class="icon one-cancel"></span> Hủy
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" >
+                    <span class="icon one-print"></span> In biên bản
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" >
+                    <span class="icon one-xlsx-import"></span> Xuất Excel
+                </a>
+            </li>
+            
+            <li>
+                <a href="javascript:void(0)" @click="btnHoanCong_Click" v-if="Visible.btnHoanCong">
+                    <span class="icon one-file-check2"></span> Hoàn thành
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtUpHS_Click">
+                    <span class="icon one-upload"></span> Up hồ sơ
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnXemHSDT_Click">
+                    <span class="icon one-search"></span> Xem hồ sơ điện tử
+                </a>
+            </li>
+
+            <ejs-dialog
+                :visible='false'
+                ref="popup_frmNhapText"
+                :animationSettings="{ effect: 'Zoom' }"
+                :showCloseIcon=false 
+                :closeOnEscape='true'
+                :enableResize='true'
+                :allowDragging='true'
+                width='30%'
+                :isModal='true'
+                :cssClass="'popup-box'"
+                :zIndex="999"
+                >
+                <frmNhapText ref="frmNhapText"></frmNhapText>
+            </ejs-dialog>
+        </ul>
+    </div>
+
+    <!-- form -->
+    <div class="p-2 page-content">
+        <!-- 1. Các thông tin liên quan -->
+        <div class="m-0">
+            <div class="box-form">
+                <div class="legend-title mb-2">
+                    <span :class="'icon pointer fa fa-angle-' + (row1 ? 'up' : 'down')" @click="row1 = !row1" v-b-tooltip title="Click vào đây để ẩn/hiện form"></span>
+                    Các thông tin liên quan
+                </div>
+                <div class="row" v-show="row1">
+                    <div class="col-md-6 col-12">
+                        <div class="card mb-2">
+                            <div class="card-header py-1 mb-2">Thông tin tìm kiếm</div>
+                            <div class="row">
+                                <div class="info-row mb-2 ml-2" v-show="Visible.ckbDaCap">
+                                    <div class="key check-action">
+                                        <input type="checkbox" class="check" v-model="params.p_ckbDaCap"> 
+                                        <span class="name">Đã cấp vật tư</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="info-row col-md-2">
+                                        <div class="key check-action">
+                                            <input type="checkbox" class="check" v-model="params.p_cbxTuNgay" @change="cbxTuNgay_CheckedChanged"> 
+                                            <span class="name">Từ ngày</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-row col-md-4 pl-0">
+                                        <div class="select-custom">
+                                            <ejs-datepicker 
+                                                v-model="params.p_dtpTuNgay"
+                                                :format="'dd/MM/yyyy'"
+                                                :enabled="Enabled.dtpTuNgay">
+                                            </ejs-datepicker> 
+                                        </div>
+                                    </div>
+                                    <div class="info-row col-md-2">
+                                        <div class="key"><span>Đến ngày</span></div>
+                                    </div>
+                                    <div class="info-row col-md-4 pl-0">
+                                        <div class="select-custom">
+                                            <ejs-datepicker 
+                                                v-model="params.p_dtpDenNgay"
+                                                :format="'dd/MM/yyyy'"
+                                                :enabled="Enabled.dtpDenNgay">
+                                            </ejs-datepicker> 
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                                <div class="row">
+                                    <div class="info-row col-md-2">
+                                        <div class="key">
+                                            <span class="name">Nhân viên</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-row col-md-4 pl-0">
+                                        <ejs-dropdownlist
+                                            locale='vi-VN'
+                                            class="form-control"
+                                            ref="cboNhanVien"
+                                            v-model="params.p_NhanVien"
+                                            :dataSource='cboNhanVien' 
+                                            :fields="{value:'NHANVIEN_ID', text: 'TEN_NEW'}"
+                                            :allowFiltering="true"
+                                            :readonly="ReadOnly.cboNhanVien"
+                                            @change="cboNhanVien_EditValueChanged"
+                                            >
+                                        </ejs-dropdownlist>
+                                    </div>
+                                    
+                                    <div class="info-row col-md-2">
+                                        <div class="key">
+                                            <span class="name">Kho</span>
+                                    </div></div>
+                                    <div class="info-row col-md-4 pl-0">
+                                        <ejs-dropdownlist
+                                            locale='vi-VN'
+                                            ref="cboKho"
+                                            v-model="params.p_Kho"
+                                            :dataSource='cboKho' 
+                                            :fields="{value:'KHO_ID', text: 'TEN_K_NEW'}"
+                                            :allowFiltering="true"
+                                            @change="cboKho_EditValueChanged"
+                                            >
+                                        </ejs-dropdownlist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header py-1 mb-2">Thông tin nhân viên thực hiện</div>
+                            <DataGrid
+                                v-bind:columns="[
+                                {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', textAlign: 'Left', allowFiltering: true},
+                                {fieldName: 'SO_DT', headerText: 'Số điện thoại', textAlign: 'Left', allowFiltering: true},
+                                {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ', textAlign: 'Left', allowFiltering: true},
+                                {fieldName: 'GHICHU', headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true},
+                                ]"
+                                v-bind:dataSource="gridGiaoviec"
+                                ref="gvGiaoviec"
+                                :showFilter="true"
+                                :allowPaging="true"
+                                >
+                            </DataGrid>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="card mb-2">
+                            <div class="card-header py-1 mb-2">Thông tin cấp vật tư</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Kiểu Tbị</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_KieuTb"
+                                                :dataSource='cboKieuTb' 
+                                                :fields="{value:'KIEUTBI_ID', text: 'KIEU_TBI'}"
+                                                :allowFiltering="true"
+                                                @change="cboKieuTb_EditValueChanged"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Ngày thực hiện</span></div>
+                                        <div class="value">
+                                            <ejs-datepicker 
+                                                v-model="params.p_dtpNgayCap"
+                                                :format="'dd/MM/yyyy hh:mm'"
+                                                >
+                                            </ejs-datepicker> 
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Kết quả thu hồi</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_KetQuaXL"
+                                                :dataSource='cboKetQuaXL' 
+                                                :fields="{value:'KQ_ID', text: 'KETQUA'}"
+                                                :allowFiltering="true"
+                                                @change="cboKetQuaXL_EditValueChanged"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Lý do tồn</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_LyDoTon"
+                                                :dataSource='cboLyDoTon' 
+                                                :fields="{value:'lyDoTonTcId', text: 'lyDoTonTc'}"
+                                                :allowFiltering="true"
+                                                :readonly="!Enabled.cboLyDoTon"
+                                                >
+                                            </ejs-dropdownlist> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Mục đích cấp</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_Droplydocap"
+                                                :dataSource='Droplydocap' 
+                                                :fields="{value:'MUCDICH_ID', text: 'MUCDICH'}"
+                                                :allowFiltering="true"
+                                                @change="Droplydocaptb_EditValueChanged"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Tình trạng T.Bị</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_TinhTrangCap"
+                                                :dataSource='cboTinhTrangCap' 
+                                                :fields="{value:'TINHTRANGTBI_ID', text: 'TINHTRANG_TBI'}"
+                                                :allowFiltering="true"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Lý do cấp</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                ref="CboLyDoCap"
+                                                v-model="params.p_LyDoCap"
+                                                :dataSource='CboLyDoCap' 
+                                                :fields="{value:'MUCDICH_ID', text: 'MUCDICH'}"
+                                                :allowFiltering="true"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Trang bị</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                ref="cboKieuTrangBi"
+                                                v-model="params.p_KieuTrangBi"
+                                                :dataSource='cboKieuTrangBi' 
+                                                :fields="{value:'TRANGBI_ID', text: 'TENTRANGBI'}"
+                                                :allowFiltering="true"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header py-1 mb-2">Thông tin cấp vật tư</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Tên thiết bị</span></div>
+                                        <!-- <div class="value"> -->
+                                            <!-- <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_VatTu"
+                                                :dataSource='cboVatTu' 
+                                                :fields="{value:'VATTU_ID', text: 'TEN_VT'}"
+                                                :allowFiltering="true"
+                                                :readonly="ReadOnly.cboVatTu || !Enabled.cboVatTu || !Enabled.pnlThuHoi"
+                                                >
+                                            </ejs-dropdownlist> -->
+                                        <div class="value">
+                                            <ComboboxGrid 
+                                            ref="TableVatTu" 
+                                            v-bind:columns="[
+                                            {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true,width: '250'},
+                                            {fieldName: 'DVI_TINH', headerText: 'Đơn vị tính', allowFiltering: true,width: '70'},
+                                            {fieldName: 'LOAI_TBI', headerText: 'Loại thiết bị', allowFiltering: true,}
+                                                    ]" 
+                                            v-bind:dataSource="cboVatTu" 
+                                            textField="TEN_VT" 
+                                            valueField="VATTU_ID"
+                                            :enabled="!ReadOnly.cboVatTu || Enabled.cboVatTu || Enabled.pnlThuHoi"
+                                            @selectedChanged="cboVatTu_selected">
+                                            </ComboboxGrid>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Số lượng</span></div>
+                                        <div class="value">
+                                            <vue-numeric ref="soluong_cu" class="form-control" v-model="params.p_soluong_cu" empty-value="0" :min="0"  :minus="false" :separator="','" 
+                                            :enabled="!ReadOnly.soluong_cu || Enabled.soluong_cu || Enabled.pnlThuHoi"></vue-numeric>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Serial</span></div>
+                                        <div class="value">
+                                            <input ref="txtSerialCu" type="text" class="form-control" v-model="params.p_txtSerialCu" :disabled="ReadOnly.txtSerialCu || !Enabled.txtSerialCu || !Enabled.pnlThuHoi">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Tình trạng T.Bị</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist
+                                                locale='vi-VN'
+                                                v-model="params.p_TinhTrangTbi"
+                                                :dataSource='cboTinhTrangTbi' 
+                                                :fields="{value:'tinhTrangTBiId', text: 'tinhTrangTBi'}"
+                                                :allowFiltering="true"
+                                                :readonly="!Enabled.cboTinhTrangTbi || !Enabled.pnlThuHoi"
+                                                >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="info-row">
+                                        <div class="key w100"><span class="name">Ghi chú</span></div>
+                                        <div class="value">
+                                            <textarea class="form-control" v-model="params.p_txtGhiChu" :disabled="!Enabled.txtGhiChu || !Enabled.pnlThuHoi" ></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 2. Danh sách hồ sơ Cải tạo/bảo dưỡng -->
+        <div class="m-0">
+            <div class="box-form">
+                <div class="legend-title mb-2 d-flex">
+                    <span :class="'icon pointer fa fa-angle-' + (row2 ? 'up' : 'down')" @click="row2 = !row2" v-b-tooltip title="Click vào đây để ẩn/hiện form">
+                    </span>
+                    <span>Danh sách hồ sơ Cải tạo/bảo dưỡng</span>
+                    <div class="list-checks red marl50">
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" value="2" class="check" v-model="params.p_rdioCKb" @change="rdioCKb_EditValueChanged"><span class="name"> {{ Text.rdioCKb_0 }}</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" value="3" class="check" v-model="params.p_rdioCKb" @change="rdioCKb_EditValueChanged"><span class="name"> {{ Text.rdioCKb_1 }}</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" value="4" class="check" v-model="params.p_rdioCKb" @change="rdioCKb_EditValueChanged"><span class="name"> {{ Text.rdioCKb_2 }}</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" value="6" class="check" v-model="params.p_rdioCKb" @change="rdioCKb_EditValueChanged"><span class="name"> {{ Text.rdioCKb_3 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <DataGrid
+                    v-show="row2"
+                    v-bind:columns="[
+                    { fieldName: '', visible: Visible.grcHuy ,headerText: 'Hủy', width: '40px', allowFiltering: false, textAlign: 'Left', width: 70, template: btnHuyGiao},
+                    { fieldName: 'MA_HS_CC', headerText: 'Mã HSCC', allowFiltering: true, textAlign: 'Left', isGroupedColumn: true, },
+                    { fieldName: 'LOAI_TBI', headerText: 'Loại thiết bị', allowFiltering: true, textAlign: 'Left', },
+                    { fieldName: 'TEN_TBI', headerText: 'Tên thiết bị', allowFiltering: true, textAlign: 'Left', },
+                    { fieldName: 'TEN_HS', headerText: 'Tên HSCC', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'NGAY_YC', headerText: 'Ngày YC', type: 'date', format: 'dd/MM/yyyy',allowFiltering: true, textAlign: 'Right'},
+                    { fieldName: 'NGAY_HT', headerText: 'Ngày HT', type: 'date', format: 'dd/MM/yyyy',allowFiltering: true, textAlign: 'Right'},
+                    { fieldName: 'TRANGTHAI_CC', headerText: 'Trạng thái CC', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'NV_YC', headerText: 'Người YC', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'SO_DT', headerText: 'Số ĐT', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'TEN_YC', headerText: 'Đơn vị YC', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'NV_GIAO', headerText: 'Nhân viên giao', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'DV_GIAO', headerText: 'Đơn vị giao', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'ND_GIAO', headerText: 'Nội dung giao', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'NGAYTRA_CON', headerText: 'Ngày trả', allowFiltering: true, textAlign: 'Left'},
+                    { fieldName: 'ND_TRA_CON', headerText: 'Nội dung trả', allowFiltering: true, textAlign: 'Left'},
+                    ]"
+                    v-bind:dataSource="gridDanhSach"
+                    ref="gridviewDanhSach"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enabledSelectFirstRow="false"
+                    @selectedRowChanged="gridviewDanhSach_FocusedRowChanged_sender"
+                    >
+                </DataGrid>
+            </div>
+        </div>
+        
+        <!-- 3. Danh sách hồ sơ Cải tạo/bảo dưỡng -->
+        <div class="m-0">
+            <div class="row">
+                <div class="col-md-6 card mt-2">
+                    <div class="pt-2 legend-title d-flex align-items-center justify-content-between" >
+                        <span>Danh sách vật tư đã cấp cho Phần tử mạng</span>
+                        <button class="btn btn-main" @click="v_btnRef_MouseClick">
+                            <span class="one-refresh"></span>
+                        </button>
+                    </div>
+                    <div>
+                        <DataGrid
+                            style="position: relative;"
+                            v-bind:columns="[
+                            { fieldName: '', headerText: 'Xóa', allowFiltering: false, allowSorting: false, width: 70, freeze: 'Left', template: btnXoaLSVT },
+                            { fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'SERIAL', headerText: 'Serial', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'SERIAL_GP', headerText: 'Serial GP', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'MA_TBI', headerText: 'Mã Tbị', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'MOTA', headerText: 'Mô tả', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'KIEU_TBI', headerText: 'Kiểu T.Bị', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'STATUS', headerText: 'Trạng thái', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'TT_TBI', headerText: 'Tinh trạng Tbị', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'TRANGBI', headerText: 'Kiểu trang bị', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'MUCDICH', headerText: 'Mục đích cấp', allowFiltering: true, textAlign: 'Left'},
+                            { fieldName: 'KHOCAP', headerText: 'Kho cấp', allowFiltering: true, textAlign: 'Left'},
+                            ]"
+                            v-bind:dataSource="gridLichSuVatTu"
+                            ref="gridViewLichSuVatTu"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            @selectedRowChanged="gridViewLichSuVatTu_FocusedRowChanged"
+                            @recordClick="MOTA_XEMANH_Click"
+                            >
+                        </DataGrid>
+                        
+                        <ejs-dialog
+                            :visible='false'
+                            ref="popup_XemAnh"
+                            :animationSettings="{ effect: 'Zoom' }"
+                            :showCloseIcon=true 
+                            :closeOnEscape='true'
+                            :enableResize='true'
+                            :allowDragging='true'
+                            width='50%'
+                            height='60%'
+                            :isModal='true'
+                            :cssClass="'popup-box'"
+                            :zIndex="999"
+                            >
+                            <FormAnhChup ref="formAnhChup" ></FormAnhChup>
+                        </ejs-dialog>
+                    </div>
+                    
+                    
+                </div>
+                <div class="col-md-6 card mt-2">
+                    <div class="pt-2 legend-title d-flex align-items-center justify-content-between" >
+                        <span v-if="Visible.xtraTabPage1">Danh sách vật tư trong kho</span>
+                        <span v-if="Visible.xtraTabPage2">Danh sách vật tư phần tử mạng sử dụng</span>
+                        <div class="check-action pl-4" v-show="Visible.ckbLocVT">
+                            <input type="checkbox" class="check" v-model="params.p_ckbLocVT" @change="ckbLocVT_CheckedChanged">
+                            <span class="name">Chưa dùng</span>
+                        </div>
+                        <div class="d-flex flex-grow-1 pl-4">
+                            <button class="btn btn-main" @click="vbtnRefresh_MouseClick">
+                                <span class="one-refresh">Serial</span>
+                            </button>
+                            <input ref="txtSerial" type="text" class="ml-3 form-control" v-model="params.p_txtSerial">
+                        </div>
+                        
+                    </div>
+                    <DataGrid
+                        v-show="Visible.xtraTabPage1"
+                        v-bind:columns="[
+                        { fieldName: 'TEN_VT', headerText: 'Tên thiết bị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SL_TON', headerText: 'Số lượng', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'ISCHECK', type: 'checkbox', width: '60px', },
+                        { fieldName: 'LUONGCAP', headerText: 'SL Cấp', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SL_KD', headerText: 'SL KD', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'MA_TBI', headerText: 'Mã T.Bị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SERIAL', headerText: 'Serial', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SERIAL_GP', headerText: 'Serial GP', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'TIEN', headerText: 'Thành tiền', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'TINHTRANG_TBI', headerText: 'Tình trạng T.Bị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SO_PHIEU', headerText: 'Số phiếu', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'CHATLUONG', headerText: 'Chất lượng', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'NGAY_CT', headerText: 'Ngày chuyển', allowFiltering: true, textAlign: 'Left', freeze: 'Right' },
+                        ]"
+                        v-bind:dataSource="grcDS_VT_Giao"
+                        ref="grvDS_VT_Giao"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        @selectedRowChanged="grvDS_VT_Giao_FocusedRowChanged"
+                        >
+                    </DataGrid>
+                    <DataGrid
+                        v-show="Visible.xtraTabPage2"
+                        v-bind:columns="[
+                        { fieldName: '', headerText: '', allowFiltering: true, textAlign: 'Left', freeze: 'Left', width: 70, template: btnThuHoi },
+                        { fieldName: 'TEN_VT_NEW', headerText: 'Thiết bị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SERIAL', headerText: 'Seri', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'MA_TBI', headerText: 'Mã T.Bị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'KIEU_TBI', headerText: 'Kiểu tbị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'TINHTRANG_TBI', headerText: 'Tỉnh trạng', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'TENTRANGBI', headerText: 'Trang bị', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: 'NGAY_SD', headerText: 'Ngày cấp', allowFiltering: true, textAlign: 'Left' },
+                        { fieldName: '', headerText: 'Sửa', allowFiltering: true, textAlign: 'Left', freeze: 'Right', width: 70, template: btnEdit },
+                        ]"
+                        v-bind:dataSource="gridVatTuSD"
+                        ref="gridViewVatTuSD"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        @selectedRowChanged="gridViewVatTuSD_FocusedRowChanged"
+                        >
+                    </DataGrid>
+                    <!-- <div class="nav tabs tab-over">
+                        <a href="#tab1" data-toggle="tab" class="active">Danh sách vật tư trong kho</a>
+                        <a href="#tab2" data-toggle="tab" >Danh sách vật tư phần tử mạng sử dụng</a>
+                    </div>
+                    <div class="tab-content box-form">
+                        <div id="tab1" class="tab-pane active">
+                            
+                        </div>
+                        <div id="tab2" class="tab-pane">
+                            
+                        </div>
+                    </div> -->
+                    
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</div>
+    

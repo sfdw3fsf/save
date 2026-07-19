@@ -1,0 +1,378 @@
+<b-modal
+  size="xl"
+  no-close-on-backdrop
+  hide-footer
+  hide-header
+  hide-header-close
+  body-class="modal-body p-0"
+  @shown="onShownModal"
+  @hidden="onHiddenModal"
+  :id="id"
+  :key="key"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title"><span class="icon one-notepad"></span> Đấu nối cáp</div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide(id)">
+      </div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="javascript:void(0)" @click="btnDauNoi">
+            <span class="icon one-connect"></span> Đấu nối
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" @click="btnNapLai">
+            <span class="icon one-file-refresh"></span> Nạp lại
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" @click="btnGoDauNoi">
+            <span class="icon fa fa-close"></span> Gỡ ĐN
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="grid-stack-box">
+        <Split :gutterSize="16">
+          <SplitArea v-show="isShowLayout1" :size="split1Size" :minSize="100">
+            <div class="box-col box-form" id="boxLeft">
+              <div class="legend-title">{{ lblNguon }}</div>
+<!--              <div class="select-custom">-->
+<!--                <select v-model="cboNguonDn" name="" class="form-control">-->
+<!--                  <option v-for="item in this.dsNguonDn" :value="item.ID"> {{item.MOTA}}</option>-->
+<!--                </select>-->
+<!--              </div>-->
+              <div class="select-custom" ref="cboNguonDn">
+                <SelectExt
+                  v-model.trim="cboNguonDn"
+                  :settings="{dropdownParent: $refs['cboNguonDn']}"
+                  :dataSource="dsNguonDn"
+                  dataTextField="MOTA"
+                  dataValueField="ID"/>
+              </div>
+              <div class="legend-title mart20">{{ lblThietBiNguon }}</div>
+              <div class="input-icon-left">
+<!--                <span class="icon nc-icon-glyph files_single-content-02 text-main"></span>-->
+                <div class="select-custom">
+<!--                  <ejs-dropdowntree id="thietbiNTree"-->
+<!--                                    :key="1"-->
+<!--                                    ref="thietbiNTree"-->
+<!--                                    :value="cboThietBiNguon"-->
+<!--                                    v-on:select='this.onchangeThietBiN'-->
+<!--                                    :fields='this.fieldsThietBiN'-->
+<!--                                    cssClass="dropdowntree-icons">-->
+<!--                  </ejs-dropdowntree>-->
+                  <treeselect
+                    ref="ref-thietbiNTree"
+                    v-model="cboThietBiNguon"
+                    :multiple="false"
+                    :flat="true"
+                    :options="dsThietBiNguon"
+                    :searchable="true"
+                    :clearable="false"
+                    :disableFuzzyMatching="true"
+                    noOptionsText="Không có dữ liệu"
+                    noResultsText="Không có dữ liệu"
+                    placeholder="">
+                    <label slot="option-label" slot-scope="{ node, labelClassName }" :class="labelClassName">
+                      <div>
+                        <img :src="node.raw.img" style="padding-right: 10px"/>
+                        <span :title="node.label">{{node.label}}</span>
+                        <div v-html="node.raw.GHICHU"></div>
+                      </div>
+                    </label>
+                  </treeselect>
+                </div>
+              </div>
+              <div class="legend-title mart20">{{ lblViTriNguon }}</div>
+              <div class="box-move-select-table">
+                <div class="box-col" style="width: calc(100% - 50px);">
+                  <div class="table-content" style="height: 150px; overflow: scroll; border: 1px solid lightgray;">
+                    <table class="table-result table-gachle">
+                      <tbody v-for="item in this.dsViTriNguon">
+                      <tr>
+                        <td class="w20 center">
+                          <div class="check-action">
+                            <input v-model="vitriNChecked" type="checkbox" class="check" :value="item.ID">
+                            <span class="name"></span>
+                          </div>
+                        </td>
+                        <td>{{item.ID}}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="actions block padt0">
+                  <button class="btn" @click="btnViTriNDauNoi">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                  </button>
+                  <button class="btn" @click="btnViTriNGoDauNoi">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="legend-title mart20">Đấu nối nhanh</div>
+              <div class="form-group">
+                <div class="label-text marb5">Vị trí từ -&gt; đến</div>
+                <div class="info-row">
+                  <div class="value padl0">
+                    <input v-model="txtTuViTriNguon" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtTuViTriNguon">
+                  </div>
+                  <div class="value w20 padl10 padr10">
+<!--                    <button class="btn">-->
+                      <span class="-ap icon-arrow-right3"></span>
+<!--                    </button>-->
+                  </div>
+                  <div class="value padl0">
+                    <input v-model="txtDenViTriNguon" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtDenViTriNguon">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="label-text marb5">Sợi cáp từ -&gt; đến</div>
+                <div class="info-row">
+                  <div class="value padl0">
+                    <input v-model="txtTuSoiCapNguon" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtTuSoiCapNguon">
+                  </div>
+                  <div class="value w20 padl10 padr10">
+<!--                    <button class="btn">-->
+                      <span class="-ap icon-arrow-right3"></span>
+<!--                    </button>-->
+                  </div>
+                  <div class="value padl0">
+                    <input v-model="txtDenSoiCapNguon" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtDenSoiCapNguon">
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-main fullw" @click="btnDauNoiNhanhNguon">Xác nhận</button>
+            </div>
+          </SplitArea>
+          <SplitArea :size="split2Size" :minSize="500">
+            <div class="box-col box-form" id="boxMid">
+              <div class="row">
+                <div class="col-sm-8 col-12">
+                  <div class="info-row">
+                    <div class="key w40">Cáp</div>
+                    <div class="value">
+<!--                      <div class="select-custom">-->
+<!--                        <select v-model="cboCap" name="" class="form-control">-->
+<!--                          <option v-for="item in this.dsCap" :value="item.ID"> {{item.MOTA}}</option>-->
+<!--                        </select>-->
+<!--                      </div>-->
+                      <div class="select-custom" ref="cboCap">
+                        <SelectExt
+                          v-model.trim="cboCap"
+                          :settings="{dropdownParent: $refs['cboCap']}"
+                          :dataSource="dsCap"
+                          @change="cboCap_EditValueChanged"
+                          dataTextField="MOTA"
+                          dataValueField="ID"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w70">Mid-Span</div>
+                    <div class="value">
+<!--                      <div class="select-custom">-->
+<!--                        <select v-model="cboMidspan" name="" class="form-control">-->
+<!--                          <option v-for="item in this.dsMidspan" :value="item.ID">{{item.MOTA}}</option>-->
+<!--                        </select>-->
+<!--                      </div>-->
+                      <div class="select-custom" ref="cboMidspan">
+                        <SelectExt
+                          v-model.trim="cboMidspan"
+                          :settings="{dropdownParent: $refs['cboMidspan']}"
+                          :dataSource="dsMidspan"
+                          @change="cboMidSpan_EditValueChanged"
+                          dataTextField="MOTA"
+                          dataValueField="ID"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-content">
+                <DataGrid v-if="show"
+                          :key="3"
+                          ref='grid' :dataSource="this.dsDauNoiCap" panelDataHeight="440px"
+                          :allowSelection="true"
+                          :selectionSettings='selectionOptions'
+                          :allowSorting='true' :enableHover='true'
+                          :allowFiltering='true'
+                          :allowPaging='false' :enablePagingServer="false"
+                          @commandClick="this.commandTTClick"
+                          @rowSelected="dauNoiCapRowSelected($event)"
+                          @rowSelecting="dauNoiCapRowSelecting($event)"
+                          @rowDeselected="dauNoiCapRowDeselected($event)"
+                          @rowDataBound="dauNoiCapRowDataBound($event)"
+                          :enabledSelectFirstRow="false"
+                          v-bind:columns="[
+                            {headerText:'Thiết bị nguồn', columns:thietbiNguonColumns, textAlign:'Center'},
+                            {headerText:'Cáp', columns:capColumns, width:'15%', textAlign:'Center'},
+                            {headerText:'Thiết bị đích', columns:thietbiDichColumns, textAlign:'Center'},
+                            {headerText:'Chức năng', width:'25%', headerAlign:'Center',textAlign:'Center', commands:commandChucNang}
+                          ]"
+                ></DataGrid>
+<!--                <ejs-grid v-if="show"-->
+<!--                  ref='grid' :dataSource="this.dsDauNoiCap" height='400px' gridLines='Both' :allowScrolling='true'-->
+<!--                  :allowTextWrap='true'  :selectionSettings='selectionOptions'-->
+<!--                  :allowSorting='true' :enableHover='true'-->
+<!--                  :allowFiltering='true' :filterSettings='this.filterOptions'-->
+<!--                  :allowPaging='true' :pageSettings='this.pageSettings'-->
+<!--                  :commandClick="this.commandTTClick"-->
+<!--                  :rowSelected="this.dauNoiCapRowSelected" :rowDeselected="this.dauNoiCapRowDeselected"-->
+<!--                >-->
+<!--                  <e-columns>-->
+<!--                    <e-column field='' headerText='' width="10"></e-column>-->
+<!--                    <e-column headerText='Thiết bị nguồn' :columns='thietbiNguonColumns' textAlign='Center'></e-column>-->
+<!--                    <e-column headerText='Cáp' :columns='capColumns' width='15%' textAlign='Center'></e-column>-->
+<!--                    <e-column headerText='Thiết bị đích':columns='thietbiDichColumns' textAlign='Center'></e-column>-->
+<!--                    <e-column headerText='Chức năng' width='25%' textAlign='Center' :commands="commandChucNang"></e-column>-->
+<!--                  </e-columns>-->
+<!--                </ejs-grid>-->
+                <div class="head-bottom">
+                  <div class="pull-right change-layout">
+                    <a :class="layout1"  title="Chỉ hiển thị mặt trước" @click="btnLayout1">
+                      <span class="one-layout1"></span>
+                    </a>
+                    <a  :class="layout2" title="Hiện cả hai mặt" @click="btnLayout2">
+                      <span class="one-layout2"></span>
+                    </a>
+                    <a :class="layout3" title="Chỉ hiển thị mặt sau" @click="btnLayout3">
+                      <span class="one-layout3"></span>
+                    </a>
+                  </div>
+                  <div class="clearfi"></div>
+                </div>
+              </div>
+
+            </div>
+          </SplitArea>
+          <SplitArea v-show="isShowLayout3" :size="split3Size" :minSize="100">
+            <div class="box-col box-form" id="boxRight">
+              <div class="legend-title">{{lblDich}}</div>
+<!--              <div class="select-custom">-->
+<!--                <select v-model="cboDichDn" name="" class="form-control">-->
+<!--                  <option v-for="item in this.dsDichDn" :value="item.ID">{{item.MOTA}}</option>-->
+<!--                </select>-->
+<!--              </div>-->
+              <div class="select-custom" ref="cboDichDn">
+                <SelectExt
+                  v-model.trim="cboDichDn"
+                  :settings="{dropdownParent: $refs['cboDichDn']}"
+                  :dataSource="dsDichDn"
+                  dataTextField="MOTA"
+                  dataValueField="ID"/>
+              </div>
+              <div class="legend-title mart20">{{ lblThietBiDich }}</div>
+              <div class="input-icon-left">
+<!--                <span class="icon nc-icon-glyph files_single-content-02 text-main"></span>-->
+                <div class="select-custom">
+<!--                  <ejs-dropdowntree id="thietbiDTree"-->
+<!--                                    :key="2"-->
+<!--                                    ref="thietbiDTree"-->
+<!--                                    :value="cboThietBiDich"-->
+<!--                                    v-on:select='this.onchangeThietBiD'-->
+<!--                                    :fields='this.fieldsThietBiD'-->
+<!--                                    cssClass="dropdowntree-icons">-->
+<!--                  </ejs-dropdowntree>-->
+                  <treeselect
+                    ref="ref-thietbiDTree"
+                    v-model="cboThietBiDich"
+                    :multiple="false"
+                    :flat="true"
+                    :options="dsThietBiDich"
+                    :searchable="true"
+                    :clearable="false"
+                    :disableFuzzyMatching="true"
+                    noOptionsText="Không có dữ liệu"
+                    noResultsText="Không có dữ liệu"
+                    placeholder="">
+                    <label slot="option-label" slot-scope="{ node, labelClassName }" :class="labelClassName">
+                      <div>
+                        <img :src="node.raw.img" style="padding-right: 10px"/>
+                        <span :title="node.label">{{node.label}}</span>
+                        <div v-html="node.raw.GHICHU"></div>
+                      </div>
+                    </label>
+                  </treeselect>
+                </div>
+              </div>
+              <div class="legend-title mart20">{{ lblViTriDich }}</div>
+              <div class="box-move-select-table">
+                <div class="actions block padt0">
+                  <button class="btn" @click="btnViTriDDauNoi">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                  </button>
+                  <button class="btn" @click="btnViTriDGoDauNoi">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                  </button>
+                </div>
+                <div class="box-col" style="width: calc(100% - 50px);">
+                  <div class="table-content" style="height: 150px; overflow: scroll; border: 1px solid lightgray;">
+                    <table class="table-result table-gachle">
+                      <tbody v-for="item in this.dsViTriDich">
+                        <tr>
+                          <td class="w20 center">
+                            <div class="check-action">
+                              <input v-model="vitriDChecked" type="checkbox" class="check" :value="item.ID">
+                              <span class="name"></span>
+                            </div>
+                          </td>
+                          <td>{{item.ID}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+              <div class="legend-title mart20">Đấu nối nhanh</div>
+              <div class="form-group">
+                <div class="label-text marb5">Vị trí từ -&gt; đến</div>
+                <div class="info-row">
+                  <div class="value padl0">
+                    <input v-model="txtTuViTriDich" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtTuViTriDich">
+                  </div>
+                  <div class="value w20 padl10 padr10">
+<!--                    <button class="btn">-->
+                      <span class="-ap icon-arrow-right3"></span>
+<!--                    </button>-->
+                  </div>
+                  <div class="value padl0">
+                    <input v-model="txtDenViTriDich" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtDenViTriDich">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="label-text marb5">Sợi cáp từ -&gt; đến</div>
+                <div class="info-row">
+                  <div class="value padl0">
+                    <input v-model="txtTuSoiCapDich" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtTuSoiCapDich">
+                  </div>
+                  <div class="value w20 padl10 padr10">
+<!--                    <button class="btn">-->
+                      <span class="-ap icon-arrow-right3"></span>
+<!--                    </button>-->
+                  </div>
+                  <div class="value padl0">
+                    <input v-model="txtDenSoiCapDich" type="number" min="0" class="form-control" v-on:keyup.delete="eventTxtDenSoiCapDich">
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-main fullw" @click="btnDauNoiNhanhDich">Xác nhận</button>
+            </div>
+          </SplitArea>
+        </Split>
+      </div>
+    </div>
+  </div>
+  <TraCuuDanDoCap id="popupTraCuuDanDoCap" :capTraCuuObject="capTraCuuObject"></TraCuuDanDoCap>
+</b-modal>

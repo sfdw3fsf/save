@@ -1,0 +1,2 @@
+import ProvideDevices4GforSubscribers from './ProvideDevices4GforSubscribers.vue'
+export default ProvideDevices4GforSubscribers

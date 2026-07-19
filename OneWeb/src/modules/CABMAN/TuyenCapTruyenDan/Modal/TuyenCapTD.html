@@ -1,0 +1,327 @@
+<b-modal
+  :id="modalId"
+  size="xl"
+  no-close-on-backdrop
+  hide-footer
+  hide-header
+  hide-header-close
+  ref="ref-modal"
+  @shown="focusMyElement"
+  @hidden="hiddenModal"
+  modal-class="modal-fullscreen"
+  body-class="modal-body p-0">
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span> Quản lý tuyến cáp truyền dẫn
+      </div>
+      <div
+        class="close -ap icon-close"
+        data-dismiss="modal"
+        @click="$refs['ref-modal'].hide()"
+      ></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a
+            href="javascript:void(0)"
+            @click="nhapMoi()"
+            :class="{'disable-btn': isDisableBtnNhapMoi}">
+            <span class="icon one-file-plus"></span> Nhập mới
+          </a>
+        </li>
+        <li>
+          <a
+            href="javascript:void(0)"
+            @click="ghiLaiTuyenCap()"
+            :class="{'disable-btn': isDisableBtnGhiLai}">
+            <span class="icon one-save"></span> Ghi lại (F9)
+          </a>
+        </li>
+        <li>
+          <a
+            href="javascript:void(0)"
+            @click="huyBo()"
+            :class="{'disable-btn': isDisableBtnHuy}">
+            <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+          </a>
+        </li>
+        <li>
+          <a
+            href="javascript:void(0)"
+            @click="xoaTuyenCap()"
+            :class="{'disable-btn': isDisableBtnXoa}">
+            <span class="icon one-trash"></span> Xóa
+          </a>
+        </li>
+        <li>
+          <a
+            href="javascript:void(0)"
+            @click="$root.toastSuccess('Hướng dẫn sử dụng')">
+            <span class="icon one-book1"></span>Hướng dẫn
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="row">
+        <Split>
+          <SplitArea :size="30" :minSize="100">
+            <div class="box-form">
+              <div class="legend-title">Thuộc tính tuyến cáp</div>
+              <div class="table-content" style="height: 160px;">
+                <table class="table-result tree-grid-2">
+                  <tbody>
+                    <tr class="tree-open highlight">
+                      <td colspan="3" class="tree-name nowrap fw6">
+                        <div class="tree-arrow" @click="cate.dinhdanh++"></div>
+                        Định danh
+                      </td>
+                    </tr>
+                    <tr v-show="cate.dinhdanh%2==0">
+                      <td class="tree-first bg-white" >
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td>Id tuyến cáp <span style="color: red;">*</span></td>
+                      <td>
+                        <span class="text-main">{{tuyenCap.tuyencap_id}}</span>
+                      </td>
+                    </tr>
+                    <tr v-show="cate.dinhdanh%2==0">
+                      <td class="tree-first bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td>Mã tuyến cáp <span style="color: red;">*</span></td>
+                      <td>
+                        <input
+                        type="text"
+                        :class="{ 'is-invalid': $v.tuyenCap.ma_tc.$error}"
+                        v-model="tuyenCap.ma_tc"
+                        class="form-control"/> 
+                      </td>
+                    </tr>
+                    <tr v-show="cate.dinhdanh%2==0">
+                      <td class="tree-first bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td>
+                        Tên tuyến cáp <span style="color: red;">*</span>
+                      </td>
+                      <td>
+                        <input
+                        type="text"
+                        :class="{ 'is-invalid': $v.tuyenCap.tuyen_cap.$error}"
+                        v-model="tuyenCap.tuyen_cap"
+                        class="form-control"/>                                  
+                      </td>
+                    </tr>
+                    <tr v-show="cate.dinhdanh%2==0">
+                      <td class="tree-first bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td>Ghi chú</td>
+                      <td>
+                        <input
+                          type="text"
+                          v-model="tuyenCap.ghichu"
+                          class="form-control"
+                        />
+                      </td>
+                    </tr>
+                    <tr class="tree-open highlight">
+                      <td colspan="3" class="tree-name nowrap fw6">
+                        <div class="tree-arrow" @click="cate.quanly++"></div>
+                        Quản lý 
+                      </td>
+                    </tr>
+                    <tr v-show="cate.quanly%2==0">
+                      <td class="tree-first bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td>
+                        Đơn vị quản lý
+                      </td>
+                      <td>
+                        <div class="select-custom">
+                          <SelectExt
+                            v-model="tuyenCap.donvi_id"
+                            :dataSource="dsTTVT"
+                            dataTextField="TEN_DV"
+                            dataValueField="DONVI_ID"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="cate.quanly%2==0"> 
+                      <td class="tree-first bg-white last">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="legend-title mart20">Danh sách tuyến cáp</div>
+              <div class="form-group">
+                <input
+                  type="text"
+                  v-model="chuoiTimKiem"
+                  @keydown="timkiem_keydown($event)"
+                  placeholder="Nhập tên/ký hiệu cáp để tra cứu"
+                  class="form-control highlight"
+                />
+              </div>
+              <div>
+                <div class="table-content">
+                 <DataGrid ref="grid-tuyencap" v-bind:columns="[
+                 {fieldName: 'MA_TC', headerText: 'Mã tuyến', allowFiltering: true,freeze:'Left'},
+                 {fieldName: 'TUYEN_CAP', headerText: 'Tên tuyến', allowFiltering: true},
+                 {fieldName: 'TEN_DV', headerText: 'Đơn vị quản lý', allowFiltering: true},
+                  ]"
+                  v-bind:dataSource="dsTuyenCap" 
+                  :showFilter=true
+                  :allowPaging=true
+                  :totalRecords='totalRow_dsTuyen'
+                  @pageChanged='dsTuyen_PageChanged'
+                  :enablePagingServer=false
+                   @selectedRowChanged="tuyencap_selectedRowChanged"></DataGrid>                  
+                </div>                
+            </div>
+            </div>
+          </SplitArea>
+          <SplitArea :size="70" :minSize="300">
+ 
+            <div class="box-move-select-table">
+              <div
+                class="box-col box-form"
+                style="height: 700px;width: calc(100% - 500px);">             
+                <div class="legend-title">Danh sách cáp trên tuyến</div>
+                <div class="table-content">  
+                    <DataGrid ref="grid-captrentuyen" v-bind:columns="[
+                 {fieldName: 'KYHIEU', headerText: 'Tên cáp', allowFiltering: true,freeze:'Left'},
+                 {fieldName: 'TEN_DV', headerText: 'Đơn vị quản lý', allowFiltering: true},
+                 {fieldName: 'SODOIDAY', headerText: 'Dung lượng', allowFiltering: true},
+                 {fieldName: 'DIEMDAU', headerText: 'Điểm đầu', allowFiltering: true},
+                 {fieldName: 'DIACHI_DAU', headerText: 'Địa chỉ đầu', allowFiltering: true},
+                 {fieldName: 'DIEMCUOI', headerText: 'Điểm cuối', allowFiltering: true},
+                 {fieldName: 'DIACHI_CUOI', headerText: 'Địa chỉ cuối', allowFiltering: true},
+                 {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                 {fieldName: 'ODFNGUON', headerText: 'ODF nguồn', allowFiltering: true},
+                 {fieldName: 'ODFDICH', headerText: 'ODF đích', allowFiltering: true},
+                  ]"
+                  v-bind:dataSource="dsCapTrenTuyen" :showColumnCheckbox='true'
+                   dataKeyField='CAP_ID' :showFilter=true
+                   @pageChanged='captrentuyen_PageChanged'
+                   :totalRecords='totalRow_captrentuyen'
+                   :allowPaging=true
+                   :enabledSelectFirstRow="false"
+                   :enablePagingServer=false
+                  @selectedItemsChanged="captrentuyen_selectedCheckbox"></DataGrid>                    
+                </div>               
+              </div>
+
+              <div class="actions">
+                <button class="btn" @click="goKhoiTuyen()">
+                  <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button class="btn" @click="ganVaoTuyen()">
+                  <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+              </div>
+              <div class="box-col" style="width: 400px;height: 700px;">
+                <div class="tabs nav tab-over">
+                  <a
+                    href="#tab1"
+                    style="min-width: 195px;"
+                    class="active"
+                    data-toggle="tab"
+                    @click="tabIndex=1">Gán cáp vào tuyến</a>
+                  <a
+                    href="#tab2"
+                    style="min-width: 195px;"
+                    data-toggle="tab"
+                    @click="tabIndex=2">Gán đơn vị quản lý cáp</a>
+                </div>
+                <div class="tab-content" >
+                  <div id="tab1" class="tab-pane active">
+                    <div class="legend-title">Danh sách cáp chưa gán</div>
+                    <div class="table-content">      
+                        <DataGrid ref="grid-capchuagan" v-bind:columns="[
+                        {fieldName: 'KYHIEU', headerText: 'Tên cáp', allowFiltering: true,freeze:'Left'},
+                        {fieldName: 'TEN_DV', headerText: 'Đơn vị quản lý', allowFiltering: true},
+                        {fieldName: 'SODOIDAY', headerText: 'Dung lượng', allowFiltering: true},
+                        {fieldName: 'DIEMDAU', headerText: 'Điểm đầu', allowFiltering: true},
+                        {fieldName: 'DIACHI_DAU', headerText: 'Địa chỉ đầu', allowFiltering: true},
+                        {fieldName: 'DIEMCUOI', headerText: 'Điểm cuối', allowFiltering: true},
+                        {fieldName: 'DIACHI_CUOI', headerText: 'Địa chỉ cuối', allowFiltering: true},
+                        {fieldName: 'TTVT', headerText: 'Trung tâm', allowFiltering: true},
+                        {fieldName: 'TOKT', headerText: 'Tổ', allowFiltering: true},
+                        {fieldName: 'TRAM', headerText: 'Trạm', allowFiltering: true},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                        {fieldName: 'ODFNGUON', headerText: 'ODF nguồn', allowFiltering: true},
+                        {fieldName: 'ODFDICH', headerText: 'ODF đích', allowFiltering: true},
+                         ]"
+
+                        v-bind:dataSource="dsCapChuaGan" :showColumnCheckbox='true'
+                         dataKeyField='CAP_ID' :showFilter="true"
+                          @selectedItemsChanged="capchuagan_selectedCheckbox"
+                          @pageChanged='capchuagan_PageChanged'
+                          :totalRecords='totalRow_capchuagan'
+                          :allowPaging=true
+                          :enabledSelectFirstRow="false"
+                         :enablePagingServer=false></DataGrid>                        
+                    </div>
+                   
+                  </div>
+                  <div id="tab2" class="tab-pane">
+                    <div class="legend-title">Đơn vị quản lý</div>
+                    <div class="table-content" style="height: 387px;">                    
+                      <DataGrid
+                        id="grid_toKT"
+                        ref="grid_toKT"
+                        v-bind:columns="[                  
+                                            {fieldName: 'TEN_DV', headerText: 'Tổ kỹ thuật', allowFiltering: true}
+                                            ]"
+                        v-bind:dataSource="dsToKyThuat"
+                        @selectedRowChanged="toKT_selectedRowChanged"
+                        :showFilter="true"
+                      ></DataGrid>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </SplitArea>
+        </Split>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <b-modal
+    ref="modalXoa"
+    v-model="modalXoa"
+    title="Thông báo"
+    size="sm"
+    @ok="xacNhanXoa">
+    <div class="d-block text-center">
+      <span>Bạn có thực sự muốn xóa tuyến cáp này không?</span>
+    </div>
+    <template #modal-footer="{ ok, cancel }">
+      <b-button
+        variant="secondary"
+        style="color: white"
+        @click="$refs['modalXoa'].hide()">Hủy</b-button>
+      <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button
+      >
+    </template>
+  </b-modal>
+</b-modal>

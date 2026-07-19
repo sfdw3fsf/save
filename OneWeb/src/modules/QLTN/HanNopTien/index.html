@@ -1,0 +1,225 @@
+<div >
+    
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="init">
+                    <span class="icon one-reload1"></span> Làm tươi (F5)
+                </a>
+            </li>
+            <li :class="isShowSearch ? 'active' : ''">
+                <a href="#" @click.prevent="isShowSearch=!isShowSearch">
+                    <span class="icon one-search"></span> Tìm kiếm (Ctrl + F)
+                </a>
+            </li>
+            <li>
+                <a href="#" @click="clickButton('xemct')">
+                    <span class="icon one-download"></span> Xem CT (F2)
+                </a>
+            </li>
+            <li>
+                <a href="#" @click="clickButton('thulai')">
+                    <span class="icon nc-icon-glyph arrows-1_simple-left"></span> Thu lại (F3)
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="onClickAddNew">
+                    <span class="icon one-file-plus"></span> Nhập mới (F4)
+                </a>
+            </li>
+            <li :class="isAddNew ? '' : 'disabled'">
+                <a href="#" @click.prevent="onClickSave">
+                    <span class="icon one-save"></span> Ghi lại (F9)
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-3 col-12">
+                <div class="box-form" v-show="isShowSearch">
+                    <div class="legend-title">Lọc thông tin đối tượng sử dụng</div>
+                    <div class="info-row">
+                        <div class="key w90">Mã quản lý</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <div class="input-text">
+                                    <input type="text" v-model="txtMaQuanLy" class="form-control" v-on:keyup.enter="searchDonVi">
+                                </div>
+                                <div class="input-addon">
+                                    <button class="btn">
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Tên quản lý</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <div class="input-text">
+                                    <input type="text" v-model="txtTenQuanLy" class="form-control" v-on:keyup.enter="searchDonVi">
+                                </div>
+                                <div class="input-addon">
+                                    <button class="btn">
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Danh sách đối tượng
+                        </div>
+                        <div class="pull-right">
+                            <div class="check-action red">
+                                <input type="checkbox" v-model="ckbChonNhanh"  class="check">
+                                <span class="name">Chọn nhanh</span>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="tree-plus tree-icon" style="height: 800px;overflow:auto;">
+                    
+                            <div class="tree-plus tree-icon" style="overflow: auto">
+                              <ejs-treeview
+                                id="treeviewGan"
+                                ref="treeObjGan"
+                                :fields="fields"
+                                :showCheckBox="true"
+                                :allowMultiSelection="true"
+                                :search="search_dt"
+                                :nodeChecked="nodeChecked"
+                              />
+                            </div>
+                
+                
+                        <!-- <ul v-if="dataTree.length > 0">
+                            <li v-for="dt in dataTree" v-if="!dt.hasParent" class="haschild open">
+                                <a class="root">
+                                    <div class="check-action -color">
+                                        <input type="checkbox" v-bind:value="dt.DONVI_ID"
+                                            @click="onChangeTreeCb($event, dt.DONVI_ID)"
+                                            :checked="selectedId.includes(dt.DONVI_ID)">
+                                        <span class="name"></span>
+                    
+                                    </div>
+                                    <span class="name" :class="choseId == dt.DONVI_ID ? 'active' : ''"
+                                        @click="onSpanSelect(dt.DONVI_ID)">{{dt.TEN_HT}}</span>
+                                </a>
+                                <ul>
+                                    <li v-for="dt2 in dataTree" v-if="dt2.DONVI_CHA_ID == dt.DONVI_ID">
+                                        <a>
+                                            <div class="check-action -color">
+                                                <input type="checkbox" v-bind:value="dt.DONVI_ID"
+                                                    @click="onChangeTreeCb($event, dt2.DONVI_ID)"
+                                                    :checked="selectedId.includes(dt2.DONVI_ID)">
+                                                <span class="name"></span>
+                    
+                                            </div>
+                                            <span class="name"
+                                                :class="choseId == dt2.DONVI_ID
+                                                || (txtTenQL.trim() && dt2.TEN_HT.toLowerCase().includes(txtTenQL.trim().toLowerCase()))
+                                                || (txtMaQl.trim() && dt2.MA_DV.toLowerCase().includes(txtMaQl.trim().toLowerCase())) ? 'active' : ''"
+                                                @click="onSpanSelect(dt2.DONVI_ID)">{{dt2.TEN_HT}}</span>
+                                        </a>
+                                        <ul>
+                                            <li v-for="dt3 in dataTree" v-if="dt3.DONVI_CHA_ID == dt2.DONVI_ID">
+                                                <a>
+                                                    <div class="check-action -color">
+                                                        <input type="checkbox" v-bind:value="dt2.DONVI_ID"
+                                                            @click="onChangeTreeCb($event, dt3.DONVI_ID)"
+                                                            :checked="selectedId.includes(dt3.DONVI_ID)">
+                                                        <span class="name"></span>
+                    
+                                                    </div>
+                                                    <span class="name" :class="choseId == dt3.DONVI_ID ? 'active' : ''"
+                                                        @click="onSpanSelect(dt3.DONVI_ID)">{{dt3.TEN_HT}}</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul> -->
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="col-sm-9 col-12">
+                <div class="box-form">
+                    <div class="legend-title">Hạn nộp tiền</div>
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w80">Ngày hạn</div>
+                                <div class="value">
+                                    <!-- <div class="input-icon-right"> -->
+                                    <ejs-datepicker class="form-control bg-none bor0 fw6 text mt-3px"
+                                        :format="'dd/MM/yyyy'" :showClearButton="false" v-model="ngayHan" ref="ngayHan"
+                                        :enabled="isAddNew">
+                                    </ejs-datepicker>
+                                    <!-- </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav tabs tab-over">
+                    <a href="#tab1" data-toggle="tab" class="active">Danh sách hạn nộp tiền</a>
+                    <a href="#tab2" data-toggle="tab">Lịch sử hạn nộp tiền</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab1">
+                        <div class="table-content" style="height:400px;">
+                            <DataGrid :columns="[
+                            {fieldName: 'NGAY_HAN', headerText: 'Ngày hạn', allowFiltering: true, allowSorting:false},
+                            {fieldName: 'NGUOI_CHAN', headerText: 'Người chặn', allowFiltering: true, allowSorting:false},
+                            {fieldName: 'XOA', headerText: 'Xóa', allowFiltering: true, allowSorting:false, textAlign:'center',allowHtml: true, width: '40px', class:'text-center'},
+                            ]" 
+							v-bind:dataSource="dsHanNop" 
+							:showFilter="false" 
+							dataKeyField="NGAY_HAN"							
+							:allowPaging="true"
+							:totalRecords="dsHanNop.length"
+							:enablePagingServer="false"
+							>
+                            </DataGrid>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="tab2">
+                        <div class="table-content" style="height:400px;">
+                            <DataGrid :columns="[
+                            {fieldName: 'NGAY_HAN', headerText: 'Ngày hạn', allowFiltering: true, allowSorting:false},
+                            {fieldName: 'NGUOI_CHAN', headerText: 'Người chặn', allowFiltering: true, allowSorting:false},
+                            ]" v-bind:dataSource="lsHanNop" 
+							:showFilter="false" 
+							dataKeyField="NGAY_HAN"
+							:allowPaging="true"
+							:totalRecords="lsHanNop.length"
+							:enablePagingServer="false"
+							>
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal size="sm" id="notice-exist" hide-header hide-footer>
+        <p class="p-3" style="word-wrap: break-word;">
+            Bạn có thực sự muốn xóa ngày hạn đang chọn không?
+        </p>
+        <div class="text-center">
+            <button id="ok-exit" @click="closeNoticeExist(true)" class="btn btn-primary">OK</button>
+            <button class="btn btn-secondary ml-2" @click="closeNoticeExist(false)">Hủy</button>
+        </div>
+    </b-modal>
+</div>

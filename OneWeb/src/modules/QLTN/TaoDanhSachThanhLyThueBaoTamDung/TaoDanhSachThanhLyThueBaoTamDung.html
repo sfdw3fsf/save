@@ -1,0 +1,472 @@
+<div >
+
+    <div class="list-actions-top">
+        <ul class="list">
+            <li
+                v-b-tooltip.hover.right
+                title="Tạo danh sách thuê bao để thanh lý"
+            >
+                <a
+                    @click="taoDanhSachThanhLy()"
+                    href="javascript:void(0)"
+                    :class="{disabled : selectedTaoHD === '2'}"
+                >
+                    <span class="icon one-file-plus-1"></span>TẠO DS
+                </a>
+            </li>
+            <li v-b-tooltip.hover.right title="Tạo phiếu thuê bao thanh lý">
+                <a
+                    @click="taoPhieu()"
+                    href="javascript:void(0)"
+                    :class="{disabled : selectedTaoHD === '2'}"
+                >
+                    <span class="icon one-file-plus"></span>Tạo phiếu
+                </a>
+            </li>
+            <li v-b-tooltip.hover.right title="Đọc file danh sách thanh lý">
+                <a
+                    href="javascript:void(0)"
+                    @click="docFile()"
+                    :class="{disabled : selectedTaoHD === '2'}"
+                >
+                    <label for="">
+                        <span class="icon one-book"></span>Đọc file
+                    </label>
+                </a>
+                <PopupDocFilePhieuThanhLy
+                    @sendData="sendData"
+                    :dichVu="dichVu"
+                />
+            </li>
+
+            <li @click="onExcelExport()">
+                <a href="javascript:void(0)">
+                    <span class="icon one-xlsx-import"></span>Xuất Excel
+                </a>
+            </li>
+
+            <li
+                v-b-tooltip.hover.right
+                title="Xóa thuê bao khỏi dữ liệu đã tạo"
+            >
+                <a href="javascript:void(0)" @click="handleXoaThueBao()">
+                    <span class="icon one-phone-remove"></span>Xoá TB
+                </a>
+            </li>
+            <li>
+                <a
+                    @click="handleXoaHopDong()"
+                    href="javascript:void(0)"
+                    :class="{disabled : selectedTaoHD === '1'}"
+                >
+                    <span class="icon one-trash"></span>Xóa HĐ
+                </a>
+            </li>
+            <li>
+                <a
+                @click="onGiaoPhieu"
+                href="javascript:void(0)"
+                :class="{disabled : selectedTaoHD === '1'}"
+                >
+                <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+                <b-modal ref="PopupGiaoPhieu" size="xl" body-class="p-0" scrollable hide-footer title="Giao phiếu điều hành thi công">
+                <PopupGiaoPhieu
+
+                :data = "dsGiaoPhieu"
+                >
+                </PopupGiaoPhieu>
+                </b-modal>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb5">
+            <div class="pull-right">
+                <app-ky-cuoc @handleChangeKyCuoc="handleKyCuoc"></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">
+                    Thông tin thanh lý
+                </div>
+                <div class="pull-right normal">
+                    <div class="list-checks">
+                        <div class="item">
+                            <div class="check-action">
+                                <input
+                                    type="radio"
+                                    checked
+                                    name="rd1"
+                                    class="check"
+                                    v-model="selectedTaoHD"
+                                    value="1"
+                                />
+                                <span class="name">Chưa tạo HĐ</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input
+                                    type="radio"
+                                    name="rd1"
+                                    class="check"
+                                    value="2"
+                                    v-model="selectedTaoHD"
+                                />
+                                <span class="name">Đã tạo HĐ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            Đơn vị
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    name=""
+                                    id=""
+                                    class="form-control"
+                                    v-model="selectedDonVi"
+                                >
+                                    <option value="-1">Tất cả</option>
+                                    <option
+                                        v-for="item in listDonViGetter"
+                                        :value="item.DONVI_ID"
+                                        >{{item.TEN_DV}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    ref="selectedDonVi"
+                                    :options="listDonVi"
+                                    v-model="selectedDonVi"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            Dịch vụ
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    name=""
+                                    id=""
+                                    class="form-control"
+                                    v-model="selectedDichVu"
+                                    @change="handleChangeDichVu"
+                                >
+                                    <option
+                                        v-for="item in listDichVuVTGetter"
+                                        :value="item.DICHVUVT_ID"
+                                        >{{item.TEN_DVVT}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    ref="selectedDichVu"
+                                    :options="listDichVu"
+                                    v-model="selectedDichVu"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="checkLoaiHinh"
+                                    class="check"
+                                />
+                                <span class="name">Loại hình</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <ejs-multiselect
+                                    locale="vi-VN"
+                                    selectAllText="Chọn tất cả"
+                                    unSelectAllText="Bỏ chọn tất cả"
+                                    :dataSource="listLoaiHinhTBGetter"
+                                    mode="CheckBox"
+                                    popupWidth="400"
+                                    v-model="selectedLoaiHinh"
+                                    :fields="fieldsLoaiHinh"
+                                    :enabled="checkLoaiHinh"
+                                    showSelectAll="true"
+                                    :value="selectedLoaiHinh"
+                                ></ejs-multiselect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="checkTrungTamVT"
+                                    class="check"
+                                />
+                                <span class="name">Trung tâm VT</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    name=""
+                                    id=""
+                                    class="form-control"
+                                    :disabled="!checkTrungTamVT"
+                                    v-model="selectedTrungTamVT"
+                                >
+                                    <option value="-1">Tất cả</option>
+                                    <option
+                                        v-for="item in listTrungTamVTGetter"
+                                        :value="item.DONVI_ID"
+                                        >{{item.TEN_DV}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    ref="selectedTrungTamVT"
+                                    :disabled="!checkTrungTamVT"
+                                    :options="listTrungTamVT"
+                                    v-model="selectedTrungTamVT"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="checkKieuTamDung"
+                                    class="check"
+                                />
+                                <span class="name">Kiểu tạm dừng</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    name=""
+                                    id=""
+                                    class="form-control"
+                                    :disabled="!checkKieuTamDung"
+                                    v-model="selectedKieuTamDung"
+                                >
+                                    <option
+                                        v-for="item in listDMKieuTamDungGetter"
+                                        :value="item.DICHVUGT_ID"
+                                        >{{item.TEN_DVGT}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    ref="selectedDichVu"
+                                    :options="listTamDung"
+                                    :disabled="!checkKieuTamDung"
+                                    v-model="selectedKieuTamDung"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Lý do hủy </div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="showLyDoHuy" v-show="btnLyDoHuyVisibled">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <b-modal id="modal-lydohuy" hide-footer modal-class="modal-lydohuy"
+                                    title="Chọn lý do hủy thanh lý tạm dừng thuê bao" no-close-on-backdrop size="lg">
+                                    <LyDoHuyModal :kieu="1" :loaiTbId="loaiTbId" :loaiLdId="1" :hdtbId="0" :kieuLyDoHuyLHTB="1"
+                                        @sendData="getDSLYDOHUY"></LyDoHuyModal>
+                                </b-modal>
+                        
+                                <input type="text" v-model="lyDoCat" class="form-control ">
+                        
+                            </div>
+                        
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-5 col-12">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">
+                                    <div class="check-action">
+                                        <input
+                                            type="checkbox"
+                                            v-model="checkLoaiKH"
+                                            class="check"
+                                        />
+                                        <span class="name">Loại KH</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <!-- <select
+                                            name=""
+                                            id=""
+                                            class="form-control"
+                                            :disabled="!checkLoaiKH"
+                                            v-model="selectedLoaiKhachHang"
+                                        >
+                                            <option value="-1">Tất cả</option>
+                                            <option
+                                                v-for="item in listLoaiKHGetter"
+                                                :value="item.LOAIKH_ID"
+                                                >{{item.TEN_LOAIKH}}</option
+                                            >
+                                        </select> -->
+                                        <select2
+                                            ref="selectedLoaiKhachHang"
+                                            :options="listLoaiKH"
+                                            :disabled="!checkLoaiKH"
+                                            v-model="selectedLoaiKhachHang"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">
+                                    <div class="check-action">
+                                        <input
+                                            type="checkbox"
+                                            v-model="checkKHLon"
+                                            class="check"
+                                        />
+                                        <span class="name">KH lớn</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <ejs-multiselect
+                                            :dataSource="listKHLonGetter"
+                                            mode="CheckBox"
+                                            locale="vi-VN"
+                                            selectAllText="Chọn tất cả"
+                                            unSelectAllText="Bỏ chọn tất cả"
+                                            v-model="selectedKHLon"
+                                            :fields="fieldsKHLon"
+                                            :enabled="checkKHLon"
+                                            showSelectAll="true"
+                                            :value="selectedKHLon"
+                                            id="multiselect"
+                                            popupWidth="400"
+                                            ref="mulObj"
+                                        ></ejs-multiselect>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            Từ ngày TD
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    v-model="tuNgay"
+                                    :max="config.dateConfig.max"
+                                    :format="config.dateConfig.format"
+                                    :showClearButton="false"
+                                    :value="config.dateConfig.value"
+                                    :allowEdit="false"
+                                >
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Đến ngày TD
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker
+                                        v-model="denNgay"
+                                        :max="config.dateConfig.max"
+                                        :format="config.dateConfig.format"
+                                        :showClearButton="false"
+                                        :value="config.dateConfig.value"
+                                        :allowEdit="false"
+                                    >
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w120">
+                        Ghi chú
+                    </div>
+                    <div class="value">
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="ghiChu"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách thanh lý</div>
+                    <div class="pull-right red">
+                        Tổng số: {{listThanhLyThueBaoGetter.length }} thuê bao
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content">
+                    <DataGrid3
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :columns="fieldDsThanhLy"
+                        :dataSource="listThanhLy"
+                        :showFilter="true"
+                        dataKeyField="THUEBAO_ID"
+                        :showColumnCheckbox="false"
+                        @selectedRowChanged="onPhieuThanhToanRowChange"
+                        :enabledSelectFirstRow="false"
+                    ></DataGrid3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

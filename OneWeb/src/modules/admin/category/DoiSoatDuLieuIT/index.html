@@ -1,0 +1,151 @@
+
+    <div id="doisoatdulieu_it" class="main-wrapper">
+        <KBreadCrumb :title="title" />
+        <div class="list-actions-top" >
+            <ul class="list" style="overflow: inherit !important; white-space: inherit !important;">
+                <li >
+                    <a style="cursor: pointer;" @click="btnGetData_Click"  :class="!btnGetData_Checked? '' : 'disabled'">
+                        <span class="icon one-file-attach"></span>{{lableGetData}}
+                    </a>
+                </li>
+
+                <li v-if="Role==1">
+                    <a style="cursor: pointer;" @click="btn_ImportExcel_Click">
+                        <span class="icon one-xlsx-import"></span>Import Excel
+                    </a>
+                </li>
+                <input ref="fileInput" id="file" type="file" @change="onChangeFile($event)" accept=".xls, .xlsx"  class="hidden">
+                <li>
+                    <a style="cursor: pointer;" @click="btnExportExcel_Click" :class="dataSources.length? '' : 'disabled'">
+                        <span class="icon one-excel"></span>Xuất Excel
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" title="Thống kê">
+                        <span class="icon files_single-content-02 nc-icon-glyph"></span>Thống kê
+                    </a>
+                    <ul class="dropdown-menu ui-thong-ke" >
+                        <li>
+                            <a href="javascript:void(0)" style="cursor: pointer;color: #007bff; text-decoration: none">
+                                <span class="icon nc-icon-glyph files_single-content-02"></span>Thống kê theo file
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" style="cursor: pointer;color: #007bff; text-decoration: none">
+                                <span class="icon nc-icon-glyph files_single-content-02"></span>Thống kê theo loại hình
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" style="cursor: pointer;color: #007bff; text-decoration: none">
+                                <span class="icon nc-icon-glyph files_single-content-02"></span>Thống kê theo ngày
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li v-if="Role==1">
+                    <a style="cursor: pointer;" @click="btnFlatData_Click">
+                        <span class="icon one-xlsx"></span>Kết xuất
+                    </a>
+                </li>
+                <li v-if="kieu_selected==2||kieu_selected==3" :class="{disabled: !btnGhepThueBao_Enabled}">
+                    <a style="cursor: pointer;" :class="{disabled_color: !btnGhepThueBao_Enabled}" @click="btnGhepThueBao_Click">
+                        <span class="icon ui-1_circle-add nc-icon-glyph"></span>Ghép thuê bao
+                    </a>
+                </li>
+                <li v-if="kieu_selected==3" :class="{disabled: !btnGhepChiTiet_Enabled}">
+                    <a style="cursor: pointer;" :class="{disabled_color: !btnGhepChiTiet_Enabled}" @click="btnGhepChiTiet_Click">
+                        <span class="icon ui-1_circle-add nc-icon-glyph"></span>Ghép chi tiết
+                    </a>
+                </li>
+                <li v-if="kieu_selected==3" title="Thêm chi tiết từ dữ liệu của IT">
+                    <a style="cursor: pointer;" @click="btnCopyChiTiet_Click">
+                        <span class="icon one-file-arrow-right1"></span>Thêm chi tiết
+                    </a>
+                </li>
+            </ul>
+            <div class="more" style="padding-right: 10px!important;" v-if="cboKieuDoiSoat_Visible">
+                <div class="select-custom" ref="ds_kieu">
+                    <select2 :settings="{ dropdownParent: $refs['ds_kieu'] }"
+                        v-model="kieu_selected" class="select2"
+                        @change="changeKieuDoiSoat"
+                        :options="ds_kieu">
+                    </select2>
+                </div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="box-col">
+                <div class="row">
+                    <div class="col-12" :class="{'col-sm-6':layGroupChuaGan}">
+                        <div class="box-form">
+                            <div class="legend-title">Danh sách dữ liệu đối soát</div>
+                            <KDataGrid
+                                ref="gridDSDLDoiSoat"
+                                :columns="columns"
+                                :dataSource="dataSources"
+                                :enable-paging-server="false"
+                                :allowPaging="true"
+                                :showFilter="true"
+                                :showColumnCheckbox="false"
+                                :enabledSelectFirstRow="true"
+                                panelDataHeight="520px"
+                                :contextMenuItems="getContextMenuItems"
+                                @contextMenuClick="contextMenuClick"
+                                @onRowSelected="onSelectedRowDsDlDoiSoat"
+                                :editSettings="editSettings"
+                                @recordClick="cellClick"
+                                @rowSelected="rowSelected"
+                                :allowExcelExport="true"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12" v-show="layGroupChuaGan">
+                        <div class="box-form">
+                            <div class="danhsachtb_chuagan">
+                                <div class="legend-title">Danh sách thuê bao gốc chưa gán</div>
+                                <KDataGrid
+                                    ref="gridDSChuaGan"
+                                    :columns="columnsChuaGan"
+                                    :dataSource="dataSourcesChuaGan"
+                                    :enable-paging-server="false"
+                                    :allowPaging="true"
+                                    :showFilter="true"
+                                    :showColumnCheckbox="false"
+                                    :enabledSelectFirstRow="false"
+                                    :panelDataHeight="heightTableChuaGan"
+                                    @onRowSelected="onSelectedRowChuaGan"
+                                />
+                            </div>
+                            <div class="danhsachcttb_chuagan" style="margin-top: 20px !important;" v-show="layGroupChiTiet">
+                                <div class="legend-title">Danh sách chi tiết thuê bao chưa gán</div>
+                                <KDataGrid
+                                    ref="gridDSCTTB"
+                                    :columns="columnsCTTB"
+                                    :dataSource="dataSourcesCTTB"
+                                    :enable-paging-server="false"
+                                    :allowPaging="true"
+                                    :showFilter="true"
+                                    :showColumnCheckbox="false"
+                                    :enabledSelectFirstRow="true"
+                                    panelDataHeight="200px"
+                                    @onRowSelected="onSelectedRowCTTB"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <LocDuLieuModal ref="locDuLieuModal"
+            :dsLoaiHinh="dsLoaiHinh"
+            :Role="Role"
+            :dsDonViVNP="dsDonViVNP"
+            @accept="acceptLocDuLieu"
+        />
+        <SearchAccountModal ref="searchAccountModal" @form-close="formCloseSearchAccount"/>
+        <DataImport ref="dataImport"
+                        :propColumnsImport="data_import.columns"
+                        :propDataSourcesImport="data_import.list"
+        />
+    </div>

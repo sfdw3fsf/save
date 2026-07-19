@@ -1,0 +1,245 @@
+<div class="">
+    <!-- <breadcrumb :header=header /> -->
+    <div class="list-actions-top">
+        <ul class="list">
+
+            <li>
+                <a href="javascript: void(0)" @click="capNhap">
+                    <span class="icon one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onOpenLoaiDonVi">
+                    <span class="icon one-sitemap-user"></span> NV - Đơn vị
+                </a>
+                <appNVDonVi ref="frmPhanQuyenNVKS_LoaiDonVi"/>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onOpenLoaiKhachHang">
+                    <span class="icon one-sitemap-user"></span> NV - Loại KH
+                </a>
+                <appLoaiKhachHang ref="frmPhanQuyenNVKS_LoaiKhachHang"/>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-5 col-12">
+                <div class="box-form">
+                    <div class="legend-title" id="lblDonViTree" ref="donViTree">Thông tin nhân viên</div>
+                    <div class="input-icon-right">
+                        <input type="text" class="form-control" v-model="tenDonViSearch"
+                            id="txtTenDonViSearch"
+                            ref="txtTenDonViSearch" @keydown="onTenDonViSearch" @change="onTenDonViChange">
+                        <span class="icon nc-icon-outline ui-1_zoom"></span>
+                    </div>
+                    <div class="tree-plus" style="height: 500px;overflow: auto;padding-top:10px">
+                        <ejs-treeview id='treeview' ref="treeObj" :fields='treeDonViFields'
+                            :selectedNodes="selectedNodes"
+                             @nodeSelected="onDonViSelect" @dataBound="onDonViSelect">
+                        </ejs-treeview>
+                    </div>
+                </div>
+                <div class="box-form">
+                        <CSKHGrid :columns="fieldThongTinNhanVien" @selectedRowChanged="nhanVienRowClicked" id="gridNhanVienId"
+                            ref="gridNhanVien" :dataSource="dsNhanVienTheoDonViGetter" :showColumnCheckbox="false"
+                            :enablePagingServer="false"
+                            :enabledSelectFirstRow="true"
+                            addClassWhenRowChecked="font-weight-bold"
+                            dataKeyField="STT" :showFilter="true" :allowPaging="true">
+                        </CSKHGrid>
+                        <!-- <DataGrid2 :columns="fieldThongTinNhanVien" @selectedRowChanged="nhanVienRowClicked" id="gridNhanVienId"
+                            ref="gridNhanVien" :dataSource="dsNhanVienTheoDonViGetter" :showColumnCheckbox="false"
+                            dataKeyField="STT" :showFilter="true">
+                        </DataGrid2> -->
+                </div>
+            </div>
+            <div class="col-sm-7 col-12">
+                <div class="box-form">
+                    <div class="list-checks marb10">
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="thiCongChecked">
+                                <span class="name">Thi công</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="baoHongChecked">
+                                <span class="name">Báo hỏng</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="info-row">
+                                <div class="key fw6">Loại hình đã gán</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <b-form-select v-model="dichVuSelected" class="form-control"
+                                            @change="onDichVuChange" :options="dsDichVuGetter">
+                                        </b-form-select>
+                                        <!-- <select name="" id="" class="form-control" v-model="dichVuSelected" @change="onDichVuChange">
+                                            <option v-for="item in dsDichVuGetter" value="item.value">{{item.text}}</option>
+                                        </select> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-content" style="height: 250px;">
+                                <CSKHGrid :columns="dgvLoaiHinhThueBaoDaGan.columns" ref="dgvLoaiHinhThueBaoDaGan"
+                                    :dataSource="dgvLoaiHinhThueBaoDaGan.dataSource" :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    addClassWhenRowChecked="font-weight-bold"
+                                    dataKeyField="LOAITB_ID" :showFilter="true"
+                                    @dataBound="onGridDataBound(1)">
+                                </CSKHGrid>
+                                <!-- <DataGrid2 :columns="fieldLoaiHinhThueBaoKSDaGan" ref="gridLoaiHinhThueBaoKSDaGan"
+                                    :dataSource="dsLoaiHinhThueBaoKSDaGanGetter" :showColumnCheckbox="true"
+                                    dataKeyField="LOAITB_ID" :showFilter="true"
+                                    @selectedItemsChanged="data => gridDichVuDaGanSelectedValues = data">
+                                </DataGrid2> -->
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="onAddChuaGan(loaiGrid.DICH_VU)">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="onAddDaGan(loaiGrid.DICH_VU)">
+                                <span class="-ap icon-chevron-thin-left"></span>
+                            </button>
+                            <!-- <button class="btn" @click="thayDoiTrangThaiGan(loaiGrid.DICH_VU, 2)">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="thayDoiTrangThaiGan(loaiGrid.DICH_VU, 1)">
+                                <span class="-ap icon-chevron-thin-left"></span>
+                            </button> -->
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">Loại hình chưa gán</div>
+                            <div class="table-content" style="height: 250px;">
+                                <CSKHGrid :columns="dgvLoaiHinhThueBaoChuaGan.columns" ref="dgvLoaiHinhThueBaoChuaGan"
+                                    :dataSource="dgvLoaiHinhThueBaoChuaGan.dataSource" :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    addClassWhenRowChecked="font-weight-bold"
+                                    dataKeyField="LOAITB_ID" :showFilter="true"
+                                    @dataBound="onGridDataBound(2)">
+                                </CSKHGrid>
+                                <!-- <DataGrid2 :columns="fieldLoaiHinhThueBaoKSChuaGan" ref="gridLoaiHinhThueBaoKSChuaGan"
+                                    :dataSource="dsLoaiHinhThueBaoKSChuaGanGetter" :showColumnCheckbox="true"
+                                    dataKeyField="LOAITB_ID" :showFilter="true"
+                                    @selectedItemsChanged="data => gridDichVuChuaGanSelectedValues = data"/> -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="legend-title">Loại HĐ đã gán</div>
+                            <div class="table-content" style="height: 250px;">
+                                <!-- <DataGrid2 :columns="fieldHopDongThueBaoKSDaGan" ref="gridHopDongThueBaoKSDaGan"
+                                    :dataSource="dsHopDongThueBaoKSDaGanGetter" :showColumnCheckbox="true"
+                                    dataKeyField="LOAIHD_ID" :showFilter="true"
+                                    @selectedItemsChanged="data => gridHopDongDaGanSelectedValues = data">
+                                </DataGrid2> -->
+                                <CSKHGrid :columns="dgvHopDongThueBaoDaGan.columns" ref="dgvHopDongThueBaoDaGan"
+                                    :dataSource="dgvHopDongThueBaoDaGan.dataSource" :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    addClassWhenRowChecked="font-weight-bold"
+                                    dataKeyField="LOAIHD_ID" :showFilter="true"
+                                    @dataBound="onGridDataBound(3)">
+                                </CSKHGrid>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="onAddChuaGan(loaiGrid.HOP_DONG)">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="onAddDaGan(loaiGrid.HOP_DONG)">
+                                <span class="-ap icon-chevron-thin-left"></span>
+                            </button>
+                            <!-- <button class="btn" @click="thayDoiTrangThaiGan(loaiGrid.HOP_DONG, 2)">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="thayDoiTrangThaiGan(loaiGrid.HOP_DONG, 1)">
+                                <span class="-ap icon-chevron-thin-left" ></span>
+                            </button> -->
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">Loại HĐ chưa gán</div>
+                            <div class="table-content" style="height: 250px;">
+                                <CSKHGrid :columns="dgvHopDongThueBaoChuaGan.columns" ref="dgvHopDongThueBaoChuaGan"
+                                    :dataSource="dgvHopDongThueBaoChuaGan.dataSource" :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    addClassWhenRowChecked="font-weight-bold"
+                                    dataKeyField="LOAIHD_ID" :showFilter="true"
+                                    @dataBound="onGridDataBound(4)">
+                                </CSKHGrid>
+                                <!-- <DataGrid2 :columns="fieldHopDongThueBaoKSChuaGan" ref="gridHopDongThueBaoKSChuaGan"
+                                    :dataSource="dsHopDongThueBaoKSChuaGanGetter" :showColumnCheckbox="true"
+                                    dataKeyField="LOAIHD_ID" :showFilter="true"
+                                    @selectedItemsChanged="data => gridHopDongChuaGanSelectedValues = data"/> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="legend-title">Phân loại KH đã gán</div>
+                            <div class="table-content" style="height: 250px;">
+                                <CSKHGrid :columns="dgvPhanLoaiKhachHangDaGan.columns" ref="dgvPhanLoaiKhachHangDaGan"
+                                    :dataSource="dgvPhanLoaiKhachHangDaGan.dataSource" :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    addClassWhenRowChecked="font-weight-bold"
+                                    dataKeyField="PHANLOAIKH_ID" :showFilter="true"
+                                    @dataBound="onGridDataBound(5)">
+                                </CSKHGrid>
+                                <!-- <DataGrid2 :columns="fieldPhanLoaiKhachHangKSDaGan" ref="gridPhanLoaiKhachHangKSDaGan"
+                                    :dataSource="dsPhanLoaiKhachHangKSDaGanGetter" :showColumnCheckbox="true"
+                                    dataKeyField="PHANLOAIKH_ID" :showFilter="true"
+                                    @selectedItemsChanged="data => gridKhachHangDaGanSelectedValues = data">
+                                </DataGrid2> -->
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="onAddChuaGan(loaiGrid.KHACH_HANG)">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="onAddDaGan(loaiGrid.KHACH_HANG)">
+                                <span class="-ap icon-chevron-thin-left"></span>
+                            </button>
+                            <!-- <button class="btn" @click="thayDoiTrangThaiGan(loaiGrid.KHACH_HANG, 2)">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="thayDoiTrangThaiGan(loaiGrid.KHACH_HANG, 1)">
+                                <span class="-ap icon-chevron-thin-left"></span>
+                            </button> -->
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">Phân loại KH chưa gán</div>
+                            <div class="table-content" style="height: 250px;">
+                                <CSKHGrid :columns="dgvPhanLoaiKhachHangChuaGan.columns" ref="dgvPhanLoaiKhachHangChuaGan"
+                                    :dataSource="dgvPhanLoaiKhachHangChuaGan.dataSource" :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    addClassWhenRowChecked="font-weight-bold"
+                                    dataKeyField="PHANLOAIKH_ID" :showFilter="true"
+                                    @dataBound="onGridDataBound(6)">
+                                </CSKHGrid>
+                                <!-- <DataGrid2 :columns="fieldPhanLoaiKhachHangKSChuaGan" ref="gridPhanLoaiKhachHangKSChuaGan"
+                                    :dataSource="dsPhanLoaiKhachHangKSChuaGanGetter" :showColumnCheckbox="true"
+                                    dataKeyField="PHANLOAIKH_ID" :showFilter="true"
+                                    @selectedItemsChanged="data => gridKhachHangChuaGanSelectedValues = data">
+                                </DataGrid2> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

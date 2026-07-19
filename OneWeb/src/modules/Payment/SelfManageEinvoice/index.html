@@ -1,0 +1,487 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header" />
+  <vue-nav>
+    <ul class="list">
+      <li
+        v-for="action in actions"
+        v-show="action.visible"
+        :key="action.id"
+        :class="{ disabled: action.disabled }"
+        @click="onClickAction(action.id)"
+      >
+        <a style="cursor: pointer;" :class="{ 'disabled-color': action.disabled }">
+          <span class="icon" :class="action.icon"></span> {{ action.name }}
+        </a>
+      </li>
+    </ul>
+  </vue-nav>
+
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin tra cứu</div>
+      <div class="row">
+        <div class="col-sm-9 col-12">
+          <div class="info-row">
+            <div class="key w100">Mã khách hàng</div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input
+                  type="text"
+                  class="form-control highlight"
+                  ref="maKHRef"
+                  v-model.trim="traCuuFilter.txtMaGD"
+                  @keyup.enter="txtMaGD_KeyPress"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w120">Thao tác</div>
+            <div class="value">
+              <div class="select-custom" ref="thaoTacRef">
+                <SelectExt
+                  dataValueField="THAOTAC_ID"
+                  dataTextField="THAOTAC"
+                  v-model.number="traCuuFilter.thaoTacId"
+                  :settings="{ dropdownParent: $refs['thaoTacRef'] }"
+                  :dataSource="cboThaoTac"
+                  @change="cboThaoTac_EditValueChanged"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-9 col-12">
+          <div class="info-row">
+            <div class="key w100">Mẫu số:</div>
+            <div class="value">
+              <div class="select-custom" ref="mauSoRef">
+                <SelectExt
+                  dataValueField="LOAIHOADON_ID"
+                  dataTextField="TEN_LOAIHD"
+                  v-model.number="traCuuFilter.mauSoId"
+                  :settings="{ dropdownParent: $refs['mauSoRef'] }"
+                  :dataSource="cboPattern"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w100">Kiểu điều chỉnh</div>
+            <div class="value">
+              <div class="select-custom" ref="kieuDieuChinhRef">
+                <SelectExt
+                  dataValueField="DIEUCHINH_ID"
+                  dataTextField="DIEUCHINH"
+                  v-model.number="traCuuFilter.kieuDieuChinhId"
+                  :settings="{ dropdownParent: $refs['kieuDieuChinhRef'] }"
+                  :dataSource="cboDieuChinh"
+                  :disabled="isDisabledCboDieuChinh"
+                  @change="cboDieuChinh_EditValueChanged"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w120">Ký hiệu (Serial No):</div>
+            <div class="value">
+              <div class="select-custom" ref="kyHieuRef">
+                <SelectExt
+                  dataValueField="seri_id"
+                  dataTextField="seri"
+                  v-model.number="traCuuFilter.kyHieuId"
+                  :settings="{ dropdownParent: $refs['kyHieuRef'] }"
+                  :dataSource="cboSeri"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Số hoá đơn:</div>
+            <div class="value">
+              <input type="text" class="form-control" ref="txtSoHoaDonRef" v-model.number="traCuuFilter.txtSoHoaDon">
+            </div>
+            <div class="value red padt7 fw6 w30 nowrap">
+              {{ traCuuFilter.lblThanhToan }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="legend-title mart20">Thông tin hoá đơn</div>
+      <div class="row">
+        <div class="col-sm-9 col-12">
+          <p>Tên hoá đơn: {{ hoaDonFilter.txtTenHD }}</p>
+          <p>Mã số thuế: {{ hoaDonFilter.txtMST }}</p>
+          <p>Tên đơn vị: {{ hoaDonFilter.txtTenDV }}</p>
+          <p>Địa chỉ: {{ hoaDonFilter.txtDiaChiDV }}</p>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key" style="width: 270px;">Tên khách hàng (Customer's name) <span class="red">(*)</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" ref="tenKHRef" v-model.trim="hoaDonFilter.txtTenKH">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">Loại khách hàng</div>
+                <div class="value">
+                  <div class="select-custom" ref="loaiKHRef">
+                    <SelectExt
+                      dataValueField="LOAIKH_ID"
+                      dataTextField="LOAI_KH"
+                      v-model.number="hoaDonFilter.loaiKHId"
+                      :settings="{ dropdownParent: $refs['loaiKHRef'] }"
+                      :dataSource="loaiKHOptions"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key" style="width: 270px;">Địa chỉ <span class="red">(*)</span></div>
+            <div class="value">
+              <input type="text" class="form-control" ref="diaChiRef" v-model.trim="hoaDonFilter.txtDiaChiKH">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key" style="width: 270px;">Hình thức thanh toán (Kind of Payment) <span class="red">(*)</span></div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    ref="hinhThucThanhToanRef"
+                    v-model.trim="hoaDonFilter.txtHTTT"
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">Mã số: {{ hoaDonFilter.txtMaKH }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key" style="width: 270px;">Biên bản đính kèm:</div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="btnFilePath_Click">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control" v-model.trim="hoaDonFilter.txtFilePath">
+                <input
+                  ref="bienBanRef"
+                  type="file"
+                  id="upload"
+                  style="display:none"
+                  @change="importFile"
+                  accept=".doc, .docx, .pdf"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <p>Mẫu số: <span class="red mr-2">(*)</span>{{ hoaDonFilter.txtMauHoaDon }}</p>
+          <p>Ký hiệu (Serial No):  <span class="red mr-2">(*)</span>{{ hoaDonFilter.lblKyHieu }}</p>
+          <p>Số (No): {{ hoaDonFilter.lblSoHoaDon }}</p>
+          <p>&nbsp;</p>
+          <vue-input labelWidth="100" label="Mã số thuế" ref="maSoThueRef" v-model.trim="hoaDonFilter.txtMSTKH" />
+          <vue-input labelWidth="100" label="Số điện thoại" ref="soDienThoaiRef" v-model.trim="hoaDonFilter.txtSoDT" />
+
+          <div class="info-row marb10">
+            <div class="key w100">Tháng hoá đơn:</div>
+            <div class="value">
+              {{ hoaDonFilter.txtKyHD }}
+            </div>
+          </div>
+          <vue-input labelWidth="100" label="Email" ref="emailRef" v-model.trim="hoaDonFilter.txtEmail" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12" :class="visibleBankAccount ? 'col-sm-6' : 'col-sm-12'">
+          <div class="info-row">
+            <div class="key" style="width: 270px;">Ghi chú hoá đơn:</div>
+            <div class="value">
+              <div class="input-number-custom">
+                <input type="text" class="form-control" ref="ghiChuRef" v-model.trim="hoaDonFilter.txtGhiChu">
+              </div>
+            </div>
+          </div>
+        </div>
+        <template v-if="visibleBankAccount">
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key">Ngân hàng:</div>
+              <div class="value">
+                <div class="select-custom" ref="nganHangRef">
+                  <SelectExt
+                    dataValueField="NGANHANG_ID"
+                    dataTextField="TEN_NH"
+                    v-model.number="hoaDonFilter.nganHangId"
+                    :settings="{ dropdownParent: $refs['nganHangRef'] }"
+                    :dataSource="cboNganHang"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key">Số tài khoản:</div>
+              <div class="value">
+                <input type="text" class="form-control" ref="ghiChuRef" v-model.trim="hoaDonFilter.txtSoTaiKhoan">
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div class="table-content">
+        <DataGridEdit
+          ref="gridInner"
+          :columns="danhSachHoaDon.headers"
+          :dataSource="danhSachHoaDon.dataSources"
+          :showFilter="true"
+          :enabledSelectFirstRow="false"
+          :editSettings="danhSachHoaDon.editSettings"
+          :showColumnPointer="false"
+          :enable-paging-server="false"
+          :allowPaging="true"
+          @actionComplete="actionComplete"
+        >
+        </DataGridEdit>
+      </div>
+      <div class="row mart20">
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 160px">Tổng tiền chịu thuế 10%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienChiuThue10"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 160px">Tổng tiền chịu thuế 8%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienChiuThue8"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 150px">Tổng tiền chịu thuế 5%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienChiuThue5"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 150px">Tổng tiền chịu thuế 0%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienChiuThue0"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-4">
+          <div class="info-row">
+            <div class="key" style="width: 170px;">Cộng tiền dịch vụ:</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                ref="txtTongTienRef"
+                v-model.number="hoaDonFilter.txtTongTien"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 160px">Tổng tiền thuế 10%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienThue10"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 160px">Tổng tiền thuế 8%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienThue8"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 150px">Tổng tiền thuế 5%</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienThue5"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 150px">Tổng tiền không thuế</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienKhongThue"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-4">
+          <div class="info-row">
+            <div class="key" style="width: 170px;">Tiền thuế GTGT:</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                ref="txtTongThueRef"
+                v-model.number="hoaDonFilter.txtTongThue"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-sm-6">
+          <div class="info-row">
+            <div class="key" style="width: 290px;">Thẻ mở rộng (Dùng cho các tỉnh có thẻ extra) :</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model.trim="hoaDonFilter.txtExtra">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 150px">Tổng tiền không chịu thuế</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTienKhongChiuThue"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-4">
+          <div class="info-row">
+            <div class="key" style="width: 170px;">Tổng cộng tiền thanh toán:</div>
+            <div class="value">
+              <vue-numeric
+                class="form-control red tright"
+                separator=","
+                placeholder="0"
+                output-type="Number"
+                disabled
+                v-model.number="hoaDonFilter.txtTongTra"
+              ></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key" style="width: 290px;">Số tiền viết bằng chữ</div>
+        <div class="value">
+          <input
+            type="text"
+            class="form-control"
+            ref="txtTienChuRef"
+            v-model.trim="hoaDonFilter.txtTienChu"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <popup-hieu-chinh-hddt ref="popupHieuChinhHDDTRef" :html="hieuChinhHDDTProp" />
+
+  <popup-einvoice-detail ref="popupEinvoiceDetailRef" @onSuccess="onSuccessEinvoiceDetail" />
+
+  <PopupTraCuuHDDT
+    ref="popupTraCuuHDDTRef"
+    :vma_gd="traCuuFilter.txtMaGD"
+    :vtt="isVTTTraCuuHDDT"
+    @chapnhan="onSuccessTC_HDDT"
+  />
+</div>

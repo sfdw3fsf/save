@@ -1,0 +1,179 @@
+<b-modal
+  ref="popupVatTuPTM"
+  size="vattuptm-size"
+  hide-header
+  hide-header-close
+  hide-footer
+  body-class="p-0"
+  no-close-on-backdrop
+  @show="handleShowModal"
+  @hide="handleHideModal"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span> Cấp/Thu hồi vật tư
+      </div>
+      <div class="close -ap icon-close" @click="hideModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li v-for="item in actions" :key="item.id" @click="onActionClick(item)"
+            :class="{disabled: !item.active}" v-show="item.visible">
+          <a style="cursor: pointer;" :class="{disabled_color: !item.active}" :ref="item.id">
+            <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="legend-title">Thông tin thiết bị</div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">Ngày thực hiện</div>
+                  <div class="value">
+                    <div class="input-icon-right">
+                      <k-date-picker type="datetime" format="DD/MM/YYYY HH:mm A"
+                                     v-model="formThongTinThietBi.dtpNgayCap" :disabled="disableBox.dtpNgayCap"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w80">Kiểu thiết bị</div>
+                  <div class="value">
+                    <SelectExt v-model="cboKieuTbi.value" placeholder="Chọn kiểu thiết bị" :disabled="cboKieuTbi.disable" :dataSource="cboKieuTbi.list" dataTextField="KIEU_TBI"
+                               dataValueField="KIEUTBI_ID"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">Mục đích cấp</div>
+              <div class="value">
+                <div v-bind:class="{ disabled: DmMucDichCap.disabled}">
+                  <ComboboxGrid :valueField="DmMucDichCap.valueField" :textField="DmMucDichCap.textField"
+                                v-model="DmMucDichCap.selectMucDichCap" :value="DmMucDichCap.selectMucDichCap"
+                                :columns="DmMucDichCap.headers"
+                                :panelDataHeight="DmMucDichCap.panelDataHeight" :enabledSelectFirstRow="true"
+                                :dataSource="DmMucDichCap.data">
+                  </ComboboxGrid>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">Lý do cấp</div>
+              <div class="value">
+                <div class="select-custom">
+                  <ComboboxGrid :valueField="DmLyDoCap.valueField" :textField="DmLyDoCap.textField"
+                                v-model="DmLyDoCap.selectLyDoCap" :value="DmLyDoCap.selectLyDoCap"
+                                :columns="DmLyDoCap.headers"
+                                :panelDataHeight="DmLyDoCap.panelDataHeight" :enabledSelectFirstRow="true"
+                                :dataSource="DmLyDoCap.data" disabled="true">
+                  </ComboboxGrid>
+                </div>
+              </div>
+            </div>           
+            <div class="info-row">
+              <div class="key w100">Tình trạng</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="cboTinhTrang.value" :disabled="cboTinhTrang.disabled" placeholder="Chọn kiểu tình trạng" :dataSource="cboTinhTrang.list" dataTextField="TINHTRANG_TBI"
+                             dataValueField="TINHTRANGTBI_ID"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w70">Nhân viên</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="cboNhanVien.value" :disabled="cboNhanVien.disabled" placeholder="Chọn nhân viên" :dataSource="cboNhanVien.list" dataTextField="TEN_NV"
+                                 dataValueField="NHANVIEN_ID"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w40">Kho</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt class="select-kho" v-model="cboKho.value" placeholder="Chọn kho" :disabled="cboKho.disabled" :dataSource="cboKho.list" dataTextField="TEN_K_NEW"
+                                 dataValueField="KHO_ID"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w70">Serial</div>
+              <div class="value">
+                <div class="select-custom dropdown">
+                  <ComboboxGridEdit ref="cboSerial" class="table-result table-gachle"
+                                    v-model="DmVTGiao.selectVTGiao"
+                                    :columns="DmVTGiao.headers"
+                                    :panelDataHeight="DmVTGiao.panelDataHeight"
+                                    :enabledSelectFirstRow="true"
+                                    :editSettings="DmVTGiao.editSettings"
+                                    :dataSource="DmVTGiao.data"
+                                    @InsertSerial="receiverInsertSerialData"
+                  >
+                  </ComboboxGridEdit>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w70">Vật tư</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="cboVatTu.value" placeholder="Chọn vật tư" :disabled="cboVatTu.disabled" :dataSource="cboVatTu.list" dataTextField="TEN_VT"
+                             dataValueField="VATTU_ID"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w70">Số lượng</div>
+              <div class="value">
+                <input type="number" ref="numberSoluong" class="form-control tright"
+                       v-model="formThongTinThietBi.soluong"
+                       :disabled="disableBox.txtSoLuong">
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w70">Ghi chú</div>
+              <div class="value">
+                <input type="text" class="form-control tright" v-model.trim="formThongTinThietBi.txtGhiChu">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title">Danh sách cấp/thu hồi vật tư</div>
+        <DataGrid ref="gridDanhSachVatTu" v-bind:columns="gridviewVatTu.headers"
+                  v-bind:dataSource="gridviewVatTu.list" :showColumnCheckbox="false"
+                  :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                  :enabled-select-first-row="true" @selectedRowChanged="gridviewVatTu_FocusedRowChanged"                  
+        >
+        </DataGrid>
+        <!-- @rowClicked="gridviewVatTuRowClick" -->
+      </div>
+      <div class="box-form">
+        <div class="legend-title">Danh sách vật tư thiết bị đang sử dụng</div>
+        <DataGrid ref="gridDanhSachVatTuDangSD" v-bind:columns="grvDS_VT_Giao.headers"
+                  v-bind:dataSource="grvDS_VT_Giao.list" :showColumnCheckbox="grvDS_VT_Giao.showColumnCheckbox"
+                  :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                  :enabled-select-first-row="true"></DataGrid>
+      </div>
+    </div>
+  </div>
+</b-modal>

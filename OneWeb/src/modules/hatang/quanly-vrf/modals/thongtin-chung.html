@@ -1,0 +1,271 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="modalThongTinChungVrf"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="70%"
+  height="auto"
+
+  :target="target"
+  :zIndex="1050"
+  :position="{ X: 'center', Y: 'center' }"
+  :overlayClick="onOverlayClick"
+>
+  <div class="modal-content popup-box">
+    <!-- <div class="popup-body"> -->
+      <div class="popup-header">
+      <div class="title" style="font-weight: 600;">Thông tin VRF</div>
+        <div class="close -ap icon-close" @click="closeModal"></div>
+      </div>
+      <div class="box-form">
+        <div class="row">
+          <div class="col-12">
+            <div class="nav tabs tab-over">
+              <a href="javascript:void(0)" @click="currentTab = 1"  :class="{active: currentTab===1}">Thông tin chung</a>
+              <template v-if="isEditMode">
+                <a href="javascript:void(0)" @click="currentTab = 2" :class="{active: currentTab===2}">VLAN</a>
+                <a href="javascript:void(0)" @click="currentTab = 3" :class="{active: currentTab===3}">Thiết bị</a>
+                <a href="javascript:void(0)" @click="currentTab = 4" :class="{active: currentTab===4}">Thiết bị mạng</a>
+                <a href="javascript:void(0)" @click="currentTab = 5" :class="{active: currentTab===5}">Subnet</a>
+                <a href="javascript:void(0)" @click="currentTab = 6" :class="{active: currentTab===6}">IP</a>
+                <!-- <a href="javascript:void(0)" @click="currentTab = 7" :class="{active: currentTab===7}">Lịch sử thay đổi</a> -->
+              </template>
+            </div>
+            <div class="tab-content">
+              <!-- --------------Thông tin Chung------------------- -->
+              <div class="tab-pane" :class="{active: currentTab===1}" id="tabThongTinChung">
+                <!-- <div class="box-form"> -->
+                  <div class="row">
+                    <div class="list-actions-top">
+                      <ul class="list">
+                        <li>
+                          <b-link href="javascript:void(0)" @click="onSave"> <span class="icon one-save"></span>Ghi lại </b-link>
+                        </li>
+                        <li>
+                          <b-link href="javascript:void(0)" @click="">
+                            <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+                          </b-link>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="box-form">
+                        <div class="legend-title" >
+                          Thông tin cơ bản
+                        </div>
+                        <div class="row">
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">Tên VRF (<span class="red">*</span>)</div>
+                              <div class="value">
+                                <input type="text" class="form-control" v-model.trim="currentItem.TEN_VRF"/>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">Hiệu lực:</div>
+                              <div class="value">
+                                <div class="check-action">
+                                  <input
+                                    type="checkbox"
+                                    class="check"
+                                    v-model="currentItem.HIEU_LUC"
+                                    :true-value="1"
+                                    :false-value="0"
+                                  /><span class="name"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">ASN</div>
+                              <div class="value">
+                                <input type="number" class="form-control" v-model="currentItem.ASN"
+                                  min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g,'')" />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">RD</div>
+                              <div class="value">
+                                <input type="number" class="form-control" v-model="currentItem.RD"
+                                  min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g,'')" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">RT Import</div>
+                              <div class="value">
+                                <input type="number" class="form-control" v-model="currentItem.RT_IMPORT"
+                                  min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g,'')" />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">RT Export</div>
+                              <div class="value">
+                                <input type="number" class="form-control" v-model="currentItem.RT_EXPORT"
+                                  min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g,'')" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">IDC (<span class="red">*</span>)</div>
+                              <div class="value">
+                                  <SelectExt v-model.trim="currentItem.IDC_ID"  dataTextField="TEN" dataValueField="ID"
+                                      :dataSource="dsIDC"  />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                              <div class="key w150">Ghi chú</div>
+                              <div class="value">
+                                <input type="text" class="form-control" v-model="currentItem.GHI_CHU"/>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <!-- </div> -->
+              </div>
+
+              <div class="tab-pane" id="tabVLAN" :class="{active: currentTab===2}">
+                <!-- <div class="box-form"> -->
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      v-bind:columns="
+                            [
+                              {fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 80},
+                              {fieldName: 'VLAN_ID', headerText: 'VLAN ID', textAlign: 'Center', width: 80},
+                              {fieldName: 'TEN_VLAN', headerText: 'VLAN', textAlign: 'Left', width: 200},
+                              {fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left', width: 150},
+                              {fieldName: 'TEN_ZONE', headerText: 'Zone', textAlign: 'Left', width: 200},
+                              {fieldName: 'TEN_VRF', headerText: 'VRF', textAlign: 'Left', width: 150},
+                              {fieldName: 'HIEULUC', headerText: 'Hiệu lực', textAlign: 'Left', width: 150}
+                            ]"
+                      v-bind:dataSource="dsVLAN"
+                      :allowPaging="true"
+                      ref="grdVLAN"
+                    >
+                    </DataGrid>
+                  </div>
+                <!-- </div> -->
+              </div>
+
+              <div class="tab-pane" id="tabTbi" :class="{active: currentTab===3}">
+                <!-- <div class="box-form"> -->
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      v-bind:columns="
+                            [
+                              {fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 80},
+                              {fieldName: 'TEN_TBI', headerText: 'Thiết bị', textAlign: 'Center', },
+                              {fieldName: 'TEN_VRF', headerText: 'VRF', textAlign: 'Left', width: 200},
+                              {fieldName: 'MATHIETBI', headerText: 'Mã thiết bị', textAlign: 'Left', width: 150},
+                              {fieldName: 'MATHIETBI_INFRA', headerText: 'Mã thiết bị Infra', textAlign: 'Left', width: 200},
+                            ]"
+                      v-bind:dataSource="dsTbi"
+                      :allowPaging="true"
+                      ref="grdTbi"
+                    >
+                    </DataGrid>
+                  </div>
+                <!-- </div> -->
+              </div>
+
+              <div class="tab-pane" id="tabTbiMang" :class="{active: currentTab===4}">
+                <!-- <div class="box-form"> -->
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      v-bind:columns="
+                            [
+                              {fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 80},
+                              {fieldName: 'TEN_TBI', headerText: 'Thiết bị', textAlign: 'Left', width: 200},
+                              {fieldName: 'TEN_VRF', headerText: 'VRF', textAlign: 'Left', width: 150},
+                              {fieldName: 'MATHIETBI', headerText: 'Mã thiết bị', textAlign: 'Left', width: 200},
+                              {fieldName: 'MATHIETBI_INFRA', headerText: 'Mã thiết bị Infra', textAlign: 'Left', width: 150}
+                            ]"
+                      v-bind:dataSource="dsTbiMang"
+                      :allowPaging="true"
+                      ref="grdTbiMang"
+                    >
+                    </DataGrid>
+                  </div>
+                <!-- </div> -->
+              </div>
+
+              <div class="tab-pane" id="tabSubnet" :class="{active: currentTab===5}">
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      v-bind:columns="
+                            [
+                              {fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 80},
+                              {fieldName: 'SUBNET_ID', headerText: 'Subnet ID', textAlign: 'Left'},
+                              {fieldName: 'TEN_SUBNET', headerText: 'Tên Subnet', textAlign: 'Left'},
+                              {fieldName: 'TEN_VRF', headerText: 'VRF', textAlign: 'Left', width: 150},
+                              {fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left', width: 150},
+                              {fieldName: 'SUBNET', headerText: 'Subnet', textAlign: 'Left', width: 150},
+                              {fieldName: 'SBMASK', headerText: 'Subnet mask', textAlign: 'Left', width: 150},
+                              {fieldName: 'GATEWAY', headerText: 'Gateway', textAlign: 'Left', width: 150}
+                            ]"
+                      v-bind:dataSource="dsSubnet"
+                      :allowPaging="true"
+                      ref="grdSubnet"
+                    >
+                    </DataGrid>
+                  </div>
+              </div>
+
+              <div class="tab-pane" id="tabIP" :class="{active: currentTab===6}">
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      v-bind:columns="
+                            [
+                              {fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 80},
+                              {fieldName: 'IP_ID', headerText: 'IP ID', textAlign: 'Left'},
+                              {fieldName: 'DIACHI_IP', headerText: 'Địa chỉ IP', textAlign: 'Left'},
+                              {fieldName: 'TEN_VRF', headerText: 'VRF', textAlign: 'Left', width: 150},
+                              {fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left', width: 150},
+                              {fieldName: 'QUANGBA_IP', headerText: 'Quảng bá IP', textAlign: 'Left', width: 150},
+                              {fieldName: 'NOIBO', headerText: 'Nội bộ', textAlign: 'Left', width: 150}
+                            ]"
+                      v-bind:dataSource="dsIP"
+                      :allowPaging="true"
+                      ref="grdIP"
+                    >
+                    </DataGrid>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- </div> -->
+  </div>
+</ejs-dialog>
+

@@ -1,0 +1,289 @@
+<ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="popup_tracuuvattu_trongkho"
+    :animationSettings='animationSettings' showCloseIcon=true width='80%' :target='target'
+    header='<h1 class="f20 m-0 font-weight-bold">Tra cứu thiết bị tồn kho</h1>' :open="openDialog" :close="dialogClose">
+    <div class="modal-content popup-box">
+        <!-- <breadcrumb :header="header" /> -->
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a @click="btnTraCuu_Click">
+                        <span class="icon  one-search"></span> Tra cứu
+                    </a>
+                </li>
+                <li>
+                    <a @click="btnXuatExcel_Click">
+                        <span class="icon one-excel"></span> Xuất Excel
+                    </a>
+                </li>
+                <!-- <li>
+                <a v-b-modal.ModalTroGiup>
+                    <span class="icon one-circle-question"></span> Trợ giúp
+                </a>
+                <b-modal id="ModalTroGiup" title="Trợ giúp" ok-only>
+                    <p class="my-4 text-center">Hướng dẫn sử dụng</p>
+                </b-modal>
+            </li> -->
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin tra cứu</div>
+                <div class="row">
+                    <div class="col-sm-9 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="p_tatca_kho">
+                                    <span class="name">Tất cả kho</span>
+                                </div>
+                            </div>
+                            <div class="key w60">
+                                Kho <span style="color: red;">*</span>
+                            </div>
+                            <div class="value" v-click-outside="hideComboKho">
+                                <!-- <div class="select-custom">
+                                <ejs-dropdownlist
+                                    class="form-control"
+                                    locale='vi-VN'
+                                    v-model="p_kho_id"
+                                    :dataSource='DSKhoTheoNV'
+                                    :allowFiltering='true'
+                                    :filtering='onFiltering'
+                                    :fields="{value:'KHO_ID', text: 'TEN_KHO'}"
+                                    :itemTemplate='iTemplate'
+                                    >
+
+                                </ejs-dropdownlist>
+                            </div> -->
+                                <div class="vattu_box">
+                                    <div class="input-group">
+                                        <div class="li input-text">
+                                            <div class="select-custom">
+                                                <input type="select" v-model="selectedKho" class="form-control" readonly
+                                                    @click="comboKho = !comboKho" style="background-color: white;">
+                                                </input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="vattu_table" v-show="comboKho">
+                                        <DataGrid v-bind:columns="[
+                                    {fieldName: 'MA_KHO', headerText: 'Mã kho', allowFiltering: true, allowSorting: false, width: '30%'},
+                                    {fieldName: 'TEN_KHO', headerText: 'Tên kho', allowFiltering: true, allowSorting: false, width: '70%'}
+                                    ]" v-bind:dataSource="DSKhoTheoNV" :showFilter="true" :allowPaging='false'
+                                            @selectedRowChanged="gridDenDonVi_selectedRowChanged"
+                                            :showColumnCheckbox="false" dataKeyField="KHO_ID"
+                                            :defaultColumnCheckboxChecked="false">
+                                        </DataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                Đến ngày <span style="color: red;">*</span>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <!-- <input type="text" class="form-control">
+                                <span class="icon one-calendar"></span> -->
+                                    <ejs-datepicker class="form-control" :placeholder="dateConfig.waterMark"
+                                        :value="dateConfig.default" :format="dateConfig.format" v-model="p_denngay">
+
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-form">
+                <div class="legend-title">Danh sách thiết bị trong kho</div>
+                <div class="row">
+                    <div class="col-12" :class="{'col-sm-6': tabThongTin}">
+                        <div class="nav tabs tab-over">
+                            <a @click="tabTongHop = false" :class="{'active': !tabTongHop}">Chi tiết</a>
+                            <a @click="tabTongHop = true" :class="{'active': tabTongHop}">Tổng hợp</a>
+                        </div>
+
+                        <div class="tab-content">
+                            <div class="table-content">
+                                <DataGrid v-bind:columns="[
+                                {fieldName: 'LOHANG', headerText: 'Lô hàng', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'MA_VT', headerText: 'Mã vật tư', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'TEN_VT', headerText: 'Tên vật tư', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'MA_TBI', headerText: 'Mã thiết bị', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'SERIAL', headerText: 'Serial', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'SERIAL_GP', headerText: 'Serial GP', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'DVI_TINH', headerText: 'Đơn vị tính', textAlign: 'Left' ,allowFiltering: true,},
+                                {fieldName: 'DONGIA', headerText: 'Đơn giá', textAlign: 'Right', type: 'number',format: 'n3'  ,allowFiltering: true,},
+                                {fieldName: 'SL_TON', headerText: 'Số lượng', textAlign: 'Right', type: 'number',format: 'n3' ,allowFiltering: true,},
+                                {fieldName: 'TINHTRANGTBI_ID', headerText: 'Tình trạng', textAlign: 'Left' ,allowFiltering: true,},
+                                ]" v-show="!tabTongHop" ref="ChiTiet" class="table-result table-gachle"
+                                    v-bind:dataSource="DSChiTietTB" :showFilter="true" :allowPaging="true"
+                                    :allowResizing="true" :enablePagingServer='false'>
+                                </DataGrid>
+                                <!-- <ejs-grid ref="ChiTiet"
+                                v-show="!tabTongHop"
+                                :dataSource="DSChiTietTB"
+                                :allowPaging='true'
+                                :allowSorting='true'
+                                :allowFiltering='true'
+                                :filterSettings='filterOptions'
+                                :allowResizing='true'
+                                :allowSelection='true'
+                                :selectionSettings='selectionOptions'
+                                :gridLines="'Both'"
+                                rowHeight=32
+                                :pageSettings='pageSettings'
+                                >
+                                <e-columns>
+                                    <e-column field='STT' headerText='' width=20 textAlign='Center' :template='cRowSelected' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='LOHANG' headerTextAlign='Center' headerText='Lô hàng' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_VT' headerTextAlign='Center' headerText='Mã vật tư' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='TEN_VT' headerTextAlign='Center' headerText='Tên vật tư' textAlign='Left'   :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SERIAL' headerTextAlign='Center' headerText='Serial' textAlign='Left'   :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='DVI_TINH' headerTextAlign='Center' headerText='Đơn vị tính' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='DONGIA' headerTextAlign='Center' headerText='Đơn giá' textAlign='Right' type='number' format='n3' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SL_TON' headerTextAlign='Center' headerText='Số lượng' textAlign='Right'  type='number' format='n3 :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='TINHTRANGTBI_ID' headerTextAlign='Center' headerText='Tình trạng' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+
+                                </e-columns> -->
+                                </ejs-grid>
+                                <DataGrid v-bind:columns="TongHop_Columns" ref="TongHop" v-show="tabTongHop"
+                                    v-bind:dataSource="DSTongHopTB" :showColumnCheckbox='false' :showFilter="true"
+                                    :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer='false'
+                                    @rowDataBound='rowDataBound'>
+                                </DataGrid>
+                                <!-- <ejs-grid ref="TongHop"
+                                v-show="tabTongHop"
+                                :dataSource="DSTongHopTB"
+                                :allowPaging='true'
+                                :allowSorting='true'
+                                :allowFiltering='true'
+                                :filterSettings='filterOptions'
+                                :allowResizing='true'
+                                :allowSelection='true'
+                                :selectionSettings='selectionOptions'
+                                :gridLines="'Both'"
+                                rowHeight=32
+                                :rowDataBound='rowDataBound'
+                                :pageSettings='pageSettings'
+                                >
+                                <e-columns>
+                                    <e-column field='STT' headerText='' width=20 textAlign='Center' :template='cRowSelected' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column headerTextAlign='Center' textAlign='Center' headerText='Các DS' width=70 :filterBarTemplate='templateOptions' :template="DSTemplate"></e-column>
+                                    <e-column field='LOHANG' headerTextAlign='Center' headerText='Lô hàng' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_VT' headerTextAlign='Center' headerText='Mã vật tư' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='TEN_VT' headerTextAlign='Center' headerText='Tên vật tư' textAlign='Left'   :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SOLUONG' headerTextAlign='Center' headerText='Số lượng' textAlign='Right' type='number' format='n3' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='DACAP' headerTextAlign='Center' headerText='Đã cấp' textAlign='Right'  type='number' format='n3 :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='CONLAI' headerTextAlign='Center' headerText='Còn lại' textAlign='Right' type='number' format='n3  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='DVI_TINH' headerTextAlign='Center' headerText='Đơn vị tính' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                </e-columns>
+                            </ejs-grid> -->
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" :class="{'col-sm-6':tabThongTin}" v-show="tabThongTin">
+                        <div class="nav tabs tab-over" style="display: block;">
+                            <a @click="tabThietBi = false" :class="{'active':!tabThietBi}">Thông tin thuê bao</a>
+                            <a @click="tabThietBi = true" :class="{'active':tabThietBi}">Thông tin thiết bị</a>
+                        </div>
+                        <div class="tab-content">
+                            <div class="table-content">
+                                <DataGrid v-bind:columns="[
+                                {fieldName: 'MA_GD', headerText: 'Mã GD', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'MA_TB', headerText: 'Mã TB', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'TEN_VT', headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'SOLUONG', headerText: 'SL cấp', textAlign: 'Right',format: 'N0', type: 'number', allowFiltering: true, },
+                                {fieldName: 'NGAY_CAP', headerText: 'Ngày cấp', textAlign: 'Right', allowFiltering: true, },
+                                {fieldName: 'SERIAL', headerText: 'Serial', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'MA_TBI', headerText: 'Mã Tbi', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'VITRI', headerText: 'Vị trí phiếu', textAlign: 'Left', allowFiltering: true, },
+                                ]" v-show="!tabThietBi" ref="ThueBao" class="table-result table-gachle"
+                                    v-bind:dataSource="DSThueBao" :showFilter="true" :showColumnCheckbox='false'
+                                    :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer='false'>
+                                </DataGrid>
+                                <!-- <ejs-grid ref="ThueBao"
+                                v-show="!tabThietBi"
+                                :dataSource="DSThueBao"
+                                :allowPaging='true'
+                                :allowSorting='true'
+                                :allowFiltering='true'
+                                :filterSettings='filterOptions'
+                                :allowResizing='true'
+                                :allowSelection='true'
+                                :selectionSettings='selectionOptions'
+                                :gridLines="'Both'"
+                                rowHeight=32
+                                :pageSettings='pageSettings'
+                                >
+                                <e-columns>
+                                    <e-column field='STT' headerText='' width=20 textAlign='Center' :template='cRowSelected' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_GD' headerTextAlign='Center' headerText='Mã GD' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_TB' headerTextAlign='Center' headerText='Mã TB' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='TEN_VT' headerTextAlign='Center' headerText='Tên vật tư' textAlign='Left'   :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SOLUONG' headerTextAlign='Center' headerText='SL cấp' textAlign='Right' type='number' format='n3' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='NGAY_CAP' headerTextAlign='Center' headerText='Ngày cấp' textAlign='Right' type='datetime' format='DD/MM/YYYY hh:mm'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SERIAL' headerTextAlign='Center' headerText='Serial' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_TBI' headerTextAlign='Center' headerText='Mã Tbi' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='VITRI' headerTextAlign='Center' headerText='Vị trí phiếu' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                </e-columns>
+                            </ejs-grid> -->
+
+                                <DataGrid v-bind:columns="[
+                                {fieldName: 'LOHANG', headerText: 'Lô hàng', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'MA_VT', headerText: 'Mã vật tư', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'TEN_VT', headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'MA_TBI', headerText: 'Mã thiết bị', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'SERIAL', headerText: 'Serial', textAlign: 'Left', allowFiltering: true, },
+                                {fieldName: 'SOLUONG', headerText: 'Số lượng', textAlign: 'Right',format: 'N3', type: 'number', allowFiltering: true, },
+                                {fieldName: 'DVI_TINH', headerText: 'Đơn vị tính', textAlign: 'Right', allowFiltering: true, },
+
+
+                                ]" v-show="tabThietBi" ref="ThietBi" class="table-result table-gachle"
+                                    v-bind:dataSource="DSThietBi" :showFilter="true" :showColumnCheckbox='false'
+                                    :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer='false'>
+                                </DataGrid>
+
+                                <!-- <ejs-grid ref="ThietBi"
+                                v-show="tabThietBi"
+                                :dataSource="DSThietBi"
+                                :allowPaging='true'
+                                :allowSorting='true'
+                                :allowFiltering='true'
+                                :filterSettings='filterOptions'
+                                :allowResizing='true'
+                                :allowSelection='true'
+                                :selectionSettings='selectionOptions'
+                                :gridLines="'Both'"
+                                rowHeight=32
+                                :pageSettings='pageSettings'
+                                >
+                                <e-columns>
+                                    <e-column field='STT' headerText='' width=20 textAlign='Center' :template='cRowSelected' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_GD' headerTextAlign='Center' headerText='Mã GD' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_TB' headerTextAlign='Center' headerText='Mã TB' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='TEN_VT' headerTextAlign='Center' headerText='Tên vật tư' textAlign='Left'   :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SOLUONG' headerTextAlign='Center' headerText='SL cấp' textAlign='Right' type='number' format='n3' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='NGAY_CAP' headerTextAlign='Center' headerText='Ngày cấp' textAlign='Right' type='datetime' format='DD/MM/YYYY hh:mm' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='SERIAL' headerTextAlign='Center' headerText='Serial' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='MA_TBI' headerTextAlign='Center' headerText='Mã Tbi' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                </e-columns>
+                            </ejs-grid> -->
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</ejs-dialog>

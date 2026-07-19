@@ -1,0 +1,206 @@
+<div class="quanly-prefix-cua-bras">
+  <div class="list-actions-top">
+      <ul class="list">
+          <li :class="{'disable-btn': !buttonState.btnNhapMoiEnabled}">
+              <a href="javascript:void(0)" @click="onClickButtonNhapMoi">
+                  <span class="icon nc-icon-glyph ui-1_circle-add"></span> Nhập mới
+              </a>
+          </li>
+          <li :class="{'disable-btn': !buttonState.btnCapNhatEnabled}">
+              <a href="javascript:void(0)" @click="onClickButtonCapNhat">
+                  <span class="icon one-calendar-sync"></span> Cập nhật
+              </a>
+          </li>
+          <li :class="{'disable-btn': !buttonState.btnHuyBoEnabled}">
+              <a href="javascript:void(0)" @click="onClickButtonHuyBo">
+                  <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy bỏ
+              </a>
+          </li>
+          <li :class="{'disable-btn': !buttonState.btnXoaEnabled}">
+              <a href="javascript:void(0)" @click="onClickButtonXoa">
+                  <span class="icon one-trash"></span> Xóa Prefix
+              </a>
+          </li>
+          <li :class="{'disable-btn': !buttonState.btnSinhIPEnabled}">
+              <a href="javascript:void(0)" @click="onClickButtonSinhIp">
+                  <span class="icon one-ip"></span> Tạo dải IP
+              </a>
+          </li>
+      </ul>
+  </div>
+  <div class="page-content">
+      <div class="row">
+          <div class="col-sm-9 col-12">
+              <div class="row">
+                  <div class="col-sm-3 col-12">
+                      <div class="box-form" style="height: 444px; overflow-y: scroll;">
+                          <div class="legend-title">Thông tin prefix</div>
+                          <div class="info-row">
+                              <div class="key w50">Bras <bss-required-marker /></div>
+                              <div class="value">
+                                  <div class="select-custom select-bras">
+                                      <bss-error-marker :has-error="$v.brasId.$error">
+                                        <treeselect 
+                                            v-model="$v.brasId.$model"
+                                            :options="treeSelectOptions"
+                                            :multiple="true"
+                                            :limit="1"
+                                            :limitText="count => `và ${count} giá trị khác`"
+                                            placeholder="" />
+                                      </bss-error-marker>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="info-row">
+                              <div class="key w50">Prefix <bss-required-marker /></div>
+                              <div class="value">
+                                    <bss-error-marker :has-error="$v.prefix.$error">
+                                        <input type="text" maxlength="11" ref="prefix-input" v-model.trim="$v.prefix.$model" class="form-control" :disabled="buttonState.btnNhapMoiEnabled">
+                                    </bss-error-marker>
+                              </div>
+                          </div>
+                          <div class="info-row">
+                              <div class="key w50">Loại IP <bss-required-marker /></div>
+                              <div class="value">
+                                  <div class="select-custom">
+                                        <bss-error-marker :has-error="$v.loaiIpId.$error">
+                                            <select v-model="loaiIpId" class="form-control">
+                                                <option v-for="loaiIp in dsLoaiIp" :value="loaiIp.LOAI_ID">{{loaiIp.LOAI}}</option>
+                                            </select>
+                                        </bss-error-marker>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w50">Từ số <bss-required-marker /></div>
+                                        <div class="value">
+                                            <bss-error-marker :has-error="$v.tuso.$error">
+                                                <vue-numeric 
+                                                    class="form-control" 
+                                                    v-model="$v.tuso.$model" 
+                                                    :min="0" 
+                                                    :max="254" 
+                                                    :minus="false" 
+                                                    :empty-value="0" 
+                                                    :separator="'.'"></vue-numeric>
+                                            </bss-error-marker>
+                                        </div>
+                                    </div>
+                              </div>
+                              <div class="col-sm-6 col-12">
+                                  <div class="info-row">
+                                        <div class="key w50">Đến số <bss-required-marker /></div>
+                                        <div class="value">
+                                            <bss-error-marker :has-error="$v.tuso.$error">
+                                                <vue-numeric class="form-control" v-model="denso" :min="0" :max="254" :minus="false" :empty-value="0" :separator="'.'"></vue-numeric>
+                                            </bss-error-marker>
+                                        </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-sm-9 col-12">
+                      <div class="box-form" style="height: 98%;">
+                          <div class="legend-title">Thông tin loại hình thuê bao prefix</div>
+                          <div class="info-row">
+                              <div class="key">Dịch vụ VT</div>
+                              <div class="value">
+                                  <div class="select-custom">
+                                      <select v-model="dichvuvtId" class="form-control" @change="onChangeComboDichvuvtId($event)">
+                                          <option v-for="dichvuvt in dsDichVuVt" :value="dichvuvt.DICHVUVT_ID">{{dichvuvt.TEN_DVVT}}</option>
+                                      </select>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="box-move-select-table">
+                              <div class="box-col">
+                                  <div class="title-bg-main">
+                                      <span class="title">Loại hình đã gán</span>
+                                  </div>
+                                  <DataGrid
+                                    class="grid-loai-hinh-da-gan"
+                                    panelDataHeight="100"
+                                    v-bind:columns="[
+                                        {fieldName: '', headerText: '', textAlign: 'Center', allowFiltering: false, width: '50', headerTemplate: getHeaderTemplateChonAllLoaiTbDaGan(this), template: getColumnTemplateChonLoaiTbDaGan(this)},
+                                        {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, width: '98%'},
+                                    ]"        
+                                    v-bind:dataSource="dsLoaiTbDaGan"
+                                    :showFilter="true"
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"></DataGrid>
+                              </div>
+                              <div class="actions padt0">
+                                  <button class="btn btn-main" @click="onClickButtonGoGan">
+                                      <span class="-ap icon-chevron-thin-right"></span>
+                                  </button>
+                                  <button class="btn btn-main" @click="onClickButtonGan">
+                                      <span class="-ap icon-chevron-thin-left"></span>
+                                  </button>
+                              </div>
+                              <div class="box-col">
+                                  <div class="title-bg-main">
+                                      <span class="title">Loại hình chưa gán</span>
+                                  </div>
+                                  <DataGrid
+                                    class="grid-loai-hinh-chua-gan"
+                                    panelDataHeight="100"
+                                    v-bind:columns="[
+                                        {fieldName: '', headerText: '', textAlign: 'Center', allowFiltering: false, width: '50', headerTemplate: getHeaderTemplateChonAllLoaiTbChuaGan(this), template: getColumnTemplateChonLoaiTbChuaGan(this)},
+                                        {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, width: '98%'},
+                                    ]"        
+                                    v-bind:dataSource="dsLoaiTbChuaGan"
+                                    :showFilter="true"
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"></DataGrid> 
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="box-form div-ds-prefix">
+                <div class="legend-title">Danh sách prefix</div>
+                <DataGrid 
+                    ref="grid-prefix" 
+                    v-bind:columns="[			
+                        {fieldName: 'TENBRAS', headerText: 'Bras', allowFiltering: true, width: 130},
+                        {fieldName: 'PREFIX', headerText: 'Prefix', allowFiltering: true, width: 130},
+                        {fieldName: 'TUSO', headerText: 'Từ số', allowFiltering: true, width: 130},
+                        {fieldName: 'DENSO', headerText: 'Đến số', allowFiltering: true, width: 130},
+                        {fieldName: 'LOAI', headerText: 'Loại', allowFiltering: true, width: 130},
+                        {fieldName: 'KEY', isPrimaryKey: true, visible: false},
+                    ]"
+                    panelDataHeight="211"
+                    v-bind:dataSource="dsPrefixIp"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    @selectedRowChanged="onSelectRowPrefixIp"></DataGrid>		
+            </div>
+            </div>
+            <div class="col-sm-3 col-12">
+                <div class="box-form" style="height: 869px;">
+                    <div class="legend-title">Danh sách IP</div>
+                    <DataGrid 
+                        v-bind:columns="[            
+                            {fieldName: 'IP', headerText: 'IP', allowFiltering: true, width: 100},    
+                            {fieldName: 'TEN_TTSO', headerText: 'Trạng thái số', allowFiltering: true, width: 100},
+                        ]"        
+                        v-bind:dataSource="dsIp"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"></DataGrid> 
+              </div>
+          </div>
+      </div>
+  </div>
+  <b-modal v-model="xacNhanXoa" centered title="Thông báo" size="sm" @ok="okXoaPrefix">        
+      <span>Bạn muốn xóa prefix IP cho bras không</span>
+      <template #modal-footer="{ ok, cancel }">
+        <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+        <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+    </template>
+  </b-modal>
+</div>

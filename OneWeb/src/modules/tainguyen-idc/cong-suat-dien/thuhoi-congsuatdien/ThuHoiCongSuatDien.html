@@ -1,0 +1,160 @@
+<div>
+  <div class="list-actions-top" v-if="isEditMode">
+    <ul class="list">
+      <li>
+        <a  v-if="actions.save" href="javascript:void(0)" @click="onSave">
+          <span class="icon one-save"></span> Ghi Lại
+        </a>
+      </li>
+      <li>
+        <a v-if="actions.transferExecute" href="javascript:void(0)" @click="onChuyenThucHien">
+          <span class="icon one-file-arrow-right"></span> Chuyển thực hiện
+        </a>
+      </li>
+      <li>
+        <a
+          v-if="actions.transfer"
+          href="javascript:void(0)"
+          :class="{'disable-btn': !tsbtnChuyenXuLy}"
+          @click="tsbtnChuyenXuLy_Click"
+        >
+          <span class="icon one-file-arrow-right"></span> Chuyển xử lý
+        </a>
+      </li>
+      <li>
+        <a
+          v-if="actions.returnTicket"
+          href="javascript:void(0)"
+          :class="{'disable-btn': !tsbtnTraPhieu}"
+          @click="tsbtnTraPhieu_Click"
+        >
+          <span class="icon one-file-back"></span> Trả phiếu
+        </a>
+      </li>
+      <li>
+        <a
+          v-if="actions.complete"
+          href="javascript:void(0)"
+          :class="{'disable-btn': !tsbtnHoanThanh}"
+          @click="tsbtnHoanThanh_Click"
+        >
+          <span class="icon one-file-check"></span> Hoàn thành
+        </a>
+      </li>
+      <!-- <li @click="onBackToResult()" v-if="!canEdit && !isTiepNhan">
+        <b-link href="javascript:void(0)">
+          <span class="icon one-file-check"></span>Trở về danh sách kết quả công việc
+        </b-link>
+      </li> -->
+      <li>
+        <a v-if="actions.confirmExecute" href="javascript:void(0)" @click="onXacNhanThucHien()">
+          <span class="icon one-file-check"></span> Xác nhận thực hiện
+        </a>
+      </li>
+    </ul>
+  </div>
+  <!-- thông tin công việc -->
+  <div class="page-content">
+    <thong-tin-cong-viec :phieuThiCongId="congviec.phieuTcId" ref="thongTinCongViec" :key="congviec" />
+    <!-- TAB NAVIGATION -->
+    <div class="">
+      <div class="nav tab-over tabs" style="margin-top: 20px;">
+        <a
+          href="#tabChonThuHoiDien"
+          v-on:click="onChangeTab(1)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 1}"
+          >Thu Hồi điện</a
+        >
+        <a
+          href="#tabLichSuThayDoi"
+          v-on:click="onChangeTab(2)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 2}"
+          >Lịch sử tác động</a
+        >
+      </div>
+    </div>
+    <div class="tab-content" style="margin-bottom: 20px;">
+      <div class="tab-pane" id="tabChonThuHoiDien" :class="{active: tab_index == 1}">
+        <div class="box-form">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <div class="pull-left">Danh sách các thiết bị thu hồi điện</div>
+            <div>
+              <button
+                v-if="actions.powerAllocate"
+                @click="openThuHoiPopup()"
+                class="btn btn-primary mr-2"
+              >
+                <i class="fa fa-plus"></i> Thu hồi công suất điện
+              </button>
+              <!-- <button
+                @click="$refs.dlgSelectThietBi.openDialog()"
+                v-if="permissions.isTiepNhan"
+                class="btn btn-primary "
+              >
+                Chọn thiết bị thu hồi điện
+              </button> -->
+            </div>
+          </div>
+          <div class="table-content">
+            <DataGrid
+              v-bind:columns="[
+              { fieldName: 'tenThietBi', headerText: 'Thiết bị', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'idRack', headerText: 'ID Rack', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'tenRack', headerText: 'Tên Rack', allowFiltering: true, allowSorting: true, width: 180 },
+              { fieldName: 'viTriUTren', headerText: 'Vị trí U trên', allowFiltering: true, allowSorting: true, width: 100 },
+              { fieldName: 'viTriUDuoi', headerText: 'Vị trí U dưới', allowFiltering: true, allowSorting: true, width: 100 },
+              { fieldName: 'tenThanhNguon', headerText: 'Thanh nguồn', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'trangThaiThanhNguonText', headerText: 'Trạng thái thanh nguồn', allowFiltering: true, allowSorting: true, width: 200 },
+              { fieldName: 'idOCam', headerText: 'ID Ổ cắm', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'trangThaiOcamText', headerText: 'Trạng thái ổ cắm', allowFiltering: true, allowSorting: true, width: 200, },
+             ...(actions.powerAllocate
+              ? [{ fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: this.actionColumn(), width: 150 }]
+              : [])
+            ]"
+              :dataSource="dsKetQuaThuHoi"
+              :showColumnCheckbox="false"
+              :enablePagingServer="false"
+              :allowPaging="true"
+              :enabledSelectFirstRow="true"
+              dataKeyField="idThietBi"
+              :showFilter="true"
+              ref="dsKetQuaThuHoi"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="tabLichSuThayDoi" :class="{active: tab_index == 2}">
+        <!-- Lịch sử tác động -->
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách lịch sử tác động</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <tab-history
+                :tenBang="'OCAM'"
+                :tenCot="''"
+                :khoaDuLieu="Number($route.query.phieutc)"
+                ref="tabHistory"
+              ></tab-history>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end of page-content -->
+  <popup-thu-hoi-dien ref="dlgThuHoiDien" @accept="handleThuHoiCongSuat" />
+  <chuyen-xu-ly-popup ref="dlgChuyenXuLy" :congviec="congviec" @accept="handleChuyenXuLy" />
+  <tra-phieu-popup ref="dlgTraPhieu" :phieuTcId="congviec.phieuTcId" @accept="loadData" />
+  <select-thiet-bi-popup
+    ref="dlgSelectThietBi"
+    :phieuTcId="congviec.phieuTcId"
+    actionType="THU_HOI"
+    @accept="loadData"
+  />
+</div>

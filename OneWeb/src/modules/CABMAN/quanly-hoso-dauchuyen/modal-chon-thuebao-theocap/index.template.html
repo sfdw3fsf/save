@@ -1,0 +1,160 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">Chọn thuê bao theo cáp</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+        <div class="popup-body hsdc-chon-thuebao-theo-cap">
+            <div class="row">
+                <div class="col-sm-5 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Chọn thuê bao theo cáp</div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Trung tâm VT
+                            </div>
+                            <div class="value" ref="ref-select-ttvt">
+                                <SelectExt     
+                                    :settings="{dropdownParent: $refs['ref-select-ttvt']}"
+                                    v-model="ttvtId" 
+                                    :dataSource="dsTtvt" 
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Tổ kỹ thuật
+                            </div>
+                            <div class="value" ref="ref-select-to">
+                                <SelectExt     
+                                    :settings="{dropdownParent: $refs['ref-select-to']}"
+                                    v-model="toId" 
+                                    :dataSource="dsTo" 
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Tổng đài
+                            </div>
+                            <div class="value" ref="ref-select-tramtbi">
+                                <SelectExt     
+                                    :settings="{dropdownParent: $refs['ref-select-tramtbi']}"
+                                    v-model="tramTbiId" 
+                                    :dataSource="dsTramTbi" 
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Nhóm loại cáp
+                            </div>
+                            <div class="value" ref="ref-select-nhom-lc">
+                                <SelectExt     
+                                    :settings="{dropdownParent: $refs['ref-select-nhom-lc']}"
+                                    v-model="nhomLcId" 
+                                    :dataSource="dsNhomLc" 
+                                    dataValueField="NHOMLC_ID"
+                                    dataTextField="NHOM_LC" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Cáp gốc
+                            </div>
+                            <div class="value" ref="ref-select-cap-goc">
+                                <SelectExt     
+                                    :settings="{dropdownParent: $refs['ref-select-cap-goc']}"
+                                    v-model="capGocId" 
+                                    :dataSource="dsCapGoc" 
+                                    dataValueField="CAP_ID"
+                                    dataTextField="KYHIEU" />
+                            </div>
+                        </div>
+                        <div class="info-row mart20">
+                            <div class="key w100 padt0 nowrap">
+                                <div class="item marb10">
+                                    <div class="check-action">
+                                        <input type="radio" class="check" value="1" v-model="kieuHienThiThueBao">
+                                        <span class="name">Hiện tất cả thuê bao đi qua cáp gốc</span>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" class="check" value="2" v-model="kieuHienThiThueBao">
+                                        <span class="name">Hiện thuê bao theo cáp ngọn</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="value tright">
+                               <button class="btn btn-second padt15 padb15 padl30 padr30" @click="onClickBtnTimKiem">
+                                    <span class="one-search"></span> Tìm kiếm
+                               </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-form" v-show="kieuHienThiThueBao == 2">
+                        <div class="legend-title">Danh sách cáp ngọn</div>
+                        <DataGrid v-bind:columns="[            
+                                {fieldName: 'KYHIEU', headerText: 'Tên cáp', allowFiltering: true},    
+                                {fieldName: 'SODOIDAY', headerText: 'Số đôi dây', allowFiltering: true},
+                                {fieldName: 'TEN_KC', headerText: 'Kết cuối đích', allowFiltering: true},    
+                                {fieldName: 'TONGSO_DD', headerText: 'DL KC', allowFiltering: true},
+                                {fieldName: 'DIACHI', headerText: 'Địa chỉ KC', allowFiltering: true},    
+                            ]"        
+                            v-bind:dataSource="dsCapNgon"
+                            panelDataHeight="120"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            @selectedRowChanged="onSelectRowCapNgon"></DataGrid> 
+                    </div>
+                </div>
+                <div class="col-sm-7 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách thuê bao</div>
+                        <div class="table-content grid-thuebao">
+                            <DataGrid
+                                class="table-result"
+                                v-bind:columns="[
+                                    {fieldName: '', headerText: '', textAlign: 'Center', allowFiltering: false, width: '70', clipMode: 'Ellipsis', freeze: 'Left', headerTemplate: getHeaderTemplateChon(this), template: getColumnTemplateChon(this)},
+                                    {fieldName: 'STT', headerText: 'STT', allowFiltering: true, width: '70', freeze: 'Left' },
+                                    {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, width: '130' },
+                                    {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, width: '130' },
+                                    {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, width: '130' },
+                                    {fieldName: 'KIEU', headerText: 'Kiểu đấu nối', allowFiltering: true, width: '130' },
+                                    {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, width: '200' },
+                                ]"        
+                                v-bind:dataSource="dsThueBao"
+                                panelDataHeight="300"
+                                :showFilter="true"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                                @queryCellInfo="onQueryCellInfo"></DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="group-buttons -bottom center">
+                <button class="btn btn-main" style="min-width: 130px;" :disabled="disableBtnThucThi" @click="onClickBtnThucThi">Thực thi</button>
+                <button class="btn btn-second" style="min-width: 130px;" @click="$bvModal.hide(modalId)">Huỷ bỏ</button>
+            </div>
+        </div>
+    </div>
+</b-modal>

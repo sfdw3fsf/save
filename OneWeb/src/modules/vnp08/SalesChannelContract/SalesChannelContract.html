@@ -1,0 +1,641 @@
+<div>
+  <breadcrumb :header="header" />
+  <vue-nav>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="javascript: void(0)" title="Hiển thị danh sách" @click="btnLayTT_click">
+            <span class="icon one-file-attach"></span>Lấy TT
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" title="Nhập mới" :class="{'disabled': !btn_Enabled.nhapMoi}"
+            @click="btnNhapMoi_click">
+            <span class="icon one-file-plus"></span>Nhập mới
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" title="Ghi lại" :class="{'disabled': !btn_Enabled.ghiLai}"
+            @click="btnCapNhat_click">
+            <span class="icon one-save"></span>Ghi lại
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" title="Hủy" :class="{'disabled': !btn_Enabled.huy}" @click="btnHuy_click">
+            <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" title="Xóa" :class="{'disabled': !btn_Enabled.xoa}" @click="btnXoa_click">
+            <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Xóa
+          </a>
+        </li>
+        <!-- <li>
+          <a href="javascript: void(0)" title="Thông tin thanh toán" @click="btnTTThanhToan_click">
+            <span class="icon nc-icon-glyph shopping_credit-card"></span>Thông tin thanh toán
+          </a>
+        </li> -->
+        <li>
+          <a href="javascript: void(0)" title="File hồ sơ" @click="btnFileHoSo_click">
+            <span class="icon one-file-attach"></span>File hồ sơ
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" title="Lịch sửa giao phiếu" @click="btnLichSu_click">
+            <span class="icon one-file-arrow-right1"></span>Lịch sử giao phiếu
+          </a>
+        </li>
+        <!-- <li>
+          <a href="javascript: void(0)" title="Thông tin hợp đồng" @click="btnChiTiet_Click">
+            <span class="icon one-file-attach"></span>Thông tin hợp đồng kênh
+          </a>
+        </li> -->
+        <!-- <li>
+          <a href="javascript: void(0)" title="Tra cứu cơ chế" @click="btnTTCoChe_Click">
+            <span class="icon one-search"></span>Tra cứu cơ chế
+          </a>
+        </li> -->
+      </ul>
+    </div>
+  </vue-nav>
+  <div class="page-content">
+    <div class="row">
+      <div class="box-form">
+        <div class="legend-title">
+          <span @click="expanded.hop_dong = !expanded.hop_dong" class="fa icon bold"
+            :class="{'fa-angle-up':expanded.hop_dong, 'fa-angle-down':!expanded.hop_dong,}"></span> Thông tin đề xuất ký hợp đồng kênh bán
+        </div>
+        <div class="row" v-if="expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Mã yêu cầu <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_MaPhieu" v-model.trim="cbb_MaPhieu.value"
+                  :settings="{dropdownParent: $refs['cbb_MaPhieu']}" :dataSource="cbb_MaPhieu.Items" dataTextField="ma_yc"
+                  dataValueField="ma_yc" @change="onSelected_MaPhieu" :disabled="!cbb_MaPhieu.Enabled" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">{{hangkenhCTV ? 'Đối tượng bán' : 'Đối tượng'}} <span class="red">(*)</span>
+              </div>
+              <div class="value">
+                <div class="select2">
+                  <SelectExt id="cbb_Doituong" v-model.trim="cbb_Doituong.value"
+                    :settings="{dropdownParent: $refs['cbb_Doituong']}" :dataSource="cbb_Doituong.Items"
+                    dataTextField="doituongban" dataValueField="dt_ban_id" @change="onChangeDoiTuong"
+                    :disabled="!cbb_Doituong.Enabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Hạng kênh <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_Hangkenh" v-model.trim="cbb_Hangkenh.value"
+                  :settings="{dropdownParent: $refs['cbb_Hangkenh']}" :dataSource="cbb_Hangkenh.Items"
+                  dataTextField="ten_loaidv" dataValueField="loaidv_id" @change="onChangeHangkenh($event)"
+                  :disabled="!cbb_Hangkenh.Enabled" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.hop_dong">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w120">ĐV đề xuất <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_DVDexuat" v-model.trim="cbb_DVDexuat.value"
+                  :settings="{dropdownParent: $refs['cbb_DVDexuat']}" :dataSource="cbb_DVDexuat.Items" dataTextField="ten_dv"
+                  dataValueField="donvi_id" @change="onChangeDVDexuat($event)" :disabled="!cbb_DVDexuat.Enabled" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Người đề xuất <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_NguoiDeXuat" v-model.trim="cbb_NguoiDeXuat.value"
+                  :settings="{dropdownParent: $refs['cbb_NguoiDeXuat']}" :dataSource="cbb_NguoiDeXuat.Items"
+                  dataTextField="ten_nv" dataValueField="nhanvien_id" @change="onChangeNguoiDeXuat($event)"
+                  :disabled="!cbb_NguoiDeXuat.Enabled" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="!hangkenhCTV && expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Mã kênh <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_MaDaiLy" :title="txt_MaDaiLy.value"
+                  :value="txt_MaDaiLy.value" @change="e => txt_MaDaiLy.value = e.target.value"
+                  :disabled="!txt_MaDaiLy.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Tên kênh <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_TenDaiLy" :title="txt_TenDaiLy.value"
+                  :value="txt_TenDaiLy.value" @change="e => txt_TenDaiLy.value = e.target.value"
+                  :disabled="!txt_TenDaiLy.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Địa chỉ <span class="red">(*)</span></div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" v-b-modal.popupDiaChiKB title="Chọn địa chỉ kênh bán" :disabled="!txt_DiaChi.Enabled">
+                    <span class="-ap one-map-location f20"></span>
+                  </button>
+      
+                  <ModalChonDiaChi modalId="popupDiaChiKB" :data="diachiKB" :isStrictMode="true" @xacnhan="getDiaChiKB" />
+                  <bss-error-marker :has-error="$v.diachiKB.DIACHI.$error">
+                    <input type="text" v-model="$v.diachiKB.DIACHI.$model" class="form-control" @change="diachiKBChanged"
+                      required :title="$v.diachiKB.DIACHI.$model" :disabled="!txt_DiaChi.Enabled">
+                  </bss-error-marker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Dai ly -->
+        <div class="row" v-if="!hangkenhCTV && expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Điện thoại</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_DienThoai" :title="txt_DienThoai.value"
+                  :value="txt_DienThoai.value" @change="e => txt_DienThoai.value = e.target.value"
+                  :disabled="!txt_DienThoai.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Fax</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_Fax" :value="txt_Fax.value" :title="txt_Fax.value"
+                  @change="e => txt_Fax.value = e.target.value" :disabled="!txt_Fax.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Mã số thuế <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_MST_CCCD" :title="txt_MST_CCCD.value"
+                  :value="txt_MST_CCCD.value" @change="e => txt_MST_CCCD.value = e.target.value"
+                  :disabled="!txt_MST_CCCD.Enabled">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="!hangkenhCTV && expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Người đại diện</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_NguoiDD" :title="txt_NguoiDD.value"
+                  :value="txt_NguoiDD.value" @change="e => txt_NguoiDD.value = e.target.value"
+                  :disabled="!txt_NguoiDD.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Chức danh</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_ChucDanh" :title="txt_ChucDanh.value"
+                  :value="txt_ChucDanh.value" @change="e => txt_ChucDanh.value = e.target.value"
+                  :disabled="!txt_ChucDanh.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Loại giấy tờ</div>
+              <div class="value">
+                <select2 :z-index="2000" class="select2" v-model="cbb_LoaiGT.value"
+                  :options="cbb_LoaiGT.Items && cbb_LoaiGT.Items.length > 0 ? cbb_LoaiGT.Items.map(e => ({id: e.loaigt_id, text: e.loai_gt})) : []"
+                  :disabled="!cbb_LoaiGT.Enabled">
+                </select2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CTV -->
+        <div class="row" v-if="hangkenhCTV && expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Mã kênh <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_MaCTV" :title="txt_MaCTV.value" :value="txt_MaCTV.value"
+                  @change="e => txt_MaCTV.value = e.target.value" :disabled="!txt_MaCTV.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Tên kênh <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_TenCTV" :title="txt_TenCTV.value"
+                  :value="txt_TenCTV.value" @change="e => txt_TenCTV.value = e.target.value" :disabled="!txt_TenCTV.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2 col-12">
+            <div class="info-row">
+              <div class="key w120">CMT/CCCD</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_MST_CCCD" :value="txt_MST_CCCD.value"
+                  @change="e => txt_MST_CCCD.value = e.target.value" :disabled="!txt_MST_CCCD.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2 col-12">
+            <div class="info-row">
+              <div class="key w120">Số ĐT</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_DienThoai" :title="txt_DienThoai.value"
+                  :value="txt_DienThoai.value" @change="e => txt_DienThoai.value = e.target.value"
+                  :disabled="!txt_DienThoai.Enabled">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="hangkenhCTV && expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Ngày sinh</div>
+              <div class="value">
+                <DatePicker :format="dateFormat" :value-type="'format'" v-model="dtp_NgaySinh.value"
+                  :disabled="!dtp_NgaySinh.Enabled">
+                </DatePicker>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Giới tính</div>
+              <div class="value">
+                <select2 :z-index="2000" class="select2" v-model="cbb_GioiTinh.value" :options="cbb_GioiTinh.Items"
+                  :disabled="!cbb_GioiTinh.Enabled">
+                </select2>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Địa chỉ <span class="red">(*)</span></div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" v-b-modal.popupDiaChiKB title="Chọn địa chỉ kênh bán" :disabled="!txt_DiaChi.Enabled">
+                    <span class="-ap one-map-location f20"></span>
+                  </button>
+      
+                  <ModalChonDiaChi modalId="popupDiaChiKB" :data="diachiKB" :isStrictMode="true" @xacnhan="getDiaChiKB" />
+                  <bss-error-marker :has-error="$v.diachiKB.DIACHI.$error">
+                    <input type="text" v-model="$v.diachiKB.DIACHI.$model" class="form-control " @change="diachiKBChanged"
+                      required :title="$v.diachiKB.DIACHI.$model" :disabled="!txt_DiaChi.Enabled">
+                  </bss-error-marker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Số giấy tờ</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_SoGT" :value="txt_SoGT.value"
+                  @change="e => txt_SoGT.value = e.target.value" :disabled="!txt_SoGT.Enabled">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Ngày cấp</div>
+              <div class="value">
+                <DatePicker :format="dateFormat" :value-type="'format'" v-model="dtp_NgayCap.value"
+                  :disabled="!dtp_NgayCap.Enabled">
+                </DatePicker>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Nơi cấp</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_NoiCap" :value="txt_NoiCap.value"
+                  @change="e => txt_NoiCap.value = e.target.value" :disabled="!txt_NoiCap.Enabled">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.hop_dong">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">ĐV phê duyệt <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_DVPheDuyet" v-model.trim="cbb_DVPheDuyet.value"
+                  :settings="{dropdownParent: $refs['cbb_DVPheDuyet']}" :dataSource="cbb_DVPheDuyet.Items"
+                  dataTextField="ten_dv" dataValueField="donvi_id" @change="onChangeDVPheDuyet($event)"
+                  :disabled="!cbb_DVPheDuyet.Enabled" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Ngày phê duyệt</div>
+              <div class="value">
+                <DatePicker :format="dateFormat" :value-type="'format'" v-model="dtp_NgayPheDuyet.value"
+                  :input-attr="{required: 'true', title: 'Chưa có ngày phê duyệt hợp đồng!'}" @change="onChangeNgayPD"
+                  :disabled="!dtp_NgayPheDuyet.Enabled">
+                </DatePicker>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Lãnh đạo duyệt</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_LanhDaoDuyet" :title="txt_LanhDaoDuyet.value"
+                  :value="txt_LanhDaoDuyet.value" @change="e => txt_LanhDaoDuyet.value = e.target.value"
+                  :disabled="!txt_LanhDaoDuyet.Enabled">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.hop_dong">
+          <div class="col-sm-12 col-12">
+            <div class="info-row">
+              <div class="key w120">Nội dung</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_YKienLD" :title="txt_YKienLD.value"
+                  :value="txt_YKienLD.value" @change="e => txt_YKienLD.value = e.target.value"
+                  :disabled="!txt_YKienLD.Enabled">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box-form">
+        <div class="legend-title"> 
+          <span @click="expanded.tt_bosung = !expanded.tt_bosung" class="fa icon bold"
+          :class="{'fa-angle-up':expanded.tt_bosung, 'fa-angle-down':!expanded.tt_bosung,}"></span> Thông tin bổ sung kênh bán
+        </div>
+        <div class="row" v-if="expanded.tt_bosung">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Username <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_Username" :title="txt_Username.value"
+                  :value="txt_Username.value" @change="e => txt_Username.value = e.target.value">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Thuộc TV kênh</div>
+              <div class="value">
+                <SelectExt id="cbb_TVKenh" v-model.trim="cbb_TVKenh.value" :settings="{dropdownParent: $refs['cbb_TVKenh']}"
+                  :dataSource="cbb_TVKenh.Items" dataTextField="ten_dv" dataValueField="donvi_id" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">NV quản lý <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_NVQL" v-model.trim="cbb_NVQL.value" :settings="{dropdownParent: $refs['cbb_NVQL']}"
+                  :dataSource="cbb_NVQL.Items" dataTextField="ten_nv" dataValueField="nhanvien_id" @change="onChange_NhanVienQL"/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.tt_bosung">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Số tài khoản </div>
+              <div class="value">
+                <input type="text" class="form-control" ref="txt_SoTK" :value="txt_SoTK.value"
+                  @change="e => txt_SoTK.value = e.target.value">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Chủ tài khoản</div>
+              <div class="value">
+                <input type="text" class="form-control" ref="txt_ChuTK" :value="txt_ChuTK.value"
+                  @change="e => txt_ChuTK.value = e.target.value">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="row custom-row">
+              <div class="w120 pad2">Ngân hàng</div>
+              <select2 :z-index="2000" class="select2 pad2"
+                style="width: calc(100% - 120px) !important; padding-left: .5rem !important;" v-model="cbb_NganHang.value"
+                :options="cbb_NganHang.Items.length > 0 ? cbb_NganHang.Items.map(e => ({ id: e.nganhang_id, text: e.ten_nh })) : []"
+                :disabled="!cbb_NganHang.Enabled">
+              </select2>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.tt_bosung">
+          <div class="col-sm-4 col-12">
+            <div class="row custom-row">
+              <div class="w120 pad2">HT thanh toán</div>
+              <select2 :z-index="2000" class="select2 pad2"
+                style="width: calc(100% - 120px) !important; padding-left: .5rem !important;" v-model="cbb_HTTT.value"
+                :options="cbb_HTTT.Items.length > 0 ? cbb_HTTT.Items.map(e => ({ id: e.httt_id, text: e.hinhthuc })) : []"
+                :disabled="!cbb_HTTT.Enabled">
+              </select2>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="row custom-row">
+              <div class="w120 pad2">ĐV quản lý</div>
+              <select2 :z-index="2000" class="select2 pad2"
+                style="width: calc(100% - 120px) !important; padding-left: .5rem !important;" v-model="cbb_DVQL_TT.value"
+                :options="cbb_DVQL_TT.Items.length > 0 ? cbb_DVQL_TT.Items.map(e => ({ id: e.donvi_id, text: e.ten_dv })) : []"
+                :disabled="!cbb_DVQL_TT.Enabled" @change="onChangeDVQLTT($event)">
+              </select2>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="row custom-row">
+              <div class="w120 pad2">NV chi trả</div>
+              <select2 :z-index="2000" class="select2 pad2"
+                style="width: calc(100% - 120px) !important; padding-left: .5rem !important;" v-model="cbb_NVQL_TT.value"
+                :options="cbb_NVQL_TT.Items.length > 0 ? cbb_NVQL_TT.Items.map(e => ({ id: e.nhanvien_id, text: e.ten_nv })) : []"
+                :disabled="!cbb_NVQL_TT.Enabled">
+              </select2>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.tt_bosung">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Mã số thuế</div>
+              <div class="value">
+                <input type="text" :value="txt_MST.value" @change="v => txt_MST.value = v.target.value"
+                  class="form-control" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Ví VNPT Pay</div>
+              <div class="value">
+                <input type="text" class="form-control" :value="txt_Vi_VNPT.value"
+                  @change="v => txt_Vi_VNPT.value = v.target.value">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Ghi chú</div>
+              <div class="value">
+                <input type="text" class="form-control" :value="txt_GhiChu_TT.value"
+                  @change="v => txt_GhiChu_TT.value = v.target.value">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title"> <span @click="expanded.tt_hopdong_kenh = !expanded.tt_hopdong_kenh" class="fa icon bold"
+          :class="{'fa-angle-up':expanded.tt_hopdong_kenh, 'fa-angle-down':!expanded.tt_hopdong_kenh,}"></span> Thông tin hợp đồng ký với kênh bán
+        </div>
+        <div class="row" v-if="expanded.tt_hopdong_kenh">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Mã HĐ/PL <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_SoHDPL" :title="txt_SoHDPL.value"
+                  :value="txt_SoHDPL.value" @change="e => txt_SoHDPL.value = e.target.value">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Ngày ký <span class="red">(*)</span></div>
+              <div class="value">
+                <DatePicker :format="dateFormat" :value-type="'format'" v-model="dtp_NgayKy.value"
+                  :input-attr="{required: 'true', title: dtp_NgayKy.value}" @change="onChangeNgayKy">
+                </DatePicker>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Người ký <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_NguoiKy" :title="txt_NguoiKy.value"
+                  :value="txt_NguoiKy.value" @change="e => txt_NguoiKy.value = e.target.value">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.tt_hopdong_kenh">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Loại hợp đồng</div>
+              <div class="value">
+                <SelectExt id="cbb_LoaiHD" v-model.trim="cbb_LoaiHD.value" :settings="{dropdownParent: $refs['cbb_LoaiHD']}"
+                  :dataSource="cbb_LoaiHD.Items" dataTextField="loaihd_kenh" dataValueField="loaihdkenh_id" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Loại thù lao <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_LoaiThuLao" v-model.trim="cbb_LoaiThuLao.value"
+                  :settings="{dropdownParent: $refs['cbb_LoaiThuLao']}" :dataSource="cbb_LoaiThuLao.Items"
+                  dataTextField="loaithulao" dataValueField="loaithulao_id" @change="onChangeLoaiThuLao" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Tổng % thù lao</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_TongTyLeThuLao" :title="txt_TongTyLeThuLao.value"
+                  :value="txt_TongTyLeThuLao.value" @change="e => txt_TongTyLeThuLao.value = e.target.value"
+                  :disabled="!txt_TongTyLeThuLao.Enabled">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="expanded.tt_hopdong_kenh">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Tần suất <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt id="cbb_TanSuatHuong" v-model.trim="cbb_TanSuatHuong.value"
+                  :settings="{dropdownParent: $refs['cbb_TanSuatHuong']}" :dataSource="cbb_TanSuatHuong.Items"
+                  dataTextField="httt_kenh" dataValueField="httt_kenh_id" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w120">Ghi chú</div>
+              <div class="value">
+                <input type="text" class="form-control text" ref="txt_GhiChu" :title="txt_GhiChu.value"
+                  :value="txt_GhiChu.value" @change="e => txt_GhiChu.value = e.target.value">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="legend-title" v-if="expanded.tt_hopdong_kenh">Danh sách cơ chế</div>
+        <div class="row" v-if="expanded.tt_hopdong_kenh">
+          <div class="col-sm-12 col-12">
+            <button class="btn btn-sm btn-primary" @click="btnReload_Click" title="Tải lại lưới">
+              <span class="-ap one-refresh"></span>
+            </button>
+            <button class="btn btn-sm btn-primary" @click="btnThemCoChe_Click" title="Thêm mới cơ chế">
+              <span class="-ap icon-plus"></span>
+            </button>
+          </div>
+        </div>
+        <DataGrid v-bind:columns="grid_CoChe.header" :commands="grid_CoChe.commands" @commandClicked="gridCommand_CoChe"
+          :commandColumn="{headerText: 'Thao tác', width: 90, cellCssClass: 'center', firstColumn: true, show: true}"
+          v-bind:dataSource="grid_CoChe.list" :showFilter="true" :allowPaging="true" ref="grid_CoChe"
+          :enablePagingServer="false" :allowExcelExport="true" :enabledSelectFirstRow="false" panelDataHeight="200px" v-show="expanded.tt_hopdong_kenh">
+        </DataGrid>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box-form">
+        <div class="legend-title"> <span @click="expanded.ds_hopdong = !expanded.ds_hopdong" class="fa icon bold"
+          :class="{'fa-angle-up':expanded.ds_hopdong, 'fa-angle-down':!expanded.ds_hopdong,}"></span> Danh sách hợp đồng
+        </div>
+        <DataGrid v-bind:columns="grid_HopDong.header" v-bind:dataSource="grid_HopDong.list" :showFilter="true"
+          :allowPaging="true" ref="grid_HopDong" :enablePagingServer="false" :showColumnCheckbox="false"
+          :allowExcelExport="true" @rowSelected="onHopDongSelected" panelDataHeight="200px" v-show="expanded.ds_hopdong">
+        </DataGrid>
+      </div>
+    </div>
+  </div>
+  <HosoFile ref="HosoFileModal" :hdkenh_id="hdkenh_id" @xacnhan="getDanhsach_FileKenhBan" />
+  <Lichsuphieugiao ref="lichsugiaophieuModal" :hdkenh_id = "hdkenh_id" />
+  <b-modal id="popupComponents" size="huge" :title="popupComponentHeader" :hide-header="popupComponentHeader?false:true"
+    hide-footer body-class="modal-body p-0">
+    <component :is="popupComponent" ref="generalPopup" :dulieu="popupComponentData" v-bind="popupComponentAttr"
+      isPopup="true" v-on="popupComponentEvts"></component>
+  </b-modal>
+</div>

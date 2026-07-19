@@ -1,0 +1,571 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="page-content" style="top: 60px;">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">Loại CT</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.loai_ct.list" v-model="listbox.loai_ct.value">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">Quản lý quyền</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.ds_quyen.list" v-model="listbox.ds_quyen.value">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav tabs tab-over">
+                <a href="#tab1" data-toggle="tab" class="active">Phân quyền menu</a>
+                <a href="#tab2" data-toggle="tab">Phân quyền báo cáo</a>
+                <a href="#tab3" data-toggle="tab">Phân quyền gọi hàm</a>
+                <a href="#tab4" data-toggle="tab">Phân quyền dữ liệu từ điển</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Nhóm menu</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select class="form-control" v-model="listbox.nhom_menu.value" @change="NhomMenuChanged">
+                                            <option :value="mn.NHOM_MENU_ID" v-for="mn in filtered_menu">{{ mn.NHOM_MENU }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_menu_chuagan_cbClicked"
+                                    :nodes="tree_menu_chuagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_menu_chuagan.text"
+                                    :hsid="tree_menu_chuagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_menu_chuagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenMenu(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenMenu(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_menu_dagan_cbClicked"
+                                    :nodes="tree_menu_dagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_menu_dagan.text"
+                                    :hsid="tree_menu_dagan.id"
+                                    :hascheckbox="false"
+                                    :selected="tree_menu_dagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Nhóm BC</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select class="form-control" v-model="listbox.nhom_bc.value">
+                                            <option :value="mn.NHOM_BC_ID" v-for="mn in filtered_bc">{{ mn.TEN_NHOM }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="table-content" style="height: 400px;">
+                                <table class="table-result table-gachle">
+                                    <thead class="center">
+                                        <tr>
+                                            <th class="w20"></th>
+                                            <th class="w20">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </th>
+                                            <th>ID</th>
+                                            <th>Tên quyền chưa gán</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="w20"></th>
+                                            <th class="w20">
+                                                <div class="check-action">
+                                                    <input type="checkbox" disabled="" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="input-icon-right">
+                                                    <input type="text" class="form-control">
+                                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="input-icon-right">
+                                                    <input type="text" class="form-control">
+                                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="highlight">
+                                            <td class="w20 center">
+                                                <span class="fa fa-play text-main"></span>
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td class="selected highlight1"></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tc-pagination">
+                                <a href="#" class="btn  one-arrow-left-forward"></a>
+                                <a href="#" class="btn fa fa-angle-double-left"></a>
+                                <a href="#" class="btn fa fa-angle-left"></a>
+                                <span class="text">Bản ghi</span>
+                                <div class="dropdown inline">
+                                    <div class="fw6 input-number" data-toggle="dropdown">
+                                        <span class="text-main">10</span>/1033
+                                    </div>
+                                    <div class="dropdown-menu">
+                                        <a href="#" class="dropdown-item">10</a>
+                                        <a href="#" class="dropdown-item">20</a>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn fa fa-angle-right"></a>
+                                <a href="#" class="btn fa fa-angle-double-right"></a>
+                                <a href="#" class="btn one-arrow-right-forward"></a>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="table-content" style="height: 400px;">
+                                <table class="table-result table-gachle">
+                                    <thead class="center">
+                                        <tr>
+                                            <th class="w20"></th>
+                                            <th class="w20">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </th>
+                                            <th>ID</th>
+                                            <th>Tên quyền chưa gán</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="w20"></th>
+                                            <th class="w20">
+                                                <div class="check-action">
+                                                    <input type="checkbox" disabled="" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="input-icon-right">
+                                                    <input type="text" class="form-control">
+                                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="input-icon-right">
+                                                    <input type="text" class="form-control">
+                                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="highlight">
+                                            <td class="w20 center">
+                                                <span class="fa fa-play text-main"></span>
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td class="selected highlight1"></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w20 center">
+                                            </td>
+                                            <td class="w20 center">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check">
+                                                    <span class="name"></span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tc-pagination">
+                                <a href="#" class="btn  one-arrow-left-forward"></a>
+                                <a href="#" class="btn fa fa-angle-double-left"></a>
+                                <a href="#" class="btn fa fa-angle-left"></a>
+                                <span class="text">Bản ghi</span>
+                                <div class="dropdown inline">
+                                    <div class="fw6 input-number" data-toggle="dropdown">
+                                        <span class="text-main">10</span>/1033
+                                    </div>
+                                    <div class="dropdown-menu">
+                                        <a href="#" class="dropdown-item">10</a>
+                                        <a href="#" class="dropdown-item">20</a>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn fa fa-angle-right"></a>
+                                <a href="#" class="btn fa fa-angle-double-right"></a>
+                                <a href="#" class="btn one-arrow-right-forward"></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane" id="tab3">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Nhóm Hàm</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select class="form-control" v-model="listbox.nhom_ham.value" @change="NhomHamChanged">
+                                            <option :value="nh.NHOMHAM_ID" v-for="nh in listbox.nhom_ham.list">{{ nh.TEN_NHOM }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_ham_chuagan_cbClicked"
+                                    :nodes="tree_ham_chuagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_ham_chuagan.text"
+                                    :hsid="tree_ham_chuagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_ham_chuagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenHam(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenHam(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_ham_dagan_cbClicked"
+                                    :nodes="tree_ham_dagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_ham_dagan.text"
+                                    :hsid="tree_ham_dagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_ham_dagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+                <div class="tab-pane" id="tab4">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Bảng từ điển</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select class="form-control" v-model="listbox.nhom_bang.value" @change="NhomBangChanged">
+                                            <option :value="dsb.TENBANG" v-for="dsb in listbox.nhom_bang.list">{{ dsb.TENBANG }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_bang_chuagan_cbClicked"
+                                    :nodes="tree_bang_chuagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_bang_chuagan.text"
+                                    :hsid="tree_bang_chuagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_bang_chuagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenBang(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenBang(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_bang_dagan_cbClicked"
+                                    :nodes="tree_bang_dagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_bang_dagan.text"
+                                    :hsid="tree_bang_dagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_bang_dagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

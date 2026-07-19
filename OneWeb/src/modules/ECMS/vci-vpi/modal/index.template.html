@@ -1,0 +1,141 @@
+<b-modal 
+    :id="modalId" 
+    ref="ref-modal"
+    size="lg" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">Cập nhật Vci - Vpi</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$refs['ref-modal'].hide()">
+            </div>
+        </div>
+        <div class="list-actions-top capnhat-vci-vpi">
+            <ul class="list">
+                <li :class="{'disable-btn': !btnNhapMoiEnabled}">
+                    <a href="javascript:void(0)" @click="onClickButtonNhapMoi">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnGhiLaiEnabled}">
+                    <a href="javascript:void(0)" @click="onClickButtonGhiLai">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnHuyBoEnabled}">
+                    <a href="javascript:void(0)" @click="onClickButtonHuy">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnXoaEnabled}">
+                    <a href="javascript:void(0)" @click="onClickButtonXoa">
+                        <span class="icon one-trash"></span>Xóa
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body capnhat-vci-vpi">
+            <div class="box-form">
+                <div class="legend-title">Thông tin Vci - Vpi</div>
+                <div class="info-row">
+                    <div class="key w90">Đơn vị QL</div>
+                    <div class="value" ref="ref-select-donvi-ql">
+                        <SelectExt
+                            :settings="{dropdownParent: $refs['ref-select-donvi-ql']}"
+                            v-model="idDonViQuanLy"
+                            :dataSource="dsDonViQuanLy" 
+                            dataValueField="DONVI_ID"
+                            dataTextField="TEN_DV" />
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Trạm thi công</div>
+                    <div class="value" ref="ref-select-tram-thi-cong">
+                        <SelectExt
+                            :settings="{dropdownParent: $refs['ref-select-tram-thi-cong']}"
+                            v-model="idTramThiCong"
+                            :dataSource="dsTramThiCong" 
+                            dataValueField="DONVI_ID"
+                            dataTextField="TEN_DV" />
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Trạm thiết bị</div>
+                    <div class="value" ref="ref-select-tram-thiet-bi">
+                        <SelectExt
+                            :settings="{dropdownParent: $refs['ref-select-tram-thiet-bi']}"
+                            v-model="idTramThietBi"
+                            :dataSource="dsTramThietBi" 
+                            dataValueField="DONVI_ID"
+                            dataTextField="TEN_DV" />
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Dslam <bss-required-marker/></div>
+                    <div class="value capnhat-vci-vpi">
+                        <bss-error-marker :has-error="$v.idDslam.$error">
+                            <treeselect
+                                v-model="$v.idDslam.$model"
+                                :multiple="false"
+                                :flat="true"
+                                :options="dsDslam.map(item => { return { id: item.DSLAM_ID, label: item.TEN_DSLAM }})"
+                                :searchable="true"
+                                :clearable="false"
+                                noOptionsText="Không có dữ liệu"
+                                noResultsText="Không có dữ liệu được tìm thấy"
+                                placeholder="" />
+                        </bss-error-marker>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Vci/Cvlan <bss-required-marker/></div>
+                            <div class="value">
+                                <vue-numeric ref="input-vci-cvlan" class="form-control highlight" v-model="vciCvlan" :min="0" maxlength="10" :minus="false" :empty-value="0" :separator="'.'"></vue-numeric>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w60">Vpi/Svlan <bss-required-marker/></div>
+                            <div class="value">
+                                <vue-numeric class="form-control highlight" v-model.trim="vpiSvlan" :min="0" maxlength="10" :minus="false" :empty-value="0" :separator="'.'"></vue-numeric>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách Vci - Vpi</div>
+                <DataGrid 
+                    ref="grid-vci-vpi"
+                    v-bind:columns="[
+                        {fieldName: 'VCI', headerText: 'VCI', allowFiltering: true},
+                        {fieldName: 'VPI', headerText: 'VPI', allowFiltering: true},
+                        {fieldName: 'VCI_VPI_ID', isPrimaryKey: true, visible: false},
+                    ]"
+                    v-bind:dataSource="dsVciVpi"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    :showColumnCheckbox="true"
+                    @selectedRowChanged="onClickRowTableVciVpi" @rowDeselected="onRowDeselected"></DataGrid>
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-confirm-xoa" centered title="Thông báo" size="sm" @ok="okXoaVciVpi">        
+        <span>Bạn thật sự muốn xóa VCI VPI không ?</span>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+</b-modal>

@@ -1,0 +1,2 @@
+import DebtTableSQLForInvoiceCycle from './DebtTableSQLForInvoiceCycle.vue'
+export default DebtTableSQLForInvoiceCycle

@@ -1,0 +1,823 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="LayTT">
+                    <span class="icon one-file-attach"></span> Lấy TT (F5)
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="CapNhatPhieu" :class="{'disabled':!isCapNhat}">
+                    <span class="icon one-reload1"></span> Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="GiaoViec" :class="{'disabled':!isGiaoViec}">
+                    <span class="icon one-file-edit2"></span>Giao việc
+                </a>
+            </li>
+            <li>
+                <a href="#" class="disabled" title="Trả phiếu thi công" @click.prevent="btnTraPhieuGiaoSai_Click">
+                    <span class="icon one-file-back"></span> Trả phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#" class="disabled" title="In hồ sơ">
+                    <span class="icon one-xlsx-import"></span> Xuất phiếu
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    <div class="page-content">
+
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Mã giao dịch</div>
+                                <div class="value">
+                                    <input type="text" class="form-control highlight" v-model="magd">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại HĐ/PL</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" v-model="loai_hd_id" class="form-control">
+                                            <option v-for="loaihd in listbox.loai_hd.list" :value="loaihd.loaihd_id">{{ loaihd.ten_loaihd }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Nhân viên YC</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :value="nhanvien_yc" />
+                            <!-- <div class="select-custom">
+                                <select name="" id="" class="form-control">
+                                    <option value=""></option>
+                                </select>
+                            </div> -->
+                        </div>
+                    </div>
+
+                    <div class="legend-title mart20">Thông tin thực hiện</div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày GV</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="filterbox.NgayGiaoViec.isEnabled">
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-icon-right" :class="{'disabled':!filterbox.NgayGiaoViec.isEnabled}">
+                                        <date-picker input-class="form-control" type="datetime" :format="datetimeFormat" :value-type="'format'" v-model="filterbox.NgayGiaoViec.value"></date-picker>
+                                        <!-- <flat-pickr class="form-control" :config="dateconfig" v-model="filterbox.NgayGiaoViec.value" :disabled="!filterbox.NgayGiaoViec.isEnabled" /> -->
+                                        <!-- <span class="icon one-calendar"></span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Người giao việc</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="listbox.nhanvien_thicong.value">
+                                            <option v-for="nv in listbox.nhanvien_thicong.list" :value="nv.ID">{{ nv.NAME }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày HT</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="filterbox.NgayHT.isEnabled">
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-icon-right" :class="{'disabled':!filterbox.NgayHT.isEnabled}">
+                                        <date-picker input-class="form-control" type="datetime" :format="datetimeFormat" :value-type="'format'" v-model="filterbox.NgayHT.value"></date-picker>
+                                        <!-- <flat-pickr class="form-control" :config="dateconfig" v-model="filterbox.NgayHT.value" :disabled="!filterbox.NgayHT.isEnabled" /> -->
+                                        <!-- <span class="icon one-calendar"></span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Nội dung giao</div>
+                                <div class="value">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Nội dung TH</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn">
+                                    <span class="nc-icon-glyph ui-1_edit-76 f16"></span>
+                                </button>
+                                <input type="text" class="form-control ">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Kết quả khảo sát</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select name="" id="" class="form-control" v-model="listbox.loai_kq_ky_hd.value">
+                                    <option v-for="kq in listbox.loai_kq_ky_hd.list" :value="kq.ID">{{ kq.NAME }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Ghi chú</div>
+                        <div class="value">
+                            <input type="text" class="form-control ">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key">Tên thuê bao</div>
+
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="ten_tb">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Địa chỉ LĐ</div>
+
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="diachi_ld">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Ghi chú TB</div>
+
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="ghichu_tb">
+                        </div>
+                    </div>
+                    <div class="legend-title mart20">Danh sách nhân viên thực hiện</div>
+                    <gridview id="table2" :datalist="listbox.dsnhanvien.list" :headers="listbox.dsnhanvien.header" v-bind:flcol="false" @recordChange="grdDsNhanVienChanged" lastcoltemplate="0"></gridview>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                Danh sách thuê bao
+            </div>
+            <div class="table-content">
+                
+                <DataGrid :columns="listbox.dsthuebao.cols"
+                    :dataSource="listbox.dsthuebao.list"
+                    :enable-paging-server="false"
+                    :allowPaging="true"
+                    :showFilter="true"
+                    :selectionSettings="{type:'Single',checkboxMode: 'ResetOnRowClick',enableToggle: true }"
+                    @rowClicked="grdDsThueBaoChanged">
+                </DataGrid>
+                <!-- <gridview id="table1" :datalist="listbox.dsthuebao.list" :headers="listbox.dsthuebao.header" v-bind:flcol="false" @recordChange="grdDsThueBaoChanged" v-bind:checkheader="true" lastcoltemplate="0"></gridview> -->
+            </div>
+        </div>
+    </div>
+    <!-- POPUP GIAO PHIEU -->
+    <b-modal id="popupTCTTTB" size="xl"
+    hide-footer
+    hide-header
+    hide-header-close
+    body-class="modal-body p-0">
+        <div class="modal-dialog" style="width: 100%; max-width:1220px;">
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title"><span class="icon -ap icon-apps text-main"></span> Giao phiếu nhân viên</div>
+                    <div class="close -ap icon-close" data-dismiss="modal">
+                    </div>
+                </div>
+                <div class="list-actions-top">
+                    <ul class="list">
+                        <li>
+                            <a href="#">
+                                <span class="icon one-save"></span> Ghi lại
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="icon one-trash"></span> Xoá giao
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="icon one-email"></span>Gửi SMS
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="icon one-reload1"></span>Cập nhật KQXL
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="popup-body">
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách nhân viên giao việc</div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check">
+                                            <span class="name">Trung tâm</span>
+                                        </div>
+
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="" class="form-control">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">
+                                        Tổ TC
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="" class="form-control">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check">
+                                            <span class="name">Trung tâm</span>
+                                        </div>
+
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="" class="form-control">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check">
+                                            <span class="name">Phòng BH</span>
+                                        </div>
+
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="" class="form-control">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8 col-12">
+                                <div class="note text-main mart7">Cấu trúc nhắn tin phản hồi: LD [Cách] Mã tỉnh [Cách] ID phiếu</div>
+                            </div>
+
+                        </div>
+                        <div class="table-content mart10">
+                            <table class="table-result table-gachle">
+                                <thead class="center">
+                                    <tr>
+                                        <th class="w20"></th>
+                                        <th>Đơn vị</th>
+                                        <th>Mã nhân viên</th>
+                                        <th>Tên nhân viên</th>
+                                        <th>Điện thoại</th>
+                                        <th>Nhiệm vụ</th>
+                                        <th>Ghi chú</th>
+                                        <th>Mã ND</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="w20"></th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="highlight">
+                                        <td class="w20 center">
+                                            <span class="fa fa-play text-main"></span>
+                                        </td>
+                                        <td class="selected highlight1"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="tright">
+                                            <div class="dropdown">
+                                                <button class="btn btn-main pad4 lh14 w24" data-toggle="dropdown">
+                                                    <span class="fa fa-angle-down"></span>
+                                                </button>
+                                                <div class="dropdown-menu pad10" style="width: 400px;">
+                                                    <div class="list-checks-v">
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">(Show all)</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Khảo sát lắp đặt</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Kéo dây</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Hàn cáp</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Gỡ dây - thu hồi thiết bị</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Khảo sát thông số</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Xác minh nợ cước</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Xác minh Tạm dừng, thanh lý theo yêu cầu</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Tư vấn và ký hợp đồng</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Kiểm tra và xử lý</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Kinh doanh vùng tiếp nhận yêu cầu tư vấn phát triển HĐ</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item marb10">
+                                                            <div class="check-action">
+                                                                <input type="checkbox" class="check">
+                                                                <span class="name padl25">Lắp đặt và xử lý sự cố</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="group-buttons -bottom center">
+                                                            <button class="btn btn-main nocorner">OK</button>
+                                                            <button class="btn btn-second nocorner">Cancel</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tc-pagination">
+                            <a href="#" class="btn  one-arrow-left-forward"></a>
+                            <a href="#" class="btn fa fa-angle-double-left"></a>
+                            <a href="#" class="btn fa fa-angle-left"></a>
+                            <span class="text">Bản ghi</span>
+                            <div class="dropdown inline">
+                                <div class="fw6 input-number" data-toggle="dropdown">
+                                    <span class="text-main">10</span>/1033
+                                </div>
+                                <div class="dropdown-menu">
+                                    <a href="#" class="dropdown-item">10</a>
+                                    <a href="#" class="dropdown-item">20</a>
+                                </div>
+                            </div>
+                            <a href="#" class="btn fa fa-angle-right"></a>
+                            <a href="#" class="btn fa fa-angle-double-right"></a>
+                            <a href="#" class="btn one-arrow-right-forward"></a>
+                        </div>
+                    </div>
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách nhân viên đã giao nhiệm vụ</div>
+                        <div class="table-content">
+                            <table class="table-result table-gachle tree-grid-2">
+                                <thead class="center">
+                                    <tr>
+                                        <th class="w20"></th>
+                                        <th class="w20"></th>
+                                        <th>Mã NV</th>
+                                        <th>Tên nhân viên</th>
+                                        <th>Điện t...</th>
+                                        <th>Nhiệm ...</th>
+                                        <th>Kết quả XL</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ghi chú</th>
+                                        <th class="w60">
+
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th class="w20"></th>
+                                        <th class="w20"></th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                        <th class="w60">
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="highlight4 fw6">
+                                        <td colspan="11">
+                                            <div class="tree-arrow"></div> : CTV036617 - Nguyễn Xuân Phong - Tổ Kỹ Thuật Bình Long -
+                                        </td>
+                                    </tr>
+                                    <tr class="highlight">
+                                        <td class="tree-first w20">
+                                            <div class="tree-line"></div>
+                                            <div class="tree-indent"></div>
+                                        </td>
+                                        <td class="w20 center">
+                                            <span class="fa fa-play text-main"></span>
+                                        </td>
+                                        <td class="selected highlight1"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="center">
+                                            <a href="#" class="btn btn-main pad4 lh14">
+                                                <span class="-ap icon-close"></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tree-first w20">
+                                            <div class="tree-line"></div>
+                                            <div class="tree-indent"></div>
+                                        </td>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="center">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tree-first w20">
+                                            <div class="tree-line"></div>
+                                            <div class="tree-indent"></div>
+                                        </td>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="center">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tree-first w20">
+                                            <div class="tree-line"></div>
+                                            <div class="tree-indent"></div>
+                                        </td>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="center">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tree-first w20">
+                                            <div class="tree-line"></div>
+                                            <div class="tree-indent"></div>
+                                        </td>
+                                        <td class="w20 center">
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="center">
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tc-pagination">
+                            <a href="#" class="btn  one-arrow-left-forward"></a>
+                            <a href="#" class="btn fa fa-angle-double-left"></a>
+                            <a href="#" class="btn fa fa-angle-left"></a>
+                            <span class="text">Bản ghi</span>
+                            <div class="dropdown inline">
+                                <div class="fw6 input-number" data-toggle="dropdown">
+                                    <span class="text-main">10</span>/1033
+                                </div>
+                                <div class="dropdown-menu">
+                                    <a href="#" class="dropdown-item">10</a>
+                                    <a href="#" class="dropdown-item">20</a>
+                                </div>
+                            </div>
+                            <a href="#" class="btn fa fa-angle-right"></a>
+                            <a href="#" class="btn fa fa-angle-double-right"></a>
+                            <a href="#" class="btn one-arrow-right-forward"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </b-modal>
+    <ejs-dialog :enableResize='true' :visible="false" ref="popupfrnGiaoPhieuNV" :header='"Giao phiếu nhân viên"'
+        showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+        <frnGiaoPhieuNV
+        ref="frnGiaoPhieuNV" @giaoviec_success="HienThiDSNV" />
+    </ejs-dialog>
+</div>

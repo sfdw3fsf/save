@@ -1,0 +1,190 @@
+<div class="sodo-ketnoi-container">
+  <!-- Toolbar Actions -->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onZoomIn">
+          <i class="fa fa-search-plus"></i> Phóng to
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onZoomOut">
+          <i class="fa fa-search-minus"></i> Thu nhỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onFitToPage">
+          <i class="fa fa-expand"></i> Vừa màn hình
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onRefresh">
+          <span class="icon one-refresh"></span>Làm mới
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="showExportModal">
+          <i class="fa fa-download"></i> Xuất sơ đồ
+        </b-link>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page-content">
+    <div class="diagram-workspace">
+      <!-- Symbol Palette - Thiết bị chưa đấu nối -->
+      <div class="palette-container">
+        <div v-show="!isDataLoaded" style="padding: 20px; text-align: center; color: #999">
+          Đang tải dữ liệu thiết bị...
+        </div>
+        <div v-show="isDataLoaded" style="width: 100%; display: flex; flex-direction: column; height: 100%;">
+          <div >
+            <ejs-symbolpalette
+              id="symbolpalette_ketnoi"
+              ref="symbolpalette"
+              :expandMode="'Multiple'"
+              :symbolHeight="80"
+              :symbolWidth="110"
+              :symbolMargin="{ left: 8, right: 8, top: 8, bottom: 8 }"
+              :getNodeDefaults="getPaletteNodeDefaults"
+              :getSymbolInfo="getSymbolInfo"
+              :palettes="palettes"
+              :width="'100%'"
+              :height="'100%'"
+            ></ejs-symbolpalette>
+          </div>
+
+          <!-- Legend (Chú thích) -->
+          <div class="legend-section-palette">
+            <div class="legend-header-palette">
+              <h6>Chú thích</h6>
+            </div>
+            <div class="legend-content-palette">
+              <div class="legend-group">
+                <div class="legend-title">Loại thiết bị</div>
+                <div class="legend-item" v-for="(color, type) in deviceColors" :key="type">
+                  <div class="legend-color" :style="{ background: color }"></div>
+                  <span>{{ getDeviceTypeName(type) }}</span>
+                </div>
+              </div>
+              <div class="legend-group">
+                {{selectedRackId}}
+                <div class="legend-title">Loại kết nối</div>
+                <div class="legend-item">
+                  <div class="legend-line" style="background: #ff0000"></div>
+                  <span>Đường trung thế</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-line" style="background: #0066ff"></div>
+                  <span>Đường hạ thế</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-line" style="background: #ffa500"></div>
+                  <span>Nguồn dự phòng</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-line" style="background: #00cc00"></div>
+                  <span>Nguồn UPS</span>
+                </div>
+              </div>
+              <div class="legend-group">
+                <div class="legend-title">Trạng thái</div>
+                <div class="legend-item">
+                  <div class="legend-status" style="background: #28a745"></div>
+                  <span>Hoạt động</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-status" style="background: #dc3545"></div>
+                  <span>Không hoạt động</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagram Canvas -->
+      <div class="diagram-container">
+        <ejs-diagram
+          v-if="isDataLoaded"
+          id="diagram-ketnoi"
+          ref="diagramObj"
+          :width="'100%'"
+          :height="'100%'"
+          :nodes="nodes"
+          :connectors="connectors"
+          :layout="layout"
+          :snapSettings="snapSettings"
+          :scrollSettings="scrollSettings"
+          :contextMenuSettings="contextMenuSettings"
+          :getNodeDefaults="getNodeDefaults"
+          :getConnectorDefaults="getConnectorDefaults"
+          :drop="onDrop"
+          :drawingObject="drawingObject"
+          :tool="tool"
+          :selectedItems="selectedItems"
+          @contextMenuClick="onContextMenuClick"
+          @contextMenuOpen="onContextMenuOpen"
+          @click="onDiagramClick"
+          @positionChange="onNodePositionChange"
+          @collectionChange="onCollectionChange"
+          @connectionChange="onConnectionChange"
+        ></ejs-diagram>
+        <div v-else class="loading-container">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Đang tải...</span>
+          </div>
+          <p class="mt-2">Đang tải sơ đồ kết nối điện...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal chi tiết thiết bị -->
+  <ModalChiTietThietBi ref="modalChiTietThietBi" :thietBiId="selectedThietBiId" />
+
+  <!-- Modal chi tiết kết nối điện Rack -->
+  <b-modal
+    ref="modalChiTietKetNoiDienRack"
+    title="Chi tiết kết nối điện Rack"
+    size="xl"
+    hide-footer
+    modal-class="chi-tiet-ket-noi-dien-rack-modal"
+    @hidden="selectedRackId = null"
+  >
+    <ChiTietKetNoiDienRack v-if="selectedRackId" :rackID="selectedRackId" />
+  </b-modal>
+
+  <!-- Modal chọn loại kết nối -->
+  <ModalChonLoaiKetNoi
+    ref="modalConnectionType"
+    :sourceNode="connectionDialog.sourceNode"
+    :targetNode="connectionDialog.targetNode"
+    :tempConnectorId="connectionDialog.tempConnectorId"
+    @create-connection="handleCreateConnection"
+    @cancel-connection="handleCancelConnection"
+  />
+
+  <!-- Modal xuất sơ đồ -->
+  <b-modal
+    ref="modalExport"
+    title="Xuất sơ đồ"
+    hide-footer
+    centered
+  >
+    <div class="export-options">
+      <button class="btn btn-block btn-outline-primary mb-2" @click="onPrint">
+        <i class="fa fa-print"></i> In sơ đồ
+      </button>
+      <button class="btn btn-block btn-outline-primary" @click="onExportPNG">
+        <i class="fa fa-file-image-o"></i> Xuất PNG
+      </button>
+    </div>
+  </b-modal>
+</div>

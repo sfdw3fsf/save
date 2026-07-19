@@ -1,0 +1,2 @@
+import AssignLocationEmployee from './AssignLocationEmployee'
+export default AssignLocationEmployee

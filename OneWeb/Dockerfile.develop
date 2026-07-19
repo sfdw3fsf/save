@@ -1,0 +1,15 @@
+FROM crelease.devops.vnpt.vn:10100/node:12.16.1-slim  AS build
+WORKDIR /tmp
+COPY package.json .npmrc /tmp/
+RUN npm install
+ENV NODE_ENV=testing
+COPY . /tmp/
+#RUN yarn build 
+RUN --mount=type=cache,target=./node_modules/.cache YARN_CACHE_FOLDER=./node_modules/.cache yarn build
+
+FROM crelease.devops.vnpt.vn:10100/nginx:alpine-slim
+COPY --from=build /tmp/dist /usr/share/nginx/html
+COPY --from=build /tmp/node_modules/.cache /tmp
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80 443
+CMD ["nginx", "-g", "daemon off;"]

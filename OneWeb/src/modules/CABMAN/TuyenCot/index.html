@@ -1,0 +1,190 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li @click="nhapMoi">
+                <a href="javascript:void(0)" :class="{'disable-btn': isDisableBtnNhapMoi}">
+                    <span class="icon one-file-plus"></span> Nhập mới
+                </a>
+            </li>
+            <li @click="ghiLai">
+                <a href="javascript:void(0)" :class="{'disable-btn': isDisableBtnGhiLai}">
+                    <span class="icon one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li @click="huy">
+                <a href="javascript:void(0)" :class="{'disable-btn': isDisableBtnHuy}">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+                </a>
+            </li>
+            <li @click="xoa">
+                <a href="javascript:void(0)" :class="{'disable-btn': isDisableBtnXoa}">
+                    <span class="icon one-trash"></span> Xóa tuyến
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tuyến cột</div>
+            <div class="row">
+                <div class="col-sm-9 col-12">
+                    <div class="info-row">
+                        <div class="key w100" >
+                            Mã tuyến cột <span class="red">*</span>
+                        </div>
+                        <div class="value">
+                            <input ref="maTuyenInp" type="text" :class="['form-control', {'is-invalid': isErorMaTuyen}]" v-model.trim="tuyenCot.maTuyenCot">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Chiều dài (m)
+                        </div>
+                        <div class="value">
+                            <div class="input-number-custom">
+                                <input ref="chieuDaiInp" type="number" :class="['form-control', 'tright', {'is-invalid': isErorChieuDai}]" v-model.trim="tuyenCot.chieuDai">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">
+                    Tên tuyến cột <span class="red">*</span>
+                </div>
+                <div class="value">
+                    <input ref="tenTuyenInp" type="text" :class="['form-control', {'is-invalid': isErorTenTuyen}]" v-model="tuyenCot.tenTuyenCot">
+                </div>
+            </div>
+            <div class="legend-title">Gán tổ quản lý tuyến</div>
+            <div class="box-move-select-table">
+                <div class="box-col">
+                    <div class="title-bg-main"><span class="title">Các tổ kỹ thuật quản lý đã gán</span></div>
+                    <DataGrid ref="grid" v-bind:columns="[
+                            {fieldName: 'TEN_DV', headerText: 'Tên tổ', allowFiltering: true, allowSorting: false},
+                        ]" 
+                        v-bind:dataSource="dsTQLDaGan" :enabledSelectFirstRow="false" :showFilter="true" dataKeyField="DONVI_ID" @selectedRowChanged="gridDsDaGan_selectedRowChanged" :showColumnCheckbox="true" @selectedItemsChanged="selectedDsDaGan">
+                    </DataGrid>
+                </div>
+                <div class="actions">
+                    <button class="btn" @click="sangPhai">
+                        <span class="-ap icon-chevron-thin-right"></span>
+                    </button>
+                    <button class="btn" @click="sangTrai">
+                        <span class="-ap icon-chevron-thin-left"></span>
+                    </button>
+                </div>
+                <div class="box-col">
+                    <div class="title-bg-main"><span class="title">Chọn tổ kỹ thuật và gạt sang bên trái</span></div>
+                    <div class="info-row">
+                        <div class="key w100">
+                            Trung tâm VT
+                        </div>
+                        <div class="value">
+                            <!-- <div class="select-custom">
+                                <select name="" id="" class="form-control" v-model="donvi_id" :disabled="isDisableTTVT">
+                                    <option v-for="(ttvt, index) in dsDonVi" :key="index" :value="ttvt.DONVI_ID">{{ ttvt.TEN_DV }}</option>
+                                </select>
+                            </div> -->
+                            <div  class="select-custom" ref="donvi">
+                                <SelectExt v-model="donvi_id"    
+                                    :settings="{dropdownParent: $refs['donvi']}"                             
+                                    :dataSource="dsDonVi" 
+                                    dataTextField="TEN_DV"
+                                    dataValueField="DONVI_ID"
+                                    :disabled="isDisableSelectDonVi"
+                                />  
+                            </div>
+                        </div>
+                    </div>
+                    <DataGrid v-bind:columns="[
+                            {fieldName: 'TEN_DV', headerText: 'Tên tổ', allowFiltering: true, allowSorting: false},
+                        ]" 
+                        v-bind:dataSource="dsTQLChuaGan" :enabledSelectFirstRow="false" :showFilter="true" dataKeyField="DONVI_ID" @selectedRowChanged="gridDsChuaGan_selectedRowChanged" :showColumnCheckbox="true" @selectedItemsChanged="selectedDsChuaGan">
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Lọc tuyến theo tổ kỹ thuật quản lý</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w140">
+                            Trung tâm Viễn Thông
+                        </div>
+                        <div class="value">
+                            <!-- <div class="select-custom">
+                                <select name="" id="" class="form-control" v-model="tuyenCot.ttvt_id">
+                                    <option v-for="(ttvt, index) in dsTTVT" :key="index" :value="ttvt.DONVI_ID">{{ ttvt.TEN_DV }}</option>
+                                </select>
+                            </div> -->
+                            <div  class="select-custom" ref="ttvt">
+                                <SelectExt v-model="tuyenCot.ttvt_id"    
+                                    :settings="{dropdownParent: $refs['ttvt']}"                             
+                                    :dataSource="dsTTVT" 
+                                    dataTextField="TEN_DV"
+                                    dataValueField="DONVI_ID"/>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Tổ kỹ thuật
+                        </div>
+                        <div class="value">
+                            <!-- <div class="select-custom">
+                                <select name="" id="" class="form-control" v-model="tuyenCot.tokt_id">
+                                    <option v-for="(tokt, index) in dsToKT" :key="index" :value="tokt.DONVI_ID">{{ tokt.TEN_DV }}</option>
+                                </select>
+                            </div> -->
+                            <div  class="select-custom" ref="tokt">
+                                <SelectExt v-model="tuyenCot.tokt_id"    
+                                    :settings="{dropdownParent: $refs['tokt']}"                             
+                                    :dataSource="dsToKT" 
+                                    dataTextField="TEN_DV"
+                                    dataValueField="DONVI_ID"/>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-move-select-table mart10">
+                <div class="box-col">
+                    <div class="legend-title">Danh sách tuyến cột</div>
+                    <DataGrid ref="gridTC" v-bind:columns="[
+                        {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: 80, minWidth: '80px'},
+                        {fieldName: 'MA_TC', headerText: 'Mã tuyến', allowFiltering: true},
+                        {fieldName: 'TUYEN_COT', headerText: 'Tên tuyến', allowFiltering: true},
+                        {fieldName: '', headerText: 'Chiều dài', allowFiltering: true}
+                        ]"
+                    v-bind:dataSource="dsTuyenCot" :showFilter="true" @selectedRowChanged="gridDsTuyenCot_selectedRowChanged" :allowPaging="true" :enablePagingServer="false"></DataGrid>
+                </div>
+                <div class="actions"
+                    style="background-image: url(../img/line.svg);background-size: contain;background-repeat: no-repeat;background-position: center 50px;">
+                </div>
+                <div class="box-col">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Danh sách cột thuộc tuyến:
+                        </div>
+                        <div class="pull-left red ml-3">{{ tuyenCot.tuyenCotId == null ? '' : tuyenCot.tenTuyenCot }}</div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <DataGrid v-bind:columns="[
+                        {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: 80, minWidth: '80px'},
+                        {fieldName: 'TEN_COT', headerText: 'Tên cột', allowFiltering: true},
+                        {fieldName: 'SO_HIEU', headerText: 'Số hiệu cột', allowFiltering: true},
+                        {fieldName: 'DOCAO', headerText: 'Độ cao(m)', allowFiltering: true, cellCssClass: 'text-right'},
+                        {fieldName: 'DIACHI', headerText: 'Địa chỉ cột', allowFiltering: true}
+                        ]"
+                    v-bind:dataSource="dsCot" :showFilter="true" :allowPaging="true" :enablePagingServer="false"></DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

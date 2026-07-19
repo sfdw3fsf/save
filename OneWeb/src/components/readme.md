@@ -1,0 +1,1 @@
+Các component dùng chung cho toàn bộ các modules.

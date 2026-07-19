@@ -1,0 +1,155 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="true"
+  :visible="false"
+  ref="ModalCapThietBiVaPort"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  :isModal="true"
+  width="90%"
+  :target="target"
+  :position="{ X: 'center', Y: 'center' }"
+  :zIndex="1000"
+  :overlayClick="false"
+  @show="onModalShow"
+>
+  <div class="popup-box" id="capphat-modalCapThietBiVaPort">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        Cấp phát thiết bị và port cho IP: {{ thongtinIP.DIACHI_IP }}
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeDialog"></div>
+    </div>
+
+    <div class="modal-content p-2">
+      <!-- Form search -->
+      <div class="list-actions-top">
+        <ul class="list">
+          <li>
+            <b-link href="javascript:void(0)" @click="onSearchThietBi">
+              <span class="icon one-search"></span>Tìm kiếm thiết bị
+            </b-link>
+          </li>
+          <li>
+            <b-link href="javascript:void(0)" @click="onSearchPort" :disabled="!selectedThietBiData">
+              <span class="icon one-search"></span>Tìm kiếm port
+            </b-link>
+          </li>
+          <li>
+            <b-link href="javascript:void(0)" @click="onAccept" :disabled="!selectedThietBiData || !selectedPortData">
+              <span class="icon one-save"></span>Chấp nhận
+            </b-link>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Search form -->
+      <div class="box-form search-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span>Điều kiện tìm kiếm</span>
+          </div>
+        </div>
+        <div class="row w-100">
+          <div class="col-sm-6 col-12 w-100 row-item-left">
+            <div class="info-row info-row-search d-flex align-items-center">
+              <div class="key">Tên thiết bị</div>
+              <div class="value">
+                <input v-model.trim="searchParams.tenThietBi" type="text" class="form-control" placeholder="Nhập tên thiết bị..." />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12 w-100 row-item-right">
+            <div class="info-row info-row-search d-flex align-items-center">
+              <div class="key">Tên port</div>
+              <div class="value">
+                <input v-model.trim="searchParams.tenPort" type="text" class="form-control" placeholder="Nhập tên port..." :disabled="!selectedThietBiData" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data grids -->
+      <div class="row dataGrids">
+        <!-- Danh sách thiết bị -->
+        <div class="col-md-6 ps-0">
+          <div class="box-form">
+            <div class="row">
+              <div class="legend-title d-flex justify-content-between align-items-center">
+                <span>Danh sách thiết bị</span>
+                <small class="text-muted">Chọn thiết bị để xem danh sách port</small>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <DataGrid
+                  ref="grdThietBi"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  :showColumnCheckbox="false"
+                  :dataSource="thietBiData"
+                  v-bind:columns="[
+                    { fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 70 },
+                    { fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 100 },
+                    { fieldName: 'TEN_THIETBI', headerText: 'Tên Thiết bị', textAlign: 'Left', width: 150 },
+                    { fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left', width: 120 },
+                    { fieldName: 'CS_DINHDANH', headerText: 'Công suất thiết kế', textAlign: 'Center', width: 130 },
+                    { fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left', width: 120 },
+                    { fieldName: 'VITRI_RACK', headerText: 'Vị trí Rack', textAlign: 'Center', width: 100 },
+                    { fieldName: 'VITRI_U', headerText: 'Vị trí U', textAlign: 'Center', width: 160 }
+                  ]"
+                  :enabledSelectFirstRow="true"
+                  @rowSelected="onThietBiRowSelected"
+                >
+                </DataGrid>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danh sách port -->
+        <div class="col-md-6 pe-0">
+          <div class="box-form">
+            <div class="row">
+              <div class="legend-title d-flex justify-content-between align-items-center">
+                <span>Danh sách port</span>
+                <small class="text-muted" v-if="selectedThietBiData">
+                  Port của thiết bị: {{ selectedThietBiData.TEN_THIETBI }}
+                </small>
+                <small class="text-muted" v-else>
+                  Vui lòng chọn thiết bị trước
+                </small>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <DataGrid
+                  ref="grdPort"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  :showColumnCheckbox="false"
+                  :dataSource="portData"
+                  v-bind:columns="[
+                    { fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 70 },
+                    { fieldName: 'ID_CONG', headerText: 'ID Cổng', textAlign: 'Left', width: 100 },
+                    { fieldName: 'TEN_CONG', headerText: 'Tên Cổng', textAlign: 'Left', width: 120 },
+                    { fieldName: 'LOAICONG', headerText: 'Loại Cổng', textAlign: 'Left', width: 150 },
+                    { fieldName: 'GIATRI_CONG', headerText: 'Giá trị cổng', textAlign: 'Center', width: 120 },
+                    { fieldName: 'THONGSO_KYTHUAT', headerText: 'Thông số kỹ thuật', textAlign: 'Left' },
+                    { fieldName: 'TRANGTHAI_PORT_VANHANH', headerText: 'Trạng thái port vận hành', textAlign: 'Left', width: 160 },
+                  ]"
+                  :enabledSelectFirstRow="true"
+                  @rowSelected="onPortRowSelected"
+                >
+                </DataGrid>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

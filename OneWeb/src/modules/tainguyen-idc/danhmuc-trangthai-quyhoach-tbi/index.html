@@ -1,0 +1,161 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="btnNhapMoi_Click" :disabled="!buttons.btnNhapMoi.enabled">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnGhiLai_Click" :disabled="!buttons.btnGhiLai.enabled">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnHuyBo_Click" :disabled="!buttons.btnHuyBo.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnSua_Click" :disabled="!buttons.btnSua.enabled">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnXoa_Click" :disabled="!buttons.btnXoa.enabled">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnImportExcel_Click">
+          <span class="icon one-download"></span>Import
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnXuatExcel_Click">
+          <span class="icon one-upload"></span>Export
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh mục trạng thái quy hoạch thiết bị</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">ID trạng thái quy hoạch <span class="red">*</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.TRANGTHAI_ID" :disabled="true" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Hiệu lực</div>
+                <div class="value padt4">
+                  <div class="check-action">
+                    <input
+                      type="checkbox"
+                      class="check"
+                      :checked="currentItem.SUDUNG === 1"
+                      @change="currentItem.SUDUNG = $event.target.checked ? 1 : 0"
+                      :disabled="!controls.checkBoxSuDung.enabled"
+                    />
+                    <span class="name"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Tên trạng thái quy hoạch <span class="red">*</span></div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :class="{ 'error-input': controls.txtTen.invalid && controls.txtTen.enabled }"
+                    v-model.trim="currentItem.TEN"
+                    :disabled="!controls.txtTen.enabled"
+                    maxlength="100"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Tên viết tắt</div>
+                <div class="value">
+                  <!-- <input type="number" class="form-control"
+                         :class="{ 'error-input': controls.txtTenTat.invalid && controls.txtTenTat.enabled }"
+                         v-model="currentItem.TENTAT"
+                         :disabled="!controls.txtTenTat.enabled" /> -->
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model.trim="currentItem.TENTAT"
+                    :disabled="!controls.txtTenTat.enabled"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách trạng thái quy hoạch thiết bị</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <DataGrid
+                ref="gridItems"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :showColumnCheckbox="true"
+                v-bind:columns="[
+                                {fieldName: 'TRANGTHAI_ID', headerText: 'ID trạng thái quy hoạch', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên trạng thái quy hoạch', textAlign: 'Left'},
+                                {fieldName: 'TENTAT', headerText: 'Tên viết tắt', textAlign: 'Left', width: 180},
+                                {fieldName: 'SUDUNG_LABEL', headerText: 'Hiệu lực', width: 100, textAlign: 'Left',allowFiltering: true},
+                                ]"
+                v-bind:dataSource="dataItems"
+                @rowSelected="gridItems_RowSelected"
+                @rowDeselected="
+                gridItems_RowDeselected"
+                @selectedItemsChanged="onSelectRowCheckbox"
+                :allowExcelExport="true"
+                :showFilter="true"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ModalImportExcel -->
+  <ModalImportExcel
+    ref="modalImportExcel"
+    :title="importConfig.title"
+    :tableColumns="importConfig.tableColumns"
+    :gridColumns="importConfig.gridColumns"
+    :templateFileName="importConfig.templateFileName"
+    :processExcelData="processCellData"
+    :formatCellValue="formatCellValue"
+    :validationRules="importConfig.validationRules"
+    :checkDataResult="importConfig.checkDataResult"
+    @check-data="handleCheckData"
+    :useHeaderMapping="true"
+  />
+</div>

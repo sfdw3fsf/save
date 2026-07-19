@@ -1,0 +1,2 @@
+import SynchronizeElectronicInvoices from './SynchronizeElectronicInvoices'
+export default SynchronizeElectronicInvoices

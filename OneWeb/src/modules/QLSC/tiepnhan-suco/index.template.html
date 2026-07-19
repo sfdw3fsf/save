@@ -1,0 +1,842 @@
+<div class="tiepnhan-suco">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="onClickBtnLayThongTin">
+                    <span class="icon one-file-attach"></span> Lấy TT
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnNhapMoi.enabled}" @click="onClickBtnNhapMoi">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-plus"></span> Nhập mới
+                </a>
+            </li>
+            <li v-show="btnTiepNhan.visible" @click="onClickBtnTiepNhan">
+                <a href="javascript:void(0)">
+                    <span class="icon one-check"></span> Tiếp nhận
+                </a>
+            </li>
+            <li v-show="btnCapNhat.visible" @click="onClickBtnCapNhat">
+                <a href="javascript:void(0)">
+                    <span class="icon one-save"></span> Cập nhật
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnXoaPhieu.enabled}" @click="onClickBtnXoaPhieu">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-trash"></span> Xóa phiếu
+                </a>
+            </li>
+            <li v-show="btnHuyBo.visible" @click="onClickBtnHuyBo">
+                <a href="javascript:void(0)">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy bỏ
+                </a>
+            </li>
+            <li v-show="btnNapLai.visible" @click="onClickBtnNapLai">
+                <a href="javascript:void(0)">
+                    <span class="icon one-refresh"></span> Nạp lại
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnNhanHong.enabled}" @click="onClickBtnNhanHong">
+                <a href="javascript:void(0)">
+                    <span class="icon one-save"></span> Nhận hỏng
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnGiaoPhieu.enabled}" @click="onClickBtnGiaoPhieu">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-arrow-right1"></span> Giao phiếu
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnKhoaPhieu.enabled}" @click="onClickBtnKhoaPhieu">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-lock"></span> Khóa phiếu
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb8">
+            <div class="row">
+                <div class="col-sm-12 col-md-3">
+                    <div class="info-row marb0">
+                        <div class="key fw6 w50 nowrap">Nguồn sự cố</div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="nguonSuCoId" 
+                                :dataSource="dsNguonSuCo" 
+                                dataTextField="MOTA"
+                                dataValueField="NGUONSC_ID"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-show="!moRongDsSuCoTmpPanel" class="row">
+            <div v-show="!moRongTtscPanel" class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            <span class="icon fa" :class="thuNhoTttnPanel ? 'fa-angle-down' : 'fa-angle-up'" @click="thuNhoTttnPanel = !thuNhoTttnPanel"></span> Thông tin tiếp nhận sự cố {{nhomScText}}
+                        </div>
+                        <div class="pull-right">
+                            <span>{{labelMaSuCo}}</span>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div v-show="!thuNhoTttnPanel">
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Nhóm sự cố <bss-required-marker />
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.nhomSuCoId.$error">
+                                            <SelectExt 
+                                                ref="ref-combo-nhom-sc"
+                                                v-model="nhomSuCoId" 
+                                                :disabled="!cboNhomSC.enabled"
+                                                :dataSource="dsNhomSuCo" 
+                                                dataTextField="NHOM_SC"
+                                                dataValueField="NHOMSC_ID"/>
+                                       </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Ngày sự cố <bss-required-marker />
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.ngaySuCo.$error">
+                                            <ejs-datetimepicker	
+                                                :style="{'padding-top': '7px'}"
+                                                class="form-control bg-none bor0 fw6 text h24"
+                                                placeholder="" 
+                                                v-model="ngaySuCo"
+                                                format="dd/MM/yyyy HH:mm"
+                                                :showClearButton="false"
+                                                :enabled="dtpNgaySC.enabled"></ejs-datetimepicker>
+                                       </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Người BH <bss-required-marker />
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.nhanVienBhId.$error">
+                                            <ComboboxGridNhanVien ref="ref-combo-nhanvien" v-model="nhanVienBhId" :disabled="!txtNhanVienBao.enabled" />
+                                       </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Ngày báo <bss-required-marker />
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.ngayBao.$error">
+                                            <ejs-datetimepicker	
+                                                :style="{'padding-top': '7px'}"
+                                                class="form-control bg-none bor0 fw6 text h24"
+                                                placeholder="" 
+                                                v-model="ngayBao"
+                                                format="dd/MM/yyyy HH:mm"
+                                                :showClearButton="false"
+                                                :enabled="dtpNgayBao.enabled"></ejs-datetimepicker>
+                                        </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Điện thoại LH <bss-required-marker />
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.dienThoaiLh.$error">
+                                            <input type="text" class="form-control" v-model.trim="dienThoaiLh" :disabled="!txtDienThoaiLH.enabled">
+                                        </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Vị trí
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" :value="viTri" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Đơn vị
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" :value="tenDonViBh" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Chức danh
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" :value="chucDanh" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Nội dung SC <bss-required-marker />
+                            </div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.noiDungSc.$error">
+                                    <textarea v-model.trim="noiDungSc" cols="30" rows="10" :disabled="!txtNoiDungSC.enabled || isSuCoTts" class="form-control" style="height:70px;resize: none;"></textarea>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkHenTraLoi" :disabled="!chkHenTraLoiEnabled">
+                                            <span class="name">Hẹn TL từ</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.henTlTu.$error">
+                                            <ejs-datetimepicker	
+                                                :style="{'padding-top': '7px'}"
+                                                class="form-control bg-none bor0 fw6 text h24"
+                                                placeholder="" 
+                                                v-model="henTlTu"
+                                                format="dd/MM/yyyy HH:mm"
+                                                :enabled="chkHenTraLoi"
+                                                :showClearButton="false"></ejs-datetimepicker>
+                                        </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Hẹn TL đến
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.henTlDen.$error">
+                                            <ejs-datetimepicker	
+                                                :style="{'padding-top': '7px'}"
+                                                class="form-control bg-none bor0 fw6 text h24"
+                                                placeholder="" 
+                                                v-model="henTlDen"
+                                                format="dd/MM/yyyy HH:mm"
+                                                :enabled="chkHenTraLoi"
+                                                :showClearButton="false"></ejs-datetimepicker>
+                                        </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Ảnh chụp
+                            </div>
+                            <div class="value" style="position: relative;">
+                                <div class="select-custom" @click="showImagePanel = !showImagePanel">
+                                    <input type="text" class="form-control" :disabled="!cboAnhChup.enabled || isSuCoTts" :value="inputImageNames" />
+                                </div>
+                                <div v-show="cboAnhChup.enabled && showImagePanel" class="panel-anh-suco table-result">
+                                    <div style="position: absolute; height: 35px; text-align: left; top: 0; padding: 5px 0px">
+                                        <span style="color: black;">Hình ảnh </span>
+                                        <button type="button" class="btn btn-sm btn-second" @click="$refs['ref-choose-img'].$el.querySelector('input').click()">...</button>
+                                        <button type="button" class="btn btn-sm btn-second" @click="deleteImages">x</button>
+                                    </div>
+                                    <button type="button" @click="showImagePanel = false" class="close" style="position: absolute; right: 4px; top: 0;">×</button>
+                                    <div style="border: 1px solid #ccc; height: 100%; overflow: auto;">
+                                        <div v-for="image in images" style="width: 33%; height: 100%; float: left; padding: 5px 5px 5px 25px; position: relative;">
+                                            <div class="check-action" style="position: absolute !important; left: 5px; top: 65px">
+                                                <input 
+                                                    type="checkbox" 
+                                                    class="check" 
+                                                    :value="image.relativeUrl"
+                                                    v-model="deletedImages"/>
+                                                <span class="name"></span>
+                                            </div>
+                                            <img 
+                                                v-on:mouseover="onMouseOverImg(image.presignedUrl)" 
+                                                v-on:mouseleave="onMouseLeaveImg" 
+                                                v-on:mousemove="onMousemoveImg($event)"
+                                                :src="image.presignedUrl" 
+                                                alt="" 
+                                                style="height: 100%; width: 100%;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <b-form-file v-show="false" ref="ref-choose-img" multiple accept="image/*" @change="onChangeChoosedImg"></b-form-file>
+                            <div ref="ref-zoom-img" v-show="!!zoomImg" class="panel-zoom-img"><img :src="zoomImg" alt="" style="height: 100%; width: 100%;" /></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Phân loại sự cố <bss-required-marker />
+                            </div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.phanLoaiSuCoId.$error">
+                                    <SelectExt 
+                                        ref="ref-combo-phan-loai-sc"
+                                        v-model="phanLoaiSuCoId" 
+                                        :dataSource="dsPhanLoaiSuCo" 
+                                        :disabled="!cboLoaiSuCo.enabled || isSuCoTts"
+                                        dataTextField="PHANLOAI_SC"
+                                        dataValueField="PHANLOAI_ID"/>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" :class="{'col-sm-6': !moRongTtscPanel}">
+                <div class="box-form" style="height: 98%;">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Thông tin tình trạng sự cố
+                        </div>
+                        <div class="pull-right">
+                            <a v-show="btnDongBoTT.visible" href="javascript:void(0)" class="btn btn-main btn-panel" title="Đồng bộ tình trạng sự cố" @click="onClickBtnDongBoTinhTrang">
+                                <span class="lh14 arrows-1_direction-53 nc-icon-glyph" style="transform: rotate(90deg);"></span>
+                            </a>
+                            <a v-show="btnTuDongChonCS.visible" href="javascript:void(0)" class="btn btn-main btn-panel" title="Tự động chọn cổng sợi" @click="onClickBtnTuDongChonCongSoi">
+                                <span class="lh14 ui-1_check-curve nc-icon-outline"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Xuất Excel" @click="onClickBtnXuatExcelTinhTrang">
+                                <span class="lh14 one-excel-outline"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Làm mới" @click="onClickBtnNapLaiTinhTrang">
+                                <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Mở rộng" @click="moRongTtscPanel = !moRongTtscPanel">
+                                <span class="lh14 one-design-per"></span>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <tab v-show="tab.visible && !thuNhoTttnPanel" ref="ref-tab-tinh-trang"></tab>
+                </div> 
+            </div>
+        </div>
+        <div v-show="!moRongTtscPanel" class="row">
+            <div class="col-12" :class="{'col-sm-6': !moRongDsSuCoTmpPanel}">
+                <div class="box-form" style="height: 98%;">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            <span class="icon fa" :class="thuNhoDsSuCoTmpPanel ? 'fa-angle-down' : 'fa-angle-up'" @click="thuNhoDsSuCoTmpPanel = !thuNhoDsSuCoTmpPanel"></span> 
+                            Danh sách tiếp nhận (tạm thời)
+                        </div>
+                        <div class="pull-right">
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Xuất Excel" @click="onClickBtnXuatExcelDsSuCoTmp">
+                                <span class="lh14 one-excel-outline"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Làm mới" @click="napDsTiepNhan">
+                                <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Ẩn / Hiện lọc" @click="allowFilterSuCoTmp = !allowFilterSuCoTmp">
+                                <span class="lh14 ui-2_filter nc-icon-outline"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Mở rộng" @click="moRongDsSuCoTmpPanel = !moRongDsSuCoTmpPanel">
+                                <span class="lh14 one-design-per"></span>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <DataGrid
+                        v-show="!thuNhoDsSuCoTmpPanel"
+                        ref="grid-suco-tamthoi"
+                        class="table-result"
+                        panelDataHeight="200"
+                        v-bind:columns="[
+                            {fieldName: '', headerText: 'Chọn', textAlign: 'Center', freeze: 'Left', clipMode: 'Ellipsis', allowFiltering: false, width: '50', template: getColumnTemplateChonSuCoTmp(this)},
+                            {fieldName: 'MA_SC', headerText: 'Mã sự cố', freeze: 'Left', allowFiltering: true, width: '130' },
+                            {fieldName: 'NHOM_SC', headerText: 'Nhóm', allowFiltering: true, width: '130' },
+                            {fieldName: 'NOIDUNG_SC', headerText: 'Nội dung sự cố', allowFiltering: true, width: '200', template: getColumnTemplateNoiDungSc(this) },
+                            {fieldName: 'NGAY_SC_HT', headerText: 'Ngày sự cố', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'THOIGIAN', headerText: 'Kéo dài', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NGAY_BH_HT', headerText: 'Ngày báo', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NGUOI_BH', headerText: 'Người báo', allowFiltering: true, width: '130' },
+                            {fieldName: 'NGAY_TN_HT', headerText: 'Ngày tiếp nhận', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NGUOI_TN', headerText: 'Người tiếp nhận', allowFiltering: true, width: '130' },
+                            {fieldName: 'KEY', headerText: '', visible: false, isPrimaryKey: true },
+                        ]"        
+                        :dataSource="dsSuCoTam"
+                        :showFilter="allowFilterSuCoTmp"
+                        :contextMenuItems='getContextMenuItemsSuCoTmp()' 
+                        @contextMenuClick='onContextMenuClickSuCoTmp'
+                        :allowPaging="true"
+                        :enablePagingServer="false"></DataGrid>
+                </div>
+            </div>
+            <div v-show="!moRongDsSuCoTmpPanel" class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="nav tabs tab-over">
+                        <a href="#tabMDAH" data-toggle="tab" class="active">Mức độ ảnh hưởng</a>
+                    </div>
+                    <div v-show="!thuNhoDsSuCoTmpPanel" class="tab-content marb0" style="height: 336px;">
+                        <div class="tab-pane active" id="tabMDAH">
+                            <div class="title-bg-main">
+                                <div class="pull-left title">
+                                    Mức độ ảnh hưởng của sự cố (tạm tính)
+                                </div>
+                                <div class="pull-right">
+                                    <div class="list-checks">
+                                        <div v-show="radioLoaiThietHai.visible" class="item">
+                                            <div class="check-action fw6">
+                                                <input type="radio" v-model="loaiThietHai" value="0" class="check">
+                                                <span class="name">Doanh thu</span>
+                                            </div>
+                                        </div>
+                                        <div v-show="radioLoaiThietHai.visible" class="item">
+                                            <div class="check-action fw6">
+                                                <input type="radio" v-model="loaiThietHai" value="1" class="check">
+                                                <span class="name">Thuê bao</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Xuất Excel" @click="xuatExcelTinhTrangMdah">
+                                                <span class="lh14 one-excel-outline"></span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Làm mới" @click="onClickBtnNapLaiMdah">
+                                                <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Ẩn / Hiện lọc" @click="allowFilterMdah = !allowFilterMdah">
+                                                <span class="lh14 ui-2_filter nc-icon-outline"></span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Mở rộng">
+                                                <span class="lh14 one-design-per"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <ejs-grid
+                                v-show="loaiThietHai == 0"
+                                ref='grid-cong-anh-huong' 
+                                class="table-result table-gachle tree-grid-2"
+                                locale='vi-VN'
+                                gridLines='Both'
+                                :height="dsCongAnhHuong.length == 0 ? 182 : 145"
+                                :groupSettings="{showDropArea: false, captionTemplate: '${key}', columns: ['TEN_TBI']}"
+                                :selectionSettings="{enableToggle: false}"
+                                :dataSource="dsCongAnhHuong"
+                                :allowPaging="false"
+                                :pageSettings="{ pageSize: 10 }"
+                                :allowFiltering='allowFilterMdah'
+                                :allowResizing='true'
+                                :allowSorting="true"
+                                :allowGrouping='true'
+                                :dataBound="onDataBound('grid-cong-anh-huong')">
+                                <e-columns>
+                                    <e-column headerText='' textAlign="Center" width="20" :allowResizing="false" :allowFiltering="false" :template='columnTemplate'></e-column>
+                                    <e-column field='TEN_TBI' :visible="false"></e-column>
+                                    <e-column field='CONG' headerText='Thiết bị / Cổng' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='SO_TB' :headerText='columnSoThueBao.caption' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='CANHBAO_DT' headerText='Cảnh báo DT' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field="dummy" :visible="btnXemChiTietMdahDoanhThu.visible" headerText='Xem CT' headerTextAlign='Center' textAlign='Center' width="100" :template="getColumnTemplateChiTietAhDoanhThu(this)"></e-column>
+                                    <e-column width="0"></e-column>
+                                </e-columns>
+                                <e-aggregates>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Sum" field="SO_TB" :groupCaptionTemplate ='sumValueTemplate'></e-column>
+                                            <e-column type="Sum" field="CANHBAO_DT" :groupCaptionTemplate ='sumValueTemplateDoanhThu'></e-column>
+                                            <e-column type="Count" field="dummy" :groupCaptionTemplate='getTemplateGroupChiTietMdahDoanhThu(this)'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Count" field="CONG" :footerTemplate='sumLabelTemplate'></e-column>
+                                            <e-column type="Sum" field="SO_TB" :footerTemplate='sumValueTemplate'></e-column>
+                                            <e-column type="Sum" field="CANHBAO_DT" :footerTemplate='sumValueTemplateDoanhThu'></e-column>
+                                            <e-column type="Count" field="dummy" :footerTemplate='getTemplateBtnXemDsThueBao(this)'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                </e-aggregates>
+                            </ejs-grid>
+                            <ejs-grid
+                                v-show="false"
+                                ref='grid-cong-anh-huong-excel' 
+                                :allowExcelExport='true'
+                                :allowGrouping='true'
+                                :groupSettings="{showDropArea: false, captionTemplate: '${key}', columns: ['TEN_TBI']}"
+                                :dataSource="dsCongAnhHuong"
+                                :exportGroupCaption="exportGroupCaption">
+                                <e-columns>
+                                    <e-column field='TEN_TBI' headerText="" :visible="false"></e-column>
+                                    <e-column field='CONG' headerText='Thiết bị / Cổng' headerTextAlign='Center' width="130"></e-column>
+                                    <e-column field='SO_TB' :headerText='columnSoThueBao.caption' headerTextAlign='Center' textAlign="Right" width="130"></e-column>
+                                    <e-column field='CANHBAO_DT' headerText='Cảnh báo DT' headerTextAlign='Center' textAlign="Right" width="130"></e-column>
+                                </e-columns>
+                                <e-aggregates>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Sum" field="SO_TB" :groupCaptionTemplate ='sumValueTemplate'></e-column>
+                                            <e-column type="Sum" field="CANHBAO_DT" :groupCaptionTemplate ='sumValueTemplate'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Count" field="CONG" :footerTemplate='sumLabelTemplate'></e-column>
+                                            <e-column type="Sum" field="SO_TB" :footerTemplate='sumValueTemplate'></e-column>
+                                            <e-column type="Sum" field="CANHBAO_DT" :footerTemplate='sumValueTemplate'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                </e-aggregates>
+                            </ejs-grid>
+
+                            <ejs-grid
+                                v-show="loaiThietHai == 1"
+                                ref='grid-tbao-anh-huong' 
+                                class="table-result table-gachle tree-grid-2"
+                                locale='vi-VN'
+                                gridLines='Both'
+                                :height="dsTbaoAnhHuong.length == 0 ? 182 : 145"
+                                :groupSettings="{showDropArea: false, captionTemplate: '${key}', columns: ['DICHVU_VT']}"
+                                :selectionSettings="{enableToggle: false}"
+                                :dataSource="dsTbaoAnhHuong"
+                                :allowPaging="false"
+                                :pageSettings="{ pageSize: 10 }"
+                                :allowFiltering='allowFilterMdah'
+                                :allowResizing='true'
+                                :allowSorting="true"
+                                :allowGrouping='true'
+                                :dataBound="onDataBound('grid-tbao-anh-huong')">
+                                <e-columns>
+                                    <e-column headerText='' textAlign="Center" width="20" :allowResizing="false" :allowFiltering="false" :template='columnTemplate'></e-column>
+                                    <e-column field='DICHVU_VT' :visible="false"></e-column>
+                                    <e-column field='LOAIHINH_TB' headerText='Loại hình thuê bao' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='SO_TB' headerText='Số thuê bao' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='dummy' headerText='Xem CT' headerTextAlign='Center' textAlign='Center' width="100" :template="getColumnTemplateChiTietAhThueBao(this)"></e-column>
+                                    <e-column width="0"></e-column>
+                                </e-columns>
+                                <e-aggregates>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Sum" field="SO_TB" :groupCaptionTemplate='sumValueTemplate'></e-column>
+                                            <e-column type="Count" field="dummy" :groupCaptionTemplate='getTemplateGroupChiTietMdahThueBao(this)'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Count" field="LOAIHINH_TB" :footerTemplate='sumLabelTemplate'></e-column>
+                                            <e-column type="Sum" field="SO_TB" :footerTemplate='sumValueTemplate'></e-column>
+                                            <e-column type="Count" field="dummy" :footerTemplate='getTemplateBtnXemDsThueBao(this)'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                </e-aggregates>
+                            </ejs-grid>
+                            <ejs-grid
+                                v-show="false"
+                                ref='grid-tbao-anh-huong-excel' 
+                                :allowExcelExport='true'
+                                :groupSettings="{showDropArea: false, captionTemplate: '${key}', columns: ['DICHVU_VT']}"
+                                :dataSource="dsTbaoAnhHuong"
+                                :allowGrouping='true'
+                                :exportGroupCaption="exportGroupCaption">
+                                <e-columns>
+                                    <e-column field='DICHVU_VT' headerText="" :visible="false"></e-column>
+                                    <e-column field='LOAIHINH_TB' headerText='Loại hình thuê bao' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                    <e-column field='SO_TB' headerText='Số thuê bao' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                </e-columns>
+                                <e-aggregates>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Sum" field="SO_TB" :groupCaptionTemplate='sumValueTemplate'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                    <e-aggregate>
+                                        <e-columns>
+                                            <e-column type="Count" field="LOAIHINH_TB" :footerTemplate='sumLabelTemplate'></e-column>
+                                            <e-column type="Sum" field="SO_TB" :footerTemplate='sumValueTemplate'></e-column>
+                                        </e-columns>
+                                    </e-aggregate>
+                                </e-aggregates>
+                            </ejs-grid>
+                        </div>
+                        <div class="tab-pane" id="tabLocTT">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Từ ngày</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon one-calendar"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Từ ngày</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon one-calendar"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Nhóm thiết bị</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select name="" id="" class="form-control">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Loại thiết bị</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select name="" id="" class="form-control">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Kiểu thiết bị</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select name="" id="" class="form-control">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-show="!moRongTtscPanel && !moRongDsSuCoTmpPanel" class="box-form">
+            <div class="legend-title">
+                <span class="icon fa fa-angle-up"></span> Danh sách sự cố
+            </div>
+            <div class="box-move-select-table">
+                <div v-show="!moRongDsSuCoCpnPanel" class="box-col" :style="{width: moRongDsSuCoDpnPanel ? '100%' : 'calc(100%/2 - 25px)'}">
+                    <div class="title-bg-main">
+                        <div class="pull-left title">
+                            Danh sách sự cố đã phân nhóm
+                        </div>
+                        <div class="pull-right">
+                            <div class="list-checks">
+                                <div class="item">
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Xuất Excel" @click="onClickBtnXuatExcelDsSuCoDpn">
+                                        <span class="lh14 one-excel-outline"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Làm mới" @click="onClickBtnNapLaiSuCoDpn">
+                                        <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel w20" title="Xem bảng mức độ sự cố" @click="onClickBtnXemMucDoSuCo">
+                                        <span class="lh14">!</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Phóng to" @click="moRongDsSuCoDpnPanel = !moRongDsSuCoDpnPanel">
+                                        <span class="lh14 nc-icon-outline media-1_button-play"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <ejs-treegrid
+                        ref='grid-suco-dpn' 
+                        class="table-result grid-suco-dpn"
+                        locale='vi-VN'
+                        gridLines='Both'
+                        childMapping="childrent"
+                        clipMode="EllipsisWithTooltip"
+                        :frozenColumns="3"
+                        :isFrozenGrid="true"
+                        :selectionSettings="{enableToggle: false}"
+                        :pageSettings="{ pageSize: 10 }"
+                        :dataSource="dsSuCoDpnTree"
+                        :allowPaging='true'
+                        :allowFiltering='true'
+                        :allowSorting="true"
+                        :allowResizing='true'
+                        :treeColumnIndex='2'
+                        :dataBound="onDataBoundTreeGrid('grid-suco-dpn')"
+                        :queryCellInfo="onQueryCellInfoSuCoDpn">
+                        <e-columns>
+                            <e-column field="SUCO_ID" headerText='' textAlign="Center" width="20" :allowResizing="false" :allowFiltering="false" :template='columnTemplate' clipMode="Ellipsis"></e-column>
+                            <e-column field="SUCO_ID" headerText='' textAlign="Center" width="30" :allowResizing="false" :allowFiltering="false" :template='getColumnTemplageChuThichSuCoDpn(this)' clipMode="Ellipsis"></e-column>
+                            <e-column field="SUCO_ID" headerText='Chọn' headerTextAlign='Center' textAlign="Center" width="100" :allowFiltering="false" :template='getColumnTemplateChonSuCoDpn(this)' clipMode="Ellipsis"></e-column>
+                            <e-column field='MA_SC' headerText='Mã sự cố' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='TEN_SC' headerText='Tên sự cố' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='MUCDO_SC' headerText='Mức độ' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NOIDUNG_SC' headerText='Nội dung sự cố' headerTextAlign='Center' width="200" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NHOM_SC' headerText='Nhóm' headerTextAlign='Center' width="100" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NGAY_SC_HT' headerText='Ngày sự cố' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='THOIGIAN' headerText='Kéo dài' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NGAY_TB_HT' headerText='Ngày báo' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NHANVIEN_TB' headerText='Người báo' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='DIENTHOAI_LH' headerText='Điện thoại liên hệ' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NGAY_TN_HT' headerText='Ngày TN' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='NHANVIEN_TN' headerText='Người TN' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='HENSUATU_HT' headerText='Hẹn sửa từ' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='HENSUADEN_HT' headerText='Hẹn sửa đến' headerTextAlign='Center' textAlign="Right" width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='KHOAPHIEU' headerText='Khóa phiếu' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                            <e-column field='KEY' headerText='' :visible="false" :isPrimaryKey="true"></e-column>
+                        </e-columns>
+                    </ejs-treegrid>
+                    <div class="grid-ext">
+                        <Pagination 
+                            ref="pagination-suco-dpn" 
+                            :pageSize="10" 
+                            :pageIndex="0" 
+                            :totalRecords="totalRecordsCount"
+                            @pageChanged="onPageChangedSuCoDpn"></Pagination>
+                    </div>
+                </div>
+                <div v-show="!moRongDsSuCoDpnPanel && !moRongDsSuCoCpnPanel" class="actions">
+                    <button class="btn" @click="onClickBtnGan">
+                        <span class="-ap icon-chevron-thin-left"></span>
+                    </button>
+                    <button class="btn" @click="onClickBtnGoGan">
+                        <span class="-ap icon-chevron-thin-right"></span>
+                    </button>
+                </div>
+                <div v-show="!moRongDsSuCoDpnPanel" class="box-col" :style="{width: moRongDsSuCoCpnPanel ? '100%' : 'calc(100%/2 - 25px)'}">
+                    <div class="title-bg-main">
+                        <div class="pull-left title">
+                            Danh sách sự cố chưa phân nhóm
+                        </div>
+                        <div class="pull-right">
+                            <div class="list-checks">
+                                <div class="item">
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Xuất Excel" @click="onClickBtnXuatExcelDsSuCoCpn">
+                                        <span class="lh14 one-excel-outline"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Phóng to" @click="moRongDsSuCoCpnPanel = !moRongDsSuCoCpnPanel">
+                                        <span class="lh14 nc-icon-outline media-1_button-play"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Làm mơi" @click="onClickBtnNapLaiSuCoCpn">
+                                        <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main btn-panel" title="Ẩn / Hiện lọc" @click="allowFilterSuCoCpn = !allowFilterSuCoCpn">
+                                        <span class="lh14 ui-2_filter nc-icon-outline"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <DataGrid
+                        ref='grid-suco-cpn'
+                        class="table-result"
+                        v-bind:columns="[
+                            {fieldName: '', headerText: 'Chọn', textAlign: 'Center', allowFiltering: false, width: '50', freeze: 'Left', headerTemplate: getHeaderTemplateChonAllSuCoCpn(this), template: getColumnTemplateChonSuCoCpn(this)},
+                            {fieldName: 'MA_SC', headerText: 'Mã sự cố', allowFiltering: true, width: '130', freeze: 'Left' },
+                            {fieldName: 'TEN_SC', headerText: 'Tên sự cố', allowFiltering: true, width: '150', freeze: 'Left' },
+                            {fieldName: 'MUCDO_SC', headerText: 'Mức độ', allowFiltering: true, width: '130' },
+                            {fieldName: 'NOIDUNG_SC', headerText: 'Nội dung sự cố', allowFiltering: true, width: '200' },
+                            {fieldName: 'NHOM_SC', headerText: 'Nhóm', allowFiltering: true, width: '100' },
+                            {fieldName: 'NGAY_SC', headerText: 'Ngày sự cố', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'THOIGIAN', headerText: 'Kéo dài', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NGAY_TB', headerText: 'Ngày báo', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NHANVIEN_TB', headerText: 'Người báo', allowFiltering: true, width: '130' },
+                            {fieldName: 'NGAY_TN', headerText: 'Ngày TN', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NHANVIEN_TN', headerText: 'Người TN', allowFiltering: true, width: '150' },
+                        ]"        
+                        v-bind:dataSource="dsSuCoCpn"
+                        :showFilter="allowFilterSuCoCpn"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :contextMenuItems='!contextMenuCpn.visible ? null : getContextMenuItemsSuCoCpn()' 
+	                    @contextMenuClick='onContextMenuClickSuCoCpn'></DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+    <giao-phieu ref="ref-modal-giao-phieu" :parent="this"></giao-phieu>
+    <giao-phieu-tts ref="ref-modal-giao-phieu-tts" :parent="this"></giao-phieu-tts>
+    <ModalKhoaPhieu ref="ref-modal-khoaphieu" modal-id="modal-khoaphieu" @success="onSuccessKhoaPhieu"></ModalKhoaPhieu>
+    <XemThongTin ref="modal-xem-thongtin"></XemThongTin>
+    <DanhSachThueBao ref="modal-danhsach-thuebao"></DanhSachThueBao>
+    <ModalMucDoSuCo ref="modal-mucdo-suco"></ModalMucDoSuCo>
+    <b-modal ref="ref-modal-xacnhan-xoa" centered title="Thông báo" size="sm">        
+        <span>Bạn thật sự muốn xoá phiếu sự cố này không?</span>
+        <template #modal-footer="{ cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="okXoaPhieu">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal ref="ref-modal-xacnhan-huy-phieu-cpn" centered title="Thông báo" size="sm">        
+        <span>Bạn có muốn hủy các phiếu đang chọn không?</span>
+        <template #modal-footer="{ cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="okHuyPhieuCpn">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal ref="ref-modal-xacnhan-xoa-phieu-cpn" centered title="Thông báo" size="sm">        
+        <span>Bạn có muốn xóa các phiếu đang chọn không?</span>
+        <template #modal-footer="{ cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="okXoaPhieuCpn">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal ref="ref-modal-xacnhan-xoa-suco-tmp" centered title="Thông báo" size="sm">        
+        <span>Bạn có thực sự muốn xóa sự cố có mã {{maSuCoTmp}}</span>
+        <template #modal-footer="{ cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="okXoaSuCoTam">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal ref="ref-modal-xacnhan-doi-nhom-sc" centered title="Thông báo">        
+        <span>
+            Đang có tình trạng được khai báo, bạn có thực sự muốn đổi nhóm sự cố không?<br>
+            Lưu ý: Danh sách tình trạng sẽ bị xóa nếu bạn tiếp tục thao tác này.
+        </span>
+        <template #modal-footer="{ cancel }">
+            <b-button variant="secondary" style="color: white" @click="notOkDoiNhomSuCo">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="okDoiNhomSuCo">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal ref="ref-xacnhan-xoa-anh" centered title="Thông báo" size="sm">        
+        <span>Bạn thật sự muốn xoá ảnh sự cố không ?</span>
+        <template #modal-footer="{ cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="okXoaAnh">Đồng ý</b-button>
+        </template>
+   </b-modal>
+</div>

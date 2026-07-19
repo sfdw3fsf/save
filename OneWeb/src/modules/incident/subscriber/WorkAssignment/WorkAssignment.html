@@ -1,0 +1,187 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <div class="list-actions-top">
+            <ul class="list">            
+                <li v-for="item in actions" :key="item.id" @click="onActionClick(item.id)"
+                    :class="{disabled: !item.active}" v-show="item.visible">
+                    <a style="cursor: pointer;" :class="{'disabled': !item.active}">
+                    <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </vue-nav>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="box-form ">
+                        <div class="legend-title" style="padding-bottom: 20px;">Thông tin công việc</div>
+                        <div class="row" >
+                            <div class="info-row">
+                                <div class="key w120">Ngày tạo</div>
+                                <vue-date :class="{disabled: !isDisableForm}" v-model="formTT.ngaytao" :format="dateFormat1" :checkbox="false"></vue-date>
+                                
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Nhân viên nhận</div>
+                                <div class="value">
+                                    <div class="select-custom" id="select_nhanviennhan">
+                                        <SelectExt   
+                                            :class="{disabled: !isDisableForm}"                                          
+                                            v-model="formTT.nhanviennhan_id" 
+                                            :allowFiltering="true"
+                                            dataTextField="ten_nv" 
+                                            dataValueField="nhanvien_id"
+                                            :dataSource="options.cbo_nhanviennhan"
+                                            >
+                                        </SelectExt>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Từ ngày</div>
+                                <vue-date :class="{disabled: !isDisableForm}" v-model="formTT.tungay" :format="dateFormat" :checkbox="false"></vue-date>
+                                
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Đến ngày</div>
+                                <vue-date :class="{disabled: !isDisableForm}" v-model="formTT.denngay" :format="dateFormat" :checkbox="false"></vue-date>
+                                
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Ghi chú</div>
+                                <div class="value">
+                                    <textarea name="" class="form-control" style="height: 68px;resize: none;" :class="{disabled: !isDisableForm}"
+                                        v-model="formTT.ghichu"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    Danh sách công việc phân công
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Từ ngày</div>
+                                        <div class="value w20 padt7">
+                                            <div class="check-action">
+                                                <input id="chkngaytn"  type="checkbox" class="check" v-model="searchDate.ckb_ngay_tn">
+                                                <span class="name"></span>
+                                            </div>
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <flat-pickr class="form-control" :config="searchDate.dateconfig" v-model="searchDate.ngay_tn" :disabled="!searchDate.ckb_ngay_tn" />
+                                                <span class="icon one-calendar"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Đến ngày</div>                                
+                                        <div class="value">                                    
+                                            <div class="input-icon-right">
+                                                <flat-pickr class="form-control" :config="searchDate.dateconfig" v-model="searchDate.den_ngay" :disabled="!searchDate.ckb_ngay_tn" />
+                                                <span class="icon one-calendar"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <DataGrid v-bind:columns="gvDSCV.tableCollumns" :showFilter="true" ref="gvDSCV"
+                                :allowPaging="true" :enabledSelectFirstRow="true" :enable-paging-server="false"
+                                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                v-bind:dataSource="gvDSCV.tableData" panelDataHeight="95"
+                                @rowSelected="selectItem" 
+                                @queryCellInfo="customiseCell"
+                                >
+                            </DataGrid>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách nhân viên nghỉ</div>
+                        <div class="table-content">
+                            <table class="table-result table-gachle">
+                                <DataGrid v-bind:columns="gvDSNVNghi.tableCollumns" :showFilter="true" ref="gvDSNVNghi"
+                                            :allowPaging="true" 
+                                            :enabledSelectFirstRow="false" 
+                                            :enable-paging-server="false"
+                                            :showColumnCheckbox="true"
+                                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                            v-bind:dataSource="gvDSNVNghi.tableData" panelDataHeight="250"
+                                            @selectedItemsChanged="selectItemsChanged_gvDSNVNghi" 
+                                            @queryCellInfo="customiseCell"
+                                            >
+                                </DataGrid>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1 col-12">
+                    <div class="actions" style="max-width: 50px;padding-top: 170px; margin:0 auto;">
+                        <button @click="btnGo_Click" class="btn" >
+                            <span class="-ap icon-chevron-thin-right"></span>
+                        </button>                        
+                        <button @click="btnGan_Click" class="btn">
+                            <span class="-ap icon-chevron-thin-left"></span>
+                        </button>                        
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách nhân viên chưa gán</div>
+                        <div class="table-content">
+                            <table class="table-result table-gachle">
+                                <DataGrid v-bind:columns="gvDSNVChuaGan.tableCollumns" :showFilter="true" ref="gvDSNVChuaGan"
+                                            :allowPaging="true" 
+                                            :enabledSelectFirstRow="false" 
+                                            :enable-paging-server="false"   
+                                            :showColumnCheckbox="true"                                     
+                                            v-bind:dataSource="gvDSNVChuaGan.tableData" panelDataHeight="250"
+                                            @rowSelected="selectItem_gvDSNVChuaGan"
+                                            @selectedItemsChanged="selectItemsChanged_gvDSNVChuaGan" 
+                                            @queryCellInfo="customiseCell"
+                                            >
+                                </DataGrid>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Lịch sử nhân viên nghỉ</div>
+                        <div class="table-content">
+                            <table class="table-result table-gachle">
+                                <DataGrid v-bind:columns="gvLichSuNVNghi.tableCollumns" :showFilter="true" ref="gvLichSuNVNghi"
+                                            :allowPaging="true" :enabledSelectFirstRow="false" :enable-paging-server="false"
+                                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                            v-bind:dataSource="gvLichSuNVNghi.tableData" panelDataHeight="250"
+                                            @queryCellInfo="customiseCell"
+                                            >
+                                            
+                                </DataGrid>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>

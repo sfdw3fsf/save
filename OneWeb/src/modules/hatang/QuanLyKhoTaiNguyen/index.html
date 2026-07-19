@@ -1,0 +1,43 @@
+<div class="p-4 h-100">
+  <!-- Loading Overlay -->
+  <div v-if="showLoading" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Đang tải...</span>
+    </div>
+  </div>
+  <div
+    class="row h-100"
+    :class="{
+      'padding-top-0': !nodeSelected.type || ['none', 'IDC', 'TOANHA', 'MATSAN', 'ZONE', 'RACK'].includes(nodeSelected.type),
+      'padding-top-4': nodeSelected.type && !['none', 'IDC', 'TOANHA', 'MATSAN', 'ZONE', 'RACK'].includes(nodeSelected.type),
+    }"
+  >
+    <div class="col-sm-3 col-12">
+      <div class="box-form">
+        <div class="legend-title">Sơ đồ thiết bị</div>
+        <CaySoDo ref="CaySoDo" @nodeSelected="handleNodeSelected"> </CaySoDo>
+      </div>
+    </div>
+
+    <div class="col-sm-9 col-12 p-4 bg-white">
+      <template v-if="nodeSelected.type === 'none'">
+        <div class="box-form text-center">
+          Chưa chọn mục trên cây sơ đồ
+        </div>
+      </template>
+
+      <template v-else>
+        <!-- Dynamic Components -->
+        <component
+          :is="currentComponent"
+          ref="dynamicComponent"
+          :modalItemID="nodeSelected.itemId"
+          :key="nodeSelected.type + '-' + nodeSelected.id + '-' + componentKey"
+          :fromDiagram="nodeSelected.type === 'PORT'"
+          @error="handleError"
+          @loading="isLoading = $event"
+        ></component>
+      </template>
+    </div>
+  </div>
+</div>

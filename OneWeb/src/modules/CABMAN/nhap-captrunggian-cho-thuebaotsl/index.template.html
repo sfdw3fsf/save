@@ -1,0 +1,261 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <button class="btn" :disabled="!getEnabledInLyLich" @click="btnInLyLich_Click"><span
+            class="icon one-print"></span> In lý lịch</button>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">
+        <div class="title pull-left">Tìm kiếm thuê bao</div>
+        <div class="pull-right">
+          <div class="list-checks">
+            <div class="item">
+              <div class="check-action">
+                <input type="radio" class="check" value="0" v-model="kieu">
+                <span class="name">Danh bạ</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="check-action">
+                <input type="radio" class="check" value="1" v-model="kieu">
+                <span class="name">Hợp đồng</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="info-row">
+        <div class="key">Số máy/Account</div>
+        <div class="value">
+          <div class="input-more-button">
+            <b-button variant="outline-primary" @click="btnShowModalChonThueBao_Click"><span
+                class="-ap icon-more_horiz"></span>
+            </b-button>
+            <input type="text" id="inputMaThueBao" v-model.trim="inputMaThueBaoText" @keyup.enter="inputMaThueBao_enter" class="form-control"
+              :class="{ 'is-invalid': $v.inputMaThueBaoText.$error }">
+          </div>
+        </div>
+        <b-modal id="modal-ChonThueBao" title="Chọn thuê bao" hide-footer size="xl" modal-class="bss-modal"
+          @ok="popupChonThueBao_ok">
+          <template #default="{ ok }">
+            <div class="list-actions-top">
+              <ul class="list">
+                <li>
+                  <button class="btn btn-link" @click="ok()"><span
+                      class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận</button>
+                </li>
+              </ul>
+            </div>
+            <popupChonThueBao :dataSource="dsThueBao" @selectedRowChanged="popupChonThueBao_selectedRowChanged">
+            </popupChonThueBao>
+          </template>
+        </b-modal>
+      </div>
+      <div class="title-bg-main">
+        <span class="title">Thông tin thuê bao</span>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key">Tên thuê bao</div>
+            <div class="value">
+              <input type="text" id="inputTenThueBao" class="form-control" readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Loại hình</div>
+            <div class="value">
+              <input type="text" id="inputTenLoaiHinh" class="form-control" readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w80">Trạng thái</div>
+            <div class="value">
+              <input type="text" id="inputTrangThai" class="form-control" readonly="readonly">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key">Địa chỉ lắp đặt</div>
+        <div class="value">
+          <input type="text" id="inputDiaChiLapDat" class="form-control" readonly="readonly">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key">Tổ quản lý</div>
+            <div class="value">
+              <input type="text" id="inputToQuanLy" class="form-control" readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w100"> Trạm thiết bị</div>
+            <div class="value">
+              <input type="text" id="inputTramThietBi" class="form-control" readonly="readonly">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form" @click.ctrl="panelChonSoiCap_Click">
+      <div class="legend-title">Chọn cáp trung gian</div>
+      <div class="note">
+        <template v-if="!hasCap">
+          <span class="fw6">*Ghi chú:</span> Nhập vào ký hiệu cáp rồi nhấn Enter (Hoặc chọn cáp từ cửa
+          sổ tìm kiếm), chọn tiếp sợi cáp cần cấp cho thuê bao rồi nhấn <span class="font-weight-bold">[Xác nhận]</span>
+        </template>
+        <template v-else>
+          <span v-html="getThongTinSoi"></span> <a href="javascript:void(0)" class="font-italic" @click="buttonQuyHoachCap_Click"><u>Click để điều chỉnh quy hoạch</u></a>
+        </template>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key">Ký hiệu cáp</div>
+            <div class="value">
+              <div class="input-group-button">
+                <input type="text" id='selectKyHieuCap' class="form-control" @keyup.enter="selectKyHieuCap_enter">
+                <!-- <input type="text" id='selectKyHieuCap' class="form-control"> -->
+                <button class="btn" v-b-modal.modal-ChonCap><span
+                    class="-ap icon-more_horiz"></span></button>
+              </div>
+            </div>
+            <b-modal id="modal-ChonCap" title="Tìm kiếm cáp" hide-footer size="lg" modal-class="bss-modal" @ok="chonCap">
+              <template #default="{ ok }">
+                <div class="list-actions-top">
+                  <ul class="list">
+                    <li>
+                      <button class="btn btn-link" @click="ok()"><span
+                          class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận</button>
+                    </li>
+                  </ul>
+                </div>
+                <popupChonCap :dataSource="[]" kyHieuCap=""
+                  @selectedRowChanged="popupChonCap_selectedRowChanged"></popupChonCap>
+              </template>
+            </b-modal>
+            <QLCap id="popupQLCap" ref="popupQLCap" modalID="popupQLCap"></QLCap>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w80">
+              Sợi cáp
+            </div>
+            <div class="value">
+              <div class="input-group-button">
+                <div class="select-custom">
+                  <select id="selectSoiCap" class="form-control" :disabled="!getEnabledDsSoi"
+                    :class="{ 'is-invalid': $v.SoiCapSelected.$error }">
+                    <option value="0">(Lựa chọn ...)</option>
+                    <option v-for="soi in dsSoi" v-bind:value="soi.SOI">
+                      {{ soi.SOI }}
+                    </option>
+                  </select>
+                </div>
+                <button class="btn btn-reload" @click="btnReloadSoi_Click" :disabled="!getEnabledDsSoi"><span
+                    class="nc-icon-outline arrows-1_refresh-68"></span></button>
+              </div>
+            </div>
+            <div class="value w30 nowrap">
+              <button class="btn btn-main" @click="buttonXacNhan_Click">
+                <span class="nc-icon-glyph ui-1_check-simple"></span> Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <span v-html="getThongTinCap"></span> <a href="javascript:void(0)" class="font-italic" @click="buttonXemCap_Click" v-if="hasCap"><u>Click để xem chi tiết</u></a>
+      </div>
+      <b-modal id="modal-QuyHoachSoiCap" title="Chọn danh sách" hide-footer size="lg" modal-class="bss-modal"
+        @ok="popupQuyHoachSoiCap_Ok">
+        <template #default="{ ok }">
+          <div class="list-actions-top">
+            <ul class="list">
+              <li>
+                <button class="btn btn-link" @click="ok()"><span
+                    class="icon nc-icon-glyph ui-1_check-circle-08"></span>Xác nhận</button>
+              </li>
+            </ul>
+          </div>
+          <popupQuyHoachSoiCap :dataSource="dsSoiQuyHoach" ref="controlPopupQuyHoachSoiCap"></popupQuyHoachSoiCap>
+        </template>
+      </b-modal>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Thông tin cáp của thuê bao</div>
+      <div class="nav tabs tab-over">
+        <a href="#tabBang" data-toggle="tab" class="active">Bảng</a>
+        <a href="#tabGianDo" data-toggle="tab" @click="refreshGianDo">Giản đồ</a>
+      </div>
+      <div class="tab-content box-form">
+        <div id="tabBang" class="tab-pane active">
+          <Split>
+            <SplitArea :size="25" :minSize="100">
+              <leftPane :dataSource="danDoDau"></leftPane>
+            </SplitArea>
+            <SplitArea :size="50" :minSize="100">
+              <!-- <centerPane :dataSource="dsCapTrungGian"></centerPane> Giải phóng-->
+              <div class="title-bg-main">
+                <span class="title">Danh sách cáp trung gian</span>
+              </div>
+              <DataGrid @commandClick='gridDsCapTrungGian_commandClick' :columns="[
+      {fieldName: 'STT', headerText: 'STT', allowFiltering: true, textAlign:'Right', width:70},
+      {fieldName: 'KYHIEU', headerText: 'Ký hiệu cáp', allowFiltering: true},
+      {fieldName: 'SOI', headerText: 'Sợi', allowFiltering: true},
+      {fieldName: 'LOAI_N', headerText: 'Loại đối tượng nguồn', allowFiltering: true, width:180},
+      {fieldName: 'KYHIEU_N', headerText: 'Đối tượng nguồn', allowFiltering: true, width:150},
+      {fieldName: 'LOAI_D', headerText: 'Loại đối tượng đích', allowFiltering: true, width:170},
+      {fieldName: 'KYHIEU_D', headerText: 'Đối tượng đích', allowFiltering: true, width:150},
+      {fieldName: 'NGUOI_CN', headerText: 'Người cập nhật', allowFiltering: true, width:150},
+      {fieldName: 'NGAY_CN', headerText: 'Ngày cập nhật', allowFiltering: true, width:150},
+      {commands: [{ buttonOption: {content: ' ', cssClass: 'e-danger e-small', iconCss: 'e-icons e-delete'}}], width:50}
+    ]" :dataSource="dsCapTrungGian" />
+              <!-- <ejs-grid ref='gridDsCapTrungGian' :dataSource='dsCapTrungGian' :allowPaging="true"
+                :pageSettings='{ pageSize: 10 }' :commandClick='gridDsCapTrungGian_commandClick'>
+                <e-columns>
+                  <e-column field='STT' headerText='STT' textAlign='Right' width=70></e-column>
+                  <e-column field='KYHIEU' headerText='Ký hiệu cáp'></e-column>
+                  <e-column field='SOI' headerText='Sợi'></e-column>
+                  <e-column field='LOAI_N' headerText='Loại đối tượng nguồn' width=180></e-column>
+                  <e-column field='KYHIEU_N' headerText='Đối tượng nguồn' width=150></e-column>
+                  <e-column field='LOAI_D' headerText='Loại đối tượng đích' width=170></e-column>
+                  <e-column field='KYHIEU_D' headerText='Đối tượng đích' width=150></e-column>
+                  <e-column field='NGUOI_CN' headerText='Người cập nhật' width=150></e-column>
+                  <e-column width=50
+                    :commands="[{ buttonOption: {content: ' ', cssClass: 'e-danger e-small', iconCss: 'e-icons e-delete' } }]">
+                  </e-column>
+                </e-columns>
+              </ejs-grid> -->
+            </SplitArea>
+            <SplitArea :size="25" :minSize="100">
+              <rightPane :dataSource="danDoCuoi"></rightPane>
+            </SplitArea>
+          </Split>
+        </div>
+        <div id="tabGianDo" class="tab-pane">
+          <gianDo :nodes="dsNodes" :connectors="dsConnectors" :refresh="gianDoRefresh"></gianDo>
+        </div>
+      </div>
+    </div>
+  </div>
+  <b-modal id="modalLyLichDayMay" title="Tra cứu lý lịch dây máy" hide-footer size="xl" modal-class="bss-modal" @shown="modalLyLichDayMay_Shown">
+    <template #default="{ ok }">
+      <TraCuuLyLichDayMay id="formLyLichDayMay" ref="formLyLichDayMay"></TraCuuLyLichDayMay>
+    </template>
+  </b-modal>
+</div>

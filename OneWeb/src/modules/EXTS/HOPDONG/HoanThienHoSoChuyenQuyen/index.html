@@ -1,0 +1,784 @@
+<div>
+<Modal id="popupThueBao" @chon="chonKH" :dataSend="dataSend"></Modal>
+<ChonHopDong id="popupHD"  @chon="chonHD" :dataHD="dataHD"></ChonHopDong>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li :class="{'disable-btn': !isEnabledTsbtnHuyBo}">
+                <a href="javascript:void(0)"  @click="tsbtnHuyBo_Click" v-show="tsbtnHuyBo">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+                </a>
+            </li>
+            <li :class="{'disable-btn': !isEnabledTsbtnChuyenDB}">
+                <a href="javascript:void(0)"  @click="tsbtnChuyenDB_Click"  v-show="tsbtnChuyenDB">
+                    <span class="icon one-file-check"></span> Hoàn thiện
+                </a>
+            </li>
+
+
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="nav tabs tab-over">
+            <a href="#tabB1" data-toggle="tab" @click="onclickTab(1)" :class="[ activetab == 1 ? 'active' : '' ]">Thông tin khách hàng</a>
+            <a href="#tabB2" data-toggle="tab" @click="onclickTab(2)" :class="[ activetab == 2 ? 'active' : '' ]">Thông tin thuê bao</a>
+        </div>
+        <div class="tab-content">
+            <div :class="[ activetab == 1 ? 'active' : '' ]" id="tabB1" v-show="activetab == 1">
+                 <div class="box-form" >
+                    <div class="legend-title">Thông tin khách hàng</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Mã GD <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <div class="input-more-button">
+                                                <button class="btn" @click="openPopupHD()" data-toggle="modal">
+                                                    <span class="-ap icon-more_horiz"></span>
+                                                </button>
+                                                <bss-error-marker :has-error="$v.modelInput.txtMaGD.$error">
+                                                    <input type="text" ref="txtMaGD" class="form-control highlight black-bold" v-model='$v.modelInput.txtMaGD.$model' v-on:keyup.enter="onEnterMaGD()">
+                                                </bss-error-marker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Ngày YC</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker
+                                                    v-model="modelDateTime.dtpNgayYC"
+                                                    :format="modelDateTime.dateFormat"
+                                                    :value="modelDateTime.dtpNgayYC"
+                                                    :enabled="modelDateTime.enableDate"
+                                                ></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Mã HĐ <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <input type="text" class="form-control black-bold" v-model='modelInput.txtMaHD'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Ngày lập HĐ</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker
+                                                    v-model="modelDateTime.dtpNgayLHD"
+                                                    :format="modelDateTime.dateFormat"
+                                                    :value="modelDateTime.dtpNgayLHD"
+                                                    :enabled="modelDateTime.enableDate"
+                                                ></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Tên KH <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <input type="text" class="form-control black-bold" v-model='modelInput.txtTenKH'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Mã KH</div>
+                                        <div class="value">
+                                            <input ref="ma-kh" type="text" class="form-control black-bold"  v-model='modelInput.txtMaKH'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Địa chỉ KH <BssRequiredMarker/></div>
+                                <div class="value">
+                                    <input type="text" class="form-control black-bold"  v-model='modelInput.txtDiaChiKH'>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Loại giấy tờ <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="cboGiayToKH">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboGiayToKH"
+                                                    :settings="{dropdownParent: $refs['cboGiayToKH']}"
+                                                    :dataSource="modelCbo.vcboGiayToKH"
+                                                    dataTextField="loai_gt"
+                                                    dataValueField="loaigt_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Số GT</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtSoGT'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Ngày hết hạn</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" value="__ /__ /____" v-model='modelInput.txtNgayHetHan'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">{{lblNgaySN}} <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" value="__ /__ /____"  v-model='modelInput.txtNgaySN'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Ngày cấp <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" value="__ /__ /____" v-model='modelInput.txtNgayCap'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Nơi cấp</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" value="" v-model='modelInput.txtNoiCap'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Giới tính</div>
+                                        <div class="value">
+                                            <div class="list-checks mart7">
+                                                <div class="item">
+                                                    <div class="check-action">
+                                                        <input name="chkGT" type="radio" value="rdoNo" v-model="checkrdo" @click="changeOption()" :disabled="modelCkeckBox.disalbeDN">
+                                                        <span class="name">Không</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item">
+                                                    <div class="check-action">
+                                                        <input name="chkGT" type="radio" value="rdoF" v-model="checkrdo" @click="changeOption()" :disabled="modelCkeckBox.disalbeGT">
+                                                        <span class="name">Nam</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item">
+                                                    <div class="check-action">
+                                                        <input name="chkGT" type="radio" value="rdoM" v-model="checkrdo" @click="changeOption()" :disabled="modelCkeckBox.disalbeGT">
+                                                        <span class="name">Nữ</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Quốc tịch</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="cboQuocTich">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboQuocTich"
+                                                    :settings="{dropdownParent: $refs['cboQuocTich']}"
+                                                    :dataSource="modelCbo.vcboQuocTich"
+                                                    dataTextField="tenquoctich"
+                                                    dataValueField="quoctich_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Ngành nghề</div>
+                                         <div class="value">
+                                            <div class="select-custom" ref="cboNganhNgheLoc">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboNganhNgheLoc"
+                                                    :settings="{dropdownParent: $refs['cboNganhNgheLoc']}"
+                                                    :dataSource="modelCbo.vcboNganhNgheLoc"
+                                                    dataTextField="tennganhnghe"
+                                                    dataValueField="nganhnghe_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Dân tộc</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="cboDanToc">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboDanToc"
+                                                    :settings="{dropdownParent: $refs['cboDanToc']}"
+                                                    :dataSource="modelCbo.vcboDanToc"
+                                                    dataTextField="tendantoc"
+                                                    dataValueField="dantoc_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại KH</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="openPopup()" data-toggle="modal">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <div class="select-custom" >
+
+                                            <ComboboxGrid ref="cboLoaiKH2" v-bind:columns="[
+                                                {fieldName: 'kieu_kh', headerText: 'Kiểu KH', allowFiltering: true, isGroupedColumn:true},
+                                                {fieldName: 'ten_nhom', headerText: 'Nhóm LKH', allowFiltering: true, isGroupedColumn:true},
+                                                {fieldName: 'ma_loaikh', headerText: 'Mã loại khách hàng', allowFiltering: true},
+                                                {fieldName: 'ten_loaikh', headerText: 'Tên loại khách hàng', allowFiltering: true}
+                                                ]"
+                                                          v-bind:dataSource="modelCbo.vcboLoaiKH2"
+                                                          v-model.trim="modelCbo.cboLoaiKH2"
+                                                          textField="ten_loaikh"
+                                                          valueField="loaikh_id"
+                                                          @selectedChanged="cbb_selectedChanged"
+                                                >
+                                            </ComboboxGrid>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key">Người đại diện</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control black-bold" v-model='modelInput.txtNguoiDD'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Chức vụ</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtChucDanhDD'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Địa chỉ NĐD</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model='modelInput.txtDiaChiNDD'>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key">Điện thoại</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtTelKH'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Fax</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtFaxKH'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Hộ khẩu</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model='modelInput.txtHoKhau'>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key">Nơi cấp HK</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtNoiCapHK'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Ngày cấp</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" value="__ /__ /____" v-model='modelInput.txtNgayCapHK'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key">Mã số thuế</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtMST'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Tài khoản</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtSTK'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Ngân hàng</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model='modelCkeckBox.chkNganHangKH'>
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboNganHangKH">
+                                        <SelectExt
+                                            v-model="modelCbo.cboNganHangKH"
+                                            :settings="{dropdownParent: $refs['cboNganHangKH']}"
+                                            :dataSource="modelCbo.vcboNganHangKH"
+                                            dataTextField="ten_nh"
+                                            :disabled="!modelCkeckBox.chkNganHangKH"
+                                            dataValueField="nganhang_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Đặc trưng</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model='modelInput.txtDactrung'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Ghi chú</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model='modelInput.txtGhiChuKH'>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form" >
+                    <div class="legend-title">Thông tin thanh toán</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">Mã TT <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <input ref="ma-tt" type="text" class="form-control black-bold" v-model='modelInput.txtMaTT'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Mã đại diện</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control highlight black-bold" v-model='modelInput.txtMaTBDD'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-row">
+                                <div class="key w120">Tên thanh toán <BssRequiredMarker/></div>
+                                <div class="value">
+                                    <input type="text" class="form-control black-bold" v-model='modelInput.txtTenTT'>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Địa chỉ TT <BssRequiredMarker/></div>
+                                <div class="value">
+                                    <input type="text" class="form-control black-bold" v-model='modelInput.txtDiaChiTT'>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Địa chỉ CT <BssRequiredMarker/></div>
+                                <div class="value">
+                                    <input type="text" class="form-control black-bold" v-model='modelInput.txtDiaChiCT'>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w120">Địa chỉ BC</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model='modelInput.txtDiaChiBC'>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key">ĐV thanh toán</div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboDonViQL">
+                                        <SelectExt
+                                            v-model="modelCbo.cboDonViQL"
+                                            :settings="{dropdownParent: $refs['cboDonViQL']}"
+                                            :dataSource="modelCbo.vcboDonViQL"
+                                            dataTextField="ten_dv"
+                                            :disabled="true"
+                                            dataValueField="donvi_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key">Hình thức TT <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="cboHTTT">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboHTTT"
+                                                    :settings="{dropdownParent: $refs['cboHTTT']}"
+                                                    :dataSource="modelCbo.vcboHTTT"
+                                                    dataTextField="hinhthuc_tt"
+                                                    @change="cboHTTT_SelectedValueChanged()"
+                                                    dataValueField="httt_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Mã NVTC <BssRequiredMarker/></div>
+                                        <div class="value">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-12">
+                                                    <input type="text" class="form-control highlight black-bold" v-model='modelInput.txtMaNVTC'>
+                                                </div>
+                                                <div class="col-sm-6 col-12">
+                                                    <input type="text" class="form-control highlight black-bold" v-model='modelInput.txtMaTuyen'>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key">Tài khoản</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtSTK'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Mã số thuế</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model='modelInput.txtMST'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Ngân hàng</div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboNganHang">
+                                        <SelectExt
+                                            v-model="modelCbo.cboNganHang"
+                                            :settings="{dropdownParent: $refs['cboNganHang']}"
+                                            :dataSource="modelCbo.vcboNganHang"
+                                            dataTextField="ten_nh"
+                                            :disabled="true"
+                                            dataValueField="nganhang_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">Ghi chú</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model='modelInput.txtGhiChuTT'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <DataGrid ref="grid" v-bind:columns="[
+                            {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true, width: 30},
+                            {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: true, width: 30},
+                            {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: true, width: 60},
+                            {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting: true}
+                            ]"
+                                v-bind:dataSource="dtList"
+                                :showFilter="true"
+                                @selectedRowChanged="selectedRowChanged1">
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+            <div :class="[ activetab == 2 ? 'active' : '' ]" id="tabB2" v-show="activetab == 2">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Số máy/Acc</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control highlight black-bold" v-model='modelInput.txtMaTB'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Thanh toán</div>
+                                         <div class="value">
+                                            <div class="select-custom" ref="cboTT">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboTT"
+                                                    :settings="{dropdownParent: $refs['cboTT']}"
+                                                    :dataSource="modelCbo.vcboTT"
+                                                    dataTextField="tentt"
+                                                    dataValueField="hdtt_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">ĐV thuê bao</div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboDaiVT">
+                                        <SelectExt
+                                            v-model="modelCbo.cboDaiVT"
+                                            :settings="{dropdownParent: $refs['cboDaiVT']}"
+                                            :dataSource="modelCbo.vcboDaiVT"
+                                            :disabled="true"
+                                            dataTextField="ten_dv"
+                                            dataValueField="donvi_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Tên thuê bao</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control black-bold" v-model='modelInput.txtTenTB'>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Đối tượng</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="cboDoituongTB">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboDoituongTB"
+                                                    :settings="{dropdownParent: $refs['cboDoituongTB']}"
+                                                    :dataSource="modelCbo.vcboDoituongTB"
+                                                    dataTextField="ten_dt"
+                                                    dataValueField="doituong_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Địa chỉ TB <BssRequiredMarker/></div>
+                                <div class="value">
+                                    <input type="text" class="form-control black-bold" v-model='modelInput.txtDiaChiTB'>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Địa chỉ LĐ <BssRequiredMarker/></div>
+                                <div class="value">
+                                    <input type="text" class="form-control black-bold" v-model='modelInput.txtDiachiLD'>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Dịch vụ</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="rcboDichVuVT">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboDichVuVT"
+                                                    :settings="{dropdownParent: $refs['rcboDichVuVT']}"
+                                                    :dataSource="modelCbo.vcboDichVuVT"
+                                                    dataTextField="ten_dvvt"
+                                                    dataValueField="dichvuvt_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Loại hình</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="cboLoaihinhTB">
+                                                <SelectExt
+                                                    v-model="modelCbo.cboLoaihinhTB"
+                                                    :settings="{dropdownParent: $refs['cboLoaihinhTB']}"
+                                                    :dataSource="modelCbo.vcboLoaihinhTB"
+                                                    dataTextField="LOAIHINH_TB"
+                                                    dataValueField="LOAITB_ID"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Kiểu yêu cầu</div>
+                                 <div class="value">
+                                    <div class="select-custom" ref="cboKieuLD">
+                                        <SelectExt
+                                            v-model="modelCbo.cboKieuLD"
+                                            :settings="{dropdownParent: $refs['cboKieuLD']}"
+                                            :dataSource="modelCbo.vcboKieuLD"
+                                            dataTextField="TEN_KIEULD"
+                                            dataValueField="KIEULD_ID"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Mức cước TB</div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboMucCuocTB">
+                                        <SelectExt
+                                            v-model="modelCbo.cboMucCuocTB"
+                                            :settings="{dropdownParent: $refs['cboMucCuocTB']}"
+                                            :dataSource="modelCbo.vcboMucCuocTB"
+                                            dataTextField="tenmuccuoc"
+                                            dataValueField="mucuoctb_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Them cho tab2 thuebao1 -->
+                             <div class="info-row" v-show = 'pnlDD'>
+                                <div class="key w100">Gói cước DĐ</div>
+                               <div class="value">
+                                    <div class="select-custom" ref="cboGoiCuocDD">
+                                        <SelectExt
+                                            v-model="modelCbo.cboGoiCuocDD"
+                                            :settings="{dropdownParent: $refs['cboGoiCuocDD']}"
+                                            :dataSource="modelCbo.vcboGoiCuocDD"
+                                            dataTextField="tengoicuoc"
+                                            dataValueField="goicuoc_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row" v-show = 'pnlDD'>
+                                <div class="key w100">ĐT Vinaphone</div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboDTVinaPhone">
+                                        <SelectExt
+                                            v-model="modelCbo.cboDTVinaPhone"
+                                            :settings="{dropdownParent: $refs['cboDTVinaPhone']}"
+                                            :dataSource="modelCbo.vcboDTVinaPhone"
+                                            dataTextField="ten_dt_neo"
+                                            dataValueField="doituong_id_neo"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Them cho tab2 thuebao2 -->
+                            <div class="info-row" v-show = 'pnlAdsl'>
+                                <div class="key w100">Tốc độ</div>
+                                <div class="value">
+                                    <div class="select-custom" ref="cboGoiCuocAdsl">
+                                        <SelectExt
+                                            v-model="modelCbo.cboGoiCuocAdsl"
+                                            :settings="{dropdownParent: $refs['cboGoiCuocAdsl']}"
+                                            :dataSource="modelCbo.vcboGoiCuocAdsl"
+                                            dataTextField="thuonghieu"
+                                            dataValueField="tocdo_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title">Dịch vụ cộng thêm</div>
+                            <div class="info-row">
+                                <div class="key w100"></div>
+                                <div class="value">
+                                    <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model='modelInput.lvDvgt'></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title">Dịch vụ khác</div>
+                            <div class="info-row">
+                                <div class="key w100"></div>
+                                <div class="value">
+                                    <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model='modelInput.lvDvkhac'></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w100">Ghi chú</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model='modelInput.txtGhiChuTB'>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">Danh sách thuê bao</div>
+                    <div class="table-content">
+                        <DataGrid ref="grid" v-bind:columns="[
+                            {fieldName: 'MA_TB', headerText: 'Số máy/Account', allowFiltering: true, allowSorting: true, width:50},
+                            {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting: true, width:100},
+                            {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'NGAY_HT', headerText: 'Ngày bàn giao', allowFiltering: true, allowSorting: true, width:50}
+                            ]"
+                                dataKeyField="HDTB_ID"
+                                :showColumnCheckbox="true"
+                                :defaultColumnCheckboxChecked="true"
+                                v-bind:dataSource="dtThueBao"
+                                :showFilter="true"
+                                @selectedItemsChanged="selectedRowChanged2">
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

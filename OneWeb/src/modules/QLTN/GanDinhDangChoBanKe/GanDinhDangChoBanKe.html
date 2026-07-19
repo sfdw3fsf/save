@@ -1,0 +1,106 @@
+<div >
+    <!-- <breadcrumb :header="header"></breadcrumb> -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" v-on:click="save">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" v-on:click="del">
+                    <span class="icon one-trash"></span>Xoá
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" v-on:click="huy">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ bỏ
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-ganddbk">
+            <div class="box-sidebar">
+                <div class="from-group">
+                    <div class="select-custom">
+                        <select class="form-control" v-model="dataSelect.verId" @change="getDataTree">
+                            <option v-for="(item, index) in dsVersion" :key="index" :value="item.VER_ID">{{item.VER_NAME}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div v-if="this.dataTree.length == 0" class="mart10" style="text-align: center;">Không có dữ liệu</div>
+                <div class="page">
+                    <div class="e-tree-plus tree-icon mart10" style="overflow: auto; height: 430px;">
+                        <ejs-treeview id="treeview" ref="treeObj" :nodeClicked="nodeClicked" :fields="getFields"></ejs-treeview>
+                    </div>
+                </div>
+            </div>
+            <div class="box-content">
+                <div class="box-form">
+                    <div class="table-content">
+                        <table class="table-result">
+                            <thead class="center">
+                                <tr>
+                                    <th class="w30"></th>
+                                    <th>Tên format</th>
+                                    <th>VER_ID</th>
+                                    <th>INV_ID</th>
+                                    <th>GROUP_ID</th>
+                                    <th>Ghi chú</th>
+                                    <th>Giá trị trường Group</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, idx) in dsDataLayout" :key="idx" :style="{background: index == idx ? '#FFF0C8 !important' : null }" @click="selectItem(item, idx)">
+                                    <td>
+                                        <span class="fa fa-play text-main" v-if="index == idx"></span>
+                                    </td>
+                                    <td>{{item.DISPLAY ? item.DISPLAY : item.FORMAT_ID}}</td>
+                                    <td style="text-align: right">{{item.VER_ID}}</td>
+                                    <td style="text-align: right">{{item.INV_ID}}</td>
+                                    <td style="text-align: right">{{item.GROUP_ID}}</td>
+                                    <td>{{item.NOTE}}</td>
+                                    <td>{{item.BINDING_VALUE}}</td>    
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="padt0 padb0" style="width: 250px;">
+                                        <div class="select-custom">
+                                            <!-- <select class="form-control">
+                                                <option v-for="(item, index) in dsFormat" :key="index" :value="item.FORMAT_ID">{{item.DISPLAY}}</option>
+                                            </select> -->
+                                            <SelectExt
+                                                v-model.trim="dataDSFormat.formatId"
+                                                :settings="{dropdownParent: $refs['dsFormat']}"
+                                                :dataSource="dsFormat"
+                                                dataTextField="DISPLAY"
+                                                dataValueField="FORMAT_ID"/>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <input :disabled="dataSelect.groupId === null" type="text" class="form-control" v-model.trim="dataDSFormat.note"/>
+                                    </td>
+                                    <td>
+                                        <input :disabled="dataSelect.groupId === null" type="number" min="0" class="form-control" v-model.trim="dataDSFormat.bindingValue"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal confirm cập nhập -->
+    <b-modal v-model="isShowModalCapNhap" cancelTitle="Hủy" okTitle="Đồng ý" title="Thông báo" size="md" @ok="ghiLai">
+        <span>Bạn có chắc chắn muốn cập nhập dữ liệu?</span>
+    </b-modal>
+    <!-- Modal confirm xoá -->
+    <b-modal v-model="isShowModalXoa" cancelTitle="Hủy" okTitle="Đồng ý" title="Thông báo" size="md" @ok="xoa">
+        <span>Bạn có chắc chắn muốn xoá dữ liệu?</span>
+    </b-modal>
+</div>

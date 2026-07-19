@@ -1,0 +1,208 @@
+<b-modal
+    :id="modalId"
+    size="xl"
+    :dataCong="dataCong"
+    no-close-on-backdrop
+    hide-footer
+    hide-header
+    hide-header-close
+    @shown="focusMyElement"
+    body-class="modal-body p-0">
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span> Chui cáp qua ống cống
+      </div>
+      <div
+        class="close -ap icon-close"
+        data-dismiss="modal"
+        @click="$bvModal.hide(modalId)">
+      </div>
+    </div>
+
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a  @click="capNhat()" >
+            <span class="icon one-save"></span> Ghi lại
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="legend-title">
+          Thông tin ống cống
+        </div>
+        <div class="row">
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w50">Ký hiệu</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="kyHieu" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w130">Số thứ tự ống cống</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="stt" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w110">
+                <span class="name">Ký hiệu ống cống</span>
+              </div>
+              <div class="value">
+                <input type="text" class="form-control" value="0" v-model="kyHieuOngCong" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w110">
+                <span class="name">Số cáp chui qua</span>
+              </div>
+              <div class="value">
+                <input type="text" class="form-control" value="0" v-model="soCapChuiQua" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="grid-stack-box">
+        <split>
+          <SplitArea :size="60" :minSize="300">
+            <div class="box-col box-form" id="boxLeft">
+              <div class="legend-title">Danh sách cáp đang trong ống cống</div>
+              <div class="input-more-button -right">
+                <button class="btn btn-main">
+                  <span class="one-search"></span>
+                </button>
+<!--                <input type="text" class="form-control highlight" v-model="txtQuery" placeholder="Nhập ký hiệu cáp để tra cứu và chọn để chui qua cống">-->
+                <div class="dropdown" style="margin-bottom: 5px">
+                  <div class="input-icon-map">
+                    <input type="text" class="form-control" @click="showTimKiem()" v-model="searchText" @keypress="onChangeTextSearch()" placeholder="Nhập ký hiệu cáp để tra cứu và chọn để chui qua cống">
+                  </div>
+                  <div class="dropdown-menu dropdown-search dropdown-icon show" v-show="showDataSearch"
+                       style="width:100%;max-height: 300px;margin-bottom: 10px;overflow: scroll;">
+                    <b-list-group v-for="(item,index) in dsCapSearch"
+                                  @click="selectCap(item,index)" :key="index">
+                      <b-list-group-item>
+                        <a class="btn">
+                          <span class="desc">{{item.OBJ_NAME}}</span>
+                        </a>
+                      </b-list-group-item>
+                    </b-list-group>
+                  </div>
+                </div>
+              </div>
+              <div class="table-content">
+                <DataGrid v-bind:columns="[
+
+                        {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                        {fieldName: 'TEN_CAP', headerText: 'Tên cáp', allowFiltering: true},
+                        ]"
+                          v-bind:dataSource="dsCapDaChui" :showColumnCheckbox="true" dataKeyField="CAP_ID" @selectedItemsChanged="selectDaChui_selectedItemsChanged" :showFilter="true" @selectedRowChanged="gridDaChui_selectedRowChanged"></DataGrid>
+              </div>
+            </div>
+          </SplitArea>
+          <SplitArea :size="60" :minSize="300">
+            <div class="box-col box-form" id="boxRight">
+              <div class="box-move-select-table">
+                <div class="actions w40 padl0">
+                  <button class="btn" @click="goCap()">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                  </button>
+                  <button class="btn" @click="chuiCap()">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                  </button>
+                </div>
+                <div class="box-col" style="width: calc(100% - 30px);">
+                  <div class="legend-title">Chọn cáp chưa chui qua ống cống</div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w70">TTVT</div>
+                        <div class="value">
+                          <div class="select-custom" ref="chuicap-ttvt">
+                            <SelectExt v-model.trim="dataSelected.TTVT"
+                                       :settings="{dropdownParent: $refs['chuicap-ttvt']}"
+                                       :dataSource="dsTTVT" dataTextField="TEN_DV"
+                                       dataValueField="DONVI_ID" @change="onChangeTTVT($event)"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w80">Tổ kỹ thuật</div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <div class="select-custom" ref="treocap-toql">
+                              <SelectExt v-model.trim="dataSelected.ToQL"
+                                         :settings="{dropdownParent: $refs['treocap-toql']}"
+                                         :dataSource="dsToQL" dataTextField="TEN_DV"
+                                         dataValueField="DONVI_ID" @change="onChangeToQL($event)"/>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w70">Tổng đài</div>
+                        <div class="value">
+                          <div class="select-custom" ref="chuicap-tongdai">
+                            <SelectExt v-model.trim="dataSelected.TongDai"
+                                       :settings="{dropdownParent: $refs['chuicap-tongdai']}"
+                                       :dataSource="dsTongDai" dataTextField="TEN_DV"
+                                       dataValueField="DONVI_ID" @change="onChangeTongDai($event)"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w80">Nhóm cáp</div>
+                        <div class="value">
+                          <div class="select-custom">
+                            <ejs-combobox id='cboNhomCap'  v-model="dataSelected.NhomCap" :dataSource='dsNhomCap' :fields='fieldsCap' @change="onChangeNhomCap()"></ejs-combobox>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w70">Cáp gốc</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <ejs-combobox id='cbocapGoc'  v-model="dataSelected.CapGoc" :dataSource='dsCapGoc' :fields='fieldsCapGoc' @change="onChangeCapGoc()"></ejs-combobox>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-content mart10" style="height: 200px;">
+                    <DataGrid v-bind:columns="[
+
+                                    {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                                    {fieldName: 'TEN_CAP', headerText: 'Tên cáp', allowFiltering: true},
+                                    ]"
+                              v-bind:dataSource="dsCapChuaChui" :showColumnCheckbox="true" dataKeyField="CAP_ID" @selectedItemsChanged="selectChuaChui_selectedItemsChanged" :showFilter="true" @selectedRowChanged="gridChuaChui_selectedRowChanged"></DataGrid>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SplitArea>
+        </split>
+      </div>
+
+    </div>
+
+  </div>
+</b-modal>

@@ -1,0 +1,425 @@
+<div class="row">
+  <div class="col-12">
+    <div class="legend-title">Đặc tính thiết bị</div>
+  </div>
+  <div class="col-6 px-0" :class="[isServer ? 'col-6' : 'col-12']">
+    <div class="col-12 row">
+      <div class="col-6">
+        <div class="info-row">
+          <div class="key w150">Hãng sản xuất</div>
+          <div class="value">
+            <SelectExt
+              :dataSource="manufacturerList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="currentItem.hangsx_id"
+              :disabled="!dacTinhThietBiControls.select_hangsx_id.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Năm sản xuất</div>
+          <div class="value">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.namsx"
+              :disabled="!dacTinhThietBiControls.txt_namsx.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Công suất định danh</div>
+          <div class="value d-flex flex-row align-items-center gap-2">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.cs_dinhdanh"
+              :disabled="!dacTinhThietBiControls.txt_cs_dinhdanh.enabled"
+            />
+            <span>KWH</span>
+          </div>
+          <div v-show="!isServer" class="key w100 text-end">Thực tế:</div>
+          <div v-if="!isServer" class="value d-flex flex-row align-items-center gap-2">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.cs_thucte"
+              :disabled="!dacTinhThietBiControls.txt_cs_thucte.enabled"
+            />
+            <span>KWH</span>
+          </div>
+        </div>
+        <div v-show="isServer" class="info-row">
+          <div class="key w150">Công suất thực tế</div>
+          <div class="value d-flex flex-row align-items-center gap-2">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.cs_thucte"
+              :disabled="!dacTinhThietBiControls.txt_cs_thucte.enabled"
+            />
+            <span>KWH</span>
+          </div>
+        </div>
+        <!-- Thiết bị mạng -->
+        <div v-show="isNetwork || isServer" class="info-row">
+          <div class="key w150">Vai trò thiết bị</div>
+          <div class="value">
+            <!-- <SelectExt :dataSource="deviceRoleList" dataTextField="TEN" dataValueField="ID" :disabled="!dacTinhThietBiControls.txt_vaitrothietbi.enabled" /> -->
+            <treeselect
+              :multiple="true"
+              v-model="currentItem.vaitrothietbi_ids"
+              :options="deviceRoleList"
+              placeholder="Vai trò thiết bị"
+              :disable-branch-nodes="false"
+              :append-to-body="true"
+              style="overflow-y:auto;"
+              :disabled="!dacTinhThietBiControls.txt_vaitrothietbi.enabled"
+              :normalizer="vaiTroNormalizer"
+            ></treeselect>
+          </div>
+        </div>
+        <!-- End -->
+        <div v-show="!isOther" class="info-row">
+          <div class="key w150">Thời hạn bảo hành</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_baohanh"
+              :disabled="!dacTinhThietBiControls.date_ngay_baohanh.enabled"
+            />
+          </div>
+        </div>
+        <div v-show="isOther" class="info-row">
+          <div class="key w150">Ngày lắp đặt</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_lapdat"
+              :disabled="!dacTinhThietBiControls.date_ngay_lapdat.enabled"
+            />
+          </div>
+        </div>
+        <!-- Thiết bị phụ trợ và khác -->
+        <div v-show="isOther" class="info-row">
+          <div class="key w150">Số cổng nguồn <span class="red">*</span></div>
+          <div class="row">
+            <div class="col-6">
+              <div class="key w70">Đầu vào</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.psu_qty_in"
+                  :disabled="!dacTinhThietBiControls.txt_psu_qty_in.enabled"
+                  :class="{'is-invalid': check_psu_qty_in}"
+                />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="key w70">Đầu ra</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.psu_qty_out"
+                  :disabled="!dacTinhThietBiControls.txt_psu_qty_out.enabled"
+                  :class="{'is-invalid': check_psu_qty_out}"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End -->
+      </div>
+      <div class="col-6">
+        <div class="info-row">
+          <div class="key w150">Nhà cung cấp</div>
+          <div class="value">
+            <SelectExt
+              :dataSource="supplierList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="currentItem.nhacungcap_id"
+              :disabled="!dacTinhThietBiControls.select_nhacungcap_id.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Hệ điều hành</div>
+          <div class="value">
+            <SelectExt
+              :dataSource="OSList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="currentItem.hedieuhanh_id"
+              :disabled="!dacTinhThietBiControls.select_hedieuhanh_id.enabled"
+            />
+          </div>
+        </div>
+        <div v-show="!isDiskShelf && !isOther" class="info-row">
+          <div class="key w150">Ngày lắp đặt</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_lapdat"
+              :disabled="!dacTinhThietBiControls.date_ngay_lapdat.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Trạng thái sử dụng</div>
+          <div class="value">
+            <SelectExt
+              :dataSource="usageStatusList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="currentItem.trangthai_sd"
+              :disabled="!dacTinhThietBiControls.select_trangthai_sd.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div v-show="isDiskShelf" class="key w150">Ngày lắp đặt</div>
+          <div v-show="isDiskShelf" class="value pr-5">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_lapdat"
+              :disabled="!dacTinhThietBiControls.date_ngay_lapdat.enabled"
+            />
+          </div>
+          <div class="key w150">Ngày sử dụng</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_sudung"
+              :disabled="!dacTinhThietBiControls.date_ngay_sudung.enabled"
+            />
+          </div>
+        </div>
+        <!-- Thiết bị phụ trợ và khác -->
+        <div v-show="isOther" class="info-row">
+          <div class="key w150">Cấu hình chi tiết</div>
+          <div class="value">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.cauhinh"
+              :disabled="!dacTinhThietBiControls.txt_cauhinh.enabled"
+            />
+          </div>
+        </div>
+        <!-- End -->
+      </div>
+
+      <!-- Tủ đĩa -->
+      <div v-show="isDiskShelf" class="info-row">
+        <div class="key w150">Bộ điều khiển <span class="red">*</span></div>
+        <div class="row">
+          <div class="col-4">
+            <div class="key w100">Số bộ</div>
+            <div class="value">
+              <input
+                type="number"
+                class="form-control"
+                v-model="currentItem.bodieukhien_qty"
+                :disabled="!dacTinhThietBiControls.txt_controller_number.enabled"
+                :class="{'is-invalid': dacTinhThietBiControls.txt_controller_number.invalid}"
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="key w100">Bắt đầu</div>
+            <div class="value">
+              <input
+                type="number"
+                class="form-control"
+                v-model="currentItem.bodieukhien_dau"
+                :disabled="!dacTinhThietBiControls.txt_controller_start.enabled"
+                :class="{'is-invalid': dacTinhThietBiControls.txt_controller_start.invalid}"
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="key w100">Định dạng tên</div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                v-model="currentItem.bodieukhien_fname"
+                :disabled="!dacTinhThietBiControls.txt_controller_name.enabled"
+                :class="{'is-invalid': dacTinhThietBiControls.txt_controller_name.invalid}"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-show="isDiskShelf" class="info-row">
+        <div class="key w150">Khay đĩa <span class="red">*</span></div>
+        <div class="row">
+          <div class="col-4">
+            <div class="key w100">Số bộ</div>
+            <div class="value">
+              <input
+                type="number"
+                class="form-control"
+                v-model="currentItem.khaydia_qty"
+                :disabled="!dacTinhThietBiControls.txt_disc_number.enabled"
+                :class="{'is-invalid': dacTinhThietBiControls.txt_disc_number.invalid}"
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="key w100">Bắt đầu</div>
+            <div class="value">
+              <input
+                type="number"
+                class="form-control"
+                v-model="currentItem.khaydia_dau"
+                :disabled="!dacTinhThietBiControls.txt_disc_start.enabled"
+                :class="{'is-invalid': dacTinhThietBiControls.txt_disc_start.invalid}"
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="key w100">Định dạng tên</div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                v-model="currentItem.khaydia_fname"
+                :disabled="!dacTinhThietBiControls.txt_disc_name.enabled"
+                :class="{'is-invalid': dacTinhThietBiControls.txt_disc_name.invalid}"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End -->
+    </div>
+  </div>
+
+  <!-- Đặc tính cho thiết bị máy chủ -->
+  <div v-show="isServer" class="col-6">
+    <div class="info-row">
+      <div class="key w120">Số khe cắm:</div>
+      <div class="row">
+        <div class="col-4">
+          <div class="key w50">CPU</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cpu_sokhe"
+              :disabled="!dacTinhThietBiControls.txt_cpu_sokhe.enabled"
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="key w50">Ổ cứng</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.hdd_sokhe"
+              :disabled="!dacTinhThietBiControls.txt_hdd_sokhe.enabled"
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="key w50">RAM</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.ram_sokhe"
+              :disabled="!dacTinhThietBiControls.txt_ram_sokhe.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w120">Số lượng đã cắm:</div>
+      <div class="row">
+        <div class="col-4">
+          <div class="key w50">CPU</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cpu_dacam"
+              :disabled="!dacTinhThietBiControls.txt_cpu_dacam.enabled"
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="key w50">Ổ cứng</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.hdd_dacam"
+              :disabled="!dacTinhThietBiControls.txt_hdd_dacam.enabled"
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="key w50">RAM</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.ram_dacam"
+              :disabled="!dacTinhThietBiControls.txt_ram_dacam.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w120">Tổng dung lượng:</div>
+      <div class="row">
+        <div class="col-4">
+          <div class="key w50">CPU</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cpu_total"
+              :disabled="!dacTinhThietBiControls.txt_cpu_total.enabled"
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="key w50">Ổ cứng</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.hdd_total"
+              :disabled="!dacTinhThietBiControls.txt_hdd_total.enabled"
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="key w50">RAM</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.ram_total"
+              :disabled="!dacTinhThietBiControls.txt_ram_total.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

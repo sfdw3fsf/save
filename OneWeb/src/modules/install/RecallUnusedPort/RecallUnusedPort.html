@@ -1,0 +1,102 @@
+<div>
+  <breadcrumb :header="header"/>
+  <vue-nav>
+    <ul class="list">
+      <li>
+        <a href="javascript:void(0)" @click="btnLayTT">
+          <span class="icon one-file-attach"></span> Lấy TT (F5)
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnGiaoViec">
+          <span class="dropdown-icon one-file-edit2"></span> Giao việc
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnCapNhat">
+          <span class="icon one-reload1"></span> Cập nhật (F9)
+        </a>
+      </li>
+      <li v-show="btnVisible.tsbtnGiaoPhieu">
+        <a href="#">
+          <span class="icon one-file-arrow-right1"></span> Giao phiếu (F8)
+        </a>
+      </li>
+      <!--      <li>-->
+      <!--        <a href="#">-->
+      <!--          <span class="icon one-xlsx-import"></span>Xuất phiếu-->
+      <!--        </a>-->
+      <!--      </li>-->
+      <li>
+        <a href="javascript:void(0)" @click="btnInPhieu">
+          <span class="icon one-print"></span>In phiếu
+        </a>
+      </li>
+      <li v-show="btnVisible.tsbtnHoanThanh">
+        <a :class="{disabled: !btnEnabled.tsbtnHoanThanh}"
+           href="javascript:void(0)"
+           @click="btnHoanThanh">
+          <span class="dropdown-icon one-file-check"></span> Hoàn thành
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)"
+           @click="btnVatTu">
+          <span class="dropdown-icon one-vt"></span> Vật tư
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnXuatFile">
+          <span class="dropdown-icon one-download"></span> Xuất file
+        </a>
+      </li>
+      <li v-show="btnVisible.btnCapNhatVT">
+        <a href="javascript:void(0)"
+           @click="btnCapNhatVT">
+          <span class="dropdown-icon one-apartment"></span> Cập nhật ĐV
+        </a>
+      </li>
+    </ul>
+  </vue-nav>
+  <div class="page-content">
+    <FormSearch v-model="frmData"
+                :ds-nhan-vien="dsNhanVien"
+                :ds-thiet-bi="dsThietBi"
+                :dsNguoiGiaoViec="dsNguoiGiaoViec"
+                :dsKieuLD="dsKieuLD"
+                :host-info="hostInfo"/>
+    <div class="box-form">
+      <div class="legend-title">
+        <div class="pull-left">Danh sách phiếu yêu cầu</div>
+        <div class="pull-right">
+          <div class="check-action red">
+            <input type="checkbox" class="check">
+            <span class="name" v-text="lblThuHoi"></span>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <DataGrid v-bind:dataSource="dsPhieu"
+                v-bind:columns="cols"
+                @selectedItemsChanged="selectedItemsChanged"
+                :allowPaging="true"
+                ref="dsPhieu"
+                :enabled-select-first-row="false"
+                :enablePagingServer="false"></DataGrid>
+    </div>
+  </div>
+
+  <VatTuThueBao ref="popupVatTuThueBao" :input-data="modelVatTu" @vattu_success="vattu_success()"/>
+  <CapNhatDonVi ref="popupCapNhatDonVi" :input-data="modelCapNhatDV" @capnhat_success="capnhatdv_success()"/>
+  <NhapText ref="popupNhapText"/>
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="giaophieunhanvien"
+              :header='"Giao phiếu nhân viên"' showCloseIcon=true :target="target" width='60%' height="800">
+    <giaophieunhanvien @giaoviec_success="giaoviec_success()" ref="formgiaphieu"
+                       :ngaygiao="frmData.hoanCongInfo.ngay_gv_form"
+                       :nguoigv_id="frmData.hoanCongInfo.nguoi_giao_viec"
+                       :phieu_id="phieu_id"/>
+  </ejs-dialog>
+
+  <ExportDataModal :data="dsPhieu" :file_name="fileNameExcel" ref="frmLayDuLieuBC"/>
+</div>

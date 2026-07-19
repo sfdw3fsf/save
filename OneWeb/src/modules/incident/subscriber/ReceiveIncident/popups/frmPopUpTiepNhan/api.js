@@ -1,0 +1,20 @@
+export default {
+  NAP_TVW_DONVI: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/nap_tvw_donvi', data),
+  NAP_CBO_LOAI_NHOM: (axios) => axios.get('web-ccdv/tien_trinh_bao_hong/sp_nap_cbo_loai_nhom'),
+  NAP_CBO_DICHVU_VT: (axios) => axios.get('web-ccdv/tien_trinh_bao_hong/sp_lay_ds_dichvu_vt_ghichu'),
+  NAP_CBO_TRANGTHAI: (axios) => axios.get('web-ccdv/tien_trinh_bao_hong/sp_nap_cbo_trangthai'),
+  NAP_CBO_LOAI_HD_PL: (axios, vnhom_id) => axios.get(`web-ccdv/tien_trinh_bao_hong/lay_tt_loai_hd_pl/${vnhom_id}`),
+  fnMapId: async (axios, data) => axios.post('/web-hopdong/goi-da-dichvu/fn_map_id', data),
+  bnm_GetPortStatus: (axios, data) => axios.post('tichhop/bnm/getPortStatus', data),
+  lay_ds_popup_baohong: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/lay_ds_popup_baohong', data),
+  lay_ds_phieu_cn_tientrinh_bh: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/lay_ds_phieu_cn_tientrinh_bh', data),
+  lay_ds_phieu_cn_tientrinh_bd: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/lay_ds_phieu_cn_tientrinh_bd', data),
+  sp_ds_tientrinh_popuptiepnhan: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/sp_ds_tientrinh_popuptiepnhan', data),
+  lay_ds_tientrinh_bh_theo_matb: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/lay_ds_tientrinh_bh_theo_matb', data),
+  capnhat_ngaygiao_td: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/capnhat_ngaygiao_td', data),
+  capnhat_tientrinh_bh: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/capnhat_tientrinh_bh', data),
+  fn_xoa_tientrinh_bh: async (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/fn_xoa_tientrinh_bh', data),
+  lay_ds_tientrinh_sms_theo_tientrinh_id: (axios, data) => axios.post('web-ccdv/tien_trinh_bao_hong/lay_ds_tientrinh_sms_theo_tientrinh_id', data),
+
+  newMapId: async (axios, url, data) => axios.post(url, data),
+}

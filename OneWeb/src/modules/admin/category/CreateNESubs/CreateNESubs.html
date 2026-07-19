@@ -1,0 +1,157 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+           
+            <li>
+                <a href="#" @click.prevent="NhapMoi" v-if="ifNhapMoi">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+                <a v-else href="#" class="disabledInput"> 
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="GhiLai" v-if="ifGhiLai">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+                <a v-else href="#" class="disabledInput"> 
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            
+            <li>
+                <a href="#" @click.prevent="Xoa" v-if="ifXoa">
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+                <a v-else href="#" class="disabledInput"> 
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="showModal">
+                    <span class="icon one-book"></span>Đọc file
+                </a>
+            </li>
+            <DocFileSoNe></DocFileSoNe>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin</div>
+            <div class="info-row">
+                <div class="key w60">Vệ tinh <span>*</span></div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt class="select-custom" v-model="listbox.don_vi.value" :dataSource="listbox.don_vi.list" dataTextField="TEN_DV" dataValueField="DONVI_ID" @change="btnSearchClicked"></SelectExt>
+                        <!-- <select name="" id="" class="form-control" v-model="listbox.don_vi.value" @change="btnSearchClicked">
+                            <option v-for="don_vi in listbox.don_vi.list" v-bind:value="don_vi.DONVI_ID">{{
+                                don_vi.TEN_DV }}</option>
+                        </select> -->
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w60">Số Ne <span>*</span></div>
+                <div class="value">
+                    <input type="text" class="form-control" v-model="TxtSone" ref = "FcNe">
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w60">Ghi chú</div>
+                <div class="value">
+                    <input type="text" class="form-control" v-model="TxtGhichu">
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách số NE</div>
+            <div class="table-content">
+                <table class="table-result table-gachle table-filter">
+                    <DataGrid v-bind:columns="ketquatimkiem.columns"
+                        v-bind:dataSource="ketquatimkiem.list"
+                        panelDataHeight="300"
+                        :enable-paging-server="false"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :showColumnCheckbox="false"
+                        :enabledSelectFirstRow="true"
+                        @selectedRowChanged="selectedRowChanged">
+                    </DataGrid>
+                </table>
+            </div>    
+        </div>
+    </div>
+    <b-modal id="docfile" class="modal-dialog" size="xl"  hide-footer hide-header
+                body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+            <span class="icon one-notepad"></span> Đọc file số Ne
+            </div>
+            <div class="close -ap icon-close" @click="hideModal"></div>
+    </div>
+    <div class="list-actions-top">
+                    <ul class="list">
+                        <li>
+                            <a href="#" @click.prevent="readFile">
+                                <span class="icon one-clipart-1"></span>Danh sách
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="#" @click.prevent="ChapNhan_Click">
+                                <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận (F5)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="popup-body">
+                    <div class="box-form">
+                        <div class="note marb10 text-main fw6">
+                            <span class="one-alert f20 inline vcenter text-warning"></span> File excel gồm trường: SONE.GHICHU.
+                        </div>
+                        <div class="info-row">
+                            <div class="key w80">Đường dẫn</div>
+                            <div class="value">
+                                <div class="input-more-button">
+                                    <button class="btn" @click="uploadFile">
+                                        <span class="-ap icon-more_horiz"></span>
+                                        <input ref="fileInput" type="file" id="upload" style="display:none" @change="importExcel"
+                                          accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                                    </button>                 
+                                    <input type="text" v-model="tenFile" class="form-control ">
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="box-form">
+                        <div class="legend-title">
+                            Danh sách số Ne
+                        </div>
+                        <div class="nav tabs tab-over">
+                            <a href="#" class="active">
+                                Số Ne <span class="text-main f20 inline vcenter -ap icon-close"></span>
+                            </a>
+                        </div>
+                        <div class="tab-content">
+                            <div class="table-content">
+                                <DataGrid v-bind:columns="ketquatimkiem1.columns"
+                                  v-bind:dataSource="ketquatimkiem1.list"
+                                  panelDataHeight="300"
+                                  :enable-paging-server="false"
+                                  :showFilter="true"
+                                  :allowPaging="true"
+                                  :showColumnCheckbox="false"
+                                  :enabledSelectFirstRow="true"
+                                  >
+                              </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+  </div>
+</b-modal>
+</div>

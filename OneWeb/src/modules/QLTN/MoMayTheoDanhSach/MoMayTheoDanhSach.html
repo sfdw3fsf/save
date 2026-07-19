@@ -1,0 +1,294 @@
+<div >
+    
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onSearch" :class="{'disabled': !params.timKiemBtn_Enable}" title="Tìm kiếm danh sách thuê bao cần mở">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onCreate" :class="{'disabled': !params.taoDSBtn_Enable}" title="Tạo danh sách thuê bao cần mở">
+                    <span class="icon one-file-plus-1"></span>Tạo DS
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onSync" title="Đồng bộ khóa/mở dịch vụ">
+                    <span class="icon one-file-check"></span>{{ display_params.btnTitle }}
+                </a>
+            </li>
+
+            <li>
+                <a href="javascript: void(0)" @click="openDialog" title="Đọc file mở máy">
+                    <span class="icon one-book"></span>Đọc file
+                </a>
+                <PopupDocFileKhoaMoTB 
+                    :dichVuId="params.dichVu_Selected"
+                    :loaiTBId="params.loaiHinh_Checked ? params.loaiHinh_Selected : ''"
+                    :kyCuoc="thongtinKyHoaDon.kyHoaDonSelected" 
+                    :chieuKhoa="2" 
+                    :khoaMo="0" 
+                    @acceptChange="onReadFile($event)" 
+                    ref="dlgDocFileKhoaMo" 
+                />
+            </li>
+
+            <li>
+                <a href="javascript: void(0)" @click="onFileExport" :class="{'disabled': !params.xuatExcelBtn_Enable}" title="Xuất file">
+                    <span class="icon one-download"></span>Xuất File
+                </a>
+                <appModalXuatDuLieu
+                    id="modal-xuat-file"
+                    :thuocTinh="[
+                        {fieldName: 'THUEBAO_ID', headerText: 'THUEBAO_ID', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MA_TB', headerText: 'MA_TB', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MA_TT', headerText: 'MA_TT', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'TEN_TT', headerText: 'TEN_TT', allowFiltering: true, allowSorting: false, width: 200},
+                        {fieldName: 'DIACHI_TT', headerText: 'DIACHI_TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'CHIEUMO', headerText: 'CHIEUMO', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'NGUOI_CN', headerText: 'NGUOI_CN', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'TRANGTHAI', headerText: 'TRANGTHAI', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MA_GPHONE', headerText: 'MA_GPHONE', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'TUYENTHU_ID', headerText: 'TUYENTHU_ID', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MANV_TC', headerText: 'MANV_TC', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'TENNV_TC', headerText: 'TENNV_TC', allowFiltering: true, allowSorting: false, width: 120}
+                    ]"
+                    :data="TBMo_grid.items"
+                />
+            </li>
+
+        </ul>
+
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb5">
+            <div class="pull-right">
+                <app-ky-cuoc :isDisabled="true" :isReadonly="true" :isTextBold="true"></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin tạo danh sách</div>
+            <div class="grid-stack-box">
+                <Split style="height: auto;">
+                    <SplitArea :size="50" :minSize="100">
+                        <div class="box-col box-form" id="boxLeft">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Dịch vụ VT</div>
+                                        <div class="value">
+                                            <div class="">
+                                                <select2
+                                                    :options = "params.dichVu_Options"
+                                                    v-model = "params.dichVu_Selected"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check" v-model="params.loaiHinh_Checked">
+                                                <span class="name">Loại hình</span>
+                                            </div>
+                                        </div>
+                                        <div class="value">
+                                            <div class="">
+                                                <select2
+                                                    :options = "params.loaiHinh_Options"
+                                                    v-model = "params.loaiHinh_Selected"
+                                                    :disabled="!params.loaiHinh_Checked"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Tiền mở &lt;=</div>
+                                        <div class="value">
+                                            <div class="input-icon-right calculator-box">
+                                                <vue-numeric currency='' separator=',' v-model="params.tienMo" class="form-control highlight tright text-rose"></vue-numeric>
+                                                <span class="icon one-calculator" @click="params.tienMoCalculator = !params.tienMoCalculator"></span>
+                                                <Calculator @display="params.tienMo = $event" :value="params.tienMo" :is-show="params.tienMoCalculator" @close="params.tienMoCalculator = !params.tienMoCalculator"></Calculator>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check" v-model="params.donVi_Checked">
+                                                <span class="name">Đơn vị</span>
+                                            </div>
+                                        </div>
+                                        <div class="value">
+                                            <div class="">
+                                                <select2
+                                                    :options = "params.donVi_Options"
+                                                    v-model = "params.donVi_Selected"
+                                                    :disabled="!params.donVi_Checked"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SplitArea>
+                    <SplitArea :size="49.7" :minSize="100">
+                        <div class="box-col box-form" id="boxRight">
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Kiểu mở</div>
+                                        <div class="value">
+                                            <div>
+                                                <select2
+                                                    :options = "params.kieuMo_Options"
+                                                    v-model = "params.kieuMo_Selected"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">
+                                            Kiểu nợ
+                                        </div>
+                                        <div class="value">
+                                            <div>
+                                                <select2
+                                                    :options = "params.kieuNo_Options"
+                                                    v-model = "params.kieuNo_Selected"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Lần mở</div>
+                                        <div class="value">
+                                            <div class="input-number-custom">
+                                                <input type="number" class="form-control tright font-weight-bold text" value="0" min="0" v-model="params.lanMo" @input="onLanMoInput">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">
+                                            Ngày mở
+                                        </div>
+                                        <div class="value">
+                                            <ejs-datepicker
+                                                v-model="params.ngayMo"
+                                                :value="params.today"
+                                                :max="params.today"
+                                                :format="'dd/MM/y'"
+                                                :showClearButton="false"
+                                            >
+                                            </ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SplitArea>
+                </Split>
+            </div>
+
+        </div>
+        <div class="grid-stack-box">
+            <Split style="height: auto;">
+                <SplitArea :size="49.7" :minSize="100">
+                    <div class="box-col box-form" id="boxLeft1">
+                        <div class="legend-title">
+                            <div class="pull-left">Danh sách mở</div>
+                            <div class="pull-right red">
+                                Thời gian tạo: {{ display_params.processTime }} - Số lượng tạo: {{ display_params.number }}
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <DataGrid v-bind:columns="[
+                            {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-left'},
+                            {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: false, width: 110},
+                            {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false, width: 200},
+                            {fieldName: 'TINHTRANG_ID', headerText: 'Tình trạng ID', allowFiltering: true, allowSorting: false, width: 200}
+                        ]"
+                            v-bind:dataSource="TBMo_grid.items"
+                            dataKeyField="MA_TB"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                            ref="moGrid"
+                            @selectedItemsChanged="onDSMoChecked"
+                            @recordDoubleClick="onDSMoDoubleClicked"
+                            @queryCellInfo="onDSMoQueryCellInfo"
+                        >
+                        </DataGrid>
+                    </div>
+                </SplitArea>
+                <SplitArea :size="50" :minSize="100">
+                    <div class="box-col box-form" id="boxRight1">
+                        <div class="legend-title">Danh sách không mở</div>
+                        <div class="box-move-select-table">
+
+                            <div class="actions w40 padl0">
+                                <button class="btn" @click="onRight">
+                                    <span class="fa fa-angle-right"></span>
+                                </button>
+                                <button class="btn" @click="onDoubleRight">
+                                    <span class="fa fa-angle-double-right"></span>
+                                </button>
+                                <button class="btn" @click="onLeft">
+                                    <span class="fa fa-angle-left"></span>
+                                </button>
+                                <button class="btn" @click="onDoubleLeft">
+                                    <span class="fa fa-angle-double-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col" style="width: calc(100% - 40px);">
+                                <DataGrid v-bind:columns="[
+                                    {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-left'},
+                                    {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: false, width: 120},
+                                    {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false, width: 200},
+                                    {fieldName: 'TINHTRANG_ID', headerText: 'Tình trạng ID', allowFiltering: true, allowSorting: false, width: 200}
+                                ]"
+                                    v-bind:dataSource="TBKhongMo_grid.items"
+                                    dataKeyField="MA_TB"
+                                    :showFilter="true"
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"
+                                    :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+                                    ref="khongMoGrid"
+                                    @selectedItemsChanged="onDSKhongMoChecked"
+                                    @recordDoubleClick="onDSKhongMoDoubleClicked"
+                                >
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </SplitArea>
+            </Split>
+            <PopupChiTietNoTB
+                :maTT="maTT"
+                :kyCuoc="thongtinKyHoaDon.kyHoaDonSelected"
+                ref="dlgChiTietNoTB"
+            />
+        </div>
+    </div>
+</div>

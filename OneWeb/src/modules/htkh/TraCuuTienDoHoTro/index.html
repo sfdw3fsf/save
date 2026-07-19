@@ -1,0 +1,190 @@
+<div class="tientrinh-xuly-suco">
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#/htkh/TraCuuTienDoHoTro" title="Tìm kiếm" @click="this.btnTimKiem">
+          <span class="icon one-search"></span>Tìm kiếm
+        </a>
+      </li>
+      <li>
+        <a href="#/htkh/TraCuuTienDoHoTro" title="Xuất danh sách" @click="this.btnXuatDS">
+          <span class="icon -ap icon-download3"></span>Xuất danh sách
+        </a>
+      </li>
+      <li>
+        <a href="#/htkh/TraCuuTienDoHoTro" title="Xuất chi tiết" @click="this.btnXuatCT">
+          <span class="icon one-download"></span>Xuất chi tiết
+        </a>
+      </li>
+      <li>
+        <a href="#/htkh/TraCuuTienDoHoTro" title="Thoát" @click="this.btnXuatThoat">
+          <span class="icon one-export"></span>Thoát
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-sm-4 col-4">
+        <div class="box-form">
+          <div class="legend-title">Thông tin tìm kiếm</div>
+          <div class="row">
+            <div class="info-row">
+              <div class="key">Dịch vụ</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="cboDichVu" :dataSource="dsDichVu" dataTextField="TEN_DVVT"
+                    :class="{ 'is-invalid': $v.tienDoHoTro.$error}" dataValueField="DICHVUVT_ID"
+                    @change="this.loadDsLoaiHinh" />
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Loại hình</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="cboLoaiHinh" :dataSource="dsLoaiHinh" dataTextField="NAME"
+                    :class="{ 'is-invalid': $v.tienDoHoTro.$error}" dataValueField="ID" />
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Số máy/Acc</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="this.showTraCuuTB">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input v-model="soMayInput" type="text" class="form-control highlight" v-on:keyup.enter="btnTimKiem">
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Mã hỗ trợ</div>
+              <div class="value">
+                <input v-model="maHoTroInput" type="text" class="form-control highlight" v-on:keyup.enter="btnTimKiem">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="col-sm-8 col-8">
+        <div class="box-form">
+          <div class="legend-title">Thông tin thuê bao</div>
+          <div class="row">
+            <div class="col-sm-6 col-6">
+              <div class="info-row">
+                <div class="key">Dịch vụ</div>
+                <div class="value">
+                  <input v-model="dichVuInput" type="text" class="form-control highlight" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-6">
+              <div class="info-row">
+                <div class="key">Loại hình</div>
+                <div class="value">
+                  <input v-model="loaiHinhInput" type="text" class="form-control highlight" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-6">
+              <div class="info-row">
+                <div class="key">Ngày tiếp nhận</div>
+                <div class="value">
+                  <input v-model="ngayTiepNhanInput" type="text" class="form-control highlight" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-6">
+              <div class="info-row">
+                <div class="key">Trạng thái</div>
+                <div class="value">
+                  <input v-model="trangThaiInput" type="text" class="form-control highlight" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="info-row">
+              <div class="key">Tên thuê bao</div>
+              <div class="value">
+                <input v-model="tenThueBaoInput" type="text" class="form-control highlight" disabled>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="info-row">
+              <div class="key">Địa chỉ lắp đặt</div>
+              <div class="value">
+                <input v-model="diaChiInput" type="text" class="form-control highlight" disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách hỗ trợ</div>
+      <div class="table-content">
+        <DataGrid v-if="showGridHoTro" class="table-result table-gachle" :showFilter="true" ref='grid'
+          :dataSource="this.dsHoTro" height='400px' gridLines='Both' :allowScrolling='true' :allowSorting='true'
+          :allowPaging="true" :allowResizing='true' :enablePagingServer="false" @rowSelected="SCrow_selected"
+          @queryCellInfo='queryCellInfoEvent' v-bind:columns="[
+            {fieldName:'MA_HT', freeze:'Left', headerText:'Mã hỗ trợ', width:'120px', textAlign:'Center'},
+            {fieldName:'MA_TB', freeze:'Left', headerText:'Số máy/Acc', width:'120px', textAlign:'Center'},
+            {fieldName:'TEN_DVVT', headerText:'Dịch vụ', width:'120px', textAlign:'Center'},
+            {fieldName:'LOAIHINH_TB', headerText:'Loại hình', width:'120px', textAlign:'Center'},
+            {fieldName:'NGAY_TN', headerText:'Ngày tiếp nhận', width:'120px', textAlign:'Center'},
+            {fieldName:'DIENTHOAI_LH', headerText:'Điện thoại LH', width:'120px', textAlign:'Center'},
+            {fieldName:'DIACHI_KH', headerText:'Địa chỉ LH', width:'300px', textAlign:'Center'},
+            {fieldName:'TRANGTHAI_HT', headerText:'Trạng thái', width:'120px',textAlign:'Center'},
+            {fieldName:'LOAI_HT', headerText:'Loại HT', width:'120px', textAlign:'Center'},
+            {fieldName:'YC_HOTRO', headerText:'Yêu cầu HT', width:'300px', textAlign:'Center'},
+            {fieldName:'CHUDE_HT_CAP1', headerText:'Chủ đề cấp 1', width:'150px', textAlign:'Center'},
+            {fieldName:'CHUDE_HT_CAP2', headerText:'Chủ đề cấp 2', width:'150px', textAlign:'Center'},
+            {fieldName:'NOIDUNG_HT', headerText:'Nội dung HT', width:'300px', textAlign:'Center'},
+            {fieldName:'TEN_TB', headerText:'Tên thuê bao', width:'150px', textAlign:'Center'},
+            {fieldName:'DIACHI_LD', headerText:'Địa chỉ thuê bao', width:'300px', textAlign:'Center'}
+         ]">
+        </DataGrid>
+
+      </div>
+    </div>
+
+    <div class="box-form">
+      <div class="legend-title">Chi tiết xử lý hỗ trợ</div>
+      <div class="table-content">
+        <DataGrid v-if="showGridChiTiet" class="table-result table-gachle" :showFilter="true" ref='gridChiTiet'
+          :dataSource="this.dsChiTiet" height='400px' gridLines='Both' :allowScrolling='true' :allowSorting='true' :allowGrouping="true"
+          :allowPaging="true" :allowResizing='true' :enablePagingServer="false" @queryCellInfo='this.queryCellInfoEvent'
+          v-bind:columns="[
+            {fieldName:'GROUP_HG', width:'120px', textAlign:'Left' , cssClass: 'text-blue',isGroupedColumn: true},
+            {fieldName:'TEN_DONVI_GIAO', headerText:'Đơn vị giao', width:'150px', textAlign:'Center'},
+            {fieldName:'TEN_NHANVIEN_GIAO', headerText:'Nhân viên giao', width:'120px', textAlign:'Center'},
+            {fieldName:'SO_DT_NHANVIEN_GIAO', headerText:'ĐTNV giao', width:'120px', textAlign:'Center'},
+            {fieldName:'NGAYGIAO', headerText:'Ngày giao', width:'120px', textAlign:'Center'},
+            {fieldName:'ND_GIAO', headerText:'Nội dung giao', width:'300px', textAlign:'Left'},
+            {fieldName:'TEN_DONVI_NHAN', headerText:'Đơn vị nhận', width:'250px', textAlign:'Left'},
+            {fieldName:'TEN_NHANVIEN_TRA', headerText:'NV trả', width:'120px',textAlign:'Center'},
+            {fieldName:'NGAYTRA', headerText:'Ngày trả', width:'120px', textAlign:'Center'},
+            {fieldName:'ND_TRA', headerText:'Nội dung trả', width:'300px', textAlign:'Center'},
+            {fieldName:'TRANGTHAI_PH', headerText:'Trạng thái phiếu', width:'120px', textAlign:'Center'},
+            {fieldName:'TEN_NHANVIEN_THUCHIEN', headerText:'Nhân viên thực hiện', width:'120px', textAlign:'Center'},
+            {fieldName:'SO_DT_NHANVIEN_THUCHIEN', headerText:'ĐTNV thực hiện', width:'120px', textAlign:'Center'},
+            {fieldName:'NGAY_TH', headerText:'Ngày TH', width:'120px', textAlign:'Center'},
+            {fieldName:'NOIDUNG_TH', headerText:'Nội dung HT', width:'300px', textAlign:'Center'},
+            {fieldName:'NGUOI_CN', headerText:'Người CN', width:'120px', textAlign:'Center'},
+            {fieldName:'NGAY_CN', headerText:'Ngày CN', width:'120px', textAlign:'Center'}
+         ]">
+        </DataGrid>
+
+      </div>
+    </div>
+  </div>
+  <ModalPopupDSThueBao modalId="popupTraCuuTB" @ChapNhanTB="ChapNhanTB"></ModalPopupDSThueBao>
+</div>

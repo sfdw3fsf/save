@@ -1,0 +1,2 @@
+import CompleteProfileChangeService from './CompleteProfileChangeService.vue'
+export default CompleteProfileChangeService

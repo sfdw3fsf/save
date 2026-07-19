@@ -1,0 +1,157 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li :class="{'disabled-btn': !buttonConfig.topActions.ghiLai.enabled}" v-if="buttonConfig.topActions.ghiLai.visible">
+        <b-link href="javascript:void(0)" @click="onSave"> <span class="icon one-save"></span>Ghi lại </b-link>
+      </li>
+      <li :class="{'disabled-btn': !buttonConfig.topActions.chuyenXuLy.enabled}" v-if="buttonConfig.topActions.chuyenXuLy.visible">
+        <b-link href="javascript:void(0)" @click="onChuyenXuLy">
+          <span class="icon one-file-arrow-right"></span>Chuyển xử lý
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': !buttonConfig.topActions.chuyenThucHien.enabled}" v-if="buttonConfig.topActions.chuyenThucHien.visible">
+        <b-link href="javascript:void(0)" @click="onChuyenThucHien">
+          <span class="icon one-file-arrow-right"></span>Chuyển người thực hiện
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': !buttonConfig.topActions.traPhieu.enabled}" v-if="buttonConfig.topActions.traPhieu.visible">
+        <b-link href="javascript:void(0)" @click="onTraPhieu">
+          <span class="icon one-file-back"></span>Trả phiếu
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': !buttonConfig.topActions.hoanThanh.enabled}" v-if="buttonConfig.topActions.hoanThanh.visible">
+        <b-link href="javascript:void(0)" @click="onHoanThanh">
+          <span class="icon one-file-check"></span>Hoàn thành
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': !buttonConfig.topActions.xacNhanThucHien.enabled}" v-if="buttonConfig.topActions.xacNhanThucHien.visible">
+        <b-link href="javascript:void(0)" @click="onXacNhanThucHien">
+          <span class="icon one-file-check"></span>Xác nhận thực hiện
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content ">
+      <ThongTinCongViec :phieuThiCongId="phieutc" v-if="phieutc" ref="thongTinCongViec"></ThongTinCongViec>
+    <div class="row">
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span>Danh sách thi công hệ thống thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}</span>
+            <div>
+              <b-link
+                v-if="buttonConfig.heThongActions.themHeThong.visible"
+                href="javascript:void(0)"
+                @click="onAddHeThongThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="!buttonConfig.heThongActions.themHeThong.enabled"
+              >
+                <span class="fa fa-plus"></span> Thêm hệ thống thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+              <b-link
+                v-if="buttonConfig.heThongActions.chonHeThong.visible"
+                href="javascript:void(0)"
+                @click="onChonHeThongThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="!buttonConfig.heThongActions.chonHeThong.enabled"
+              >
+                <span class="fa fa-check"></span> Chọn hệ thống thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <!-- DataGrid hệ thống -->
+            <DataGrid
+              v-if="shouldShowHeThongGrid"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              :columns="heThongColumnsResolved"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span> Danh sách thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}</span>
+            <div>
+              <b-link
+                v-if="buttonConfig.thietBiActions.themThietBi.visible"
+                href="javascript:void(0)"
+                @click="onAddThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="!buttonConfig.thietBiActions.themThietBi.enabled"
+              >
+                <span class="fa fa-plus"></span> Thêm thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+              <b-link
+                v-if="buttonConfig.thietBiActions.chonThietBi.visible"
+                href="javascript:void(0)"
+                @click="onChonThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="!buttonConfig.thietBiActions.chonThietBi.enabled"
+              >
+                <span class="fa fa-check"></span> Chọn thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <!-- DataGrid thiết bị -->
+            <DataGrid
+              v-if="shouldShowThietBiGrid"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :columns="dataGridConfig.thietBiColumns"
+              @selectedRowChanged="onSelectThietBiKhachHang"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ModalChuyenXuly modalID="ModalChuyenXuly" ref="ModalChuyenXuly" @saved="chuyenXylySuccess"> </ModalChuyenXuly>
+  <ModalTraPhieu modalID="ModalTraPhieu" ref="ModalTraPhieu" @saved="traPhieuSuccess"> </ModalTraPhieu>
+  <ModalChonHeThong
+    @chon-he-thong-thiet-bi-kh="chonHeThongThietBiKH"
+    ref="ModalChonHeThong"
+    :isKhachHang="isKhachHang"
+  />
+  <ModalChonThietBi
+    @chon-thiet-bi="chonThietBi"
+    ref="ModalChonThietBi"
+    :isKhachHang="isKhachHang"
+    :heThongTbi="thiCongHeThongSelected"
+  />
+  <ModalChiTietHeThongIDCKhachHang
+    :isKhachHang="isKhachHang"
+    :phieuThiCongDetail="phieuThiCongDetail"
+    ref="ModalChiTietHeThongIDCKhachHang"
+    @refreshData="onRefreshDataHeThongThietBiKhachHang"
+    @themMoiHeThongSuccess="chonHeThongThietBiKH"
+  />
+  <ModalChiTietThietBiIDCKhachHang
+    :isKhachHang="isKhachHang"
+    :modalID="'ModalChiTietThietBiIDCKhachHang'"
+    :heThongTbi="thiCongHeThongSelected"
+    :phieutc="phieutc"
+    :phieuThiCongDetail="phieuThiCongDetail"
+    ref="ModalChiTietThietBiIDCKhachHang"
+    @themMoiThietBiSuccess="onThemMoiThietBiSuccess"
+    @reloadDataDevice="loadDsThietBiKhachHang"
+  ></ModalChiTietThietBiIDCKhachHang>
+</div>

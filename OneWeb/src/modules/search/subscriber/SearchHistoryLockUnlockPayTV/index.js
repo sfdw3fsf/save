@@ -1,0 +1,2 @@
+import SearchHistoryLockUnlockPayTV from './SearchHistoryLockUnlockPayTV'
+export default SearchHistoryLockUnlockPayTV

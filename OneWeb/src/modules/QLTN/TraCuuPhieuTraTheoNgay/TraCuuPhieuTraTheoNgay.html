@@ -1,0 +1,239 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onDanhSach()" title="Danh sách">
+                    <span class="icon one-clipart-1"></span>Danh sách
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onDelete" title="Xóa phiếu" :class="{'disabled': !params.xoaPhieuBtn_Enable}" :style="{ display: params.xoaPhieuBtn_Enable }">
+                    <span class="icon one-file-trash"></span>Xóa phiếu
+                </a>
+                <PopupXacNhanXoaPhieu ref="refXoaPhieuTT" :kycuoc="thongtinKyHoaDon.kyHoaDonSelected" :dsPhieu="phieuSelected" @acceptChange="deletePhieuThuHandler"></PopupXacNhanXoaPhieu>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onChangeDate" title="Sửa lại ngày thanh toán">
+                    <span class="icon one-change-date"></span>Đổi ngày
+                </a>
+                <SuaNgayTT ref="dlgThayDoiNgayTT" 
+                    :kycuoc="thongtinKyHoaDon.kyHoaDonSelected" 
+                    :dsPhieu="phieuSelected"
+                    :kiemtra_matkhau="params.p_kiemtra_mk"
+                    @acceptChange="updateDatePhieuThuHandler">
+                </SuaNgayTT>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onChangeDetail" title="Sửa thông tin phiếu trả">
+                    <span class="icon nc-icon-glyph ui-1_edit-74"></span>Sửa TT
+                </a>
+                <PopupThayDoiThongTinThanhToan ref="dlgThayDoiThongTinTT" 
+                    :phieu="phieuSelected !== null && phieuSelected.length > 0 ? phieuSelected[0] : null"
+                    :kiemtra_matkhau="params.p_kiemtra_mk"
+                    @acceptChange="changeDetailProcess($event)">
+                </PopupThayDoiThongTinThanhToan>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onPrint" title="In phiếu thu">
+                    <span class="icon one-print"></span>In phiếu
+                </a>
+                <PopupInPhieuThu ref="dlgInPhieuThu" 
+                    @accept="acceptPrintPhieuThuHandler">
+                </PopupInPhieuThu>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onXuatExcel" title="Xuất excel">
+                    <span class="icon one-xlsx"></span>Xuất Excel
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onSynVNP" title="Đồng bộ VNP">
+                    <span class="icon one-lock-wifi"></span>Đồng bộ VNP
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form box-gn-tt">
+            <div class="legend-title mart0">
+                <div class="title pull-left mart10" style="font-weight: 600!important">Thông tin thanh toán</div>
+                <div class="pull-right">
+                  <app-ky-cuoc :isTextRed="true"></app-ky-cuoc>
+                </div>
+                <div class="clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Ngày thanh toán
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker
+                                v-model="params.ngayTT"
+                                :value="params.today"
+                                :format="'dd/MM/y'"
+                                :showClearButton="false"
+                            >
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="params.denNgay_Checked">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker
+                                v-model="params.denNgay"
+                                :value="params.today"
+                                :format="'dd/MM/y'"
+                                :enabled="params.denNgay_Checked"
+                                :showClearButton="false"
+                            >
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Tổng trả
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right calculator-box">
+                                <vue-numeric currency='' separator=',' v-model="params.tongTra" class="screen-cal form-control tien-tra font-weight-bold"></vue-numeric>
+                                <span class="icon one-calculator" @click="params.isCalculatorShow = !params.isCalculatorShow"></span>
+                                <Calculator @display="params.tongTra = $event" :value="params.tongTra" :is-show="params.isCalculatorShow" @close="params.isCalculatorShow = !params.isCalculatorShow"></Calculator>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap" title="Mã thanh toán">
+                            Mã TT
+                        </div>
+                        <div class="value">
+                            <input type="text" v-model="params.maTT" class="form-control highlight" @keyup.enter="onMaTTKeyPress" ref="maTT">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-4 col-lg-4 col-12">
+                    <div class="note"><span class="-ap icon-warning3 text-warning f20 mar10"></span> Kỳ cước {{ kyCuoc }}, chu kỳ {{ this.thongtinKyHoaDon.chuKySelected }} tính từ ngày {{ common_params.ngay_BD }} - đến ngày {{ common_params.ngay_KT }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form box-gn-tt" style="padding-left: 0px;padding-right: 0px;">
+            <ejs-splitter id='nested-splitter' width='100%' height='100%' :created="onCreate">
+                <e-panes>
+                    <e-pane content ='#leftPane' size ='30%'></e-pane>
+                    <e-pane content ='#rightPane' size ='70%'></e-pane>
+                </e-panes>
+            </ejs-splitter>
+
+            <div id="leftPane">
+                <div id ='vertical_splitter' class="vertical_splitter">
+                    <div class="box-col box-form marb0 table-responsive" id="boxTop">
+                        <div class="title-bg-main"><span class="title" style="font-weight: 600!important">Danh sách thu ngân</span></div>
+                        <DataGrid v-bind:columns="[
+                            {fieldName: 'THUNGAN', headerText: 'Thu ngân', allowFiltering: true, allowSorting: false, width: 250},
+                            {fieldName: 'TONGTIEN', headerText: 'Tiền thu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right', format: 'N0', type: 'number'},
+                            {fieldName: 'TONGPHIEU', headerText: 'Tổng phiếu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right', format: 'N0', type: 'number'}
+                        ]"
+                            :enabledSelectFirstRow="true"
+                            v-bind:dataSource="thuNgan_grid.items"
+                            dataKeyField="THUNGAN_ID"
+                            :showFilter="false"
+                            :allowPaging="false"
+                            :enablePagingServer="false"
+                            :aggregates="TNAggregatesColumns"
+                            ref="thuNganGrid"
+                            :panelDataHeight='"150"'
+                            @selectedRowChanged="onThuNganSelect"
+                            :key="thuNgan_grid.key"
+                        >
+                        </DataGrid>
+                    </div>
+                    <div class="box-col box-form marb0 table-responsive" id="boxBottom">
+                        <div class="title-bg-main mart10"><span class="title" style="font-weight: 600!important">Hình thức thanh toán</span></div>
+                        <DataGrid v-bind:columns="[
+                            {fieldName: 'HINHTHUC', headerText: 'Hình thức TT', allowFiltering: false, allowSorting: false, isGroupedColumn: true},
+                            {fieldName: 'LUOT_TT', headerText: 'Lượt thu', allowFiltering: true, allowSorting: false, width: 200},
+                            {fieldName: 'TONGTIEN', headerText: 'Tiền thu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'tien-tra', format: 'N0', type: 'number'},
+                            {fieldName: 'TONGPHIEU', headerText: 'Tổng phiếu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right', format: 'N0', type: 'number'}
+                        ]"
+                            v-bind:dataSource="hinhThucTT_grid.items"
+                            dataKeyField="HTTT_ID"
+                            :showFilter="false"
+                            :allowPaging="false"
+                            :enablePagingServer="false"
+                            :enabledSelectFirstRow="true"
+                            :aggregates="TNAggregatesColumns"
+                            ref="hinhThucGrid"
+                            :panelDataHeight='"150"'
+                            @selectedRowChanged="onHTTTSelect"
+                            :key="hinhThucTT_grid.key"
+                        >
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+            <div id="rightPane">
+                <div class="box-col box-form marb0 table-responsive" id="boxRight">
+                    <div class="title-bg-main"><span class="title" style="font-weight: 600!important">Danh sách phiếu thanh toán</span></div>
+                    <DataGrid3 v-bind:columns="[
+                        {fieldName: '_CHECK', visible: false},
+                        {fieldname: 'PHIEU_ID', visible: false, isPrimaryKey: true},
+                        {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: 70, cssClass: 'text-right'},
+                        {fieldName: 'NGAY_TT', headerText: 'Ngày trả', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'NGAY_CN', headerText: 'Ngày CN', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'MANV_TC', headerText: 'Đại lý', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'TIEN_TRA', headerText: 'Tiền trả', visible: false},
+                        {fieldName: 'TIEN_TRA_', headerText: 'Tiền trả', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'tien-tra'},
+                        {fieldName: 'LANTRA', headerText: 'Lần trả', allowFiltering: true, allowSorting: false, width: 90, cssClass: 'text-right'},
+                        {fieldName: 'SO_HD', headerText: 'Số HĐ', allowFiltering: true, allowSorting: false, width: 90, cssClass: 'text-left'},
+                        {fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'NGUOI_CN', headerText: 'Người gạch', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'CHUNGTU', headerText: 'Chứng từ', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-left'},
+                        {fieldName: 'THUNGAN', headerText: 'Thu ngân', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'HDDT', headerText: 'HĐĐT', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'NGANHANG', headerText: 'Ngân hàng', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'NGAYNGANHANG', headerText: 'Ngày ngân hàng', allowFiltering: true, allowSorting: false, width: 150, cssClass: 'text-right'},
+                        {fieldName: 'STATUS', headerText: 'Status', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'SO_TC', headerText: 'Số tham chiếu', allowFiltering: true, allowSorting: false, width: 130},
+                        {fieldName: 'MA_CHUAN', headerText: 'Mã chuẩn chi', allowFiltering: true, allowSorting: false, width: 130},
+                        {fieldName: 'DOITAC', headerText: 'Đối tác', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'PHIEU_ID_NEO', headerText: 'Phiếu ID NEO', allowFiltering: true, allowSorting: false, width: 130, cssClass: 'text-right'},
+                        {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', visible: false},
+                        {fieldName: '', headerText: 'Trạng thái', allowFiltering: true, allowSorting: false, width: 105, template: statusTemplate, /*freeze: 'right',*/ template: statusTemplate, cssClass: 'text-center'}
+                    ]"
+                        v-bind:dataSource="this.phieuTT_grid.items"
+                        dataKeyField="MA_TT"
+                        :showFilter="true" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="true" :allowExcelExport='true' :showColumnCheckbox="true"                        
+                        :aggregates="[
+                            {field: 'STT', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggCountPhieu},
+                            {field: 'TIEN_TRA_', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggSumTIENTRA}
+                        ]"
+                        :totalRecords="phieuTT_grid.pageInfo.totalElement" :pageSize="phieuTT_grid.pageInfo.maxSize" :pageIndex="phieuTT_grid.pageInfo.page"
+                        @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                        @keyPressed="keyPressedHandler" @queryCellInfo="queryCellInfoHandler" @excelExportComplete="excelExportCompleteHandler"
+                        :selectionSettings="{checkboxOnly: true, type: 'Multiple'}"
+                        ref="phieuTraGrid" :panelDataHeight='"520"'
+                    >
+                    </DataGrid3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

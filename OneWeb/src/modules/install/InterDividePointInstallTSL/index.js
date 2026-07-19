@@ -1,0 +1,2 @@
+import InterDividePointInstallTSL from './InterDividePointInstallTSL.vue'
+export default InterDividePointInstallTSL

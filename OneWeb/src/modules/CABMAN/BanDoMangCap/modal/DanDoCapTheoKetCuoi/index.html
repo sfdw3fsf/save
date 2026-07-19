@@ -1,0 +1,130 @@
+<b-modal 
+    :id="modalID"
+    size="xl"         
+    no-close-on-backdrop   
+    hide-footer 
+    hide-header-close              
+    hide-header     
+    body-class="modal-body p-0"
+    @hidden="hiddenModal"
+    @shown="shownModal">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span> TRA CỨU DẪN ĐỘ KẾT CUỐI
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="closeModal()">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="timKiemKetCuoi">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-search"></span>Tra cứu
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body" ref="xxx">            
+                <div class="box-form">
+                    <div class="legend-title">Thông tin tra cứu</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">
+                                    Ký hiệu KC <span class="red">*</span>
+                                </div>
+                                <div class="value">
+                                    <div class="input-group">
+                                        <div class="input-text">
+                                            <input  ref="inputText" type="text" class="form-control" v-model.trim="kyhieu" @keyup.enter="timKiemKetCuoi">
+                                        </div>
+                                        <div class="input-addon">
+                                            <button class="btn" @click="timKiemKetCuoi">
+                                                <span class="icon one-search"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w60">
+                                    Mặt <span class="red">*</span>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="mat">
+                                            <option v-for="(mat, index) in mats" :key="index" :value="mat.id">{{ mat.ten }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w60">
+                                    Vị trí <span class="red">*</span>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="vitri" :disabled="vitris.length > 0 ? false : true">
+                                            <option v-for="(vitri, index) in vitris" :key="index" :value="vitri.VITRI">{{ vitri.VITRI }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Dẫn độ cáp
+                        </div>
+                        <div class="pull-left ml-3">
+                            <div class="check-action normal">
+                                <input type="checkbox" class="check" v-model="soDott">
+                                <span class="name">Sơ đồ tuyến tính</span>
+                            </div>
+                            <div class="check-action normal"  v-show="soDott">
+                                <input type="checkbox" class="check" v-model="isAnDayNhayTrong">
+                                <span class="name">Ẩn dây nhảy trong</span>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <template v-if="soDott">
+                        <DataGrid id="grid1_dando" ref="grid1"  v-bind:columns="[
+                            {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: '50px', cellCreatedEventEnabled: true},
+                            {fieldName: 'LOAI_DT', headerText: 'Loại đối tượng', allowFiltering: true, cellCreatedEventEnabled: true},
+                            {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true, cellCreatedEventEnabled: true},
+                            {fieldName: 'DUNGLUONG', headerText: 'Dung lượng', allowFiltering: true, cellCssClass: 'text-right', cellCreatedEventEnabled: true},
+                            {fieldName: 'MAT', headerText: 'Hướng', allowFiltering: true, cellCreatedEventEnabled: true},
+                            {fieldName: 'VITRI', headerText: 'Vị trí/sợi', allowFiltering: true, cellCssClass: 'text-right', cellCreatedEventEnabled: true},
+                            {fieldName: 'TEN_CHA', headerText: 'Kết cuối | Địa chỉ', allowFiltering: true, cellCreatedEventEnabled: true}
+                        ]" 
+                        @dataGridCellCreated="grid_dataGridCellCreated"
+                        v-bind:dataSource="tempdanDoCapRutGon"  @queryCellInfo="queryCellInfo1"   :showFilter="true" @selectedItemsChanged="select_selectedItemsChanged" @selectedRowChanged="gridDanDoRG_selectedRowChanged"></DataGrid>
+                    </template>
+                    <template v-else>
+                        <DataGrid id="grid2_dando" ref="grid2" v-bind:columns="[
+                            {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: '50px'},
+                            {fieldName: 'KIEU_DN', headerText: 'Kiểu ĐN', allowFiltering: true},
+                            {fieldName: 'KYHIEU', headerText: 'Ký hiệu cáp', allowFiltering: true},
+                            {fieldName: 'SOI', headerText: 'Sợi', cellCssClass: 'text-right', allowFiltering: true},
+                            {fieldName: 'NGUON', headerText: 'Đi từ', allowFiltering: true},
+                            {fieldName: 'VITRI_N', headerText: 'VT Nguồn', allowFiltering: true},
+                            {fieldName: 'DICH', headerText: 'Đi đến', allowFiltering: true},
+                            {fieldName: 'VITRI_D', headerText: 'VT Đích', allowFiltering: true}
+                        ]" 
+                        v-bind:dataSource="danDoCapChiTiet" @queryCellInfo="queryCellInfo2" :showFilter="true" @selectedRowChanged="gridDanDoCT_selectedRowChanged"></DataGrid>
+                    </template>
+                </div>            
+        </div>        
+    </div>
+</b-modal>    

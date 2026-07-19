@@ -1,0 +1,2 @@
+import SearchHistoryPayrollManagementStaff from './SearchHistoryPayrollManagementStaff'
+export default SearchHistoryPayrollManagementStaff

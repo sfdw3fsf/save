@@ -1,0 +1,124 @@
+<div class="box-form">
+  <div class="legend-title">Danh sách khách hàng</div>
+  <div class="row">
+    <div class="col-sm-6 col-12">
+      <div class="info-row">
+        <div class="key w40 padt7">
+          <span class="one-alert f20 text-warning"></span>
+        </div>
+        <div class="value">
+          <p class="text-main marb5">File excel gồm 7 trường: MA_KH, TEN_KH, MST, DIACHI, EMAIL, SDT, HTTT</p>
+          <p class="red">Trường bắt buộc: MA_KH, TEN_KH, DIACHI, SDT</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3 col-12">
+      <div class="info-row">
+        <div class="key w60">
+          Mẫu số
+        </div>
+        <div class="value">
+          <div class="select-custom">
+            <SelectExt v-model="cboPattern.value"
+                       :allowFiltering="true"
+                       :dataSource="cboPattern.data"
+                       dataValueField="LOAIHOADON_ID"
+                       dataTextField="TEN_LOAIHD"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3 col-12">
+      <div class="info-row">
+        <div class="key w150">
+          Ký hiệu (Serial No)
+        </div>
+        <div class="value">
+          <div class="select-custom">
+            <SelectExt v-model="cboSerial.value"
+                       :allowFiltering="true"
+                       :dataSource="cboSerial.data"
+                       dataValueField="seri_id"
+                       dataTextField="seri"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="info-row">
+    <div class="key w80">
+      Đường dẫn
+    </div>
+    <div class="value">
+      <div class="input-more-button">
+        <button class="btn"
+                :class="{disabled: !khachHang.isShowBtnUpload}"
+                @click="openDialog">
+          <span class="-ap icon-more_horiz"></span>
+        </button>
+        <input type="text" class="form-control " id="dsKHFilePath" v-model="khachHang.dsKHFilePath">
+        <input type="file"
+               @change="onChangeFile"
+               id="dsKHFileDialog"
+               class="hidden"
+               accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+      </div>
+    </div>
+  </div>
+  <div class="head-top mart10">
+    <div class="pull-left">
+      <div class="nav tabs tab-over">
+        <a href="javascript: void(0)"
+           @click="setActiveTab(khachHang.dsKHTab)"
+           class="padt5 padb5"
+           :class="{active: khachHang.currentTab === khachHang.dsKHTab}">
+          <span class="icon inline vcenter f20 nc-icon-glyph design_bullet-list-67 text-main"></span> Danh sách
+        </a>
+        <a href="javascript: void(0)"
+           @click="setActiveTab(khachHang.dsErrorTab)"
+           class="padt5 padb5"
+           :class="{active: khachHang.currentTab === khachHang.dsErrorTab}">
+          <span class="icon inline vcenter f20 one-alert text-warning"></span> Lỗi
+        </a>
+      </div>
+    </div>
+    <div class="pull-right">
+      <a class="btn btn-success mart3"
+         href="/static/files/MauFile_Import_KH_Invoice_File.xlsx">
+        <span class="one-file-excel"></span> Tải file mẫu
+      </a>
+
+      <button class="btn btn-second mart3" @click="exportExcel">
+        <span class="one-xlsx-import f20 inline vcenter"></span> Export
+      </button>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="tab-content">
+    <div class="dsKhachHang" v-show="khachHang.currentTab === khachHang.dsKHTab">
+      <div class="grid-khachhang">
+      <DataGrid :panelDataHeight="'150'"
+                :dataSource="khachHang.dsKhachHang"
+                :columns="dsCols"
+                :showColumnCheckbox="true"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :selectionSettings="{checkboxOnly: true}"
+                :allowExcelExport="true"
+                @actionComplete="actionComplete"
+                @queryCellInfo="queryCellInfo"
+                ref="dsKhachHang"
+                ></DataGrid>
+      </div>
+    </div>
+    <div v-show="khachHang.currentTab === khachHang.dsErrorTab">
+      <DataGrid v-bind:panelDataHeight="'150'"
+                v-bind:dataSource="khachHang.dsError"
+                v-bind:columns="errorCols"
+                :allowPaging="true"
+                @queryCellInfo="queryCellInfo"
+                ref="dsError"
+                :enablePagingServer="false"></DataGrid>
+    </div>
+  </div>
+</div>

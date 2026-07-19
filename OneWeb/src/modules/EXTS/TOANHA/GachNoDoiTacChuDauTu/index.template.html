@@ -1,0 +1,494 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onLayTT(true)" title="Hiển thị danh sách">
+                    <span class="icon one-search"></span>Lấy TT
+                </a>
+            </li>
+            <li v-if="btn_Visible.gachNo">
+                <a href="javascript: void(0)" @click="onGachNo" title="Gạch nợ" :class="{'disabled': !btn_Enabled.gachNo}">
+                    <span class="icon one-sign"></span>Gạch nợ
+                </a>
+            </li>
+            <li v-if="btn_Visible.dieuChinh">
+                <a href="javascript: void(0)" @click="onDieuChinh" title="Điều chỉnh" :class="{'disabled': !btn_Enabled.dieuChinh}">
+                    <span class="icon one-file-edit2"></span>Điều chỉnh
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onHuy" title="Hủy thao tác" :class="{'disabled': !btn_Enabled.huy}">
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Hủy
+                </a>
+            </li>            
+            <li>
+                <a href="javascript: void(0)" @click="onPhieuTra" title="Phiếu trả">
+                    <span class="icon nc-icon-glyph files_single-content-03"></span>Phiếu trả
+                </a>
+                <PopupPhieuTraTCQLDA :id="'frmPhieuTraTCQLDA'" :vloai="cbo_Loai.selected" :vdt_id="cbo_DTCDT.selected"></PopupPhieuTraTCQLDA/>
+            </li>            
+            <li>
+                <a href="javascript: void(0)" @click="onPhieuHuy" title="Phiếu hủy">
+                    <span class="icon one-trash"></span>Phiếu hủy
+                </a>
+                <PopupPhieuHuy ref="dlgPhieuHuy"></PopupPhieuHuy>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="pull-right w120">
+              <app-ky-cuoc></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin chủ đầu tư, đối tác</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Đầu tư/Đối tác</div>
+                                    <div class="value">
+                                        <div class="row">
+                                            <div class="col-sm-3 col-12">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="cbo_Loai.selected">
+                                                        <option v-for="item in cbo_Loai.items" :value="item.loai_id">{{ item.ten_loai }}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-9 col-12">
+                                                <div class="select-custom">
+                                                    <app-combobox
+                                                        :columns="[
+                                                            { fieldName: 'ma_dt', headerText: '', width: 50 },
+                                                            { fieldName: 'ma_ten_dt', headerText: '' }
+                                                        ]"
+                                                        @selectedChanged="onDTSelected" 
+                                                        :dataSource="cbo_DTCDT.items"
+                                                        :allowPaging="false" 
+                                                        :enablePagingServer="false"
+                                                        :gridPanelDataHeight="'200px'"
+                                                        textField="ma_ten_dt"
+                                                        valueField="dt_id"
+                                                        ref="dtCbo"
+                                                    >
+                                                    </app-combobox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Tòa nhà</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <app-combobox
+                                                :columns="[
+                                                    { fieldName: 'ma_toanha', headerText: '', width: 50 },
+                                                    { fieldName: 'ma_ten_toanha', headerText: '' }
+                                                ]"
+                                                @selectedChanged="onToaNhaSelected" 
+                                                :dataSource="cbo_ToaNha.items"
+                                                :allowPaging="false" 
+                                                :enablePagingServer="false"
+                                                :gridPanelDataHeight="'200px'"
+                                                textField="ma_ten_toanha"
+                                                valueField="toanha_id"
+                                                ref="toaNhaCbo"
+                                            >
+                                            </app-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Mã TB</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight" v-model="txt_MaTB" @keyup.enter="onMaTBKeyPress" ref="maTB">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Địa chỉ</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txt_DiaChi" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row" style="margin-bottom: 0px;">
+                                    <div class="key w110">Tài khoản</div>
+                                    <div class="value">
+                                        <div class="row">
+                                            <div class="col-sm-3 col-12">
+                                                <div>
+                                                    <input type="text" class="form-control" v-model="txt_TaiKhoan" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-9 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w100">Ngân hàng</div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <app-combobox
+                                                                :columns="[
+                                                                    { fieldName: 'ma_nh', headerText: '', width: 50 },
+                                                                    { fieldName: 'ten_nh', headerText: '' }
+                                                                ]"
+                                                                @selectedChanged="onNganHangSelected" 
+                                                                :dataSource="cbo_NganHang.items"
+                                                                :allowPaging="false" 
+                                                                :enablePagingServer="false"
+                                                                :gridPanelDataHeight="'200px'"
+                                                                textField="ten_nh"
+                                                                valueField="nganhang_id"
+                                                                ref="nganHangCbo"
+                                                                :enabled="false"
+                                                            >
+                                                            </app-combobox>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Hình thức TT<span class="red"> (*)</span></div>
+                                    <div class="value">
+                                        <ejs-dropdownlist 
+                                            :filtering='onFilteringHTTT' 
+                                            :allowFiltering="true" 
+                                            :dataSource='cbo_HinhThucTT.items' 
+                                            :fields="cbo_HinhThucTT.fields" 
+                                            v-model = "cbo_HinhThucTT.selected" 
+                                            :placeholder="'Chọn hình thức thanh toán'"
+                                        >
+                                        </ejs-dropdownlist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ghi chú</div>
+                                    <div class="value">
+                                        <textarea name="" class="form-control" style="height: 90px;" v-model="txt_GhiChu"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Hóa đơn điện tử</div>
+                                    <div class="value">
+                                        <div class="check-action">
+                                            <input type="checkbox" checked name="cb1" class="check" v-model="chb_HDDT.value" :disabled="!chb_HDDT.enabled">
+                                            <span class="name"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="chb_HDDT.value" class="box-form">
+                            <div class="legend-title">Hóa đơn điện tử</div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Số hóa đơn<span class="red"> (*)</span></div>
+                                        <div class="value">
+                                            <input 
+                                                type="number" 
+                                                class="form-control" 
+                                                v-model="txt_SoHD" 
+                                                ref="soHD" 
+                                                :class="{'is-invalid': $v.txt_SoHD.$error || customError.txt_SoHD}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w110">Ngày hóa đơn<span class="red"> (*)</span></div>
+                                        <div class="value">
+                                            <ejs-datepicker
+                                                v-model="date_NgayHoaDon"
+                                                :value="today"
+                                                :format="'dd/MM/y'"
+                                                :showClearButton="false"
+                                            >
+                                            </ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Mẫu số<span class="red"> (*)</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist 
+                                                :filtering='onFilteringPattern' 
+                                                :allowFiltering="true" 
+                                                :dataSource='cbo_MauSo.items' 
+                                                :fields="cbo_MauSo.fields" 
+                                                v-model = "cbo_MauSo.selected" 
+                                                :placeholder="'Chọn mẫu số'"
+                                            >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w110">Ký hiệu<span class="red"> (*)</span></div>
+                                        <div class="value">
+                                            <ejs-dropdownlist 
+                                                :filtering='onFilteringSerial' 
+                                                :allowFiltering="true" 
+                                                :dataSource='cbo_KyHieu.items' 
+                                                :fields="cbo_KyHieu.fields" 
+                                                v-model = "cbo_KyHieu.selected" 
+                                                :placeholder="'Chọn ký hiệu'"
+                                            >
+                                            </ejs-dropdownlist>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Chứng từ</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control font-weight-bold" v-model="txt_ChungTu" style="color: blue">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Thủ quỹ</div>
+                                    <div class="value">
+                                        <ejs-dropdownlist 
+                                            :filtering='onFilteringThuQuy' 
+                                            :allowFiltering="true" 
+                                            :dataSource='cbo_ThuQuy.items' 
+                                            :fields="cbo_ThuQuy.fields" 
+                                            v-model = "cbo_ThuQuy.selected" 
+                                            :placeholder="'Chọn thủ quỹ'"
+                                        >
+                                        </ejs-dropdownlist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày TT</div>
+                                    <div class="value">
+                                        <ejs-datepicker
+                                            v-model="date_NgayTT"
+                                            :value="today"
+                                            :format="'dd/MM/y'"
+                                            :showClearButton="false"
+                                        >
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Loại tiền</div>
+                                    <div class="value">
+                                        <ejs-dropdownlist 
+                                            :filtering='onFilteringLoaiTien' 
+                                            :allowFiltering="true" 
+                                            :dataSource='cbo_LoaiTien.items' 
+                                            :fields="cbo_LoaiTien.fields" 
+                                            v-model = "cbo_LoaiTien.selected" 
+                                            :placeholder="'Chọn loại tiền'"
+                                        >
+                                        </ejs-dropdownlist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Tiền trả</div>
+                                    <div class="value">
+                                        <div class="input-icon-right calculator-box">
+                                            <vue-numeric 
+                                                currency='' 
+                                                separator=',' 
+                                                v-model="txt_TienTra.value" 
+                                                class="form-control tright" 
+                                                style="color: red; font-weight: bold" 
+                                                :readonly="txt_TienTra.readOnly" 
+                                                @change="onChangeTienTra"
+                                                ref="tienTra"
+                                                :class="{'is-invalid': $v.txt_TienTra.value.$error}"
+                                            >
+                                            </vue-numeric>
+                                            <span class="icon one-calculator" @click="isCalcShow = !isCalcShow"></span>
+                                            <Calculator @display="txt_TienTra.value = $event" :value="txt_TienTra.value" :is-show="isCalcShow && !txt_TienTra.readOnly" @close="isCalcShow = !isCalcShow"></Calculator>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Tiền ĐC</div>
+                                    <div class="value">
+                                        <div class="input-icon-right calculator-box">
+                                            <vue-numeric currency='' separator=',' v-model="txt_TienDC" class="form-control tright" style="color: red; font-weight: bold" readonly></vue-numeric>
+                                            <span class="icon one-calculator"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Loại DTPC</div>
+                                    <div class="value">
+                                        <div class="check-action">
+                                            <input type="checkbox" checked name="cb1" class="check" v-model="chb_DTPC">
+                                            <span class="name red">(Check: Cước PS, Uncheck: Cước thực thu)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách gạch nợ</div>
+            <div class="box-tab-horizontal">
+                <div class="tabs tab-over nav tab-left">
+                    <a href="#tab0" data-toggle="tab" class="active" @click="changeTab(0)" style="transform: rotate(180deg);">Gạch nợ DT</a>
+                    <a href="#tab1" data-toggle="tab" @click="changeTab(1)" style="transform: rotate(180deg);">Điều chỉnh</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab0">
+                        <DataGrid v-bind:columns="[
+                            {fieldName: 'thangno', headerText: 'Tháng nợ', allowFiltering: true, allowSorting: false, width: 120, isGroupedColumn: true},
+                            {fieldName: 'ma_toanha', headerText: 'Mã tòa nhà', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'ten_toanha', headerText: 'Tên tòa nhà', allowFiltering: true, allowSorting: false, width: 150},
+                            {fieldName: 'ma_tb', headerText: 'Mã TB', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'ten_dvvt', headerText: 'Dịch vụ VT', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'loaihinh_tb', headerText: 'Loại hình TB', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'ten_loai_chiphi', headerText: 'Loại chi phí', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'tongno', headerText: 'Tổng nợ', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', cssClass: 'text-blue-bold'},
+                            {fieldName: 'conno', headerText: 'Còn nợ', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', cssClass: 'text-red-bold'},
+                            {fieldName: 'datra', headerText: 'Đã trả', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', cssClass: 'text-orange-bold'}
+                        ]"
+                            :aggregates="[
+                                { field: 'tongno', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate },
+                                { field: 'conno', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate },
+                                { field: 'datra', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate }
+                            ]"
+                            v-bind:dataSource="grid_ThangNo.items"
+                            dataKeyField="thangno"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            ref="thangNoGrid"
+                            @rowSelected="onSelectThangNo"
+                            :key="grid_ThangNo.key"
+                            
+                        >
+                        </DataGrid>
+                    </div>
+                    <div class="tab-pane" id="tab1">
+                        <DataGrid v-bind:columns="[
+                                {headerText: 'Điều chỉnh', textAlign: 'Center',
+                                    columns: [
+                                        {field: 'ma_toanha', headerText: 'Mã tòa nhà', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120},
+                                        {field: 'ma_tb', headerText: 'Mã TB', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120},
+                                        {field: 'ten_dvvt', headerText: 'Dịch vụ VT', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 150},
+                                        {field: 'loaihinh_tb', headerText: 'Loại hình TB', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120},
+                                        {field: 'dc_nogoc', headerText: 'Nợ gốc', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, customAttributes: {class: 'text-red-bold'}, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: true, editType: 'numericedit'},
+                                        {field: 'dc_thue', headerText: 'Thuế', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, customAttributes: {class: 'text-blue-bold'}, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: true, editType: 'numericedit'},
+                                        {field: 'dc_tong', headerText: 'Tổng cộng', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, customAttributes: {class: 'text-brown-bold'}, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false}
+                                    ]
+                                },
+                                {headerText: 'Tổng nợ', textAlign: 'Center',
+                                    columns: [
+                                        {field: 'nogoc', headerText: 'Nợ gốc', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false},
+                                        {field: 'thue', headerText: 'Thuế', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false},
+                                        {field: 'tongno', headerText: 'Tổng nợ', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false}
+                                    ]
+                                },
+                                {headerText: 'Nợ đầu kỳ', textAlign: 'Center',
+                                    columns: [
+                                        {field: 'nogoc_dk', headerText: 'Nợ gốc', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false},
+                                        {field: 'thue_dk', headerText: 'Thuế', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false},
+                                        {field: 'tongno_dk', headerText: 'Tổng nợ', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false}
+                                    ]
+                                },
+                                {headerText: 'Nợ phát sinh', textAlign: 'Center',
+                                    columns: [
+                                        {field: 'nogoc_ps', headerText: 'Nợ gốc', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false},
+                                        {field: 'thue_ps', headerText: 'Thuế', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false},
+                                        {field: 'tongno_ps', headerText: 'Tổng nợ', headerTextAlign: 'Center', allowFiltering: true, allowSorting: false, width: 120, format: 'N0', type: 'number', textAlign: 'Right', allowEditing: false}
+                                    ]
+                                }
+                            ]"
+                            v-bind:dataSource="grid_DieuChinh.items"
+                            :aggregates="[
+                                {field: 'dc_nogoc', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'dc_thue', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'dc_tong', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'nogoc', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'thue', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'tongno', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'nogoc_dk', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'thue_dk', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'tongno_dk', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'nogoc_ps', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'thue_ps', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate},
+                                {field: 'tongno_ps', type: 'Sum', format: 'N0', footerTemplate: this.sumTemplate}
+                            ]"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            ref="dieuChinhGrid"
+                            :key="grid_DieuChinh.key"
+                            :editSettings='{ allowEditing: true, mode: "Batch" }'
+                            @cellSaved='onCellEdit'
+                        >
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

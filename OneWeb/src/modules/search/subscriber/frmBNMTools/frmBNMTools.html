@@ -1,0 +1,606 @@
+<div class="">
+  <vue-card label="Chọn chức năng">
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="value">
+            <div class="select-custom">
+              <SelectExt v-model="cboChucNang"
+                         @change="cboChucNang_EditValueChanged"
+                         :allowFiltering="true"
+                         :dataSource="funcs"
+                         dataValueField="Code"
+                         dataTextField="Text"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="value">
+            <div class="input-more-button">
+              <button class="btn" @click="showFormTraCuuDanhBa">
+                <span class="-ap icon-more_horiz"></span>
+              </button>
+              <input type="text" class="form-control" v-model="txtTraCuu"
+                     :placeholder="txtTraCuu_PlaceHolder"
+                     @keypress.enter="txtTraCuu_KeyDown"
+                     maxlength="200">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-md-12">
+        <div v-show="MyFunctionEnum.DOIPASS_WIFI === cboChucNang">
+          <div class="info-row">
+            <div class="key w110">Kiểu xác thực</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt v-model="cboKieuXacThuc.value"
+                           :allowFiltering="true"
+                           :dataSource="cboKieuXacThuc.source"
+                           dataValueField="KIEU_XT"
+                           dataTextField="GHICHU"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w110">Kiểu mã hóa</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt v-model="cboKieuMaHoa.value"
+                           :allowFiltering="true"
+                           :dataSource="cboKieuMaHoa.source"
+                           dataValueField="KIEU_MH"
+                           dataTextField="KIEU_MH"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w110">Tên wifi <span class="text-danger">*</span></div>
+            <div class="value">
+              <input type="text" v-model="txtTenWifi" class="form-control" id="txtTenWifi">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w110">Mật khẩu <span class="text-danger">*</span></div>
+            <div class="value">
+              <input type="password" v-model="txtPwd" class="form-control" id="txtPwd">
+            </div>
+          </div>
+        </div>
+
+        <div v-show="MyFunctionEnum.DOIPASS_ONT === cboChucNang">
+          <div class="info-row">
+            <div class="key w110">User ONT</div>
+            <div class="value">
+              <input type="text" v-model="txtTenWifi" class="form-control">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w110">Password ONT</div>
+            <div class="value">
+              <input type="password" v-model="txtPwd" class="form-control">
+            </div>
+          </div>
+
+          <button class="btn btn-primary float-right" @click="btnDoiPassONT_Click">Thực hiện
+          </button>
+        </div>
+
+        <div v-show="MyFunctionEnum.THAYDOI_CHANEL_BANDWIDTH === cboChucNang">
+          <div class="info-row">
+            <div class="key w110">Channel</div>
+            <div class="value">
+              <input type="text" v-model="txtChannel" class="form-control">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w110">Bandwidth</div>
+            <div class="value">
+              <input type="text" v-model="txtBandwidth" class="form-control">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w110">Transmit Power</div>
+            <div class="value">
+              <input type="text" v-model="txtTransmitPower" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div v-show="MyFunctionEnum.ADD_BRIDGE_WAN === cboChucNang">
+          <div class="info-row">
+            <div class="key w150">802.1P Priority [0-7]</div>
+            <div class="value">
+              <input type="text" v-model="txtVlanMux802_1Priority" class="form-control">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w150">802.1Q VLAN ID [0-4094]</div>
+            <div class="value">
+              <input type="text" v-model="txtVlanMuxID" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2" v-show="cboChucNang !== MyFunctionEnum.MAP_PORT">
+      <div class="col-md-12 text-right">
+        <button class="btn btn-primary mr-2"
+                v-if="cboChucNang === MyFunctionEnum.THAYDOI_CHANEL_BANDWIDTH"
+                @click="btnAction2_Click">Tra cứu
+        </button>
+        <button class="btn btn-primary"
+                v-if="btnTraCuu.Visible && cboChucNang !== MyFunctionEnum.DOIPASS_ONT"
+                :class="btnTraCuu.Enabled ? '' : 'disabled'"
+                @click="btnTraCuu_Click">{{ btnTraCuuText }}
+        </button>
+      </div>
+
+      <div class="col-md-12">
+        <div class="result" v-html="wbrKQ">
+        </div>
+      </div>
+    </div>
+  </vue-card>
+
+  <div v-show="cboChucNang === MyFunctionEnum.MAP_PORT">
+    <div class="head-top mart10">
+      <div class="pull-left">
+        <div class="nav tabs tab-over">
+          <a href="javascript: void(0)"
+             @click="setActiveTab(1)"
+             class="padt5 padb5"
+             :class="{active: currentTab === 1}">
+            Wan Setup
+          </a>
+          <a href="javascript: void(0)"
+             @click="setActiveTab(2)"
+             class="padt5 padb5"
+             :class="{active: currentTab === 2}">
+            Interface Grouping
+          </a>
+          <a href="javascript: void(0)"
+             @click="setActiveTab(3)"
+             class="padt5 padb5"
+             :class="{active: currentTab === 3}">
+            Voice
+          </a>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+
+    <div class="tab-content">
+      <div v-show="currentTab === 1">
+        <DataGrid :panelDataHeight="'150'"
+                  :dataSource="gridWanService"
+                  :columns="colsWanSetup"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+        ></DataGrid>
+
+        <vue-card label="Wide Area Network (WAN) Service List - ONT/AON" :class="'mt-4'">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-row">
+                <div class="key w200">WAN Port Selected:</div>
+                <div class="value">
+                  <input type="text" class="form-control" readonly v-model="txtWanPortSelected">
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">Network Protocol Selection:</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select class="form-control" v-model="cboNetworkProtocol"
+                            :class="cboNetworkProtocol_Enabled ? '' : 'disabled'">
+                      <option :value="cboNetworkProtocol">{{ cboNetworkProtocol }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">Enter Service Description:</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txtServiceDescription">
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">Enter 802.1P Priority [0-7]</div>
+                <div class="value">
+                  <input type="text" v-model="txtVlanMux802_1Priority" class="form-control">
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">Enter 802.1Q VLAN ID [0-4094]</div>
+                <div class="value">
+                  <input type="text" v-model="txtVlanMuxID" class="form-control">
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="value d-flex justify-content-around">
+                  <div>
+                    <input type="radio" v-model="grdoAddType" value="0"/> <label>Add PPPoE</label>
+                  </div>
+                  <div>
+                    <input type="radio" v-model="grdoAddType" value="1"/> <label>Add IPoE</label>
+                  </div>
+                  <div>
+                    <input type="radio" v-model="grdoAddType" value="2"/> <label>Add Bridge</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row text-right">
+                <button class="btn btn-sm btn-primary mr-2" @click="btnGetWanList_Click">Wan List</button>
+                <button class="btn btn-sm btn-primary" @click="btnApply_Click">Apply/Save</button>
+              </div>
+            </div>
+            <div class="col-md-6" v-show="grdoAddType != 2">
+              <div class="info-row" v-show="grdoAddType == 1">
+                <div class="key w130">IPv4:</div>
+                <div class="value">
+                  <div>
+                    <input type="radio" v-model="rdogrIPv4" value="0"> Obtain IP address automatically_v4
+                  </div>
+                  <div>
+                    <input type="radio" v-model="rdogrIPv4" value="1"> Use the following Static IP Address_v4
+                  </div>
+                </div>
+              </div>
+
+              <div v-show="grdoAddType == 1 && rdogrIPv4 == 1">
+                <div class="info-row">
+                  <div class="key w130">WAN Ip Address:</div>
+                  <div class="value">
+                    <input type="text" v-model="txtExternalIPAdress" class="form-control">
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="key w130">WAN Subnet Mask:</div>
+                  <div class="value">
+                    <input type="text" v-model="txtSubnetMask" class="form-control">
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="key w130">WAN Gateway:</div>
+                  <div class="value">
+                    <input type="text" v-model="txtDefaultGateway" class="form-control">
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="key w130">DNS 1:</div>
+                  <div class="value">
+                    <input type="text" v-model="txtDnsIfName" class="form-control">
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="key w130">DNS 2:</div>
+                  <div class="value">
+                    <input type="text" v-model="txtDnsServers" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w130">&nbsp;</div>
+                <div class="value d-flex">
+                  <div class="w-50">
+                    <input type="checkbox" v-model="chkNAT"> NAT
+                  </div>
+                  <div class="w-50">
+                    <input type="checkbox" v-model="chkFirewall"> Firewall
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row" v-show="grdoAddType == 1">
+                <div class="key w130">&nbsp;</div>
+                <div class="value">
+                  <input type="checkbox" v-model="chkIGMPEnabled"> IGMP Enabled
+                </div>
+              </div>
+
+              <div v-show="grdoAddType == 0">
+                <div class="info-row">
+                  <div class="key w130">PPP Username</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="txtPPPUser"/>
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="key w130">PPP Password</div>
+                  <div class="value">
+                    <input type="password" class="form-control" v-model="txtPPPPass"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </vue-card>
+      </div>
+      <div v-show="currentTab === 2">
+        <DataGrid :panelDataHeight="'150'"
+                  :dataSource="gridInterfaceGrouping"
+                  :columns="colsInterfaceGroup"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  @selectedRowChanged="grvInterfaceGrouping_FocusedRowChanged"
+        ></DataGrid>
+
+        <vue-card label="Add Interface Grouping" :class="'mt-4'">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-row">
+                <div class="key w250">Group Name *:</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txtGroupName">
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w250">WAN Interface used in the grouping *:</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt v-model="cboWanInterfacesList.value"
+                               :allowFiltering="true"
+                               :dataSource="cboWanInterfacesList.source"
+                               dataValueField="id"
+                               dataTextField="name"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w250">Available LAN Interfaces *:</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt v-model="cboLanInterfacesList.value"
+                               :allowFiltering="true"
+                               :dataSource="cboLanInterfacesList.source"
+                               dataValueField="id"
+                               dataTextField="name"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row mt-2 text-right">
+                <button class="btn btn-sm btn-primary mr-4" @click="btnGetInterfaceGrouping_Click">Interface Grouping
+                  List
+                </button>
+                <button class="btn btn-sm btn-primary mr-4" @click="btnAddInterfaceGrouping_Click_1">Add interface
+                  grouping
+                </button>
+                <button class="btn btn-sm btn-primary" @click="btnDelInterfaceGrouping_Click_1">Del interface grouping
+                </button>
+              </div>
+            </div>
+          </div>
+        </vue-card>
+      </div>
+      <div v-show="currentTab === 3">
+        <div class="row">
+          <div class="col-md-6">
+            <vue-card label="Global Parameters">
+              <h4 class="my-2 font-weight-bold">Global Parameter</h4>
+              <div class="info-row">
+                <div class="key w200">Bound Interface Name:</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt v-model="cboBoundIfName.value"
+                               :allowFiltering="true"
+                               :dataSource="cboBoundIfName.source"
+                               dataValueField="boundIfName"
+                               dataTextField="boundIfName"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">Bound Interface Name:</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select class="form-control" v-model="cboIpAddressFamily">
+                      <option :value="cboIpAddressFamily">IPv4 Only</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <h4 class="my-2 font-weight-bold">Voice -- SIP Configuration</h4>
+              <h6>Enter the SIP parameters and click Start/Stop to save parameters and start/stop the voice
+                application</h6>
+
+              <div class="info-row">
+                <div class="key w200">Local Selection *:</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt v-model="cboRegion.value"
+                               :allowFiltering="true"
+                               :dataSource="cboRegion.source"
+                               dataValueField="id"
+                               dataTextField="name"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Domain Name *:</div>
+                <div class="value">
+                  <input type="text" v-model="txtUserAgentDomain" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">Voice Dialpan Setting:</div>
+                <div class="value">
+                  <input type="text" v-model="txtDigitMap" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="value">
+                  <input type="checkbox" v-model="chkProxy"/> Use SIP Proxy
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Proxy:</div>
+                <div class="value">
+                  <input type="text" v-model="txtProxyServer" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Proxy Port:</div>
+                <div class="value">
+                  <input type="text" v-model="txtProxyServerPort" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="value">
+                  <input type="checkbox" v-model="chkOutboundProxy"/> Use SIP Outbound Proxy
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Outbound Proxy:</div>
+                <div class="value">
+                  <input type="text" v-model="txtOutBoundProxy" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Outbound Proxy Port:</div>
+                <div class="value">
+                  <input type="text" v-model="txtOutBoundProxyPort" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="value">
+                  <input type="checkbox" v-model="chkRegistrar"/> Use SIP Registrar
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Registrar:</div>
+                <div class="value">
+                  <input type="text" v-model="txtRegistrarServer" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w200">SIP Registrar Port:</div>
+                <div class="value">
+                  <input type="text" v-model="txtRegistrarServerPort" class="form-control"/>
+                </div>
+              </div>
+            </vue-card>
+          </div>
+          <div class="col-md-6">
+            <vue-card label="SIP Parameter">
+              <div class="info-row">
+                <div class="key w150">SIP Account:</div>
+                <div class="value text-center">
+                  <label class="w-48">1</label>
+                  <label class="w-48">2</label>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">Account Enable:</div>
+                <div class="value text-center">
+                  <input type="checkbox" v-model="chkAccountEnable1" class="w-48"/>
+                  <input type="checkbox" v-model="chkAccountEnable2" class="w-48"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">User status:</div>
+                <div class="value text-center">
+                  <label class="w-48">{{lblStatus1}}</label>
+                  <label class="w-48">{{lblStatus2}}</label>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">Calling status:</div>
+                <div class="value text-center">
+                  <label class="w-48">{{lblCallState1}}</label>
+                  <label class="w-48">{{lblCallState2}}</label>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">Extension:</div>
+                <div class="value text-center">
+                  <input type="text" class="form-control w-48 d-inline-block" v-model="txtSipUri1"/>
+                  <input type="text" class="form-control w-48 d-inline-block" v-model="txtSipUri2"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">Display Name:</div>
+                <div class="value text-center">
+                  <input type="text" class="form-control w-48 d-inline-block" v-model="txtCallIDNamer1"/>
+                  <input type="text" class="form-control w-48 d-inline-block" v-model="txtCallIDNamer2"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">Authentication Name:</div>
+                <div class="value text-center">
+                  <input type="text" class="form-control w-48 d-inline-block" v-model="txtSipAuthUserName1"/>
+                  <input type="text" class="form-control w-48 d-inline-block" v-model="txtSipAuthUserName2"/>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="key w150">Password:</div>
+                <div class="value text-center">
+                  <input type="password" class="form-control w-48 d-inline-block" v-model="txtSipAuthUserPass1"/>
+                  <input type="password" class="form-control w-48 d-inline-block" v-model="txtSipAuthUserPass2"/>
+                </div>
+              </div>
+
+              <div class="info-row text-right">
+                <button class="btn btn-sm btn-primary mr-2" @click="btnGetVoice_Click">Get Voice</button>
+                <button class="btn btn-sm btn-primary" @click="btnSetVoice_Click">Apply/Save</button>
+              </div>
+            </vue-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <b-modal ref="popupSearchAccount" size="xl" hide-footer hide-header hide-header-close
+           body-class="modal-body p-0 frm-chon-port">
+    <SearchAccount @form-close="acceptSearchAccount" :isPopup="true"/>
+  </b-modal>
+</div>

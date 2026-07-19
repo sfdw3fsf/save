@@ -1,0 +1,130 @@
+<div>
+  <div class="box-gridstack-ver overflow-scoll-height">
+    <div class="box-col box-form marb0" id="boxTop">
+        <div class="info-row">
+            <div class="key w60">Nhóm</div>
+            <div class="value">
+                <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="nhomlc_id" @change="getDsCap()">
+                        <option v-for="nhom in ds_nhom" :key="nhom.ID" :value="nhom.ID">{{nhom.TEN}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w60">TTVT</div>
+            <div class="value">
+                <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="selectedTTVT">
+                        <option v-for="ttvt in ds_ttvt" :value="{ DONVI_ID : ttvt.DONVI_ID, TEN_DV : ttvt.TEN_DV }">{{ttvt.TEN_DV}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w60">Tổ</div>
+            <div class="value">
+                <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="selectedTOKT">
+                        <option v-for="tokt in ds_tokt" :value="{ DONVI_ID : tokt.DONVI_ID, TEN_DV : tokt.TEN_DV }">{{tokt.TEN_DV}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w60">Tổng đài</div>
+            <div class="value">
+                <div class="input-more-button -right">
+                    <button :disabled="selectedTRAM.DONVI_ID===null" class="btn" @click="cboTRAMButtonClick()">
+                        <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <div class="select-custom">
+                        <ejs-dropdownlist
+                        locale='vi-VN'
+                        v-model="selectedTRAMid"
+                        :dataSource='ds_tram'
+                        :allowFiltering='true'
+                        :filtering='filtering'
+                        :fields="{value:'DONVI_ID', text: 'TEN_DV'}" >
+                        </ejs-dropdownlist>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- Danh sách cáp gốc -->
+        <div class="table-content table-content-head mt-2" style="min-height: 150px">
+        <div class="legend-title head-title">Danh sách cáp gốc</div>
+            <DataGrid ref="grid1" :allowResizing='true' @rowSelected="selectedItemsCapGoc" v-bind:columns="[
+            {fieldName: 'CAP_ID', width : 70, headerText: 'ID', allowFiltering: true},
+            {fieldName: 'KYHIEU', width : 150, headerText: 'Ký hiệu cáp gốc', allowFiltering: true},
+            {fieldName: 'TEN_CAP', headerText: 'Tên cáp gốc', allowFiltering: true},
+            {fieldName: 'KYHIEU_KC_GOC', headerText: 'Ký hiệu kết cuối gốc', allowFiltering: true},
+            {fieldName: 'DIACHI_KC_GOC', headerText: 'Địa chỉ kết cuối gốc', allowFiltering: true}
+            ]" v-bind:dataSource="ds_cap" :showFilter="true" :showColumnCheckbox="true" :enabledSelectFirstRow="false" @rowDeselected="deselectedItems"
+          :allowPaging="true"></DataGrid>
+        </div>
+        <!-- Modal cáp gốc Region -->
+        <ModalChonDSKetCuoiExt modalID="modalChonKC" ref="ModalChonDSKetCuoiExt"/>
+        <ModalQLKetCuoiExt modalID="modalQLKetCuoi" ref="ModalQLKetCuoiExt"/>
+        <ModalQLCapExt modalID="modalQLCap" ref="ModalQLCap"/>
+        <QuanLyCapReNhanh id="popupQuanLyCapReNhanhLeft" :midspanObject="getMidspanObject" @napGD="napGD"></QuanLyCapReNhanh>
+        <QuanLyTramThietBi
+        id="popupTramThietBiGianDo2"
+        :tramTb_id="tramTb_id"
+        @isOk="QuanLyTramThietBiIsOk"
+        >
+        </QuanLyTramThietBi>
+        <!-- End Modal cáp gốc Region -->
+        <!-- Danh sách tuyến cống - bể -->
+        <div class="table-content table-content-head mt-2" style="min-height: 150px">
+          <div class="legend-title head-title">Danh sách tuyến cống - bể</div>
+          <DataGrid ref="gridTC" :columns="[
+          {fieldName: 'MA_TCB',width : 100, headerText: 'Mã tuyến'},
+          {fieldName: 'SL_CONGBE',width : 100, headerText: 'SL bể-cống'},
+          {fieldName: 'TUYEN_CB',width : 180, headerText: 'Tên tuyến cống-bể'},
+      ]"
+          :commands="[
+      {name: 'SuaTC', cssClass: 'btn btn-second pad3 lh14 button-not-bg', width: 20, text: '...',title:'tuyến cống'},]"
+          :commandColumn="{headerText: '', width: 50, cellCssClass: 'css1', firstColumn: false, show: true}"
+          :enabledSelectFirstRow="false"
+          @rowSelected="selectedItemsCongBe" @rowDeselected="deselectedItems"
+          :dataSource="dsTuyenCB" @commandClicked="commandTCClick" :showColumnCheckbox="true"></DataGrid>
+          </div>
+          <!-- Modal tuyến cống - bể Region -->
+          <b-modal id="modal-TuyenCongBe" ref="formTuyenCongBe" title="Tuyến cống bể" centered
+          hide-footer size="xl" modal-class="bss-modal" @ok="modalTuyenCongBe_Ok" @shown="modalTuyenCongBe_Show">
+            <template #default="{ ok }">
+              <TuyenCongBe ref = "tuyenCongBe"/>
+            </template>
+          </b-modal>
+          <!-- End Modal tuyến cống - bể Region -->
+          <!-- Danh sách tuyến cột -->
+        <div class="table-content table-content-head mt-2" style="min-height: 150px">
+          <div class="legend-title head-title">Danh sách tuyến cột</div>
+          <DataGrid
+              v-bind:columns="[
+                        {fieldName: 'MA_TC', headerText: 'Mã tuyến', allowFiltering: true,width:'100'},
+                        {fieldName: 'SL_COT', headerText: 'SL cột', allowFiltering: true,width:'80'},
+                        {fieldName: 'TUYEN_COT', headerText: 'Tên tuyến cột',width:'200', allowFiltering: true},]"
+              v-bind:dataSource="dsTuyenCot"
+              :showFilter="true"
+              :commands="[{name: 'SuaTC', cssClass: 'btn btn-second pad3 lh14 button-not-bg', width: 20, text: '...',title:'Sửa tuyến cột'},]"
+              :commandColumn="{headerText: '', width: 50, cellCssClass: 'css1', firstColumn: false, show: true}"
+              :enabledSelectFirstRow="false"
+              @rowSelected="selectedItemsTuyenCot"
+              @rowDeselected="deselectedItems"
+              @commandClicked="gridTC_onCommandClicked"
+              :showColumnCheckbox="true"
+            ></DataGrid>
+        </div>
+        <!-- Modal tuyến cột Region -->
+        <b-modal id="modal-TuyenCot" ref="formTuyenCot" title="Tuyến cột" centered hide-footer size="xl" modal-class="bss-modal" @ok="modalTuyenCot_Ok" @shown="modalTuyenCot_Show">
+          <template #default="{ ok }">
+            <TuyenCot ref="tuyencot" />
+          </template>
+        </b-modal>
+        <!-- End Modal tuyến cột Region -->
+    </div>
+  </div>
+</div>

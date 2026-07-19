@@ -1,0 +1,330 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+
+            <li>
+                <a href="#" @click.prevent="btnNhapMoi">
+                    <span class="icon one-reload"></span>Làm mới
+                </a>
+            </li>
+
+            <li>
+                <a href="#" @click.prevent="btnGhiLai">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <!-- <li>
+                <a href="#">
+                    <span class="icon one-circle-question"></span>Trợ giúp
+                </a>
+            </li> -->
+
+
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Chọn loại vật tư</div>
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Nhóm vật tư
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.NhomVT.list" v-model="listbox.NhomVT.value.NHOMVT_ID" @change="NhomVTChanged">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Nhóm LVT
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.NhomLVT.list" v-model="listbox.NhomLVT.value.loaivt_id" @change="NhomLVTChanged">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Loại vật tư
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.LVT.list" v-model="listbox.LVT.value.loaivt_id" @change="LVTChanged">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-col" id="boxRight">
+
+
+        <b-tabs class="nav tabs tab-over relative" style="z-index: 2;" v-model="TabIndex">
+            <b-tab title="Đơn vị" @click="onDVChanged">
+                <div class="tab-content">
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách đơn vị đã gán
+                                </div>
+                                <div class="pull-right">
+                                    <div class="check-action normal">
+                                        <input v-model="model.chb_chonnhanh" type="checkbox" class="check" id="chb_chonnhanh" @change="onCheckbox" />
+                                        <span class="name">Chọn nhanh</span>
+                                      </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                                <DataGridCustom
+                                ref="thuocTinhDaGan"
+                                v-bind:columns="listbox.ds_donvidagan.header"
+                                v-bind:dataSource="listbox.ds_donvidagan.list"
+                                :showColumnCheckbox="true"
+                                :showFilter="true"
+                                :editSettings='editSettings'
+                                :enabledSelectFirstRow="false"
+                                :selectionSettings="{ checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                                panelDataHeight="340"
+                                @rowSelected="rowSelected" @rowDeselected="rowDeselected"
+                                @pageChanged="pageChanged" @actionComplete="actionComplete"
+                                :allowPaging="true" :enablePagingServer="false"></DataGridCustom>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="btnGoGan">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+                            <button class="btn" @click="btnGan">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách đơn vị chưa gán
+                                </div>
+                                <div class="pull-right">
+                                    <div class="check-action normal red">
+                                        <input type="checkbox" class="check" @click="selectAll()">
+                                        <span class="name">Chọn nhanh</span>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="table-content">
+                                <table class="table-result table-gachle">
+                                    <thead class="center">
+                                        <tr>
+                                            <th>Tên vật tư</th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <div class="input-icon-right">
+                                                    <input type="text" class="form-control" v-model="txtTenVatTu" v-on:keyup.enter="txtTenVatTuEnter">
+                                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <div class="tree-plus ovauto tree-icon" style="height: 600px;">
+                                            <ejs-treeview id='treeview' ref="treeObj" :fields='listbox.fields' :showCheckBox='true' :nodeChecked='nodeChecked'>
+                                            </ejs-treeview>
+                                    </div>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-tab>
+            <b-tab title="Vị trí công việc" @click="onVTCVChange">
+                <div class="tab-content" >
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách vị trí công việc đã gán
+                                </div>
+                                <div class="pull-right">
+                                    <div class="check-action normal">
+                                        <input v-model="model.chb_chonnhanh_cd" type="checkbox" class="check" id="chb_chonnhanhcd" @change="onCheckbox_CD" />
+                                        <span class="name">Chọn nhanh</span>
+                                      </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <DataGridCustom
+                                ref="thuocTinhDaGan_CD"
+                                v-bind:columns="listbox.ds_chucdanhdagan.header"
+                                v-bind:dataSource="listbox.ds_chucdanhdagan.list"
+                                :showColumnCheckbox="true"                                
+                                :enabledSelectFirstRow="false"
+                                :editSettings='editSettings'                                
+                                :selectionSettings="{ checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                                panelDataHeight="340"
+                                @rowSelected="rowSelected_CD" @rowDeselected="rowDeselected_CD"
+                                @pageChanged="pageChanged_CD" @actionComplete="actionComplete_CD"
+                                :allowPaging="true" :enablePagingServer="false"></DataGridCustom>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="btnGoGan_CD">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+                            <button class="btn" @click="btnGan_CD">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách vị trí công việc chưa gán
+                                </div>
+                                <div class="pull-right">
+                                    <div class="check-action normal">
+                                        <input v-model="model.chb_chonnhanh_cc" type="checkbox" class="check" id="chb_chonnhanhcc" @change="onCheckbox_CC" />
+                                        <span class="name">Chọn nhanh</span>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <DataGridCustom
+                                ref="thuocTinhDaGan_CC"
+                                v-bind:columns="listbox.ds_chucdanhchuagan.header"
+                                v-bind:dataSource="listbox.ds_chucdanhchuagan.list"
+                                :showColumnCheckbox="true"
+                                :showFilter="true"
+                                :enabledSelectFirstRow="false"
+                                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' , checkboxOnly: true}"
+                                panelDataHeight="340"
+                                @rowSelected="rowSelected_CC" @rowDeselected="rowDeselected_CC"
+                                @pageChanged="pageChanged_CC" @actionComplete="actionComplete_CC"
+                                :allowPaging="true" :enablePagingServer="false">
+                            </DataGridCustom>
+                        </div>
+                    </div>
+                </div>
+            </b-tab>
+            <b-tab title="Nhân viên" @click="onNVChange">
+                <div class="tab-content" >
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách nhân viên đã gán
+                                </div>
+                                <div class="pull-right">
+                                    <div class="check-action normal">
+                                        <input v-model="model.chb_chonnhanh_nd" type="checkbox" class="check" id="chb_chonnhanhnd" @change="onCheckbox_ND" />
+                                        <span class="name">Chọn nhanh</span>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w30 nowrap">
+                                            Đơn vị
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select2 :options="listbox.DonVi.list" v-model="listbox.DonVi.value.DONVI_ID" @change="DVDaGanChanged">
+                                                    <option disabled value="0">Select one</option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <DataGridCustom
+                                ref="thuocTinhDaGan_ND"
+                                v-bind:columns="listbox.ds_nvdagan.header"
+                                v-bind:dataSource="listbox.ds_nvdagan.list"
+                                :showColumnCheckbox="true"
+                                :showFilter="true"
+                                :enabledSelectFirstRow="false"
+                                :editSettings='editSettings'
+                                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' , checkboxOnly: true}"
+                                panelDataHeight="340"
+                                @rowSelected="rowSelected_ND" @rowDeselected="rowDeselected_ND"
+                                @pageChanged="pageChanged_ND" @actionComplete="actionComplete_ND"
+                                :allowPaging="true" :enablePagingServer="false">
+                            </DataGridCustom>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="btnGoGan_NV">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+                            <button class="btn" @click="btnGan_NV">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách nhân viên chưa gán
+                                </div>
+                                <div class="pull-right">
+                                    <div class="check-action normal">
+                                        <input v-model="model.chb_chonnhanh_nc" type="checkbox" class="check" id="chb_chonnhanhnc" @change="onCheckbox_NC" />
+                                        <span class="name">Chọn nhanh</span>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w30 nowrap">
+                                            Đơn vị
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select2 :options="listbox.DonVi1.list" v-model="listbox.DonVi1.value.DONVI_ID" @change="DVChuaGanChanged">
+                                                    <option disabled value="0">Select one</option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <DataGridCustom
+                                ref="thuocTinhDaGan_NC"
+                                v-bind:columns="listbox.ds_nvchuagan.header"
+                                v-bind:dataSource="listbox.ds_nvchuagan.list"
+                                :showColumnCheckbox="true"
+                                :showFilter="true"
+                                :enabledSelectFirstRow="false"
+                                :editSettings='editSettings'
+                                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' , checkboxOnly: true}"
+                                panelDataHeight="340"
+                                @rowSelected="rowSelected_NC" @rowDeselected="rowDeselected_NC"
+                                @pageChanged="pageChanged_NC" @actionComplete="actionComplete_NC"
+                                :allowPaging="true" :enablePagingServer="false">
+                            </DataGridCustom>
+                        </div>
+                    </div>
+                </div>
+            </b-tab>
+        </b-tabs>
+        </div>
+
+
+
+    </div>
+</div>

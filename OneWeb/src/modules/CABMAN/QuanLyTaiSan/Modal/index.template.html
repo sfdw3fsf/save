@@ -1,0 +1,181 @@
+<b-modal 
+    :id="modalId" 
+    ref="ref-modal"
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @hidden="onModalHidden"
+    @shown="onModalShown">
+    <div class="modal-content popup-box quanly-taisan">
+        <div class="popup-header">
+            <div class="title">Quản lý tài sản</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$refs['ref-modal'].hide()">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li :class="{'disable-btn': !buttonState.tsbtnNhapMoiEnabled}">
+                    <a href="javascript:void(0)" @click="onClickButtonNhapMoi">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !buttonState.tsbtnGhiLaiEnabled}">
+                    <a href="javascript:void(0)" @click="onClickButtonGhiLai">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin tài sản</div>
+                <div class="info-row">
+                    <div class="key w80">Dự án<bss-required-marker/></div>
+                    <div class="value">
+                        <combobox-grid
+                            ref="ref-combo-duan"
+                            gridPanelDataHeight="300"
+                            :columns="[
+                                {fieldName: 'MA_CT', headerText: 'Mã CT', allowFiltering: true, width: '100' },
+                                {fieldName: 'DUAN_ID', headerText: 'ID', allowFiltering: true, width: '100' },
+                                {fieldName: 'SOHIEU_CT', headerText: 'Số hiệu CT', allowFiltering: true, width: '200' },    
+                            ]"
+                            :dataSource="dsDuAn"
+                            textField="MA_CT"
+                            valueField="DUAN_ID"
+                            @selectedChanged="onSelectDuAn"></combobox-grid>
+                    </div>
+                    <div class="value w30 nowrap">
+                        <button class="btn btn-second" @click="onClickButtonChuyenDuAn">
+                            <span class="one-file-back-1 inline vcenter f16 normal"></span> Chuyển dự án
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Mã tài sản<bss-required-marker/></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.maTaiSan.$error">
+                                    <input type="text" maxlength="200" class="form-control" v-model.trim="$v.maTaiSan.$model" />
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Nguyên giá<bss-required-marker/></div>
+                            <div class="value">
+                                <vue-numeric class="form-control" v-model="nguyenGia" :min="0" maxlength="15" :minus="false" :separator="'.'"></vue-numeric>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Tên tài sản<bss-required-marker/></div>
+                    <div class="value">
+                        <bss-error-marker :has-error="$v.tenTaiSan.$error">
+                            <input type="text" maxlength="500" class="form-control" v-model.trim="$v.tenTaiSan.$model" />
+                        </bss-error-marker>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">TTVT<bss-required-marker/></div>
+                    <div class="value">
+                        <bss-error-marker :has-error="$v.ttvtId.$error">
+                            <SelectExt
+                                v-model="$v.ttvtId.$model" 
+                                :dataSource="dsTtvt" 
+                                dataValueField="DONVI_ID"
+                                dataTextField="TEN_DV" />
+                        </bss-error-marker>
+                    </div>
+                </div>
+                <div class="legend-title mart10">
+                    Tìm tài sản theo mã
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Tìm kiếm</div>
+                    <div class="value">
+                        <div class="input-more-button">
+                            <button class="btn" @click="onClickButtonTimTaiSan">
+                                <span class="one-search"></span>
+                            </button>
+                            <input type="text" ref="input-timkiem" class="form-control highlight" v-model="maTimKiem" v-on:keyup.enter="onEnterInputTimKiem">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách tài sản</div>
+                <DataGrid
+                    class="table-result"
+                    v-bind:columns="[
+                        {fieldName: 'MA_TS', headerText: 'Mã tài sản', allowFiltering: true, width: '130' },
+                        {fieldName: 'TEN_TS', headerText: 'Tên tài sản', allowFiltering: true, width: '130' },
+                        {fieldName: 'GIA', headerText: 'Nguyên giá', allowFiltering: true, width: '130' },
+                        {fieldName: 'TEN_DV', headerText: 'TTVT', allowFiltering: true, width: '130' },
+                        {fieldName: '', headerText: '', allowFiltering: false, textAlign: 'Center', width: '50', template: getColumnTemplateXoa(this) },
+                    ]"        
+                    v-bind:dataSource="dsTaiSan"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    @selectedRowChanged="onSelectTaiSan"></DataGrid>
+            </div>
+        </div>
+    </div>
+    <b-modal v-model="showModalXacNhanXoa" centered title="Thông báo" size="sm" @ok="okXoaTaiSan">        
+        <span>Bạn thật sự muốn xóa tài sản?</span>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal id="modal-chuyen-duan" centered title="Chuyển dự án" ok-only @ok="okChuyenDuAn" @hidden="loiChuyenDuAn=false">
+        <div v-if="dsDuAn && dsDuAn.length > 0" style="position: relative;">
+            <div>Chọn dự án cần chuyển tài sản sang <bss-required-marker/></div>
+            <bss-error-marker :has-error="loiChuyenDuAn">
+                <combobox-grid
+                    ref="ref-combo-duan-chuyen"
+                    gridPanelDataHeight="200"
+                    :columns="[
+                        {fieldName: 'MA_CT', headerText: 'Mã CT', allowFiltering: true, width: '98%' },
+                    ]"
+                    :dataSource="dsDuAn"
+                    textField="MA_CT"
+                    valueField="DUAN_ID"
+                    @selectedChanged="onSelectDuAnChuyen"></combobox-grid>
+            </bss-error-marker>
+        </div>
+        <div v-else>Chưa có danh mục dự án.</div>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal id="modal-chon-taisan" scrollable centered title="Chọn 1 tài sản để xem" ok-only @ok="okChonTaiSanTimKiem">
+        <div>Tìm thấy {{dsTaiSanTimKiem.length}} tài sản.</div>
+        <div style="padding-left: 20px; padding-top: 5px;">
+            <div v-for="taiSan in dsTaiSanTimKiem" style="position: relative; padding-left: 15px;">
+                <input 
+                    type="radio" 
+                    :id="taiSan.TAISAN_ID" 
+                    :value="taiSan.TAISAN_ID" 
+                    v-model="taiSanTimKiemSelected" 
+                    style="position: absolute; left: 0;">
+                <label :for="taiSan.TAISAN_ID">[{{taiSan.SOHIEU_CT}}] {{taiSan.MA_TS}}</label>
+            </div>
+        </div>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+</b-modal>

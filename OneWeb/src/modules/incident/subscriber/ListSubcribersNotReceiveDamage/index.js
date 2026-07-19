@@ -1,0 +1,2 @@
+import ListSubcribersNotReceiveDamage from './ListSubcribersNotReceiveDamage.vue'
+export default ListSubcribersNotReceiveDamage

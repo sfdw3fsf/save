@@ -1,0 +1,687 @@
+<div>
+  <div class="list-actions-top">
+    <div class="pull-left">
+      <ul class="list">
+        <li>
+          <a href="javascript: void(0)" @click="onLayTT" title="Hiển thị danh sách"> <span class="icon one-search"></span>Lấy TT </a>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onNhapMoi" title="Nhập mới" :class="{'disabled': !btn_Enabled.nhapMoi}"> <span class="icon one-file-plus"></span>Nhập mới </a>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onGhiLai" title="Ghi lại" :class="{'disabled': !btn_Enabled.ghiLai }"> <span class="icon one-save"></span>Ghi lại </a>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onHuy" title="Hủy" :class="{'disabled': !btn_Enabled.huy}"> <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy </a>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onXoa" title="Xóa" :class="{'disabled': !btn_Enabled.xoa}"> <span class="icon one-trash"></span>Xóa </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="onChiTiet" title="Cập nhật chi tiết khuyến mại" :class="{'disabled': !btn_Enabled.chiTiet}"> <span class="icon one-file-edit2"></span>Chi tiết </a>
+          <PopupChiTietHDDT :vma_hd="txt_MaHDDT" :vten_hd="txt_TenHDDT" :vten_toanha="cbo_ToaNha.text" :vhddtu_id="common_params.hddtuId" :checkThangChot="checkThangChot" :thangChot="thangChot" ref="popupChiTietHDDT"> </PopupChiTietHDDT>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onTienTrinh" title="Tiến trình đầu tư" :class="{'disabled': !btn_Enabled.tienTrinh}"> <span class="icon one-file-attach"></span>Tiến trình </a>
+          <PopupTienTrinhDT :vma_hd="txt_MaHDDT" :vten_hd="txt_TenHDDT" :vhddtu_id="common_params.hddtuId" ref="popupTienTrinhDT"> </PopupTienTrinhDT>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onFileHS" title="File HS"> <span class="icon one-upload"></span>File HS </a>
+          <PopupUploadFile ref="popupUploadFile"> </PopupUploadFile>
+        </li>
+        <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onXuatExcel" title="Xuất Excel"> <span class="icon one-xlsx"></span>Xuất Excel </a>
+        </li>
+        <!-- <li v-if="!isViewOnly">
+          <a href="javascript: void(0)" @click="onChayLaiDTPC" title="Chạy lại DTPC" v-if="isRequiredHT && checkThangChot"> <span class="icon one-file-refresh"></span>Chạy lại DTPC </a>
+        </li> -->
+        <li v-if="!isViewOnly & isRequiredHT">
+          <a href="javascript: void(0)" @click="onChayLaiDTPCModal" title="Chạy lại DTPC" :class="{'disabled': !isRowSelected}"> <span class="icon one-file-refresh"></span>Chạy lại DTPC </a>
+        </li>
+      </ul>
+    </div>
+    <div class="pull-right mt-1" v-if="isRequiredHT">
+      <div class="info-row">
+        <div class="key w100">
+          <div class="check-action">
+            <input v-model="checkThangChot" @change="onCheckThangChot(checkThangChot)" type="checkbox" class="check" />
+            <span class="name">Tháng chốt</span>
+          </div>
+        </div>
+        <div class="value">
+          <ejs-datepicker class="form-control bg-none bor0 fw6 text" :placeholder="waterMark" start="Year" depth="Year" :format="dateFormat" :showClearButton="false" :allowEdit="true" :enabled="checkThangChot" v-model="thangChot.value" @change="onChangeThangChot(thangChot.value)"> </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="box-form padt8 padb8" v-if="isShowChonTinh">
+      <div class="row">
+        <div class="col-sm-2 col-12">
+          <div class="info-row marb0">
+            <div class="key w100 nowrap fw6">Chọn tỉnh</div>
+            <div class="value" style="width: 100%">
+              <SelectExt class="select-custom" v-model="tinh" :dataSource="listTinh" dataTextField="tentinh" dataValueField="tinh_id" @change="cboTinh_EditValueChanged"></SelectExt>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Thông tin hợp đồng</div>
+      <!-- <div class="box-form"> -->
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Mã hợp đồng</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_MaHDDT" readonly />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Tên hợp đồng<span class="red">(*)</span></div>
+                <div class="value">
+                  <input type="text" class="form-control font-weight-bold text" v-model="txt_TenHDDT" ref="tenHddt" :class="{'is-invalid': $v.txt_TenHDDT.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Người ký</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_NguoiKy" ref="nguoiKy" :class="{'is-invalid': $v.txt_NguoiKy.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Chức vụ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_ChucVu" ref="chucVu" :class="{'is-invalid': $v.txt_ChucVu.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110" title="Định dạng: dd/mm/yyyy">Ngày ký<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value" title="Định dạng: dd/mm/yyyy">
+                  <ejs-datepicker v-model="date_NgayKy" :value="today" :format="'dd/MM/y'" :showClearButton="false" :enabled="!isViewOnly"> </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Số HĐ giấy</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_SoHD" ref="soHD" :class="{'is-invalid': $v.txt_SoHD.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110" title="Định dạng: dd/mm/yyyy">Thời hạn <span class="red">(*)</span></div>
+                <div class="value" title="Định dạng: dd/mm/yyyy" :class="{'is-invalid-date': $v.date_ThoiHan.$error }">
+                  <ejs-datepicker v-model="date_ThoiHan" :value="today" :format="'dd/MM/y'" :showClearButton="false" :enabled="!isViewOnly" > </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Tiến độ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_TienDo" ref="tienDo" :class="{'is-invalid': $v.txt_TienDo.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110" title="Định dạng: dd/mm/yyyy">Ngày thanh toán</div>
+                <div class="value" title="Định dạng: dd/mm/yyyy">
+                  <ejs-datepicker v-model="date_NgayThanhToan" :value="today" :format="'dd/MM/y'" :showClearButton="false" :enabled="!isViewOnly"> </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Chu kỳ TT</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_ChuKy.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_ChuKy.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110" title="Định dạng: dd/mm/yyyy">Ngày hiệu lực</div>
+                <div class="value" title="Định dạng: dd/mm/yyyy">
+                  <ejs-datepicker v-model="date_NgayHieuLuc" :value="today" :format="'dd/MM/y'" :showClearButton="false" :enabled="!isViewOnly"> </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Mã số thuế</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_MST" ref="mst" :class="{'is-invalid': $v.txt_MST.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">NV đối soát</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_NVDoiSoat.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_NVDoiSoat.items" :value="item.nhanvien_id">{{ item.ten_nv }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">NV quản lý</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_NVQuanLy.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_NVQuanLy.items" :value="item.nhanvien_id">{{ item.ten_nv }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w110">Ngân hàng</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <app-combobox
+                      :enabled="!isViewOnly"
+                      :columns="[
+                                                    { fieldName: 'ma_nh', headerText: 'Mã NH', width: 100 },
+                                                    { fieldName: 'ten_nh', headerText: 'Tên ngân hàng', width: 520 }
+                                                ]"
+                      @selectedChanged="onNganHangSelected"
+                      :dataSource="cbo_NganHang.items"
+                      :allowPaging="false"
+                      :enablePagingServer="false"
+                      :gridPanelDataHeight="'200px'"
+                      textField="ten_nh"
+                      valueField="nganhang_id"
+                      ref="nganHangCbo"
+                    >
+                    </app-combobox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Số tài khoản</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_STK" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Tên tài khoản</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_TenTK" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Bộ phận đối soát</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_TenBPDS" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110" title="Định dạng: dd/mm/yyyy">Thời hạn đối tác </div>
+                <div class="value" title="Định dạng: dd/mm/yyyy">
+                  <ejs-datepicker v-model="date_ThoiHanDoiTac" :value="today" :format="'dd/MM/y'" :showClearButton="false" :enabled="!isViewOnly" > </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">SĐT BPĐS</div>
+                <div v-if="phanVungID == 28" class="value">
+                  <input type="text" class="form-control" v-model="txt_SdtBPDS" ref="phone" :disabled="isViewOnly" />
+                </div>
+                <div v-if="phanVungID != 28" class="value">
+                  <input type="text" class="form-control" v-model="txt_SdtBPDS" ref="phone" :class="{'is-invalid': $v.txt_SdtBPDS.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Email BPĐS</div>
+                <div v-if="phanVungID == 28" class="value">
+                  <input type="text" class="form-control" v-model="txt_EmailBPDS" ref="email" :disabled="isViewOnly" />
+                </div>
+                <div v-if="phanVungID != 28" class="value">
+                  <input type="text" class="form-control" v-model="txt_EmailBPDS" ref="email" :class="{'is-invalid': $v.txt_EmailBPDS.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w110">Địa chỉ liên hệ BPĐS</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_DiaChiBPDS" ref="diaChi" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w110">Ghi chú</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="txt_GhiChu" ref="ghiChu" :class="{'is-invalid': $v.txt_GhiChu.$error }" :disabled="isViewOnly" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w120">Tòa nhà<span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <app-combobox
+                      :enabled="!isViewOnly"
+                      :columns="[
+                                                    { fieldName: 'ma_toanha', headerText: '', width: 50 },
+                                                    { fieldName: 'ten_toanha', headerText: '' }
+                                                ]"
+                      @selectedChanged="onToaNhaSelected"
+                      :dataSource="cbo_ToaNha.items"
+                      :allowPaging="false"
+                      :enablePagingServer="false"
+                      :gridPanelDataHeight="'200px'"
+                      textField="ten_toanha"
+                      valueField="toanha_id"
+                      ref="toaNhaCbo"
+                    >
+                    </app-combobox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w120">Chủ quản<span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <!-- <select2
+                                                :options = "cbo_ChuQuan.items"
+                                                v-model = "cbo_ChuQuan.selected"
+                                                :class="{'is-invalid': $v.cbo_ChuQuan.selected.$error}"
+                                            /> -->
+                    <select name="" id="" class="form-control" v-model="cbo_ChuQuan.selected" :class="{'is-invalid': $v.cbo_ChuQuan.selected.$error}" :disabled="isViewOnly">
+                      <option v-for="item in cbo_ChuQuan.items" :value="item.id">{{ item.text }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Nhóm dự án</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_NhomDA.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_NhomDA.items" :value="item.nhomda_id">{{ item.ten_nhomda }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Hợp đồng cha</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ComboboxGrid
+                      :enabled="!isViewOnly"
+                      :dataSource="cbo_HopDongCha.items"
+                      v-model="cbo_HopDongCha.selected"
+                      textField="ten_hddtu"
+                      valueField="hddtu_id"
+                      :enabledSelectFirstRow="false"
+                      :allowPaging="false"
+                      :columns="[
+                                                        { fieldName: 'ma_hddtu', headerText: '', width: 50 },
+                                                        { fieldName: 'ten_hddtu', headerText: '' }
+                                                    ]"
+                      ref="hdchaCbo"
+                    />
+                    <!-- <app-combobox :columns="[
+                                                    { fieldName: 'ma_hddtu', headerText: '', width: 50 },
+                                                    { fieldName: 'ten_hddtu', headerText: '' }
+                                                ]" @selectedChanged="onHDChaSelected"
+                                            :dataSource="cbo_HopDongCha.items" :allowPaging="false"
+                                            :enablePagingServer="false" :gridPanelDataHeight="'200px'"
+                                            textField="ten_hddtu" valueField="hddtu_id" ref="hdchaCbo">
+                                        </app-combobox> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Hình thức đầu tư<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_HinhThucDauTu.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_HinhThucDauTu.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Hình thức PCDT<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_HinhThucPCDT.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_HinhThucPCDT.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Hình thức hóa đơn<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_HinhThucHoaDon.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_HinhThucHoaDon.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Tình trạng</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_TinhTrang.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_TinhTrang.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Tổng mức ĐT</div>
+                <div class="value">
+                  <vue-numeric currency="" separator="," v-model="txt_TongMucDT" class="form-control tright" ref="tongMucDT" :class="{'is-invalid': $v.txt_TongMucDT.$error }" :read-only="isViewOnly"></vue-numeric>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110" title="Định dạng: dd/mm/yyyy">TG tính HQĐT</div>
+                <div class="value" title="Định dạng: dd/mm/yyyy">
+                  <ejs-datepicker v-model="date_TGTinhHQDT" :value="today" :format="'dd/MM/y'" :showClearButton="false" :enabled="!isViewOnly"> </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Thị phần tối thiếu<span class="red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric currency="" separator="," v-model="txt_ThiPhanToiThieu" class="form-control tright" ref="thiPhanTT" :class="{'is-invalid': $v.txt_ThiPhanToiThieu.$error }" :read-only="isViewOnly"></vue-numeric>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">APRU tối thiểu<span class="red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric currency="" separator="," v-model="txt_APRUToiThieu" class="form-control tright" ref="apruTT" :class="{'is-invalid': $v.txt_APRUToiThieu.$error }" :read-only="isViewOnly"></vue-numeric>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Giá trị tài sản</div>
+                <div class="value">
+                  <vue-numeric currency="" separator="," v-model="txt_GiaTriTS" class="form-control tright" ref="giaTriTS" :class="{'is-invalid': $v.txt_GiaTriTS.$error }" :read-only="isViewOnly"></vue-numeric>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12" v-if="isHopDongCha">
+              <div class="info-row">
+                <div class="key w110">Tỷ lệ PCDT<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value">
+                  <div class="input-icon-right calculator-box">
+                    <vue-numeric
+                      currency=""
+                      separator=","
+                      :precision="tylePCDT.precision"
+                      :min="tylePCDT.min"
+                      :max="tylePCDT.max"
+                      v-model="txt_TyLePCDT"
+                      class="form-control tright"
+                      style="color: red; font-weight: bold"
+                      ref="tyLePCDT"
+                      :class="{'is-invalid': $v.txt_TyLePCDT.$error}"
+                      :readonly="tylePCDT.readonly || isViewOnly"
+                      :onchange="onChangeTyLePCDT(txt_TyLePCDT)"
+                    ></vue-numeric>
+                    <span class="icon one-calculator" @click="isCalcShow = !isCalcShow"></span>
+                    <Calculator @display="txt_TyLePCDT = $event" :value="txt_TyLePCDT" :is-show="isCalcShow" @close="isCalcShow = !isCalcShow"></Calculator>
+                  </div>
+                </div>
+                <div class="value nowrap" v-if="!(!isRequiredHT || grid_HopDong.selected.hddtu_id == undefined || grid_HopDong.selected.hddtu_id == null || grid_HopDong.selected.hddtu_id <= 0 || tylePCDT.readonly || !btn_Enabled.nhapMoi)">
+                  <a href="javascript:void(0)" class="btn btn-second" @click="btnCapNhatTyLe_Click()">Cập nhật tỷ lệ HH</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">PLDA cáp đồng<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_PLDACapDong.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_PLDACapDong.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">PLDA cáp quang<span class="red" v-if="isRequiredHT">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="cbo_PLDACapQuang.selected" :disabled="isViewOnly">
+                      <option v-for="item in cbo_PLDACapQuang.items" :value="item.vid">{{ item.vname }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="check-action">
+                  <input type="checkbox" checked name="cb1" class="check" v-model="chb_GoiCuocTichHop" :disabled="isViewOnly" />
+                  <span class="name">Gói cước tích hợp (Check: Lấy doanh thu TB trong gói, Uncheck: Chỉ lấy doanh thu Fiber)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="check-action">
+                  <input type="checkbox" checked name="cb2" class="check" v-model="chb_DTPCTheoCuocPS" :disabled="isViewOnly" />
+                  <span class="name">DTPC theo cước phát sinh (Check: Cước PS, Uncheck: Cước thực thu)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="check-action">
+                  <input type="checkbox" checked name="cb3" class="check" v-model="chb_ChiPhiToiDa" :disabled="isViewOnly" />
+                  <span class="name">Chi phí tối đa KTR-TSL</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="value">
+                  <vue-numeric currency="" separator="," v-model="txt_ChiPhiTSL" class="form-control tright" ref="chiPhiTSL" :class="{'is-invalid': $v.txt_ChiPhiTSL.$error }" :read-only="isViewOnly"></vue-numeric>
+                </div>
+                <div class="key w150">VND/Kênh/Tháng</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="check-action">
+                  <input type="checkbox" checked name="cb4" class="check" v-model="chb_MangNoiBo" :disabled="isViewOnly" />
+                  <span class="name">Mạng nội bộ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div> -->
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách hợp đồng</div>
+      <div class="table-content">
+        <DataGrid
+          v-bind:columns="[
+                        {fieldName: 'ck', headerText: 'CK', allowFiltering: true, allowSorting: false, width: 90},
+                        {fieldName: 'ma_duan', headerText: 'Mã dự án', allowFiltering: true, allowSorting: false, width: 90},
+                        {fieldName: 'ten_duan', headerText: 'Tên dự án', allowFiltering: true, allowSorting: false, width: 150},
+                        {fieldName: 'ma_hddtu', headerText: 'Mã HĐ', allowFiltering: true, allowSorting: false, width: 90, cssClass: 'text-blue'},
+                        {fieldName: 'ten_hddtu', headerText: 'Tên HĐ', allowFiltering: true, allowSorting: false, width: 150, cssClass: 'text-bold'},
+                        {fieldName: 'so_hd', headerText: 'Số HĐ', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'ngayky1', headerText: 'Ngày ký', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'thoihan1', headerText: 'Thời hạn', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'tiendo', headerText: 'Tiến độ', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'ma_chudtu', headerText: 'Mã TC QLDA', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'ten_chudtu', headerText: 'Tên TC QLDA', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'ma_toanha', headerText: 'Mã tòa nhà', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ten_toanha', headerText: 'Tên tòa nhà', allowFiltering: true, allowSorting: false, width: 130, cssClass: 'text-bold'},
+                        {fieldName: 'ttvt', headerText: 'Trung tâm VT', allowFiltering: true, allowSorting: false, width: 130},
+                        {fieldName: 'ten_nhomda', headerText: 'Nhóm dự án', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-blue'},
+                        {fieldName: 'tongmuc_dtu', headerText: 'Tổng mức đtư', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-red-bold', format: 'N0', type: 'number'},
+                        {fieldName: 'tg_hqdt1', headerText: 'TG tính HQĐT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'thiphan_toithieu', headerText: 'Thị phần tối thiểu', allowFiltering: true, allowSorting: false, width: 110, cssClass: 'text-right', format: 'N0', type: 'number'},
+                        {fieldName: 'apru_toithieu', headerText: 'APRU tối thiểu', allowFiltering: true, allowSorting: false, width: 110, cssClass: 'text-right', format: 'N0', type: 'number'},
+                        {fieldName: 'tyle_pcdt', headerText: 'Tỷ lệ PCDT', allowFiltering: true, allowSorting: false, width: 110, cssClass: 'text-right', format: 'N2', type: 'number'},
+                        {fieldName: 'tinhtrang', headerText: 'Tình trạng', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'nv_quanly', headerText: 'NV quản lý', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'nv_doisoat', headerText: 'NV đối soát', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ten_bpds', headerText: 'Bộ phận đối soát', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'sdt_bpds', headerText: 'SĐT BPĐS', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'email_bpds', headerText: 'Email BPĐS', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'diachi_bpds', headerText: 'Địa chỉ BPĐS', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'chuky_tt', headerText: 'Chu kỳ TT', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ngay_tt1', headerText: 'Ngày TT', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ngay_hieuluc1', headerText: 'Ngày hiệu lực', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ht_hoadon', headerText: 'HT hóa đơn', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ht_pcdt', headerText: 'HT PCDT', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ht_dautu', headerText: 'HT đầu tư', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ten_nh', headerText: 'Ngân hàng', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'stk', headerText: 'STK', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ten_tk', headerText: 'Tên TK', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'mst', headerText: 'MST', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'tenchuquan', headerText: 'Chủ quản', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'plda_dong', headerText: 'PLDA Đồng', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'plda_quang', headerText: 'PLDA Quang', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'goicuoc_tichhop', headerText: 'Gói cước tích hợp', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'dtpc_cps', headerText: 'DTPC CPS', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'cp_toida_tsl', headerText: 'Chi phí KTR-TSL', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'mang_noibo', headerText: 'Mạng nội bộ', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ghichu', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'ngay_cn1', headerText: 'Ngày CN', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'nguoi_cn', headerText: 'Người CN', allowFiltering: true, allowSorting: false, width: 110},
+                        {fieldName: 'thoihan_doitac', headerText: 'Thời hạn đối tác', allowFiltering: true, allowSorting: false, width: 110},
+                    ]"
+          v-bind:dataSource="grid_HopDong.items"
+          :enabledSelectFirstRow="false"
+          :showFilter="true"        
+          :allowPaging="true"
+          ref="hopDongGrid" 
+          :enablePagingServer="false"               
+          :allowExcelExport="true"
+          @rowSelected="onHopDongSelected"
+          :key="grid_HopDong.key"
+        >
+        </DataGrid>
+      </div>
+    </div>
+  </div>
+  <frmChonTinhHopDong ref="ref_frmChonTinhHopDong" @onChapNhan="onChapNhanModalChonTinh"></frmChonTinhHopDong>
+  <PopupChayLaiDTPC ref="ref_popupChayLaiDTPC" @onChapNhan="onChapNhanChayLaiDTPC" :maDuAn="txt_maduan" :hddtuId="common_params.hddtuId" :checkDTPC="chb_DTPCTheoCuocPS" :txt_TyLePCDT="txt_TyLePCDT" :chb_GoiCuocTichHop="chb_GoiCuocTichHop"></PopupChayLaiDTPC>
+</div>

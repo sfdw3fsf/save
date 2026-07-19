@@ -1,0 +1,148 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+     <li>
+        <button class="btn" @click="btnGhiLai_Click()" :disabled="!enabledSave"><span class="icon one-save"></span> Ghi lại</button>
+      </li>
+		<li>
+        <button class="btn" @click="btnLapCard_Click()" :disabled="!enabledLapCard"><span class="icon nc-icon-glyph ui-1_circle-add"></span> Lắp card</button>
+      </li>
+      <li>
+        <button class="btn" @click="btnXoa_Click()" :disabled="!enabledDelete"><span class="icon one-trash"></span> Xóa</button>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-sm-3 col-12">
+        <div class="box-form" style="height: 800px;">
+          <div class="legend-title">Sơ đồ thiết bị</div>
+          <div class="form-group">
+            <div class="input-icon-right">
+              <input type="text" v-model="txtSearch" placeholder="" class="form-control">
+              <span class="icon one-search"></span>
+            </div>
+          </div>
+          <div class="e-tree-plus" style="overflow: auto;max-height: calc(100% - 80px);">
+            <button class="btn btn-refresh btn-second" @click="reloadDonVi">
+              <span class="arrows-1_refresh-68 nc-icon-outline"></span>
+            </button>
+            <ejs-treeview ref="treeDonVi" :nodeClicked="treeDonVi_nodeClicked" :fields='treeFields'></ejs-treeview>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-9 col-12" v-show="isShowDiv">
+                    <div class="box-form" style="height: 800px;">
+                        <div class="legend-title">EWSD CARD</div>
+                        <div class="title-bg-main">
+                            <span class="title">Thông tin Card</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">
+                                        Vị trí cắm
+                                    </div>
+                                    <div class="value">
+                                        <input type="text"  class="form-control" v-model="currentItem.VITRI_CAM">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">
+                                        Vị trí quy ước
+                                    </div>
+                                    <div class="value">
+                                        <input type="text"  class="form-control" v-model="currentItem.VITRI_QUYUOC">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="info-row">
+                            <div class="key w100">
+                                Nhóm Card
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select class="form-control" name="" id="131" v-model="currentItem.NHOMCARD_ID" :class="{'form-control':ok, 'is-invalid':isError}" ref="cboNhomCard" @change="loadLoaiCard">
+                                        <option v-for="host in dsNhomCard" :value="host.NHOMCARD_ID">{{ host.NHOM_CARD }}</option>
+                                    </select>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Loại Card
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select class="form-control" name="" id="132" v-model="currentItem.LOAICARD_ID" :class="{'form-control':ok, 'is-invalid':isError}" ref="cboLoaiCard" @change="changeLoaiCard">
+                                        <option v-for="host in dsLoaiCard" :value="host.LOAICARD_ID">{{ host.LOAI_CARD }}</option>
+                                    </select>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Số lượng Port
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="currentItem.SOLUONG_PORT" :disabled="enabledTrangThai">
+                            </div>
+                            <div class="value red padt7 w30 nowrap">
+                                <span style="color:red;">Đang sử dụng: </span> <span>{{currentItem.DANGSUDUNG}}</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                Trạng thái port
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select class="form-control" name="" id="133" v-model="currentItem.TT_PORT" ref="cboHost" :disabled="enabledTrangThai">
+                                        <option v-for="host in dsTTPort" :value="host.TT_PORT_ID">{{ host.TRANGTHAI_PORT }}</option>
+                                    </select>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="group-buttons mart10">
+                            <button class="btn btn-second" :disabled="!enabledExcel" @click="btnExcel_Click()">
+                                <span class="one-excel-outline normal f24 inline vcenter"></span> Xuất Excel
+                            </button>
+                             <download-excel :data="dataExcelEx" id="exportexcel"  style="display: none;">
+                                <span class="icon one-xlsx"></span>Xuất Excel
+                            </download-excel>
+                            <button class="btn btn-second  padt6 padb6" :disabled="!enabledDoiTT" @click="btnDoiTT_Click()">
+                                Đổi trạng thái
+                            </button>
+                        </div>
+                        <div class="title-bg-main mart10">
+                            <span class="title">Danh sách port</span>
+                        </div>
+                        <DataGrid v-bind:columns="[
+                                    {fieldName: 'VITRI', headerText: 'Port', allowFiltering: true},
+                                    {fieldName: 'NE', headerText: 'Số Ne', allowFiltering: true},
+                                    {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true},
+                                    {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+                                    {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ', allowFiltering: true},
+                                    {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true},
+                                    {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái', allowFiltering: true},
+                                    {fieldName: 'PORT_MDF', headerText: 'Port MDF', allowFiltering: true},
+                                    {fieldName: 'NE_ID', headerText: 'Ne ID', allowFiltering: true}
+                                  ]" 
+                                v-bind:dataSource="dsPort" 
+                                :showFilter="true" 
+                                :showColumnCheckbox="true"  
+                                dataKeyField="NE" 
+                                @selectedItemsChanged="selectedItemsPort"/>
+                    </div>
+                </div>
+    </div>
+  </div>
+</div>

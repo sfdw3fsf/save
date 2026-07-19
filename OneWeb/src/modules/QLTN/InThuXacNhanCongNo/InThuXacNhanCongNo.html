@@ -1,0 +1,224 @@
+<div >
+  <!-- BEGIN TOOLBAR -->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript: void(0)" @click="doSearch">
+              <span class="icon one-search"></span> Tìm kiếm
+          </a>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="doPrint">
+          <span class="icon one-print"></span>In thư
+        </a>
+        <appPopupChonNgayIn ref="refChonNgayIn" @acceptPrint="printHandler"></appPopupChonNgayIn>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="exportExcel">
+            <span class="icon one-download"></span>Xuất File
+        </a>
+        <poupXuatFile id="modal-xuat-dulieu" :thuocTinh="colXacNhan" :data="selectedResults" tenFileXuat="InThuXacNhanCongNo.xlsx"/>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="doReorder">
+          <span class="icon one-sort"></span>Sắp xếp
+        </a>
+        <PopupSapXep ref="dlgSapXep" @sort="onSortProcess($event)" />
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="createData">
+            <span class="icon one-file-plus"></span>Tạo DL
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- BEGIN CONTENT-->
+  <div class="page-content">
+    <div class="box-form">
+      <div class="pull-right">
+        <ejs-dropdownlist width="250" :change="onChangeLanTao" :filtering='onFilteringLanTao' :allowFiltering="true" :dataSource='params.p_lantao_options' :fields="config.fieldsLanTao" v-model = "params.p_lantao"></ejs-dropdownlist>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="box-form">
+        <div class="legend-title">Thông tin tìm kiếm</div>
+        <div class="row">
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key">
+                <div class="">
+                  <b-form-checkbox
+                    v-model = "params.p_chk_donvi"
+                    class = "check"
+                    value = '1'
+                    unchecked-value = '0'
+                  >
+                    <span class="name">Đơn vị</span>
+                  </b-form-checkbox>
+                </div>
+              </div>
+              <div class="value">
+                <ejs-dropdownlist :change="onChangeDonVi" :popupWidth=400 :enabled="f_donvi_enabled" :filtering='onFilteringDonVi' :allowFiltering="true" :dataSource='params.p_donvi_options' :fields="config.fieldsDonVi" v-model = "params.p_donvi"></ejs-dropdownlist>
+              </div>
+            </div>
+          </div>
+            <div class="col-sm-3 col-12">
+                <div class="info-row">
+                    <div class="key">
+                      <div class="">
+                        <b-form-checkbox
+                          v-model = "params.p_chk_matt"
+                          class = "check"
+                          value = '1'
+                          unchecked-value = '0'
+                        >
+                          <span class="name">Mã TT</span>
+                        </b-form-checkbox>
+                      </div>
+                    </div>
+                    <div class="value">
+                      <b-form-input @keyup.enter="doSearch" class="form-control highlight" v-model="params.p_ma_tt" :disabled="!f_matt_enabled"></b-form-input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3 col-12">
+                <div class="info-row">
+                    <div class="key">
+                      <div class="">
+                        <b-form-checkbox
+                          v-model = "params.p_chk_httt"
+                          class = "check"
+                          value = '1'
+                          unchecked-value = '0'
+                        >
+                          <span class="name">Hình thức TT</span>
+                        </b-form-checkbox>
+                      </div>
+                    </div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <ejs-dropdownlist :popupWidth=400 :enabled="f_httt_enabled" :filtering='onFilteringHTTT' :allowFiltering="true" :dataSource='params.p_httt_options' :fields="config.fieldsHTTT" v-model = "params.p_httt"></ejs-dropdownlist>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="">
+                    <b-form-checkbox
+                      v-model = "params.p_chk_nhomkh"
+                      class = "check"
+                      value = '1'
+                      unchecked-value = '0'
+                    >
+                      <span class="name">Nhóm KH</span>
+                    </b-form-checkbox>
+                  </div>
+                </div>
+                <div class="value">
+                  <ejs-dropdownlist :change="onChangeNhomKH"  :popupWidth=400 :enabled="f_nhomkh_enabled" :filtering='onFilteringNhomKH' :allowFiltering="true" :dataSource='params.p_nhomkh_options' :fields="config.fieldsNhomKH" v-model = "params.p_nhomkh"></ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="">
+                    <b-form-checkbox
+                      v-model = "params.p_chk_nvql"
+                      class = "check"
+                      value = '1'
+                      unchecked-value = '0'
+                    >
+                      <span class="name">Nhân viên QL</span>
+                    </b-form-checkbox>
+                  </div>
+                </div>
+                <div class="value">
+                  <ejs-dropdownlist :change="onChangeNVQL" :popupWidth=400 :enabled="f_nvql_enabled" :filtering='onFilteringNVQL' :allowFiltering="true" :dataSource='params.p_nvql_options' :fields="config.fieldsNVQL" v-model = "params.p_nvql"></ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="">
+                    <b-form-checkbox
+                      v-model = "params.p_chk_nvtc"
+                      class = "check"
+                      value = '1'
+                      unchecked-value = '0'
+                    >
+                      <span class="name">NVTC</span>
+                    </b-form-checkbox>
+                  </div>
+                </div>
+                <div class="value">
+                  <ejs-dropdownlist :enabled="f_nvtc_enabled" :filtering='onFilteringNVTC' :allowFiltering="true" :dataSource='params.p_nvtc_options' :fields="config.fieldsNVTC" v-model = "params.p_nvtc"></ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="">
+                    <b-form-checkbox
+                      v-model = "params.p_chk_phanloaikh"
+                      class = "check"
+                      value = '1'
+                      unchecked-value = '0'
+                    >
+                      <span class="name">Phân loại KH</span>
+                    </b-form-checkbox>
+                  </div>
+                </div>
+                <div class="value">
+                  <ejs-dropdownlist :popupWidth=400 :enabled="f_phanloaikh_enabled" :filtering='onFilteringPhanLoaiKH' :allowFiltering="true" :dataSource='params.p_phanloaikh_options' :fields="config.fieldsPhanLoaiKH" v-model = "params.p_phanloaikh"></ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+                <div class="info-row">
+                    <div class="key">
+                        <div class="">
+                          <b-form-checkbox
+                            v-model = "params.p_chk_loaikh"
+                            class = "check"
+                            value = '1'
+                            unchecked-value = '0'
+                          >
+                            <span class="name">Loại KH</span>
+                          </b-form-checkbox>
+                        </div>
+                    </div>
+                    <div class="value">
+                      <ejs-dropdownlist  :popupWidth=400 :enabled="f_loaikh_enabled" :filtering='onFilteringLoaiKH' :allowFiltering="true" :dataSource='params.p_loaikh_options' :fields="config.fieldsLoaiKH" v-model = "params.p_loaikh"></ejs-dropdownlist>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="legend-title">Danh sách công nợ</div>
+        <div class="table-content">
+          <DataGrid
+            v-bind:columns="colXacNhan"
+            v-bind:dataSource="results" :showFilter="true"
+            :allowPaging="true"
+            :totalRecords="pageinfo.totalElement"
+            :pageSize="pageinfo.maxSize"
+            :pageIndex="pageinfo.page"
+            :showColumnCheckbox="true"
+            @selectedItemsChanged="selectedRowChanged"            
+            @rowDataBound="rowDataBound"
+            :allowExcelExport=true
+            @pageChanged="pageChangeHandler"
+            ref="dsXacNhanCongNo"
+            >
+          </DataGrid>
+        </div>
+    </div>
+  </div>
+</div>

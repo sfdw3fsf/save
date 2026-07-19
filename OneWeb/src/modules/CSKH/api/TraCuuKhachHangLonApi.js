@@ -1,0 +1,15 @@
+export default {
+    getDSLienHe: (axios, data) => axios.get('/web-cskh/api/lien-he/' + data + "?pageNo=0&pageSize=10000"),
+    traCuuKHTheoMa: (axios, data) => axios.get('/web-cskh/api/tra-cuu/khach-hang/'+ data),
+    traCuuThanhToan: (axios, data) => axios.post('/web-cskh/api/tra-cuu/thanh-toan', data),
+    traCuuLienHe: (axios, data) => axios.get('/web-cskh/api/tra-cuu/lien-he/'+ data),
+    themSuaXoaTTLH: (axios, data) => axios.post('/web-cskh/api/lien-he', data),
+    xoaLienHe: (axios, data) => axios.delete('/web-cskh/api/lien-he/' + data),
+    getDsMaTTTheoMaInGhep: (axios, data) => axios.get('/web-cskh/api/mig/danh-sach-mtt', {params: data}),
+    xoaTTKhoiMaInGhep: (axios, data) => axios.post('/web-cskh/api/mig/delete', {params: data}),
+    getDsDonViQuanLy: (axios, data) => axios.get('/web-cskh/api/danh-muc/don-vi-quan-ly', {params: data}),
+    getDsMIGTheoKhachHang: (axios, data) => axios.get('/web-cskh/api/mig', {params: data}),
+    getDsMaTTTheoMaIG: (axios, data) => axios.get('/web-cskh/api/mig/thanh-toan', {params: data}),
+    themMaTT: (axios, data) => axios.post('/web-cskh/api/mig/them-ma-thanh-toan', data),
+    taoDanhSachKHL: (axios, data) => axios.post('/web-cskh/api/tao-danh-sach-khl/tao', data),
+}

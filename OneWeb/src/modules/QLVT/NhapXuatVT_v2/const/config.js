@@ -1,0 +1,6 @@
+export default {
+  dateFormat: 'DD/MM/YYYY',
+  DEFAULT_DATE_FORMAT: 'DD/MM/YYYY HH:mm:ss',
+  DEFAULT_SHORT_DATE_FORMAT: 'DD/MM/YYYY',
+  CAP_NHAT_CT_THEO_KIEU_DATE_FORMAT: 'DD/MM/YYYY hh:mm:ss A'
+}

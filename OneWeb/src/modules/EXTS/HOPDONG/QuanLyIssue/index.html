@@ -1,0 +1,498 @@
+<div class="quanly-issues">
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript:void(0)" @click="layThongTinClick()">
+          <span class="icon one-file-attach"></span>Lấy TT
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnCapNhat_Click">
+          <span class="icon one-reload1"></span>Cập nhật
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="btnBieuMau_Click">
+          <span class="icon nc-icon-glyph files_single-content-02"></span>Biểu mẫu
+        </a>
+      </li>
+      <li :class="{'disabled': !isEnableDongBo}">
+        <a href="javascript:void(0)" @click="tsbtnDongBo_Click">
+          <span class="icon one-sync1"></span>Đồng bộ Jira
+        </a>
+      </li>
+      <li :class="{'disabled': !isEnableHuyDongBo}">
+        <a href="javascript:void(0)" @click="btnHuyBo_Click">
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy đồng bộ
+        </a>
+      </li>
+    </ul>
+
+  </div>
+  <div class="page-content">
+    <div class="grid-stack-box">
+      <split :gutterSize="16">
+        <SplitArea :size="45" :minSize="300">
+          <div class="box-col box-form marb0" id="boxLeft">
+            <div class="legend-title">
+              Danh sách hợp đồng/báo hỏng <a href="javascript:void(0)" class="act text-desc one-reload"></a>
+            </div>
+            <div class="select-custom marb10">
+              <input type="text" v-model="dataSearch.toString()" class="form-control" @click="showDataSearch = !showDataSearch">
+              <div class="dropdown-menu fullw popup-box pad0 show" v-show="showDataSearch">
+                <div class="popup-header">
+                  <div class="title"><span class="icon one-notepad"></span> Điều kiện lọc</div>
+                </div>
+                <div class="pad10">
+                  <div class="box-form">
+                    <div class="info-row">
+                      <div class="key w80">Chọn</div>
+                      <div class="value w30 padt7 nowrap">
+                        <div class="check-action">
+                          <input type="radio" class="check" @click="checkboxLoai = 1"
+                                 :checked="checkboxLoai == 1">
+                          <span class="name">Hợp đồng</span>
+                        </div>
+                        <div class="check-action">
+                          <input type="radio" class="check" @click="checkboxLoai = 2"
+                                 :checked="checkboxLoai == 2">
+                          <span class="name">Báo hỏng</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w100">Số máy/Acc</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model="maThueBao">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                          <div class="key w100">
+                            <div class="check-action">
+                              <input type="checkbox" class="check" v-model="chkNgay">
+                              <span class="name">Từ ngày</span>
+                            </div>
+                          </div>
+                          <div class="value">
+                            <div class="input-icon-right">
+                              <!--                          <input type="date" class="form-control" :disabled="isDisableNgay" v-model="dtTuNgay">-->
+                              <ejs-datepicker class="form-control bg-none bor0 fw6 text h24"
+                                              :placeholder="waterMark"
+                                              :format="dateFormat"
+                                              :enabled="!isDisableNgay"
+                                              v-model="dtTuNgay"></ejs-datepicker>
+
+                              <!--                          <input type="text" class="form-control">-->
+                              <!--                          <span class="icon one-calendar"></span>-->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                          <div class="key w70">
+                            Đến ngày
+                          </div>
+                          <div class="value">
+                            <div class="input-icon-right">
+                              <!--                          <input type="date" class="form-control" :disabled="isDisableNgay" v-model="dtDenNgay">-->
+                              <ejs-datepicker class="form-control bg-none bor0 fw6 text h24"
+                                              :placeholder="waterMark"
+                                              :format="dateFormat"
+                                              :enabled="!isDisableNgay"
+                                              v-model="dtDenNgay"></ejs-datepicker>
+                              <!--                          <input type="text" class="form-control">-->
+                              <!--                          <span class="icon one-calendar"></span>-->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w100">Trạng thái</div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <ejs-multiselect id='trangthai-multiselect'
+                                           v-model="trangThaiId"
+                                           :dataSource='dsTrangThai'
+                                           placeholder='Chọn trạng thái'
+                                           selectAllText="Chọn tất cả"
+                                           unSelectAllText="Bỏ chọn tất cả"
+                                           mode="CheckBox"
+                                           :showSelectAll='true'
+                                           :fields="{ text:'TRANGTHAI_JIRA', value: 'TTJR_ID' }">
+                          </ejs-multiselect>
+                          <!--                      <select name="" id="" class="form-control">-->
+                          <!--                        <option value=""></option>-->
+                          <!--                      </select>-->
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row" v-if="checkboxLoai == 1">
+                      <div class="key w100">Trạng thái HĐ</div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <ejs-multiselect id='trangthaihd-multiselect'
+                                           v-model="trangThaiHDId"
+                                           :dataSource='dsTrangThaiHD'
+                                           placeholder='Chọn trạng thái'
+                                           selectAllText="Chọn tất cả"
+                                           unSelectAllText="Bỏ chọn tất cả"
+                                           mode="CheckBox"
+                                           :showSelectAll='true'
+                                           :fields="{ text:'trangthai', value: 'id' }">
+                          </ejs-multiselect>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row" v-if="checkboxLoai == 2">
+                      <div class="key w100">Trạng thái Báo hỏng</div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <ejs-multiselect id='trangthaibh-multiselect'
+                                           v-model="trangThaiBaoHongId"
+                                           :dataSource='dsTrangThaiBaoHong'
+                                           placeholder='Chọn trạng thái'
+                                           selectAllText="Chọn tất cả"
+                                           unSelectAllText="Bỏ chọn tất cả"
+                                           mode="CheckBox"
+                                           :showSelectAll='true'
+                                           :fields="{ text:'trangthai_bh', value: 'ttbh_id' }">
+                          </ejs-multiselect>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      <div class="key w100">Thời gian quét</div>
+                      <div class="value">
+                        <div class="input-number-custom">
+                          <input type="number" class="form-control tright red" v-model="spTimer">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key nowrap">{{ layoutJira }}</div>
+              <div class="value">
+                <!--            <span class="btn btn-main fullw">{{this.processJira.value}}/{{ this.processJira.Maximum }}</span>-->
+                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                     :style="{'width':(this.processJira.value/this.processJira.Maximum)*100 + '%'}">
+                  {{ this.processJira.value }}/{{ this.processJira.Maximum }}
+                </div>
+              </div>
+            </div>
+            <div class="table-content mart20">
+              <DataGrid v-if="checkboxLoai == 1" ref="gridDsHD" v-bind:columns="[
+                            {fieldName: 'ma_tb', headerText: 'Số máy/Acc', width:'150px', freeze:'Left', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'ma_gd', headerText: 'Mã GD', width:'150px', freeze:'Left', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'ten_tb', headerText: 'Tên TB', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'ten_loaihd', headerText: 'Loại HĐ', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'loaihinh_tb', headerText: 'Loại hình', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'ttjira', headerText: 'TT Jira', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'diachi_tb', headerText: 'Địa chỉ TB', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'trangthai_hd', headerText: 'Trạng thái HĐ', freeze:'Right', allowFiltering: true, allowSorting: false},
+                        ]"
+                        @pageChanged='dsHopDong_PageChanged'
+                        :totalRecords='totalRowDsHopDong'
+                        :allowPaging="isPaging"
+                        :enablePagingServer='isPaging'
+                        v-bind:dataSource="dsHopDong"
+                        :showFilter="true"
+                        @selectedRowChanged="gridDsHopDong_rowSelected"
+                        @queryCellInfo="gridDsHopDong_queryCellInfo"
+                        :panelDataHeight="'500px'"
+                        dataKeyField="hdtb_id"
+              >
+              </DataGrid>
+              <DataGrid v-if="checkboxLoai == 2" ref="gridDsHD" v-bind:columns="[
+                            {fieldName: 'ma_tb', headerText: 'Số máy/Acc', width:'150px', freeze:'Left', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'ma_bh', headerText: 'Mã BH', width:'150px', freeze:'Left', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'ten_tb', headerText: 'Tên TB', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'loaihinh_tb', headerText: 'Loại hình', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'ttjira', headerText: 'TT Jira', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'diachi_tb', headerText: 'Địa chỉ TB', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'trangthai_bh', headerText: 'Trạng thái BH', freeze:'Right', allowFiltering: true, allowSorting: false},
+                        ]"
+                        @pageChanged='dsHopDong_PageChanged'
+                        :totalRecords='totalRowDsHopDong'
+                        :allowPaging="isPaging"
+                        :enablePagingServer='isPaging'
+                        v-bind:dataSource="dsHopDong"
+                        :showFilter="true"
+                        @selectedRowChanged="gridDsHopDong_rowSelected"
+                        @queryCellInfo="gridDsHopDong_queryCellInfo"
+                        :panelDataHeight="'500px'"
+                        dataKeyField="hdtb_id"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </SplitArea>
+        <SplitArea :size="55" :minSize="300">
+          <div class="box-col" id="boxRight">
+            <div class="box-grid-ver">
+
+              <div class="box-form marb0" id="boxTop">
+                <div class="legend-title">Danh sách yêu cầu</div>
+                <div class="table-content" style="height: calc(100% - 90px);">
+                  <DataGrid ref="gridDsYC" v-bind:columns="[
+                            {fieldName: 'key', headerText: 'Số phiếu', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'ngay_cn', headerText: 'Ngày CN', width:'130', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'nguoi_cn', headerText: 'Người tạo', width:'130', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'url', headerText: 'URL', template:URLTemplate, allowFiltering: true, allowSorting: false},
+                        ]"
+                            :allowPaging="true" :enablePagingServer="false"
+                            v-bind:dataSource="dsYeuCau"
+                            :panelDataHeight="'50px'"
+                            @queryCellInfo="gridDsYeuCau_queryCellInfo"
+                            @selectedRowChanged="gridDsYeuCau_rowSelected">
+                  </DataGrid>
+                </div>
+              </div>
+              <div class="box-form ovauto marb0" id="boxBottom">
+                <div class="row fullh">
+                  <div class="col-sm-6 col-12 fullh">
+                    <div class="box-form fullh ovauto" style="max-height: 100%">
+                      <div class="legend-title">Thông tin yêu cầu</div>
+                      <div class="info-row">
+                        <div class="key">Tiêu đề</div>
+                        <div class="value">
+                          <textarea name="" class="form-control" v-model="txtSummary"
+                                    style="height: 52px;resize: none;color: darkblue;font-weight: bold;"></textarea>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Mô tả</div>
+                        <div class="value">
+                          <textarea name="" class="form-control" v-model="txtDescription"
+                                    style="height: 124px;resize: none;color: darkblue;font-weight: bold;"></textarea>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Trạng thái</div>
+                        <div class="value">
+                          <SelectExt
+                            v-model="cboTrangThai"
+                            :settings="{dropdownParent: $refs['cboTrangThai']}"
+                            :dataSource="dsTrangThai"
+                            dataTextField="TRANGTHAI_JIRA"
+                            dataValueField="ID"/>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Ngày hết hạn</div>
+                        <div class="value">
+                          <div class="input-icon-right">
+                            <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark"
+                                            :value="dateVal" :format="dateFormat" v-model="dtpDueDate"></ejs-datepicker>
+                            <!--                        <input type="text" class="form-control">-->
+                            <!--                        <span class="icon one-calendar"></span>-->
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Ngày HT</div>
+                        <div class="value">
+                          <div class="input-icon-right">
+                            <ejs-datetimepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark"
+                                                :value="dateVal" :format="datetimeFormat"
+                                                v-model="dtpResolved"></ejs-datetimepicker>
+                            <!--                        <span class="icon one-calendar"></span>-->
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Loại yêu cầu</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="txtIssuseType" :readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Reporter</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model="txtReporter" :readonly="true">
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Assignee</div>
+                        <div class="value">
+                          <div class="input-group">
+                            <div class="input-text">
+                              <input type="text" v-model="txtAssignee" class="form-control">
+                            </div>
+                            <div class="input-addon ">
+                              <button class="btn padl5 padr5 w30" @click="btnAssignee_ButtonClick">
+                                <span class="-ap icon-more_horiz"></span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">Thêm Participant</div>
+                        <div class="value">
+                          <div class="input-group">
+                            <div class="input-text">
+                              <input type="text" class="form-control" v-model="txtParicipant">
+                            </div>
+                            <div class="input-addon ">
+                              <button class="btn padl5 padr5 w30" @click="btnParicipant_ButtonClick">
+                                <span class="-ap icon-plus2"></span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-12 fullh">
+                    <div class="nav tab-over tabs">
+                      <a href="#tab1" data-toggle="tab" class=" minw0 active">Comment</a>
+                      <a href="#tab2" data-toggle="tab" class="minw0">File đính kèm</a>
+                      <a href="#tab3" data-toggle="tab" class="minw0 ">Watchers</a>
+                    </div>
+                    <div class="tab-content" style="height:calc(100% - 40px);">
+                      <div class="tab-pane fullh" id="tab3">
+                        <div class="box-grid-ver fullh">
+                          <div class="box-col ovauto" id="boxTop1">
+                            <div class="info-row">
+                              <div class="key w100">
+                                Người theo dõi
+                              </div>
+                              <div class="value">
+                                <div class="input-more-button -right">
+                                  <button class="btn" @click="txtAddWatcher_ButtonClick">
+                                    <span class="-ap icon-plus2"></span>
+                                  </button>
+                                  <input type="text" v-model="txtAddWatcher" class="form-control ">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="box-col" id="boxBottom1">
+                            <div class="table-content" style="height: calc(100% - 40px);">
+                              <DataGrid ref="gridDsWatchers" v-bind:columns="[
+                            {fieldName: 'displayName', headerText: 'Tên', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'emailAddress', headerText: 'Email', allowFiltering: true, allowSorting: false},
+                        ]"
+                                        v-bind:dataSource="dsWatchers"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                        :showFilter="true"
+                                        @selectedRowChanged="gridDsWatchers_rowSelected"
+                                        :panelDataHeight="'200px'"
+                              >
+                              </DataGrid>
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+                      <div class="tab-pane fullh" id="tab2">
+                        <div class="box-grid-ver fullh">
+                          <div class="box-col ovauto" id="boxTop2">
+                            <div class="info-row">
+                              <div class="key w60 nowrap">
+                                Đường dẫn
+                              </div>
+                              <div class="value">
+                                <div class="input-group">
+                                  <div class="input-text">
+                                    <div class="input-icon-right">
+                                      <!--                                  <input type="text" class="form-control highlight">-->
+                                      <b-form-file id="fileUpload" v-model="fileUpload" placeholder=""></b-form-file>
+                                      <!--                                  <span class="icon one-back1"></span>-->
+                                    </div>
+                                  </div>
+                                  <div class="input-addon">
+                                    <button class="btn" @click="resetFileUpload" style="height: 33px !important;">
+                                      <!--                                  <span class="-ap icon-more_horiz"></span>-->
+                                      <span class="-ap icon one-back1"></span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="value w30 nowrap">
+                                <button class="btn btn-main" @click="btnThemFile_Click">Upload</button>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="box-col" id="boxBottom2">
+                            <div class="table-content" style="height: calc(100% - 40px);">
+                              <DataGrid ref="gridDsFile" v-bind:columns="[
+                            {fieldName: 'created', headerText: 'Ngày tạo', width:'160', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'filename', headerText: 'Tên file', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'content', headerText: 'Url', template: URLTemplate, allowFiltering: true, allowSorting: false},
+                            {fieldName: 'author', headerText: 'Người tạo', allowFiltering: true, allowSorting: false},
+                        ]"
+                                        v-bind:dataSource="dsFile"
+                                        :showFilter="true"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                        @selectedRowChanged="gridDsFile_rowSelected"
+                                        :panelDataHeight="'200px'"
+                              >
+                              </DataGrid>
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+                      <div class="tab-pane active fullh" id="tab1">
+                        <div class="box-grid-ver fullh">
+                          <div class="box-col ovauto" id="boxTop3">
+                            <div class="info-row">
+                              <div class="key w60 nowrap">
+                                Message
+                              </div>
+                              <div class="value">
+                                <div class="input-more-button -right">
+                                  <button class="btn" @click="vbtnSend_Click">
+                                    <span class="one-save"></span>
+                                  </button>
+                                  <textarea v-model="txtComment" name="" class="form-control"
+                                            style="height: 140px;resize: none;"></textarea>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                          <div class="box-col" id="boxBottom3">
+                            <div class="table-content" style="height: calc(100% - 40px);">
+                              <DataGrid ref="gridDsComment" v-bind:columns="[
+                            {fieldName: 'created', headerText: 'Ngày tạo', width:'160', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'author', headerText: 'Người tạo', width:'130', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'body', headerText: 'Nội dung', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'name', headerText: 'User', allowFiltering: true, allowSorting: false},
+                        ]"
+                                        v-bind:dataSource="dsComment"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                        :showFilter="true"
+                                        @selectedRowChanged="gridDsComment_rowSelected"
+                                        :panelDataHeight="'160px'"
+                              >
+                              </DataGrid>
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SplitArea>
+      </split>
+    </div>
+    <NhapText :id="'formNhapText'" ref="formNhapText"></NhapText>
+    <BieuMau :id="'BieuMau'"></BieuMau>
+  </div>
+</div>

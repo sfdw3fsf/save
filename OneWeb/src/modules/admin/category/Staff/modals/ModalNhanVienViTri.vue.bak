@@ -1,0 +1,239 @@
+<template>
+  <div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="#" @click.prevent="updateGanViTriNhanVien"> <span class="icon one-save"></span>Ghi lại </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="info-row">
+          <div class="key w80">Nhân viên</div>
+          <div class="value">
+            <input type="text" class="form-control" :value="tenNhanVien" :readonly="true" />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w80">Chức danh</div>
+          <div class="value">
+            <div class="select-custom">
+              <ejs-dropdownlist
+                popupWidth="auto"
+                :dataSource="danhSachChucDanh"
+                :allowFiltering="true"
+                :fields="{ text: 'chucdanh', value: 'chucdanh_id' }"
+                v-model="seletedChucDanh"
+                @change="onChangeChucDanh"
+                @filtering="onFilteringDropDownList($event, danhSachChucDanh, 'chucdanh')"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-move-select-table">
+        <div class="box-col box-form">
+          <div class="legend-title">Vị trí đã gán</div>
+          <div class="grid-ext grid-ext-freeze">
+            <ejs-grid
+              ref="tableViTriDaGan"
+              height="110"
+              :dataSource="danhSachViTriDaGan"
+              :allowPaging="true"
+              :pageSettings="pageSettings"
+              :allowSorting="false"
+              :allowFiltering="true"
+              :allowSelection="true"
+              :selectionSettings="selectionOptionsMultiple"
+              :pagerTemplate="pagerTemplate"
+              gridLines="Both"
+            >
+              <e-columns>
+                <e-column
+                  template="<span class='fa selected-flag'></span>"
+                  :allowFiltering="false"
+                  filterTemplate="<span></span>"
+                  width="26"
+                  maxWidth="26"
+                  minWidth="26"
+                  textAlign="center"
+                  :customAttributes="{ class: 'column-selected-flag' }"
+                  :freeze="'left'"
+                  :allowResizing="false"
+                  clipMode="Ellipsis"
+                ></e-column>
+                <e-column type="checkbox" width="39" maxWidth="39" minWidth="39" headerTextAlign="center" textAlign="center" :customAttributes="{ class: 'column-check-selected' }" :allowResizing="false" clipMode="Ellipsis"></e-column>
+
+                <e-column field="vitri" headerText="Vị trí" width="150" :filter="filterOptions"></e-column>
+                <e-column field="chucdanh" headerText="Chức danh" :filter="filterOptions"></e-column>
+              </e-columns>
+            </ejs-grid>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" @click="moveToLeft">
+            <span class="-ap icon-chevron-thin-right"></span>
+          </button>
+          <button class="btn" @click="moveToRight">
+            <span class="-ap icon-chevron-thin-left"></span>
+          </button>
+        </div>
+        <div class="box-col box-form">
+          <div class="legend-title">Vị trí chưa gán</div>
+          <div class="grid-ext grid-ext-freeze">
+            <ejs-grid
+              ref="tableViTriChuaGan"
+              height="110"
+              :dataSource="danhSachViTriChuaGan"
+              :allowPaging="true"
+              :pageSettings="pageSettings"
+              :allowSorting="false"
+              :allowFiltering="true"
+              :allowSelection="true"
+              :selectionSettings="selectionOptionsMultiple"
+              :pagerTemplate="pagerTemplate"
+              gridLines="Both"
+            >
+              <e-columns>
+                <e-column
+                  template="<span class='fa selected-flag'></span>"
+                  :allowFiltering="false"
+                  filterTemplate="<span></span>"
+                  width="26"
+                  maxWidth="26"
+                  minWidth="26"
+                  textAlign="center"
+                  :customAttributes="{ class: 'column-selected-flag' }"
+                  :freeze="'left'"
+                  :allowResizing="false"
+                  clipMode="Ellipsis"
+                ></e-column>
+                <e-column type="checkbox" width="39" maxWidth="39" minWidth="39" headerTextAlign="center" textAlign="center" :customAttributes="{ class: 'column-check-selected' }" :allowResizing="false" clipMode="Ellipsis"></e-column>
+
+                <e-column field="vitri" headerText="Vị trí" width="150" :filter="filterOptions"></e-column>
+                <e-column field="chucdanh" headerText="Chức danh" :filter="filterOptions"></e-column>
+              </e-columns>
+            </ejs-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import { pagingAndFilter } from '../mixins/pagingAndFilter'
+import { getDanhSachChucDanh, getDanhSachViTriTable, updateGanViTriNhanVien } from '../api'
+
+const CHUA_GAN = 0
+const DA_GAN = 1
+
+export default {
+  mixins: [pagingAndFilter],
+  data: () => ({
+    seletedChucDanh: null,
+    danhSachViTriChuaGan: [],
+    danhSachViTriDaGan: [],
+    danhSachChucDanh: []
+  }),
+  props: {
+    nhanVienId: [String, Number],
+    tenNhanVien: String
+  },
+  watch: {},
+  async mounted() {
+    this.loading(true)
+    await this.openPopupNhanVienViTri()
+    // await getDanhSachViTriTable(this.axios, {
+    //   chucdanh_id: 0,
+    //   type: DA_GAN,
+    //   nhanvien_id: this.nhanVienId
+    // })
+    this.loading(false)
+  },
+  methods: {
+    show() {
+      this.$refs.modalNhanVienViTri.show()
+    },
+    async onChangeChucDanh() {
+      this.loading(true)
+      Promise.all([
+        getDanhSachViTriTable(this.axios, {
+          chucdanh_id: this.seletedChucDanh,
+          type: CHUA_GAN,
+          nhanvien_id: this.nhanVienId
+        }),
+        getDanhSachViTriTable(this.axios, {
+          chucdanh_id: this.seletedChucDanh,
+          type: DA_GAN,
+          nhanvien_id: this.nhanVienId
+        })
+      ])
+        .then((response) => {
+          this.danhSachViTriChuaGan = response[0]
+          this.danhSachViTriDaGan = response[1]
+        })
+        .finally(() => {
+          this.loading(false)
+        })
+    },
+    moveToRight() {
+      const selected = this.$refs.tableViTriChuaGan.getSelectedRecords()
+      if (selected.length === 0) return
+      const a = JSON.parse(JSON.stringify(this.danhSachViTriDaGan))
+      const b = JSON.parse(JSON.stringify(this.danhSachViTriChuaGan))
+      a.push(...selected)
+      this.danhSachViTriDaGan = a
+      selected.forEach((item) => {
+        const index = b.findIndex((findItem) => findItem.donvi_id === item.donvi_id)
+        b.splice(index, 1)
+      })
+      this.danhSachViTriChuaGan = b
+    },
+    moveToLeft() {
+      const selected = this.$refs.tableViTriDaGan.getSelectedRecords()
+      if (selected.length === 0) return
+      const a = JSON.parse(JSON.stringify(this.danhSachViTriChuaGan))
+      const b = JSON.parse(JSON.stringify(this.danhSachViTriDaGan))
+      a.push(...selected)
+      this.danhSachViTriChuaGan = a
+      selected.forEach((item) => {
+        const index = b.findIndex((findItem) => findItem.donvi_id === item.donvi_id)
+        b.splice(index, 1)
+      })
+      this.danhSachViTriDaGan = b
+    },
+    updateGanViTriNhanVien() {
+      const param = {
+        vkieu: 1,
+        vnhanvien_id: this.nhanVienId,
+        js_data:
+          this.danhSachViTriDaGan.map((item) => ({
+            NHANVIEN_ID: this.nhanVienId,
+            VITRI_ID: item.vitri_id
+          })) || []
+      }
+      this.loading(true)
+      updateGanViTriNhanVien(this.axios, param)
+        .then(() => {
+          this.$toast.success('Gán Nhân viên - vị trí thành công')
+          this.$emit('save-success')
+        })
+        .catch(() => {
+          this.$toast.error('Gán Nhân viên - vị trí không thành công')
+        })
+        .finally(() => {
+          this.loading(false)
+        })
+    },
+
+    async openPopupNhanVienViTri() {
+      this.danhSachChucDanh = await getDanhSachChucDanh(this.axios).catch((_) => {
+        this.$toast.error('Lỗi tải danh sách chức danh')
+      })
+    }
+  }
+}
+</script>
+
+<style scoped></style>

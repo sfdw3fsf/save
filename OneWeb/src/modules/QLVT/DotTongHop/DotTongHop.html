@@ -1,0 +1,369 @@
+<ejs-dialog
+  :header="'Đợt tổng hợp'"
+  :enableResize='true'
+  :allowDragging='true'
+  :visible='false'
+  ref="popupDotTongHop"
+  :animationSettings='animationSettings'
+  showCloseIcon=true width='80%'
+  :target='target'
+  style="top:30px; bottom:30px"
+  :open="dialogOpen"
+  :close="onClickThoat">  
+    <div class="">      
+        <div class="popup-header">           
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="onClickNhapMoi()" :class="{ disabledInput: !Enabled.nhapMoi}">
+                    <a >
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li @click="onClickGhiLai()" :class="{ disabledInput: !Enabled.ghiLai}">
+                    <a>
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li @click="onClickHuy()" :class="{ disabledInput: !Enabled.Huy}">
+                    <a >
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                    </a>
+                </li>               
+                <li @click="onClickXoa()" :class="{ disabledInput: !Enabled.Xoa}">
+                    <a >
+                        <span class="icon one-trash"></span>Xóa 
+                    </a>
+                </li>
+                <li @click="showPopupNhapNgayDuyet()" :class="{ disabledInput: !Enabled.Duyet}" v-if="Visible.Duyet">
+                    <a>
+                        <span class="icon one-circle-question"></span>Duyệt
+                    </a>
+                </li>
+                <li @click="onClickHuyDuyet()" :class="{ disabledInput: !Enabled.huyDuyet  }" v-if="Visible.huyDuyet">
+                    <a>
+                        <span class="icon one-cancel"></span>Hủy duyệt
+                    </a>
+                </li>
+                <li @click="onClickInPhieu()" v-if="thongTinNguoiDung.maTinh === 'HCM' || thongTinNguoiDung.maTinh === 'HNI'">
+                    <a >
+                        <span class="icon one-trash"></span>In phiếu
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">
+                    Thông tin đợt tổng hợp
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w70">Tháng</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker class="form-control" @change="onChangeThang()"
+                                        :placeholder="dateConfig.waterMark" :format="dateConfig.formatMonth"
+                                        v-model="params.Thang">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w70">Đợt</div>
+                            <div class="value">
+                                <div class="select-custom">                                    
+                                    <select name="" id="" class="form-control" @change=""
+                                        v-model="params.Dot">
+                                        <option v-for="DotDK in dataSource.DSDotDK" v-bind:value="DotDK.dotDkId">
+                                            {{DotDK.dotDk}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Ngày duyệt</div>
+                            <div class="value">
+                                <ejs-datepicker class="form-control" @change=""
+                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatDay"
+                                    v-model="params.ngayDuyet">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div :class="isKHDN ? 'col-sm-3 col-12' : 'col-sm-6 col-12'">
+                        <div class="info-row">
+                            <div class="key w70">Mã TH</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.maTH">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12" v-if="isKHDN">
+                        <div class="info-row">
+                           
+                            <div class="key w70">Loại TH</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist class="form-control" locale='vi' v-model="params.loaiTH"
+                                        :dataSource='cboLoaiTongHop' :fields="{value:'loaiTHId', text: 'TenTongHop'}"
+                                        :allowFiltering="true" >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>   
+                            
+                        </div>
+                    </div>
+                   
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Ngày VB</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker class="form-control" @change=""
+                                        :placeholder="dateConfig.waterMark" :format="dateConfig.formatDay"
+                                        v-model="params.ngayVB">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="key w70">File CV</div>
+                    <div class="value">
+                        <div class="input-more-button">
+                            <b-form-file v-show="false" ref="ref-choose-file" multiple  @change="onChangeFile" accept=".docx, .doc, .pdf, .xls, .xlsx"></b-form-file>
+                            <button type="button" class="btn btn-sm btn-second" @click="chooseFile">...</button>
+
+                            <div class="select-custom" ref="title-file">
+                                <input class="form-control"  style="pointer-events: none;"  />                                    
+                            </div>
+                            <div ref="table-file" style="z-index: 99999; background-color: white; border: 1px solid #ddd; margin-right: 40px;" :style="{display: showFile}">
+                                <div style="z-index: 999999;  overflow: auto; border: 1px solid #ddd; margin-bottom: 5px; ">
+                                    <DataGrid3 ref="gridFile" class="table-result table-gachle" v-bind:columns="[
+                                        {fieldName: '', headerText: 'Tải xuống', width: 60, allowFiltering: false, template: downloadTemplate, cssClass: 'text-center'},
+                                        {fieldName: 'nameFile', headerText: 'Tên file', allowFiltering: true},        
+                                        {fieldName: '', headerText: 'Xóa', width: 60, allowFiltering: false, template: deleteTemplate, cssClass: 'text-center'},                      
+                                        ]" 
+                                        v-bind:dataSource="dataSource.DSFile" 
+                                        :showFilter="true" 
+                                        dataKeyField="linkFile"
+                                        @selectedRowChanged=""                                       
+                                        :enabledSelectFirstRow="false" >
+                                    </DataGrid3>
+                                </div>
+                            </div>            
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w70">Ghi chú</div>
+                    <div class="value">
+                        <textarea v-model="params.ghiChu" class="form-control" style="height: 80px;resize: vertical;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-form">
+                <div class="nav tabs tab-over">
+                    <a href="#tonghop"  data-toggle="tab"class="active">Danh sách đợt tổng hợp trong tháng</a>
+                    <a href="#dangky" data-toggle="tab">Danh sách đăng ký</a>
+                </div>
+                <div class="box-form tab-content">
+                    <div class="tab-pane active" id="tonghop">
+                        <DataGrid ref="gridDotTongHop" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: '', headerText: '', allowSorting:false , allowFiltering:false, textAlign:'Center', allowEditing:false , width: 40, headerTemplate:columnsCheckboxAll ,template:columnsCheckbox},
+                            {fieldName: 'DOT', headerText: 'Đợt', allowFiltering: true, allowSorting: false },
+                            {fieldName: 'MA_TH', headerText: 'Mã TH', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'NGAYDUYET', headerText: 'Ngày Duyệt', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'NGAY_VB', headerText: 'Ngày VB', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},   
+                            {fieldName: 'TONGHOP_ID', headerText:'', visible:false, isPrimaryKey:true}                 
+                            ]" 
+                            v-bind:dataSource="this.dataSource.DSDotTongHop" 
+                            :showFilter="true" 
+                            dataKeyField="TONGHOP_ID"
+                            @selectedRowChanged="gridDotTongHop_FocusedRowChanged"
+                            :showColumnCheckbox="false"
+                            @selectedItemsChanged="gridDotTongHop_selected"
+                            :allowPaging="true"
+                            :enablePagingServer="false"                   
+                        >
+                        </DataGrid>
+                    </div>
+
+                    <div class="tab-pane" id="dangky">
+                        <div class="box-col box-form">
+                            <div class="legend-title">
+                                <div class="pull-left">Dánh sách đăng ký đã gán</div>                                
+                                <div class="clearfix"></div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Từ tháng</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker class="form-control" 
+                                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatMonth"
+                                                    v-model="params.tuThang">
+                                                </ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Đến tháng</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker class="form-control" 
+                                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatMonth"
+                                                    v-model="params.denThang">
+                                                </ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="input-more-button">                                       
+                                        <button type="button" class="btn btn-sm btn-second" @click="NAP_DS_DKTH">
+                                            <span class="nc-icon-outline arrows-1_refresh-69"></span>
+                                        </button>           
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="table-content">
+                                <DataGrid ref="gridDaGan" class="table-result table-gachle" v-bind:columns="[
+                                    {fieldName: 'MAPHIEU_DK', headerText: 'Mã ĐK', allowFiltering: true, allowSorting: false, freeze:'Left' },
+                                    {fieldName: 'SO_CV', headerText: 'Số công văn', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'TEN_TG', headerText: 'Thời gian ĐK', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'MA_CT', headerText: 'Dự án', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGAY_DK', headerText: 'Ngày yêu cầu', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'DOT', headerText: 'Đợt', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'CONLAI', headerText: 'Số Tháng ĐK', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'TEN_DV', headerText: 'Đơn vị ĐK', allowFiltering: true, allowSorting: true},  
+                                    {fieldName: 'SODANGKY', headerText: 'SL đăng ký', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NHOM', headerText: 'Nhóm', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},  
+                                    {fieldName: 'TEN_KHO', headerText: 'Kho đăng ký', allowFiltering: true, allowSorting: true , freeze:'Right'},                
+                                    ]" v-bind:dataSource="this.dataSource.DSDKDaGan" :showFilter="true" dataKeyField="DANGKY_ID"
+                                    @selectedRowChanged=""
+                                    :showColumnCheckbox="true"
+                                    @selectedItemsChanged=""
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"  
+                                    @selectedItemsChanged="gridDaGan_selected" 
+                                >
+                                </DataGrid>
+                            </div>
+
+                            
+                            <div class="row actions" style="height: 35px;">
+                                <div class="col-sm-5 col-12"></div>
+                                <div class="col-sm-1 col-12" style="text-align: right;">
+                                    <div class="input-more-button" >                                       
+                                        <button type="button" class="btn btn-sm btn-second" @click="onClickInsert()" style="width:50px; font-size: 20px; font-weight: bold;">
+                                            <span class="-ap icon-chevron-thin-up"></span>
+                                        </button>           
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 col-12">
+                                    <div class="input-more-button" >                                       
+                                        <button type="button" class="btn btn-sm btn-second" @click="onClickOut()" style="width:50px; font-size: 20px; font-weight: bold;">
+                                            <span class="-ap icon-chevron-thin-down"></span>
+                                        </button>           
+                                    </div>
+                                </div>  
+                                <div class="col-sm-5 col-12"></div>                            
+                            </div>
+
+                            <div class="legend-title">
+                                <div class="pull-left">Danh sách đăng ký chưa gán</div>                                
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="table-content">
+                                <DataGrid ref="gridChuaGan" class="table-result table-gachle" v-bind:columns="[
+                                    {fieldName: 'MAPHIEU_DK', headerText: 'Mã ĐK', allowFiltering: true, allowSorting: false, freeze:'Left' },
+                                    {fieldName: 'SO_CV', headerText: 'Số công văn', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'TEN_TG', headerText: 'Thời gian ĐK', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'MA_CT', headerText: 'Dự án', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGAY_DK', headerText: 'Ngày yêu cầu', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'DOT', headerText: 'Đợt', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'CONLAI', headerText: 'Số Tháng ĐK', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'TEN_DV', headerText: 'Đơn vị ĐK', allowFiltering: true, allowSorting: true},  
+                                    {fieldName: 'SODANGKY', headerText: 'SL đăng ký', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NHOM', headerText: 'Nhóm', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},  
+                                    {fieldName: 'TEN_KHO', headerText: 'Kho đăng ký', allowFiltering: true, allowSorting: true , freeze:'Right'},                
+                                    ]" v-bind:dataSource="this.dataSource.DSDKChuaGan" :showFilter="true" dataKeyField="DANGKY_ID"
+                                    @selectedRowChanged=""
+                                    :showColumnCheckbox="true"
+                                    @selectedItemsChanged=""
+                                    :allowPaging="true"
+                                    :enablePagingServer="false" 
+                                    @selectedItemsChanged="gridChuaGan_selected"
+                                >
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+        <b-modal 
+            no-close-on-backdrop
+            hide-footer 
+            hide-header 
+            hide-header-close 
+            class="modal" 
+            id="popupNhapNgayDuyet">
+            
+                <div class="modal-content popup-box">
+                    <div class="popup-header">
+                        <div class="title">Nhập ngày duyệt</div>
+                        <div class="close -ap icon-close"  @click="$bvModal.hide('popupNhapNgayDuyet')" data-dismiss="modal">
+                        </div>
+                    </div>
+                    <div class="list-actions-top">
+                        <ul class="list">
+                            <li>
+                                <a  @click="onClickDuyet()">
+                                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="popup-body">
+                        <div class="info-row">
+                            <div class="key w120">
+                                Nhập ngày duyệt
+                            </div>
+                            <div>
+                                <ejs-datepicker class="form-control" @change=""
+                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatDay"
+                                    v-model="params.ngayDuyetConfirm">
+                                </ejs-datepicker>
+                            </div>      
+                        </div>
+                    </div>
+                </div>
+            
+        </b-modal>
+    </div>
+</ejs-dialog>
+

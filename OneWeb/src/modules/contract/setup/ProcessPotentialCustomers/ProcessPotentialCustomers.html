@@ -1,0 +1,403 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <breadcrumb :header="header" />
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="clickLayDS">
+                    <span class="icon one-file-attach1"></span>Lấy DS
+                </a>
+            </li>
+            <li>
+                <a @click="clickGhiLai" :class="{disabled:!button.ghilai}">
+                    <span class="icon one-save"></span>Ghi lại (F9)
+                </a>
+            </li>
+            <li>
+                <a @click ="clickGiaoPhieu" :class="{disabled:!button.giaophieu}">
+                    <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+            </li>
+            <li>
+                <a @click="clickHuyYC" :class="{disabled:!button.huyyc}">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ YC
+                </a>
+            </li>
+        </ul>
+
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="legend-title">Thông tin khách hàng</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã giao dịch</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="showPopupSearchContract">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract"
+                                            :loai_hd_id="1" :dichvu_id="parseInt(list_TTThuebao.dichvuvt)"
+                                            :ngay_yc="list_TTKhachHang.ngay_yc?list_TTKhachHang.ngay_yc:''" />
+                                        <input type="text" class="form-control highlight fw6"
+                                            v-model="list_TTKhachHang.ma_gd" @keypress.enter="txtMaGD_KeyPress"
+                                            ref="inputMaGD">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Ngày YC</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="list_TTKhachHang.ngay_yc" :value="params.today"
+                                            :format="'dd/MM/y'" :showClearButton="false"
+                                            :placeholder="'__/__/____'" :enabled="false">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã KH (*)</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="ShowSearchAccount">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control fw6"
+                                            v-model="list_TTKhachHang.ma_kh" 
+                                            ref="inputMaKH" @keyup.enter="txtMaKH_KeyPress">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Số máy/Acc</div>
+                                <div class="value">
+                                    <input type="text" class="form-control highlight" v-model="list_TTThuebao.ma_tb" @keypress.enter="txtMaTB_KeyPress" ref="inputSoMayAcc">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Tên khách hàng (*)</div>
+                        <div class="value">
+                            <input type="text" v-on:blur="tenKHLeave" class="form-control fw6" v-model="list_TTKhachHang.ten_kh" ref="inputTenKH" @keypress.enter="txtTenKH_KeyPress">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Địa chỉ KH (*)</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="showpopupDiaChiKH">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <ModalChonDiaChi modalId="popupDiaChiKH" ref="popupDiaChiKH" :data="diachiKH" @xacnhan="getDiaChiKH" :isStrictMode="true"/>
+                                <input type="text" v-model="diachiKH.DIACHI" class="form-control"
+                                    @change="diachiKHChanged" ref="inputDiaChiKH" @keypress.enter="txtDiaChiKH_KeyPress" readonly>
+                                <!--  <bss-error-marker :has-error="$v.diachiKH.DIACHI.$error">
+                                    <input type="text" v-model="$v.diachiKH.DIACHI.$model" class="form-control" @change="diachiKHChanged" required title="Bạn chưa nhập địa chỉ khách hàng">
+                                </bss-error-marker>   -->
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Loại giấy tờ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="list_TTKhachHang.loaigiayto"
+                                            :options="list_TTKhachHang.loaigiayto_options" @select=""
+                                            placeholder="Vui lòng chọn loại giấy tờ" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Số giấy tờ</div>
+                                <div class="value">
+                                    <input v-on:blur="KiemTraSoGT" type="text" class="form-control" v-model="list_TTKhachHang.sogiayto" ref="inputSoGT">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Ngày cấp</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="list_TTKhachHang.ngaycap" :value="params.today"
+                                            :format="'dd/MM/y'" :showClearButton="false"
+                                            :placeholder="'__/__/____'">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Nơi cấp</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="list_TTKhachHang.noicap">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Ngày hết hạn</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="list_TTKhachHang.ngayhethan" :value="params.today"
+                                            :format="'dd/MM/y'" :showClearButton="false" :placeholder="'__/__/____'">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Ngày sinh</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="list_TTKhachHang.ngaysinh" :value="params.today"
+                                            :format="'dd/MM/y'" :showClearButton="false"
+                                            :placeholder="'__/__/____'">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Giới tính</div>
+                                <div class="value">
+                                    <div class="list-checks mart7">
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" class="check" value="0"
+                                                    v-model="list_TTKhachHang.gioitinh">
+                                                <span class="name">Không</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" class="check" value="1"
+                                                    v-model="list_TTKhachHang.gioitinh">
+                                                <span class="name">Nam</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" class="check" value="2"
+                                                    v-model="list_TTKhachHang.gioitinh">
+                                                <span class="name">Nữ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Quốc tịch</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="list_TTKhachHang.quoctich"
+                                            :options="list_TTKhachHang.quoctich_options" @select=""
+                                            placeholder="Vui lòng chọn quốc tịch" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Ngành nghề</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="clickButtonNganhNghe" >
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <SelectExt v-model="list_TTKhachHang.nganhnghe"
+                                        :options="list_TTKhachHang.nganhnghe_options" @select="changeNganhNghe"
+                                        placeholder="Vui lòng chọn ngành nghề" />
+                                       <!--  <ejs-dropdownlist :allowFiltering="true" v-model="list_TTKhachHang.nganhnghe"  
+                                            ref="inputNganhNghe"
+                                             @change="changeNganhNghe"
+                                            :dataSource="list_TTKhachHang.nganhnghe_options"
+                                            :fields="{ text: 'tennganhnghe', value: 'nganhnghe_id' }"
+                                            /> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Điện thoại (*)</div>
+                                <div class="value">
+                                    <input type="number" class="form-control" v-model="list_TTKhachHang.sodienthoai" ref="inputSDT">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="legend-title">Thông tin thuê bao</div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key">Dịch vụ VT</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="list_TTThuebao.dichvuvt"
+                                            :options="list_TTThuebao.dichvuvt_options" @select="onDichVuChange($event)"
+                                            tabindex="1" placeholder="Vui lòng chọn dịch vụ" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w80">Loại hình TB</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model="list_TTThuebao.loaihinh"
+                                            :options="list_TTThuebao.loaihinh_options"
+                                            @select="onLoaiHinhChange($event)"
+                                            placeholder="Vui lòng chọn loại hình thuê bao" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Kiểu yêu cầu</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="list_TTThuebao.kieuld" :options="list_TTThuebao.kieuld_options"
+                                    placeholder="Vui lòng chọn kiểu yêu cầu" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key">Tên thuê bao (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control fw6" v-model="list_TTThuebao.ten_tb" ref="inputTenTB">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w80">Ngày sinh</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <ejs-datepicker v-model="list_TTThuebao.ngaysinh" :value="params.today"
+                                            :format="'dd/MM/y'" :showClearButton="false"
+                                            :placeholder="'__/__/____'" v-on:blur="ngaySinhLeave">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Địa chỉ TB (*)</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="showpopupDiaChiTB">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <ModalChonDiaChi modalId="popupDiaChiTB" :data="diachiTB" @xacnhan="getDiaChiTB" :isStrictMode="true"/>
+                                <input type="text" v-model="diachiTB.DIACHI" class="form-control"
+                                    @change="diachiTBChanged" ref="inputDiaChiTB" @keypress.enter="txtDiaChiTB_KeyPress" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Địa chỉ LĐ (*)</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="showpopupDiaChiLD">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <ModalChonDiaChi modalId="popupDiaChiLD" :data="diachiLD" @xacnhan="getDiaChiLD" :isStrictMode="true"/>
+                                <input type="text" v-model="diachiLD.DIACHI" class="form-control"
+                                    @change="diachiLDChanged" ref="inputDiaChiLD" @keypress.enter="txtDiaChiLD_KeyPress" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Đối tượng TB</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="list_TTThuebao.doituong" :options="list_TTThuebao.doituong_options"
+                                    @select="" placeholder="Vui lòng chọn đối tượng" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Ghi chú</div>
+                        <div class="value">
+                            <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model="list_TTThuebao.ghichu"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-title mart20">Danh sách phiếu yêu cầu</div>
+            <div class="table-content">
+                <DataGrid v-bind:columns="[
+                    {fieldName: 'ten_tb', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                    {fieldName: 'loaihinh_tb', headerText: 'Loại hình thuê bao', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                    {fieldName: 'diachi_ld', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, allowSorting: false, textAlign: 'left'},
+                    ]" v-bind:dataSource="ds_PhieuYC.list" :showFilter="true"
+                    @selectedRowChanged="onDSPhieuYCChange" :showColumnCheckbox="false" @selectedItemsChanged=""
+                    dataKeyField="" :defaultColumnCheckboxChecked="false" :allowPaging="true"  :enabledSelectFirstRow="true"
+                    :enablePagingServer="false">
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+    <ChiTietNganhNgheModal ref="chiTietNganhNgheModal" :data="dataTieuNganh" @accept="acceptTieuNganh" />
+    <b-modal id="popupComponents" size="xl" hide-footer hide-header hide-header-close body-class="modal-body p-0">
+        <component :is="popupComponent" isPopup="true" @form-close="popupClosed" ref="popupComponent"></component>
+    </b-modal>
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+</div>
+<!-- <script>
+    $(".select2js").select2();
+</script>
+<script type="text/javascript" src="../vendor/jquery/split.js"></script>
+<script type="text/javascript">
+    Split(['#boxLeft', '#boxRight'], {
+        sizes: [50, 50],
+        gutterSize: 16,
+        onDragEnd: function (sizes) {
+        },
+    });
+</script>
+ -->

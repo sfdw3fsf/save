@@ -1,0 +1,15 @@
+export default{
+    get_ds_nganhang: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_NGANHANG'),
+    get_ds_toanha: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_TOANHA'),
+    get_ds_nhom_duan: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_NHOM_DUAN'),
+    get_ds_nhanvien: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/lay_tt_nhanvien', data),
+    get_ds_hopdong: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/sp_lay_tt_hd_dautu', data),
+    upload_file: async (axios, data,header) => axios.post('/web-quantri/upload', data, header),
+    ins_upd_hddt: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/fn_ghilai_hd_dautu', data),
+    del_upd_hddt: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/fn_xoa_hd_dautu', data),    
+    kt_mst: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/fn_chk_mst', data),
+    get_ds_tientrinh: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/sp_lay_ds_tientrinh_dtu', data),
+    get_ds_chitiet: async (axios, data) => axios.post('/web-toanha/dm_hopdong_dautu/sp_lay_ds_chitiet_hddtu', data),
+    download_file: async (axios, data) => axios.post('/web-quantri/upload/link_view_file', data),
+    // post_capnhat_template_bnm: async (axios, data) => axios.post('/web-hopdong/phattrienthuebao/capnhat_template_bnm', data),
+  }

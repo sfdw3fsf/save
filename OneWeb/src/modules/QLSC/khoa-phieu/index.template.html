@@ -1,0 +1,116 @@
+<b-modal 
+    :id="modalId" 
+    size="lg" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box khoa-phieu">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span> {{title}}</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="onClickBtnKhoaPhieu">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-lock"></span>{{btnKhoaPhieuText}}
+                    </a>
+                </li>
+                <li @click="onClickBtnDongBo">
+                    <a href="javascript:void(0)">
+                        <span class="icon nc-icon-glyph arrows-1_direction-53" style="transform: rotate(90deg);"></span>ĐB nguyên nhân
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin giao phiếu</div>
+                <div class="info-row">
+                    <div class="key w110">
+                        Ngày TH <bss-required-marker />
+                    </div>
+                    <div class="value">
+                        <bss-error-marker :has-error="$v.ngayTh.$error">
+                            <ejs-datetimepicker	
+                                :style="{'padding-top': '7px'}"
+                                class="form-control bg-none bor0 fw6 text h24"
+                                placeholder="" 
+                                v-model="ngayTh"
+                                format="dd/MM/yyyy HH:mm"
+                                :showClearButton="false"></ejs-datetimepicker>
+                        </bss-error-marker>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w110">
+                        Nhân viên TH <bss-required-marker />
+                    </div>
+                    <div class="value">
+                        <bss-error-marker :has-error="$v.nhanVienTh.$error">
+                            <ComboboxGridNhanVien v-model="nhanVienTh" :disabled="false" />
+                       </bss-error-marker>
+                    </div>
+                </div>
+            </div>
+            <div style="position: relative; width: 100%; padding-right: 50px;">
+                <div 
+                    ref="ref-tabs" style="width: 100%; overflow: hidden; border-top-left-radius: 4px; border-top-right-radius: 4px;" 
+                    :style="{'border-left': isOver ? '1px solid #E0E0E0;' : '', 'border-right': isOver ? '1px solid #E0E0E0;' : ''}"
+                    v-on:mousedown="onMousedown($event)"
+                    v-on:mouseleave="onMouseleave($event)"
+                    v-on:mouseup="onMouseup($event)"
+                    v-on:mousemove="onMousemove($event)">
+                    <div class="nav tabs tab-over" style="white-space: nowrap; display: -webkit-box;">
+                        <a 
+                            v-for="item in items" 
+                            class="minw0"
+                            :ref="'tab-' + item.args.id"
+                            :key="item.args.id" 
+                            :href="'#' + item.args.id"
+                            :class="{active: item.args.id == selectedTabId, show: item.args.id == selectedTabId}"
+                            @click="onClickTab(item, $event)">
+                            {{item.args.name}}
+                            <span class="remove-item" style="position: absolute; top: 0; right: 2px;">&#x02A2F;</span>
+                        </a>
+                        <a href="javascript:void(0)" class="minw0" @click="onClickAddTab">
+                            <span class="-ap icon-plus text-main"></span>
+                        </a>
+                    </div>
+                </div>
+                <div v-show="isOver" style="position: absolute; right: 0; top: 0;">
+                    <a href="javascript:void(0)" @click="tabs.scrollLeft = 0" class="btn fa fa-angle-double-left" style="display: inline-block; width: 20px; padding: 0;"></a>
+                    <a href="javascript:void(0)" @click="tabs.scrollLeft = tabs.scrollWidth" class="btn fa fa-angle-double-right" style="display: inline-block; width: 20px; padding: 0;"></a>
+                </div>
+            </div>
+            <div class="tab-content box-form">
+                <component v-for="item in items" :ref="item.args.id" :key="item.args.id" v-bind:is="item" />
+            </div>
+            <div class="box-form">
+                <div class="info-row">
+                    <div class="key w120">
+                        Ghi chú xử lý
+                    </div>
+                    <div class="value">
+                        <textarea cols="30" rows="10" class="form-control" v-model="ghiChuTh" style="height: 62px; resize: none;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal ref="ref-modal-xacnhan-khoa-phieu" class="xacnhan-khoa-phieu" centered title="Thông báo" @ok="okKhoaPhieu">        
+        <span>Bạn thật sự muốn {{btnKhoaPhieuText.toLowerCase()}} sự cố không?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+   </b-modal>
+</b-modal>

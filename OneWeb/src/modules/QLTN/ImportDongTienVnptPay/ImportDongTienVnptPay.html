@@ -1,0 +1,525 @@
+<div>
+  <input id="file-browser" ref="file-browser" @change="uploadFile" type="file" hidden>
+      <!-- menu -->
+      <b-nav class="mt-2" tabs="" align="center">
+          <b-nav-item :active="active_page==1" @click="active_page=1">
+              Giới thiệu mở ví
+          </b-nav-item>
+          <b-nav-item :active="active_page==2" @click="active_page=2">
+              Thanh toán cước trả sau qua ví
+          </b-nav-item>
+          <b-nav-item :active="active_page==3" @click="active_page=3">
+              Thanh toán đơn hàng qua ví
+          </b-nav-item>
+          <b-nav-item :active="active_page==4" @click="active_page=4">
+              DL nạp thẻ topup qua ví NV
+          </b-nav-item>
+          <b-nav-item :active="active_page==5" @click="active_page=5">
+              Import dữ liệu bán gói D99V
+          </b-nav-item>
+      </b-nav>
+
+      <!-- 1. Giới thiệu mở ví -->
+      <b-container fluid="" class="p-3 page-content" v-show="active_page==1">
+          <b-row class="p-0">
+              <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+                  <div class="legend-title mb-2">
+                      File Nạp
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Tháng/Năm</div>
+                    <div class="col-sm-6 col-12">
+                      <ejs-datepicker
+                        v-model="params[1].p_thangnam"
+                        :max="config.max_date"
+                        :start="'Year'"
+                        :depth="'Year'"
+                        :format="'MM/y'"
+                        :showClearButton="false"
+                        :allowEdit="false"
+                        :width="'100%'"
+                      >
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">File dữ liệu</div>
+
+                    <div class="value col-sm-6 col-12">
+                      <div class="input-more-button">
+
+                        <input type="text" class="form-control " v-model="params[1].p_filepath">
+                        <button class="btn" @click="browserFile">
+                            <span class="-ap icon-more_horiz"></span>
+                        </button>
+
+                      </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                      <a href="/static/files/Mau_Gioi_Thieu_Mo_Vi_VNPTPay.xlsx">Tải biểu mẫu</a>
+                    </div>
+                  </div>
+              </b-col>
+          </b-row>
+          <b-row class="p-0">
+              <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+                  <div class="legend-title mb-2">
+                      Dữ liệu import
+                  </div>
+                  <b-nav tabs="" class="mb-2">
+                      <b-nav-item :active="active_tab==1" @click="active_tab=1">
+                          Thành công
+                      </b-nav-item>
+                      <b-nav-item :active="active_tab==2" @click="active_tab=2">
+                          Lỗi
+                      </b-nav-item>
+                  </b-nav>
+          <data-grid-3
+            id="gridviewDanhSach1"
+            v-show="active_tab==1"
+            :data-source="tabData[1].dsImport"
+            :showFilter="true"
+            :columns="[
+              { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true, width: 50 },
+              { fieldName: 'TTKD', headerText: 'TTKD', allowFiltering: true, allowSorting: true },
+              { fieldName: 'SDT_VI_NV', headerText: 'SĐT ví nhân viên', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'TEN_NV', headerText: 'Họ tên nhân viên', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'MA_NV', headerText: 'Mã nhân viên', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'SDT_DANGKY_VI_END_USER', headerText: 'SĐT đăng ký ví end-user', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'THOIGIAN_DANGKY_VI', headerText: 'Thời gian đăng ký ví', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'LOAI_CHI_CTKM', headerText: 'Loại chi CTKM', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'VINAPHONE_CHITRA', headerText: 'Vinaphone chi trả', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'MEDIA_CHITRA', headerText: 'Media chi trả', allowFiltering: true, allowSorting: true },
+              { fieldName: 'LIENKET_NGANHANG', headerText: 'Liên kết ngân hàng', allowFiltering: true, allowSorting: true },
+              { fieldName: 'GIAODICH_TRONGTHANG', headerText: 'Phát sinh giao dịch trong tháng', allowFiltering: true, allowSorting: true },
+              { fieldName: 'DINHDANH_VI', headerText: 'Đăng kí ví', allowFiltering: true, allowSorting: true },
+              { fieldName: 'DINHDANH_KHACHHANG', headerText: 'Định danh khách hàng', allowFiltering: true, allowSorting: true },
+              { fieldName: 'THULAO_CHI_KHUYENKHICH', headerText: 'Thù lao chi KK', allowFiltering: true, allowSorting: true },
+              { fieldName: 'NGAY_MOVI_END_USER', headerText: 'Ngày mở ví End user', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'THANG_THONGKE', headerText: 'Tháng thống kê', allowFiltering: true, allowSorting: true, visible: false },
+              { fieldName: 'DANHSACH_DICHVU', headerText: 'Danh sách dịch vụ', allowFiltering: true, allowSorting: true, visible: false },
+              { fieldName: 'NGAY_DK_VI', headerText: 'Ngày đăng kí ví', allowFiltering: true, allowSorting: true, visible: false },
+              { fieldName: 'NGAY_CN', headerText: 'Ngày cập nhật', allowFiltering: true, allowSorting: true },
+              ]"
+              :enablePagingServer="false"
+              :allowPaging="true"
+              :allowExcelExport="true"
+              :totalRecords="tabData[1].successPage.totalElement"
+              :pageSize="tabData[1].successPage.maxSize"
+              :pageIndex="tabData[1].successPage.page"
+              >
+          </data-grid-3>
+          <data-grid-3 id="gridviewDanhSachLoi1"
+            v-show="active_tab==2"
+            :data-source="tabData[1].error"
+            :showFilter="true"
+          :columns="[
+          { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true, width: 50 },
+            { fieldName: 'ERROR_MSG', headerText: 'Mô tả lỗi', allowFiltering: true, allowSorting: true, width: 300 },
+            { fieldName: 'SDT_VI_NV', headerText: 'SĐT ví nhân viên', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'TEN_NV', headerText: 'Họ tên nhân viên', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'MA_NV', headerText: 'Mã nhân viên', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'SDT_DANGKY_VI_END_USER', headerText: 'SĐT đăng ký ví end-user', allowFiltering: true, allowSorting: true, width: 120 },
+              { fieldName: 'THOIGIAN_DANGKY_VI', headerText: 'Thời gian đăng ký ví', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'LOAI_CHI_CTKM', headerText: 'Loại chi CTKM', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'VINAPHONE_CHITRA', headerText: 'Vinaphone chi trả', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'MEDIA_CHITRA', headerText: 'Media chi trả', allowFiltering: true, allowSorting: true },
+              { fieldName: 'LIENKET_NGANHANG', headerText: 'Liên kết ngân hàng', allowFiltering: true, allowSorting: true },
+              { fieldName: 'GIAODICH_TRONGTHANG', headerText: 'Phát sinh giao dịch trong tháng', allowFiltering: true, allowSorting: true },
+              { fieldName: 'DINHDANH_VI', headerText: 'Đăng kí ví', allowFiltering: true, allowSorting: true },
+              { fieldName: 'DINHDANH_KHACHHANG', headerText: 'Định danh khách hàng', allowFiltering: true, allowSorting: true },
+              { fieldName: 'THULAO_CHI_KHUYENKHICH', headerText: 'Thù lao chi KK', allowFiltering: true, allowSorting: true },
+              { fieldName: 'NGAY_MOVI_END_USER', headerText: 'Ngày mở ví End user', allowFiltering: true, allowSorting: true, width: 150 },
+              { fieldName: 'THANG_THONGKE', headerText: 'Tháng thống kê', allowFiltering: true, allowSorting: true, visible: false },
+              { fieldName: 'DANHSACH_DICHVU', headerText: 'Danh sách dịch vụ', allowFiltering: true, allowSorting: true, visible: false },
+              { fieldName: 'NGAY_DK_VI', headerText: 'Ngày đăng kí ví', allowFiltering: true, allowSorting: true, visible: false },
+            ]"
+            :enablePagingServer="false"
+            :allowPaging="true"
+            :allowExcelExport="true"
+            :totalRecords="tabData[1].errorPage.totalElement"
+            :pageSize="tabData[1].errorPage.maxSize"
+            :pageIndex="tabData[1].errorPage.page"
+            >
+          </data-grid-3>
+              </b-col>
+          </b-row>
+      </b-container>
+
+      <!-- 2. Thanh toán cước trả sau qua ví -->
+      <b-container fluid="" class="p-3 page-content" v-show="active_page==2">
+          <b-row class="p-0">
+            <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+              <div class="legend-title mb-2">
+                  File Nạp
+              </div>
+              <div class="info-row">
+                <div class="key w80">Tháng/Năm</div>
+                <div class="col-sm-6 col-12">
+                  <ejs-datepicker
+                    v-model="params[2].p_thangnam"
+                    :max="config.max_date"
+                    :start="'Year'"
+                    :depth="'Year'"
+                    :format="'MM/y'"
+                    :showClearButton="false"
+                    :allowEdit="false"
+                    :width="'100%'"
+                  >
+                  </ejs-datepicker>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">File dữ liệu</div>
+
+                <div class="value col-sm-6 col-12">
+                  <div class="input-more-button">
+
+                    <input type="text" class="form-control " v-model="params[2].p_filepath">
+                    <button class="btn" @click="browserFile">
+                        <span class="-ap icon-more_horiz"></span>
+                    </button>
+
+                  </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                  <a href="/static/files/Mau_Thanh_Toan_Cuoc_Tra_Sau_VNPTPay.xlsx">Tải biểu mẫu</a>
+                </div>
+              </div>
+            </b-col>
+          </b-row>
+          <b-row class="p-0">
+              <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+                  <div class="legend-title mb-2">
+                      Dữ liệu import
+                  </div>
+                  <b-nav tabs="" class="mb-2">
+                      <b-nav-item :active="active_tab==1" @click="active_tab=1">
+                          Thành công
+                      </b-nav-item>
+                      <b-nav-item :active="active_tab==2" @click="active_tab=2">
+                          Lỗi
+                      </b-nav-item>
+                  </b-nav>
+                <data-grid-3 id="gridviewDanhSach2" v-show="active_tab==1" :data-source="tabData[2].dsImport"
+                :showFilter="true"
+                :columns="[
+                  { fieldName: 'TT', headerText: 'TT', allowFiltering: true, allowSorting: true, width: 60 },
+                  { fieldName: 'TINHTHANH', headerText: 'Tỉnh thành', allowFiltering: true, allowSorting: true, width: 120 },
+                  { fieldName: 'DICHVU', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'MA_GD', headerText: 'Mã giao dịch', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'SODT_VI', headerText: 'Số điện thoại ví', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'HOADON_MA_TT', headerText: 'Hóa đơn/ số được topup', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'THOIGIAN_TT', headerText: 'Thời gian thanh toán', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'Ma_GD_VI', headerText: 'Mã giao dịch ví', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'SOTIEN_HD', headerText: 'Số tiền hóa đơn', allowFiltering: true, allowSorting: true, type: 'number', format: 'N0' },
+                  { fieldName: 'SOTIEN_TRUVI', headerText: 'Số tiền trừ ví', allowFiltering: true, allowSorting: true, type: 'number', format: 'N0' },
+                  { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'NGAY_CN', headerText: 'Ngày cập nhật', allowFiltering: true, allowSorting: true },
+                  ]">
+                </data-grid-3>
+                <data-grid-3 id="gridviewDanhSachLoi2" v-show="active_tab==2" :data-source="tabData[2].error" :showFilter="true" :columns="[
+                  { fieldName: 'TT', headerText: 'TT', allowFiltering: true, allowSorting: true, width: 60 },
+                  { fieldName: 'ERROR_MSG', headerText: 'Mô tả lỗi', allowFiltering: true, allowSorting: true, width: 300 },
+                  { fieldName: 'TINHTHANH', headerText: 'Tỉnh thành', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'DICHVU', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'MA_GD', headerText: 'Mã giao dịch', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'SODT_VI', headerText: 'Số điện thoại ví', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'HOADON_MATT', headerText: 'Hóa đơn/ số được topup', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'THOIGIAN_TT', headerText: 'Thời gian thanh toán', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'Ma_GD_VI', headerText: 'Mã giao dịch ví', allowFiltering: true, allowSorting: true },
+                  { fieldName: 'SOTIEN_HD', headerText: 'Số tiền hóa đơn', allowFiltering: true, allowSorting: true, type: 'number', format: 'N0' },
+                  { fieldName: 'SOTIEN_TRUVI', headerText: 'Số tiền trừ ví', allowFiltering: true, allowSorting: true, type: 'number', format: 'N0' },
+                  ]">
+                </data-grid-3>
+              </b-col>
+          </b-row>
+      </b-container>
+
+      <!-- 3. Thanh toán đơn hàng qua ví -->
+      <b-container fluid="" class="p-3 page-content" v-show="active_page==3">
+          <b-row class="p-0">
+            <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+              <div class="legend-title mb-2">
+                  File Nạp
+              </div>
+              <div class="info-row">
+                <div class="key w80">Tháng/Năm</div>
+                <div class="col-sm-6 col-12">
+                  <ejs-datepicker
+                    v-model="params[2].p_thangnam"
+                    :max="config.max_date"
+                    :start="'Year'"
+                    :depth="'Year'"
+                    :format="'MM/y'"
+                    :showClearButton="false"
+                    :allowEdit="false"
+                    :width="'100%'"
+                  >
+                  </ejs-datepicker>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">File dữ liệu</div>
+
+                <div class="value col-sm-6 col-12">
+                  <div class="input-more-button">
+
+                    <input type="text" class="form-control " v-model="params[2].p_filepath">
+                    <button class="btn" @click="browserFile">
+                        <span class="-ap icon-more_horiz"></span>
+                    </button>
+
+                  </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                  <a href="/static/files/Mau_Thanh_Toan_Don_Hang_VNPTPay.xlsx">Tải biểu mẫu</a>
+                </div>
+              </div>
+            </b-col>
+          </b-row>
+          <b-row class="p-0">
+              <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+                  <div class="legend-title mb-2">
+                      Dữ liệu import
+                  </div>
+                  <b-nav tabs="" class="mb-2">
+                      <b-nav-item :active="active_tab==1" @click="active_tab=1">
+                          Thành công
+                      </b-nav-item>
+                      <b-nav-item :active="active_tab==2" @click="active_tab=2">
+                          Lỗi
+                      </b-nav-item>
+                  </b-nav>
+          <data-grid-3 id="gridviewDanhSach3" v-show="active_tab==1" :data-source="tabData[3].dsImport" :showFilter="true" :columns="[
+            { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+            { fieldName: 'KENHTHANHTOAN', headerText: 'Kênh thanh toán', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGUONTIEN_THANHTOAN', headerText: 'Nguồn tiền thanh toán', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_GD', headerText: 'Mã giao dịch', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_GD_VI', headerText: 'Mã giao dịch ví', allowFiltering: true, allowSorting: true },
+            { fieldName: 'DICHVU', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true },
+            { fieldName: 'SOTIEN', headerText: 'Số tiền', allowFiltering: true, allowSorting: true, type: 'number', format:'N0' },
+            { fieldName: 'NGAY_GD', headerText: 'Ngày giao dịch', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TINHTHANH', headerText: 'Tỉnh thành', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_THANHTOAN', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: true },
+            { fieldName: 'HINHTHUC_GACHNO', headerText: 'Hình thức gạch nợ', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_GD_APP_BANHANG', headerText: 'Mã GD App bán hàng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGAY_CN', headerText: 'Ngày cập nhật', allowFiltering: true, allowSorting: true },
+            ]">
+          </data-grid-3>
+          <data-grid-3 id="gridviewDanhSachLoi3" v-show="active_tab==2" :data-source="tabData[3].error" :showFilter="true" :columns="[
+            { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+            { fieldName: 'ERROR_MSG', headerText: 'Mô tả lỗi', allowFiltering: true, allowSorting: true },
+            { fieldName: 'KENHTHANHTOAN', headerText: 'Kênh thanh toán', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGUONTIEN_THANHTOAN', headerText: 'Nguồn tiền thanh toán', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_GD', headerText: 'Mã giao dịch', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_GD_VI', headerText: 'Mã giao dịch ví', allowFiltering: true, allowSorting: true },
+            { fieldName: 'DICHVU', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true },
+            { fieldName: 'SOTIEN', headerText: 'Số tiền', allowFiltering: true, allowSorting: true, type: 'number', format:'N0' },
+            { fieldName: 'NGAY_GD', headerText: 'Ngày giao dịch', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TINHTHANH', headerText: 'Tỉnh thành', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_THANHTOAN', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: true },
+            { fieldName: 'HINHTHUC_GACHNO', headerText: 'Hình thức gạch nợ', allowFiltering: true, allowSorting: true },
+            { fieldName: 'MA_GD_APP_BANHANG', headerText: 'Mã GD App bán hàng', allowFiltering: true, allowSorting: true },
+            ]">
+          </data-grid-3>
+              </b-col>
+          </b-row>
+      </b-container>
+
+      <!-- 4. DL nạp thẻ topup qua ví NV -->
+      <b-container fluid="" class="p-3 page-content" v-show="active_page==4">
+        <b-row class="p-0">
+          <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+            <div class="legend-title mb-2">
+                File Nạp
+            </div>
+            <div class="info-row">
+              <div class="key w80">Tháng/Năm</div>
+              <div class="col-sm-6 col-12">
+                <ejs-datepicker
+                  v-model="params[4].p_thangnam"
+                  :max="config.max_date"
+                  :start="'Year'"
+                  :depth="'Year'"
+                  :format="'MM/y'"
+                  :showClearButton="false"
+                  :allowEdit="false"
+                  :width="'100%'"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w80">File dữ liệu</div>
+
+              <div class="value col-sm-6 col-12">
+                <div class="input-more-button">
+
+                  <input type="text" class="form-control " v-model="params[4].p_filepath">
+                  <button class="btn" @click="browserFile">
+                      <span class="-ap icon-more_horiz"></span>
+                  </button>
+
+                </div>
+              </div>
+              <div class="col-sm-2 col-12">
+                <a href="/static/files/Mau_NapThe_Topup_quavi_NV_app_SMCS.xlsx">Tải biểu mẫu</a>
+              </div>
+            </div>
+          </b-col>
+        </b-row>
+
+          <b-row class="p-0">
+              <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+                  <div class="legend-title mb-2">
+                      Dữ liệu import
+                  </div>
+                  <b-nav tabs="" class="mb-2">
+                      <b-nav-item :active="active_tab==1" @click="active_tab=1">
+                          Thành công
+                      </b-nav-item>
+                      <b-nav-item :active="active_tab==2" @click="active_tab=2">
+                          Lỗi
+                      </b-nav-item>
+                  </b-nav>
+                  <data-grid-3 id="gridviewDanhSach4" v-show="active_tab==1" :data-source="tabData[4].dsImport" :showFilter="true" :columns="[
+                    { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'MA_GIAODICH', headerText: 'Mã giao dịch', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'THOIGIAN_GIAODICH', headerText: 'Thời gian giao dịch', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'THOIGIAN_XULY', headerText: 'Thời gian xử lý', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'DICHVU', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'SOVI', headerText: 'Số ví', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'HOTEN', headerText: 'Họ tên', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'USER_VI', headerText: 'Số Eload/User', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'TTKD', headerText: 'TTKD', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'SOTIEN', headerText: 'Số tiền', allowFiltering: true, allowSorting: true, type: 'number', format: 'N0' },
+                    { fieldName: 'SOTHUHUONG', headerText: 'Số thụ hưởng', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'MOTA', headerText: 'Mô tả', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: true },
+                    ]">
+                  </data-grid-3>
+                  <data-grid-3 id="gridviewDanhSachLoi4" v-show="active_tab==2" :data-source="tabData[4].error" :showFilter="true" :columns="[
+                    { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'ERROR_MSG', headerText: 'Mô tả lỗi', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'MA_GIAODICH', headerText: 'Mã giao dịch', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'THOIGIAN_GIAODICH', headerText: 'Thời gian giao dịch', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'THOIGIAN_XULY', headerText: 'Thời gian xử lý', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'DICHVU', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'SOVI', headerText: 'Số ví', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'HOTEN', headerText: 'Họ tên', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'USER_VI', headerText: 'Số Eload/User', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'TTKD', headerText: 'TTKD', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'SOTIEN', headerText: 'Số tiền', allowFiltering: true, allowSorting: true, type: 'number', format: 'N0' },
+                    { fieldName: 'SOTHUHUONG', headerText: 'Số thụ hưởng', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'MOTA', headerText: 'Mô tả', allowFiltering: true, allowSorting: true },
+                    { fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: true },
+                    ]">
+                  </data-grid-3>
+              </b-col>
+          </b-row>
+      </b-container>
+
+      <!-- 5. Import dữ liệu bán gói D99V -->
+      <b-container fluid="" class="p-3 page-content" v-show="active_page==5">
+        <b-row class="p-0">
+          <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+            <div class="legend-title mb-2">
+                File Nạp
+            </div>
+            <div class="info-row">
+              <div class="key w80">Tháng/Năm</div>
+              <div class="col-sm-6 col-12">
+                <ejs-datepicker
+                  v-model="params[5].p_thangnam"
+                  :max="config.max_date"
+                  :start="'Year'"
+                  :depth="'Year'"
+                  :format="'MM/y'"
+                  :showClearButton="false"
+                  :allowEdit="false"
+                  :width="'100%'"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w80">File dữ liệu</div>
+
+              <div class="value col-sm-6 col-12">
+                <div class="input-more-button">
+
+                  <input type="text" class="form-control " v-model="params[5].p_filepath">
+                  <button class="btn" @click="browserFile">
+                      <span class="-ap icon-more_horiz"></span>
+                  </button>
+
+                </div>
+              </div>
+              <div class="col-sm-2 col-12">
+                <a href="/static/files/Mau_Du_Lieu_Ban_goi_D99V.xlsx">Tải biểu mẫu</a>
+              </div>
+            </div>
+          </b-col>
+        </b-row>
+          <b-row class="p-0">
+              <b-col class="mr-1 box-form p-2" style="overflow: hidden">
+                  <div class="legend-title mb-2">
+                      Dữ liệu import
+                  </div>
+                  <b-nav tabs="" class="mb-2">
+                      <b-nav-item :active="active_tab==1" @click="active_tab=1">
+                          Thành công
+                      </b-nav-item>
+                      <b-nav-item :active="active_tab==2" @click="active_tab=2">
+                          Lỗi
+                      </b-nav-item>
+                      <b-nav-item :active="active_tab==3" @click="active_tab=3">
+                          Danh sách
+                      </b-nav-item>
+                  </b-nav>
+          <data-grid-3 id="gridviewDanhSach5" v-show="active_tab==1" :data-source="tabData[5].success" :showFilter="true" :columns="[
+            { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+            { fieldName: 'STB', headerText: 'Số TB', allowFiltering: true, allowSorting: true },
+            { fieldName: 'PHONG', headerText: 'Phòng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'LOAIMAY', headerText: 'Loại máy', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TIEUDUNG', headerText: 'Tiêu dùng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TKC_HIENTAI', headerText: 'TKC Hiện tại', allowFiltering: true, allowSorting: true },
+            { fieldName: 'THANG', headerText: 'Tháng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'GOI_MUCTIEU', headerText: 'Gói mục tiêu', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGAY_DUYET', headerText: 'Ngày duyệt', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true, allowSorting: true },
+            ]">
+          </data-grid-3>
+          <data-grid-3 id="gridviewDanhSachLoi5" v-show="active_tab==2" :data-source="tabData[5].error" :showFilter="true" :columns="[
+            { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+            { fieldName: 'ERROR_MSG', headerText: 'Mô tả lỗi', allowFiltering: true, allowSorting: true },
+            { fieldName: 'STB', headerText: 'Số TB', allowFiltering: true, allowSorting: true },
+            { fieldName: 'PHONG', headerText: 'Phòng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'LOAIMAY', headerText: 'Loại máy', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TIEUDUNG', headerText: 'Tiêu dùng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TKC_HIENTAI', headerText: 'TKC Hiện tại', allowFiltering: true, allowSorting: true },
+            { fieldName: 'THANG', headerText: 'Tháng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'GOI_MUCTIEU', headerText: 'Gói mục tiêu', allowFiltering: true, allowSorting: true },
+            ]">
+          </data-grid-3>
+          <data-grid-3 id="gridviewDanhSachDL5" v-show="active_tab==3" :data-source="tabData[5].dsImport" :showFilter="true" :columns="[
+            { fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true },
+            { fieldName: 'STB', headerText: 'Số TB', allowFiltering: true, allowSorting: true },
+            { fieldName: 'PHONG', headerText: 'Phòng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'LOAIMAY', headerText: 'Loại máy', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TIEUDUNG', headerText: 'Tiêu dùng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'TKC_HIENTAI', headerText: 'TKC Hiện tại', allowFiltering: true, allowSorting: true },
+            { fieldName: 'THANG', headerText: 'Tháng', allowFiltering: true, allowSorting: true },
+            { fieldName: 'GOI_MUCTIEU', headerText: 'Gói mục tiêu', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGAY_DUYET', headerText: 'Ngày duyệt', allowFiltering: true, allowSorting: true },
+            { fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true, allowSorting: true },
+            { fieldName: '', headerText: 'Ngày CN', allowFiltering: true, allowSorting: true },
+            ]">
+          </data-grid-3>
+              </b-col>
+          </b-row>
+      </b-container>
+</div>

@@ -1,0 +1,125 @@
+<template>
+    <div>
+        <div class="control-section">
+            <h4
+                id="days"
+                align="center"
+                style="font-family: Segoe UI;font-weight: 500; font-style:normal; font-size:15px;"
+            >Filter From Hire Date</h4>
+            <div align="center">
+                <ejs-rangenavigator
+                    style="display:block"
+                    ref="range"
+                    align="center"
+                    id="containerFilter"
+                    :value="value"
+                    height="75"
+                    labelPosition="Outside"
+                    valuetype="DateTime"
+                    allowSnapping="true"
+                    intervalType="Quarter"
+                    enableGrouping="true,"
+                    groupBy="Years"
+                    enableDeferredUpdate="true"
+                    :dataSource="dataSource"
+                    xName="HireDate"
+                    yName="yValue"
+                    :width="width"
+                    :changed="changed"
+                    :theme="theme"
+                    animationDuration="500"
+                ></ejs-rangenavigator>
+            </div>
+            <br />
+            <div align="center">
+                <ejs-grid
+                    id="grid"
+                    ref="gridref"
+                    :dataSource="gridData"
+                    height="350"
+                    :width="width"
+                >
+                    <e-columns>
+                        <e-column field="EmployeeID" headerText="Employee ID" textAlign="Center"></e-column>
+                        <e-column field="FirstName" headerText="Name" textAlign="Center"></e-column>
+                        <e-column field="Title" headerText="Title" format="yMd" textAlign="Center"></e-column>
+                        <e-column
+                            field="HireDate"
+                            headerText="Hire Date"
+                            :format="format"
+                            textAlign="Center"
+                        ></e-column>
+                    </e-columns>
+                </ejs-grid>
+            </div>
+        </div>
+        
+    </div>
+</template>
+<style scoped>
+#control-containerFilter {
+    padding: 0px !important;
+}
+</style>
+<script>
+import Vue from "vue";
+import { Browser } from "@syncfusion/ej2-base";
+import { GridPlugin } from "@syncfusion/ej2-vue-grids";
+// import { RangeNavigatorPlugin, AreaSeries, DateTime } from "@syncfusion/ej2-vue-charts";
+// import { employeeData } from "./datasource.ts";
+
+// Vue.use(RangeNavigatorPlugin);
+Vue.use(GridPlugin);
+
+let selectedTheme = location.hash.split("/")[1];
+selectedTheme = selectedTheme ? selectedTheme : "Material";
+let theme = (selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)).replace(/-dark/i, "Dark").replace(/contrast/i, 'Contrast');
+
+export default Vue.extend({
+    data: function () {
+        let gridDataSource;
+        return {
+            //Grid Properties
+            format: { skeleton: "yMd", type: "date" },
+            //Range Navigator Properties
+            value: [new Date(1992, 5, 1), new Date(1993, 4, 1)],
+            dataSource: [{
+                EmployeeID: 1,
+                yValue: 2,
+                FirstName: 'Nancy',
+                Title: 'Sales Representative',
+                HireDate: new Date(1992, 0, 1),
+            }],
+            width: Browser.isDevice ? "100%" : "80%",
+            gridData: [{
+                EmployeeID: 1,
+                yValue: 2,
+                FirstName: 'Nancy',
+                Title: 'Sales Representative',
+                HireDate: new Date(1992, 0, 1),
+            }],
+            theme: theme
+        };
+    },
+    provide: {
+        rangeNavigator: []
+    },
+    updated: function () {
+        this.$nextTick(function () {
+            this.$refs.range.ej2Instances.refresh();
+            this.$refs.gridref.ej2Instances.refresh();
+        });
+    },
+    methods: {
+
+        changed: function (args) {
+            this.$refs.gridref.ej2Instances.dataSource = employeeData.filter(function (data) {
+                return (
+                    data.HireDate >= new Date(+args.start) &&
+                    data.HireDate <= new Date(+args.end)
+                );
+            });
+        }
+    }
+});
+</script>

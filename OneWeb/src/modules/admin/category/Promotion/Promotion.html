@@ -1,0 +1,193 @@
+<div class="main-wrapper">
+    <!-- <div class="breadcrumb-top">
+        <div class="main-title">khuyến mại</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="#">Lập hợp đồng</a></li>
+            <li class="breadcrumb-item active">Lắp đặt mới</li>
+        </ul>
+    </div> -->
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li class="pointer">
+                <a href="" @click.prevent="onBtnAddNewClick" class="" :class="buttonStatus.btnAddNew ? '' : 'disabled'">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li class="pointer">
+                <a href="" @click.prevent="onBtnSaveClick" :class="buttonStatus.btnSave ? '' : 'disabled'">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li class="pointer">
+                <a href="" @click.prevent="onBtnCancelClick" :class="buttonStatus.btnCancel ? '' : 'disabled'">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ
+                </a>
+            </li>
+            <li class="pointer">
+                <a href="" @click.prevent="onBtnDeleteClick" :class="buttonStatus.btnDelete ? '' : 'disabled'">
+                    <span class="icon one-trash"></span>Xoá
+                </a>
+            </li>
+            <li class="pointer">
+                <a @click.prevent="() => { isViewDetail = !isViewDetail }"
+                    :class="infoPromotion.khuyenmai_id ? '' : 'disabled'">
+                    <span class="icon one-eye"></span>Chi tiết
+                </a>
+            </li>
+            <li class="pointer">
+                <a @click.prevent="onBtnCopyClick" :class="listPromotion.length > 0 ? '' : 'disabled'">
+                    <span class="icon one-copy"></span>Copy
+                </a>
+            </li>
+            <li class="pointer">
+                <a @click.prevent="onBtnXuatCTKMClick">
+                    <span class="icon one-excel"></span>Xuất CTKM
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-5 col-12">
+                    <info-promotion v-if="infoPromotion" :value="infoPromotion" :infoInstallationType="infoInstallationType" :v="$v" ref="infoPromotion" @chkConHL_CheckedChanged="()=>{}" @chkHienThiTaCa_CheckedChanged="()=>{this.loadGrid();}"/>
+                </div>
+                <div class="col-sm-7 col-12">
+                    <div class="nav tabs tab-over">
+                        <a v-for="(item, i) in tabList" class="minw0 pointer" :class="{active: item.id == selectedTab}"
+                            @click.prevent="() => selectedTab = item.id">{{ item.name }} </a>
+                    </div>
+                    <Area v-show="selectedTab == 0" />
+                    <SubscribersType v-show="selectedTab == 1" :value="infoInstallationType"
+                        :infoPromotion="infoPromotion" :tabIndex="state.tabIndex"/>
+                    <installation-type v-show="selectedTab == 2" ref="infoPromotion" :value="infoInstallationType" />
+                    <equipment v-show="selectedTab == 3" :value="infoInstallationType" />
+                    <objectTB v-show="selectedTab == 4" :value="infoInstallationType" />
+                    <Service v-show="selectedTab == 5" :value="dichVuKem" />
+                    <Package v-show="selectedTab == 6" />
+                    <Loainha v-show="selectedTab == 7" />
+                    <div class="legend-title mart20">Danh sách khuyến mại
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Số công văn </div>
+                        <div class="input-more-button-right">
+                            <div class="select-custom">
+                                <div @click.prevent="toggleCshtPopup">
+                                    <vue-input v-model="infoInstallationType.serviceTransportationName"></vue-input>
+                                </div>
+                                <div v-show="isShowCshtPopup" class="box-form csht-popup" style="position: absolute ; z-index: 99999999;overflow:scroll;">
+                                    <div class="info-row" style="width: 1500px;">
+                                        <ejs-grid ref="vueTableDetail" :dataSource="ListSoCongVan_TimKiem"
+                                            :allowPaging="true" :pageSettings="pageSettings" :allowSorting="false"
+                                            :allowFiltering="true" :selectedRowIndex=0
+                                            :rowSelected='rowSelectedSoCongVan' :pagerTemplate="pagerTemplate"
+                                            gridLines="Both">
+                                            <e-columns>
+                                                <e-column template="<span class='fa selected-flag'></span>"
+                                                    :allowFiltering="false" filterTemplate="<span></span>" width="40"
+                                                    maxWidth="40" minWidth="40" textAlign="center"
+                                                    :customAttributes="{ class: 'column-selected-flag' }"
+                                                    :freeze="'left'" :allowResizing="false" clipMode="Ellipsis">
+                                                </e-column>
+                                                <e-column field="congvan_id" id="Grid1" headerText="Số CV" width="120"  class="bold red"
+                                                    headerTextAlign="center" textAlign="center"
+                                                    :filter="{ operator: 'contains' }">
+                                                </e-column>
+                                                <e-column field="ten_cv" id="Grid1" headerText="Tên CV"
+                                                    headerTextAlign="center" textAlign='Left'  class="bold"
+                                                    :filter="{ operator: 'contains' }">
+                                                </e-column>
+                                                <!-- <e-column field="nam" id="Grid1" headerText="Năm" width="200"
+                                                    headerTextAlign="center" textAlign='Right'
+                                                    :filter="{ operator: 'contains' }">
+                                                </e-column>
+                                                <e-column field="hieuluc" id="Grid1" :valueAccessor='valueAccess'
+                                                    headerText="Hiệu lực" width="200" headerTextAlign="center"
+                                                    textAlign='Right' :filter="{ operator: 'contains' }">
+                                                </e-column> -->
+                                            </e-columns>
+                                        </ejs-grid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">{{cboDichVuVT.text}}</div>
+                        <div class="value">
+                            <select2 v-model="cboDichVuVT.value" :options="listTelecomService_V2"></select2>
+                        </div>
+                    </div>
+                    <div class="table-content"  >
+                        <DataGrid ref="vueTable" v-bind:columns="promotionsHeader" height="250px"
+                            v-bind:dataSource="listPromotion" :showColumnCheckbox="false"
+                            :enable-paging-server="false" :allowPaging="true" :showFilter="true" :allowResizing='true'
+                            :enabled-select-first-row="false" @selectedRowChanged="grvDanhSachKM_FocusedRowChanged"
+                            >
+                            <!-- @rowDoubleClicked="gridviewVatTuRowDoubleClick" -->
+                        </DataGrid>
+                        <!-- <vue-table ref="vueTable" v-model="promotionsCurrentRecord" :options="listPromotion"
+                            :config="promotionsHeader" :multiple="false"></vue-table> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Chi tiết khuyến mại</div>
+            <div class="table-content">
+                <div class="grid-ext grid-ext-freeze">
+                    <DataGrid v-bind:columns="[
+                                    {fieldName: 'chitietkm_id', headerText: 'ID', allowFiltering: true, width: '50', },
+                                    {fieldName: 'ten_ctkm', headerText: 'Tên chi tiết KM', allowFiltering: true, },
+                                    {fieldName: 'cuoc_sd', headerText: 'Tiền KM', allowFiltering: true, width: '200'},
+                                    {fieldName: 'tyle_kmld', headerText: 'Tỷ lệ KMLĐ', allowFiltering: true,  width: '200'},
+                                    {fieldName: 'nhom_km', headerText: 'Nhóm', allowFiltering: true,},
+                                ]"
+                            ref="vueTableDetail"
+                            :showColumnCheckbox='false'
+                            :sortSettings="sortOptions"
+                            v-bind:dataSource="detailPromotion"
+                            @selectedRowChanged="rowSelected"
+                            :enable-paging-server="false"
+                            :allowPaging="true"
+                            :allowSelection='true'
+                            :multiple="false"
+                            :enabled-select-first-row="true"
+                            :showFilter="true">
+                    </DataGrid>
+                    <!-- <ejs-grid v-if="!tableDetailLoading" ref="vueTableDetail" :dataSource="detailPromotion" :sortSettings="sortOptions"
+                        :allowPaging="true" :pageSettings="pageSettings" :allowSorting="true" :allowFiltering="true"
+                        :selectedRowIndex=0 :rowSelected='rowSelected' :pagerTemplate="pagerTemplate" gridLines="Both">
+                        <e-columns>
+                            <e-column template="<span class='fa selected-flag'></span>" :allowFiltering="false"
+                                filterTemplate="<span></span>" width="20" maxWidth="20" minWidth="20" textAlign="center"
+                                :customAttributes="{ class: 'column-selected-flag' }" :freeze="'left'"
+                                :allowResizing="false" clipMode="Ellipsis"></e-column>
+                            <e-column field="chitietkm_id" id="Grid1" headerText="ID" width="120"
+                                headerTextAlign="center" textAlign="center" :filter="{ operator: 'contains' }" allowSorting="true">
+                            </e-column>
+                            <e-column field="ten_ctkm" id="Grid1" headerText="Tên chi tiết KM" headerTextAlign="center"
+                                textAlign='Left' :filter="{ operator: 'contains' }">
+                            </e-column>
+                            <e-column field="cuoc_sd" id="Grid1" headerText="Tiền KM" width="200"
+                                headerTextAlign="center" format="n" type="number" textAlign='Right'
+                                :filter="{ operator: 'contains' }">
+                            </e-column>
+                            <e-column field="tyle_kmld" id="Grid1" headerText="Tỷ lệ KMLĐ" width="200"
+                                headerTextAlign="center" format="n" type="number" textAlign='Right'
+                                :filter="{ operator: 'contains' }">
+                            </e-column>
+                        </e-columns>
+                    </ejs-grid> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <update-promotion-detail :khuyenmai_id="infoPromotion.khuyenmai_id"
+        :dichvuvt_id="infoInstallationType.serviceTransportation2" :index="promotionsCurrentRecordDetail" v-if="isViewDetail"
+        @close="() => { isViewDetail = false; }" />
+  <ExportDataModal ref="exportDataModal" :data="this.table.data"></ExportDataModal>
+</div>

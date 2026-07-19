@@ -1,0 +1,150 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li :class="{'disable-btn': !tsbtnXem}" @click="tsbtnXem_Click">
+        <a href="javascript:void(0)"> <span class="icon one-refresh"></span> Lấy TT </a>
+      </li>
+      <li :class="{'disable-btn': !tsbtnChapNhan}" @click="btnDongBoDL">
+        <a href="javascript:void(0)"> <span class="icon one-save"></span> Đồng bộ DL </a>
+      </li>
+      <li :class="{'disable-btn': !tsbtnHuy}" @click="tsbtnHuy_Click">
+        <a href="javascript:void(0)"> <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy </a>
+      </li>
+      <li :class="{'disable-btn': !tsbtnMauEx}" @click="tsbtnMauEx_Click">
+        <a href="javascript:void(0)"> <span class="icon one-xlsx"></span> File Excel mẫu </a>
+      </li>
+      <li :class="{'disable-btn': !btnXuatExcel}" @click="btnXuatExcel_Click">
+        <a href="javascript:void(0)"> <span class="icon one-xlsx"></span> Xuất Excel </a>
+      </li>
+    </ul>
+  </div>
+  <div class></div>
+  <div class="page-content">
+    <div class="box-form padt8 padb8" v-if="isShowChonTinh">
+      <div class="row">
+        <div class="col-sm-2 col-12">
+          <div class="info-row marb0">
+            <div class="key w100 nowrap fw6">Chọn tỉnh</div>
+            <div class="value" style="width: 100%;">
+              <SelectExt class="select-custom" v-model="tinh" :dataSource="listTinh" dataTextField="tentinh" dataValueField="tinh_id" @change="cboTinh_EditValueChanged"></SelectExt>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <Split :gutterSize="16">
+        <SplitArea :size="50" :minSize="100">
+          <div class="info-row">
+            <div class="box-form" style="display: inline-grid">
+              <div class="legend-title">Chọn đường dẫn</div>
+              <span class="one-alert text-warning"></span>
+              <span class="name text-main fw6">- File excel gồm 5 trường: CHUKY, MA_TB, MA_TOANHA, DOANHTHU, CHIPHI</span>
+              <span class="name text-main fw6">- Cập nhật MA_TOANHA = "XOATHUEBAO" để xóa dữ liệu thuê bao</span>
+              <span class="name text-main fw6">- CHUKY: yyyyMMck (Vd: 20211201)</span>
+            </div>
+            <div class="box-form">
+              <div class="row">
+                <div class="info-row">
+                  <div class="key w80">Đường dẫn</div>
+                  <div class="input-more-button">
+                    <label for="upload" class="btn">
+                      <span class="-ap icon-more_horiz"></span>
+                      <input ref="fileInput" type="file" id="upload" style="display: none" @change="onChangeFile" accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                    </label>
+                    <input @click="duongDan_click" v-model="duongDan" type="text" class="form-control" style="background-color: #fff" readonly="true" />
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="info-row">
+                <div class="key padl10">Đường dẫn</div>
+                <div class="value">
+                  <b-form-file id="fileUpload" v-model="fileExcel" placeholder="" accept=".xls, .xlsx"></b-form-file>
+                </div>
+              </div> -->
+            </div>
+          </div>
+          <div class="box-form">
+            <div class="legend-title">File Upload</div>
+            <div class="table-content">
+              <DataGrid
+                :allowPaging="true"
+                :enablePagingServer="false"
+                v-bind:columns="[
+                {fieldName: 'trangthai',freeze:'Left', width:'150px', headerText: 'Trạng thái', template:TrangThaiTemplate, cellCssClass: 'white-space:normal !important', allowFiltering: true},
+                {fieldName: 'chuky', headerText: 'Chu kỳ (yyyyMMck)', allowFiltering: true},
+                {fieldName: 'ma_tb', headerText: 'Mã TB', width:'150px', allowFiltering: true},
+                {fieldName: 'ma_toanha', headerText: 'Mã tòa nhà', allowFiltering: true},
+                {fieldName: 'doanhthu', headerText: 'Doanh thu (VNĐ)', allowFiltering: true},
+                {fieldName: 'chiphi', headerText: 'Chi phí (VNĐ)', allowFiltering: true},
+                {fieldName: 'ghichu', headerText: 'Ghi chú', allowFiltering: true},
+                ]"
+                ref="gridDgvDanhSach"
+                v-bind:dataSource="dgvDanhSach"
+                :showFilter="false"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </SplitArea>
+        <SplitArea :size="50" :minSize="100">
+          <div class="box-form">
+            <div class="legend-title">Doanh thu chi phí thuê bao (Bán chéo)</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="row">
+                  <div class="col-sm-3 col-6">
+                    <div class="info-row">
+                      <div class="value w20 padt4">
+                        <div class="check-action">
+                          <input type="checkbox" v-model="chkThangChot" class="check" />
+                          <span class="name"></span>
+                        </div>
+                      </div>
+                      <div class="key">Chu kỳ</div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4 col-6">
+                    <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" style="width: 100%" :placeholder="waterMark" :value="dateVal" :format="dateFormat" :enabled="chkThangChot" v-model="dtpKyHD"></ejs-datepicker>
+                  </div>
+                  <div class="col-sm-1 col-6">
+                    <button class="btn btn-main" @click="btnRefresh">
+                      <span class="icon one-refresh"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12"></div>
+            </div>
+          </div>
+          <div class="box-form">
+            <div class="table-content">
+              <DataGrid
+                :allowPaging="true"
+                :enablePagingServer="false"
+                v-bind:columns="[
+                {fieldName: 'thang', headerText: 'Chu kỳ', allowFiltering: true},
+                {fieldName: 'ma_tb', headerText: 'Mã TB', allowFiltering: true},
+                {fieldName: 'ten_dvvt', headerText: 'Dịch vụ VT', allowFiltering: true},
+                {fieldName: 'loaihinh_tb', headerText: 'Loại hình TB', allowFiltering: true},
+                {fieldName: 'ma_toanha', headerText: 'Mã tòa nhà', allowFiltering: true},
+                {fieldName: 'doanhthu', headerText: 'Doanh thu (VNĐ)', allowFiltering: true},
+                {fieldName: 'chiphi', headerText: 'Chi phí (VNĐ)', allowFiltering: true},
+                {fieldName: 'nguoi_cn', headerText: 'User', allowFiltering: true},
+                {fieldName: 'may_cn', headerText: 'Máy CN', allowFiltering: true},
+                {fieldName: 'ngay_cn', headerText: 'Ngày CN', allowFiltering: true},
+                ]"
+                ref="gridDgvDoanhThu"
+                v-bind:dataSource="dgvDoanhThu"
+                :allowExcelExport="true"
+                :showFilter="true"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </SplitArea>
+      </Split>
+    </div>
+  </div>
+  <frmChonTinhBanCheo ref="ref_frmChonTinhBanCheo" @onChapNhan="onChapNhanModalChonTinh"></frmChonTinhBanCheo>
+</div>

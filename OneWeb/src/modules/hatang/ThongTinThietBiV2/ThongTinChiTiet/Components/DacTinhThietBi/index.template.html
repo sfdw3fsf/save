@@ -1,0 +1,610 @@
+
+<div class="row">
+  <div class="col-12">
+    <div class="legend-title">Đặc tính thiết bị</div>
+  </div>
+  <div class="col-6">
+    <div class="info-row">
+      <div class="key w150">Hãng sản xuất</div>
+      <div class="value">
+        <SelectExt
+          :dataSource="manufacturerList"
+          dataTextField="TEN"
+          dataValueField="ID"
+          v-model="currentItem.hangsx_id"
+          :disabled="!controls.select_hangsx_id.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Năm sản xuất</div>
+      <div class="value">
+        <input
+          type="number"
+          class="form-control"
+          v-model="currentItem.namsx"
+          :disabled="!controls.txt_namsx.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Nhà cung cấp</div>
+      <div class="value">
+        <SelectExt
+          :dataSource="supplierList"
+          dataTextField="TEN"
+          dataValueField="ID"
+          v-model="currentItem.nhacungcap_id"
+          :disabled="!controls.select_nhacungcap_id.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Hệ điều hành</div>
+      <div class="value">
+        <SelectExt
+          :dataSource="OSList"
+          dataTextField="TEN"
+          dataValueField="ID"
+          v-model="currentItem.hedieuhanh_id"
+          :disabled="!controls.select_hedieuhanh_id.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row d-flex gap-5 justify-content-between">
+      <div class="field-group-wrapper">
+        <div class="field-group">
+          <div class="key w150">Ngày lắp đặt</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_lapdat"
+              :disabled="!controls.txt_ngay_lapdat.enabled"
+            />
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="key w150">Ngày sử dụng</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_sudung"
+              :disabled="!controls.txt_ngay_sudung.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row d-flex gap-5 justify-content-between">
+      <div class="field-group-wrapper">
+        <div class="field-group">
+          <div class="key w150">Trạng thái sử dụng</div>
+          <div class="value">
+            <SelectExt
+              :dataSource="usageStatusList"
+              dataTextField="TEN"
+              dataValueField="ID"
+              v-model="currentItem.trangthai_sd"
+              :disabled="!controls.select_trangthai_sd.enabled"
+            />
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="key w150">Ngày bảo hành</div>
+          <div class="value">
+            <input
+              type="date"
+              class="form-control"
+              v-model="currentItem.ngay_baohanh"
+              :disabled="!controls.txt_ngay_baohanh.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row d-flex gap-5 justify-content-between">
+      <div class="field-group-wrapper">
+        <div class="field-group">
+          <div class="key w150">Công suất định danh</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cs_dinhdanh"
+              :disabled="!controls.txt_cs_dinhdanh.enabled"
+            />
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="key w150">Công suất thực tế</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cs_thucte"
+              :disabled="!controls.txt_cs_thucte.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-row" v-if="isNetwork || isServer">
+      <div class="key w150">Vai trò thiết bị</div>
+      <div class="value">
+        <treeselect
+          :multiple="true"
+          v-model="currentItem.vaitrothietbi_ids"
+          :options="deviceRoleList"
+          placeholder="Chọn vai trò thiết bị"
+          :disable-branch-nodes="false"
+          :append-to-body="true"
+          style="overflow-y:auto;"
+          :disabled="!controls.select_vaitrothietbi_ids.enabled"
+          :normalizer="normalizer"
+          :class="{ 'is-invalid': controls.select_vaitrothietbi_ids.invalid }"
+        ></treeselect>
+      </div>
+    </div>
+    <div class="info-row" v-if="isOther">
+      <div class="key w150">Cấu hình chi tiết</div>
+      <div class="value">
+        <textarea
+          class="form-control"
+          rows="3"
+          v-model="currentItem.cauhinh"
+          :disabled="!controls.txt_cauhinh.enabled"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <!-- Server Information with Tabs -->
+    <div v-show="isServer" class="server-info-section">
+      <div class="nav tab-over tabs">
+        <a
+          href="#tabCPU"
+          v-on:click="onChangeTab(1)"
+          data-toggle="tab"
+          class="tab"
+          :class="{ active: tab_index == 1 }"
+          >CPU</a
+        >
+        <a
+          href="#tabRAM"
+          v-on:click="onChangeTab(2)"
+          data-toggle="tab"
+          class="tab"
+          :class="{ active: tab_index == 2 }"
+          >RAM</a
+        >
+        <a
+          href="#tabHDD"
+          v-on:click="onChangeTab(3)"
+          data-toggle="tab"
+          class="tab"
+          :class="{ active: tab_index == 3 }"
+          >HDD</a
+        >
+      </div>
+      <!-- CPU Tab -->
+      <div v-show="tab_index == 1" class="cpu-section">
+        <h6>Thông tin CPU</h6>
+        <div class="info-row">
+          <div class="key w150">Số khe CPU</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cpu_sokhe"
+              :disabled="!controls.txt_cpu_sokhe.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">CPU đã cắm</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cpu_dacam"
+              :disabled="!controls.txt_cpu_dacam.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Tổng CPU</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.cpu_total"
+              :disabled="!controls.txt_cpu_total.enabled"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- RAM Tab -->
+      <div v-show="tab_index == 2" class="ram-section">
+        <h6>Thông tin RAM</h6>
+        <div class="info-row">
+          <div class="key w150">Số khe RAM</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.ram_sokhe"
+              :disabled="!controls.txt_ram_sokhe.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">RAM đã cắm</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.ram_dacam"
+              :disabled="!controls.txt_ram_dacam.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Tổng RAM</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.ram_total"
+              :disabled="!controls.txt_ram_total.enabled"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- HDD Tab -->
+      <div v-show="tab_index == 3" class="hdd-section">
+        <h6>Thông tin HDD</h6>
+        <div class="info-row">
+          <div class="key w150">Số khe HDD</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.hdd_sokhe"
+              :disabled="!controls.txt_hdd_sokhe.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">HDD đã cắm</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.hdd_dacam"
+              :disabled="!controls.txt_hdd_dacam.enabled"
+            />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w150">Tổng HDD</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model="currentItem.hdd_total"
+              :disabled="!controls.txt_hdd_total.enabled"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Power Supply Information -->
+    <div v-if="isOther" class="power-section">
+      <h6>Số cổng nguồn</h6>
+      <div class="info-row">
+        <div class="key w150">Đầu vào</div>
+        <div class="value">
+          <input
+            type="number"
+            class="form-control"
+            v-model="currentItem.psu_qty_in"
+            :disabled="!controls.txt_psu_qty_in.enabled"
+          />
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Đầu ra</div>
+        <div class="value">
+          <input
+            type="number"
+            class="form-control"
+            v-model="currentItem.psu_qty_out"
+            :disabled="!controls.txt_psu_qty_out.enabled"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Disk Shelf Information with Tabs -->
+    <div v-show="isDiskShelf" class="disk-shelf-section">
+      <div class="nav tab-over tabs">
+        <a
+          href="#tabController"
+          v-on:click="onChangeDiskShelfTab(1)"
+          data-toggle="tab"
+          class="tab"
+          :class="{ active: disk_shelf_tab_index == 1 }"
+          >Bộ điều khiển</a
+        >
+        <a
+          href="#tabDiskTray"
+          v-on:click="onChangeDiskShelfTab(2)"
+          data-toggle="tab"
+          class="tab"
+          :class="{ active: disk_shelf_tab_index == 2 }"
+          >Khay đĩa</a
+        >
+        <a
+          href="#tabStorageCapacity"
+          v-on:click="onChangeDiskShelfTab(3)"
+          data-toggle="tab"
+          class="tab"
+          :class="{ active: disk_shelf_tab_index == 3 }"
+          >Năng lực lưu trữ</a
+        >
+      </div>
+
+      <!-- Controller Tab -->
+      <div v-show="disk_shelf_tab_index == 1" class="controller-section">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w60">Số bộ</div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="currentItem.bodieukhien_qty"
+                  :disabled="!controls.txt_bodieukhien_qty.enabled"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w60">Bắt đầu</div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="currentItem.bodieukhien_dau"
+                  :disabled="!controls.txt_bodieukhien_dau.enabled"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-sm-12 col-12">
+            <div class="info-row">
+              <div class="key w120">Định dạng tên</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.bodieukhien_fname"
+                  :disabled="!controls.txt_bodieukhien_fname.enabled"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disk Tray Tab -->
+      <div v-show="disk_shelf_tab_index == 2" class="disk-tray-section">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w60">Số bộ</div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="currentItem.khaydia_qty"
+                  :disabled="!controls.txt_khaydia_qty.enabled"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w60">Bắt đầu</div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="currentItem.khaydia_dau"
+                  :disabled="!controls.txt_khaydia_dau.enabled"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-sm-12 col-12">
+            <div class="info-row">
+              <div class="key w120">Định dạng tên</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.khaydia_fname"
+                  :disabled="!controls.txt_khaydia_fname.enabled"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage Capacity Tab -->
+      <div v-show="disk_shelf_tab_index == 3" class="storage-capacity-section">
+        <div class="info-row">
+          <div class="key w100">Tổng:</div>
+          <div class="row">
+            <div class="col-4 info-row">
+              <div class="key w50">HDD <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="currentItem.hdd_tong"
+                  :disabled="!controls.txt_hdd_tong.enabled"
+                  :class="{ 'is-invalid': controls.txt_hdd_tong.invalid }"
+                />
+              </div>
+            </div>
+            <div class="col-4 info-row">
+              <div class="key w50">SSD <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.ssd_tong"
+                  :disabled="!controls.txt_ssd_tong.enabled"
+                  :class="{ 'is-invalid': controls.txt_ssd_tong.invalid }"
+                />
+              </div>
+            </div>
+            <div class="col-4 info-row">
+              <div class="key w50">IOPS <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.iops_tong"
+                  :disabled="!controls.txt_iops_tong.enabled"
+                  :class="{ 'is-invalid': controls.txt_iops_tong.invalid }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w100">Khả năng cấp:</div>
+          <div class="row">
+            <div class="col-4 info-row">
+              <div class="key w50">HDD <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.hdd_nangluc"
+                  :disabled="!controls.txt_hdd_nangluc.enabled"
+                  :class="{ 'is-invalid': controls.txt_hdd_nangluc.invalid }"
+                />
+              </div>
+            </div>
+            <div class="col-4 info-row">
+              <div class="key w50">SSD <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.ssd_nangluc"
+                  :disabled="!controls.txt_ssd_nangluc.enabled"
+                  :class="{ 'is-invalid': controls.txt_ssd_nangluc.invalid }"
+                />
+              </div>
+            </div>
+            <div class="col-4 info-row">
+              <div class="key w50">IOPS <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.iops_nangluc"
+                  :disabled="!controls.txt_iops_nangluc.enabled"
+                  :class="{ 'is-invalid': controls.txt_iops_nangluc.invalid }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w100">Đã cấp:</div>
+          <div class="row">
+            <div class="col-4 info-row">
+              <div class="key w50">HDD <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.hdd_capphat"
+                  :disabled="!controls.txt_hdd_capphat.enabled"
+                  :class="{ 'is-invalid': controls.txt_hdd_capphat.invalid }"
+                />
+              </div>
+            </div>
+            <div class="col-4 info-row">
+              <div class="key w50">SSD <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.ssd_capphat"
+                  :disabled="!controls.txt_ssd_capphat.enabled"
+                  :class="{ 'is-invalid': controls.txt_ssd_capphat.invalid }"
+                />
+              </div>
+            </div>
+            <div class="col-4 info-row">
+              <div class="key w50">IOPS <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.iops_capphat"
+                  :disabled="!controls.txt_iops_capphat.enabled"
+                  :class="{ 'is-invalid': controls.txt_iops_capphat.invalid }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="info-row">
+              <div class="key w100">MemCache</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.mem_cache"
+                  :disabled="!controls.txt_mem_cache.enabled"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="info-row">
+              <div class="key w100">FlashCache</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="currentItem.flash_cache"
+                  :disabled="!controls.txt_flash_cache.enabled"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

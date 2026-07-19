@@ -1,0 +1,344 @@
+<div>
+  <div class="breadcrumb-top">
+    <div class="main-title">khoản mục thanh toán</div>
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ </a>
+      </li>
+      <li class="breadcrumb-item"><a href="#">Lập hợp đồng</a></li>
+      <li class="breadcrumb-item active">Lắp đặt mới</li>
+    </ul>
+  </div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li @click="tsbtnNhapMoi_Click" :class="!tsbtnNhapMoi.Enabled ? 'non-ative' : ''">
+        <a> <span class="icon one-file-plus"></span>Nhập mới </a>
+      </li>
+      <li @click="CapNhat" :class="!tsbtnGhiLai.Enabled ? 'non-ative' : ''">
+        <a> <span class="icon one-save"></span>Ghi lại </a>
+      </li>
+      <li :class="!tsbtnHuyBo.Enabled ? 'non-ative' : ''" @click="tsbtnHuyBo_Click">
+        <a> <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ </a>
+      </li>
+
+      <li @click="Xoa" :class="!tsbtnXoa.Enabled ? 'non-ative' : ''">
+        <a href="#"> <span class="icon one-trash"></span>Xoá </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="grid-stack-box">
+      <div class="box-col" id="boxLeft" style="width: calc(35% - 8px);">
+        <div class="box-form" style="padding-bottom: 20px;">
+          <div class="legend-title">Thông tin khoản mục</div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Nhóm KM</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt ref="cboNhomKM" v-model="cboNhomKM.Value" :allowFiltering="true" dataTextField="NHOM_KM" dataValueField="NHOMKM_ID" :dataSource="cboNhomKM.DataSource"></SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Mã KM</div>
+                <div class="value">
+                  <input v-model="txtMaKM" type="text" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Tên KM</div>
+                <div class="value">
+                  <input v-model="txtTenKM" type="text" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Tên tắt</div>
+                <div class="value">
+                  <input v-model="txtTentat_KMTT" type="text" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w70">KM Cha</div>
+                <div class="value">
+                  <SelectExt ref="kmChaDropdown" v-model="khoanmuctt_cha_id" :allowFiltering="true" dataTextField="ten_kmtt" dataValueField="khoanmuctt_id" :dataSource="KMChaList"></SelectExt>
+                </div>
+                <div v-if="khoanmuctt_cha_id" class="">
+                  <button @click="() => {khoanmuctt_cha_id=null}" class="btn"><span class="icon nc-icon-glyph ui-1_circle-remove"></span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Kiểu KM</div>
+                <div class="value">
+                  <SelectExt ref="kieuKmDropdown" v-model="p_danhdau" :allowFiltering="true" dataTextField="text" dataValueField="value" :dataSource="kieuKMList"></SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Tỉ lệ VAT</div>
+                <div class="value">
+                  <SelectExt ref="vatDropDown" v-model="p_tyle_vat_id" :allowFiltering="true" dataTextField="tyle_vat_loai" dataValueField="tyle_vat_id" :dataSource="vatList"></SelectExt>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w70">Ghi chú</div>
+                <div class="value">
+                  <input v-model="txtGhiChu" type="text" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="box-form marb0">
+          <div class="legend-title">Danh sách các khoản mục</div>
+          <div class="table-content" style="height: 556px;">
+            <!-- <DataGrid :columns="dsKMTT.columns" ref="dsKMTT" :dataSource="dsKMTT.DataSource" :enable-paging-server="false" :allowPaging="true" :showFilter="true" @selectedRowChanged="dsKMTT_focus"> </DataGrid> -->
+            <div>
+              <DataGrid
+                ref="dsKMTT"
+                :columns="dsKMTT.columns"
+                :dataSource="dsKMTT.DataSource"
+                childMapping="children"
+                height="400px"
+                gridLines="Both"
+                :enable-paging-server="false"
+                :allowPaging="true"
+                :showFilter="true"
+                @selectedRowChanged="dsKMTT_focus"
+                :treeColumnIndex="1"
+              ></DataGrid>
+              <!-- <e-columns>
+                    <e-column field='TENTRUNGTAM' headerText='Tên đơn vị'  width='150' textAlign='Right'></e-column>
+                  <e-column field="TENTO" headerText="Tổ thi công" width="210" headerTextAlign="Center" textAlign="Left" :filterBarTemplate="filterBarTemplate"></e-column>
+                  <e-column headerText="Kết cuối nguồn" :columns="ketcuoiNguonColumns" headerTextAlign="Center" textAlign="Center"></e-column>
+                  <e-column headerText="Cáp" :columns="capColumns" width="200" headerTextAlign="Center" textAlign="Center"></e-column>
+                  <e-column headerText="Kết cuối đích" :columns="ketcuoiDichColumns" headerTextAlign="Center" textAlign="Center"></e-column>
+                </e-columns>
+              </ejs-treegrid>
+              <Pagination ref="pagination" :pageSize="pageSize" :pageIndex="pageIndex" :totalRecords="this.getTotalRecords" @pageChanged="this.pagination_PageChanged"></Pagination> -->
+            </div>
+            <!-- <ejs-grid
+                                    v-bind:dataSource="dsKMTT.DataSource"
+                                    allowPaging="true"                                     
+                                    class="no-header"
+                                    height="360"
+                                    :selectionSettings='selectOptions' 
+                                    :allowSorting='true'
+                                    :allowFiltering='true'                                    
+                                    :allowPaging='true'
+                                    :allowSelection="true"                                    
+                                    :rowSelecting="dsKMTT_focus"
+                                    ref="dsKMTT"
+                                    >
+                                    <e-columns>                                        
+                                        <e-column
+                                            field="khoanmuctt_id"
+                                            headerText="ID"
+                                            textAlign="Left"
+                                            width="100"
+                                        ></e-column>
+                                        <e-column
+                                            field="ten_kmtt"
+                                            headerText="TENTAT_KMTT"
+                                            textAlign="Left"
+                                            width="100"
+                                        ></e-column>
+                                        <e-column
+                                            field="tentat_kmtt"
+                                            headerText="TENTAT_KMTT"
+                                            textAlign="Left"
+                                            width="100"
+                                        ></e-column>
+                                        <e-column
+                                            field="tyle_vat"
+                                            headerText="TYLE_VAT"
+                                            textAlign="Left"
+                                            width="100"
+                                        ></e-column>                                        
+                                    </e-columns>
+                                </ejs-grid> -->
+          </div>
+        </div>
+      </div>
+      <div class="gutter gutter-horizontal" style="width: 16px;"></div>
+      <div class="box-col" id="boxRight" style="width: calc(65% - 8px);">
+        <div class="grid-stack-ver">
+          <div class="box-form marb0 box-col ovauto" id="boxTop" style="height: calc(25.5348% - 5px);">
+            <div class="legend-title">Lọc danh sách kiểu lắp đặt</div>
+            <div class="info-row">
+              <div class="key w70">Dịch vụ</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt ref="cboDichVuVT" @change="cboDichVuVT_change" v-model="cboDichVuVT.Value" :allowFiltering="true" dataTextField="TEN_DVVT" dataValueField="DICHVUVT_ID" :dataSource="cboDichVuVT.DataSource"></SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w70">Loại HĐ</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt ref="cboLoaiHD" @change="cboLoaiHD_change" v-model="cboLoaiHD.Value" :allowFiltering="true" dataTextField="TEN_LOAIHD" dataValueField="LOAIHD_ID" :dataSource="cboLoaiHD.DataSource"></SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w70">Sửa tiền</div>
+              <div class="value padt7">
+                <div class="check-action marb5">
+                  <input type="checkbox" class="check" ref="suatien"  @change="checkAll()"/>
+                  <span class="name"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="gutter gutter-vertical" style="height: 10px;"></div>
+          <div class="box-col ovauto" id="boxBottom" style="height: calc(74.4652% - 5px);">
+            <div class="box-form">
+              <div class="legend-title"><span class="icon fa fa-angle-up"></span> Kiểu lắp đặt</div>
+              <div class="box-move-select-table">
+                <div class="box-col">
+                  <!-- <DataGrid 
+                                    panelDataHeight="160" 
+                                    showColumnCheckbox 
+                                    :columns="grvDaGan.columns" 
+                                    ref="grvDaGan" 
+                                    :dataSource="grvDaGan.DataSource" 
+                                    :enable-paging-server="false"
+                                    :allowPaging="true" 
+                                    :showFilter="true" 
+                                    @selectedRowChanged="grvDaGan_focus">                                    
+                                </DataGrid> -->
+                  <!-- <ejs-grid v-bind:dataSource="grvDaGan.DataSource" allowPaging="true" class="no-header" height="160" :allowFiltering="true" :allowPaging="true" :allowSorting="true" :pageSettings="pageOptions" ref="grvDaGan">
+                    <e-columns>
+                      <e-column field="checkbox" editType="checkbox" name="checkbox" headerText="Chọn" type="checkbox" width="20"></e-column>
+                      <e-column field="ten_kieuld" headerText="Tên kiểu lắp đặt đã gán" textAlign="Left" width="100"></e-column>
+                      <e-column headerText="Sửa tiền KM" field="checkboxsuatien" type="boolean" editType="checkboxsuatien" textAlign="Center" displayAsCheckBox="false" width="47"></e-column>
+                    </e-columns>
+                  </ejs-grid> -->
+                  <DataGridCustom
+                    ref="grvDaGan"
+                    v-bind:columns="grvDaGan.columns"
+                    v-bind:dataSource="grvDaGan.DataSource"
+                    :showColumnCheckbox="true"
+                    :showFilter="true"
+                    :enabledSelectFirstRow="false"
+                    :selectionSettings="{ checkboxMode: 'ResetOnRowClick' , checkboxOnly: true}"
+                    panelDataHeight="160"
+                    :allowPaging="true" :enablePagingServer="false">
+                  </DataGridCustom>
+                </div>                
+                <div class="actions">
+                  <button @click="Next" class="btn">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button @click="Last" class="btn">
+                    <span class="fa fa-angle-double-right"></span>
+                  </button>
+                  <button @click="Previous" class="btn">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                  <button @click="First" class="btn">
+                    <span class="fa fa-angle-double-left"></span>
+                  </button>
+                </div>
+                <div class="box-col">
+                  <!-- <DataGrid panelDataHeight="160" 
+                                    showColumnCheckbox 
+                                    :columns="grvChuaGan.columns" 
+                                    ref="grvChuaGan" 
+                                    textAlign="Left"
+                                    :dataSource="grvChuaGan.DataSource" 
+                                    :enable-paging-server="false"
+                                    :allowPaging="true" 
+                                    :showFilter="true" 
+                                    @selectedRowChanged="grvChuaGan_focus">
+                                </DataGrid> -->
+                  <ejs-grid v-bind:dataSource="grvChuaGan.DataSource" class="no-header" height="160" :allowFiltering="true" :allowPaging="true" :allowSorting="true" :pageSettings="pageOptions" ref="grvChuaGan">
+                    <e-columns>
+                      <e-column headerText="Chọn" type="checkbox" width="50"></e-column>
+                      <e-column field="ten_kieuld" headerText="Tên kiểu lắp đặt chưa gán" textAlign="Left" width="auto"></e-column>
+                      <!-- <e-column headerText="Chọn" 
+                                        editType="booleanedit"
+                                        displayAsCheckBox="true"
+                                        type="boolean" width="auto"></e-column> -->
+                    </e-columns>
+                  </ejs-grid>
+                </div>
+              </div>
+            </div>
+            <div class="box-form marb0">
+              <div class="legend-title"><span class="icon fa fa-angle-up"></span> Loại hình</div>
+              <div class="box-move-select-table">
+                <div class="box-col">
+                  <!-- <DataGrid panelDataHeight="160" showColumnCheckbox :columns="gridviewDaKhoa.columns" ref="gridviewDaKhoa" :dataSource="gridviewDaKhoa.DataSource" :enable-paging-server="false"
+                                        :allowPaging="true" :showFilter="true" @selectedRowChanged="gridviewDaKhoa_focus">
+                                        </DataGrid> -->
+                  <ejs-grid v-bind:dataSource="gridviewDaKhoa.DataSource" allowPaging="true" class="no-header" height="160" :allowSorting="true" :allowFiltering="true" :allowPaging="true" :pageSettings="pageOptions" ref="gridviewDaKhoa">
+                    <e-columns>
+                      <e-column headerText="Chọn" type="checkbox" width="20"></e-column>
+                      <e-column field="loaihinh_tb" headerText="Loại hình đã gán" textAlign="Left" width="100"></e-column>
+                      <e-column field="ten_dvvt" headerText="Dịch vụ" textAlign="Left" width="100"></e-column>
+                    </e-columns>
+                  </ejs-grid>
+                </div>
+                <div class="actions" style="height:-50px">
+                  <button @click="btNext" class="btn">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button @click="btLast" class="btn">
+                    <span class="fa fa-angle-double-right"></span>
+                  </button>
+                  <button @click="btPrevious" class="btn">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                  <button @click="btFirst" class="btn">
+                    <span class="fa fa-angle-double-left"></span>
+                  </button>
+                </div>
+                <div class="box-col">
+                  <!-- <DataGrid panelDataHeight="160" showColumnCheckbox :columns="gridviewChuaKhoa.columns" ref="gridviewChuaKhoa" :dataSource="gridviewChuaKhoa.DataSource" :enable-paging-server="false"
+                                    :allowPaging="true" :showFilter="true" @selectedRowChanged="gridviewChuaKhoa_focus">
+                                    </DataGrid> -->
+                  <ejs-grid v-bind:dataSource="gridviewChuaKhoa.DataSource" allowPaging="true" class="no-header" height="160" :allowSorting="true" :allowFiltering="true" :allowPaging="true" :pageSettings="pageOptions" ref="gridviewChuaKhoa">
+                    <e-columns>
+                      <e-column headerText="Chọn" type="checkbox" width="20"></e-column>
+                      <e-column field="loaihinh_tb" headerText="Loại hình chưa gán" textAlign="Left" width="100"></e-column>
+                      <e-column field="ten_dvvt" headerText="Dịch vụ" textAlign="Left" width="100"></e-column>
+                    </e-columns>
+                  </ejs-grid>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' :animationSettings='animationSettings'
+        ref="dialogObjKMTT" :header='"Khoản mục thanh toán"' showCloseIcon=true width='80%' target='#app .main-wrapper'
+        :close="closeDialog" :open="open">
+    <h2>Bạn chưa nhập “Mã KM”!</h2>
+    </ejs-dialog> -->
+</div>

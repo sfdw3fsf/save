@@ -1,0 +1,130 @@
+<b-modal
+    id="popup-nhomcongnonhanvien"
+    size="xl"
+    no-close-on-backdrop
+    hide-footer
+    hide-header
+    hide-header-close
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="close"
+  >
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+          <div class="title"><span class="icon one-notepad"></span>Nhóm công nợ - nhân viên</div>
+          <div
+            class="close -ap icon-close"
+            data-dismiss="modal"
+            @click="close"
+          ></div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="#" v-on:click="ghiLai()">
+                        <span class="icon nc-icon-glyph ui-1_edit-76"></span> Ghi lại
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <label for="upload1">
+                            <span class="icon one-book"></span>Đọc file
+                            <input ref="fileInput" type="file" id="upload1" style="display: none" @change="importExcel"
+                                accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                        </label>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" v-on:click="xuatFileMau">
+                        <span class="icon one-excel"></span>Tải file mẫu
+                    </a>
+                </li>
+                <li v-on:mouseover="mouseOver" v-on:mouseleave="mouseLeave" style="padding-bottom: 15px !important">
+                    <a href="#">
+                        <span class="icon one-download"></span>Xuất file
+                    </a>
+                    <div class="dropdown-menu neo" id="clickbox">
+                        <a
+                            class="dropdown-item"
+                            href="#"
+                            v-on:click="xuatTheoNhom"
+                            >Xuất theo nhóm</a
+                        >
+                        <a
+                            class="dropdown-item"
+                            href="#"
+                            v-on:click="xuatAllFile"
+                            >Xuất hết</a
+                        >
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="legend-title">Thông tin nhóm công nợ</div>
+                        <DataGrid
+                            :columns="fieldsNhomCongNo"
+                            :dataSource="dsCongNo"
+                            dataKeyField="NHOMCNO_ID"
+                            ref="gridNhomCongNo"
+                            @selectedRowChanged="rowClicked"
+                            :showColumnCheckbox="false"
+                            :showFilter="true"
+                            :allowPaging="false">
+                        </DataGrid>
+                    </div>
+                    <div class="col-sm-9 col-12">
+                        <div class="box-move-select-table">
+                            <div class="box-col">
+                                <div class="legend-title">Nhân viên đã gán</div>
+                                <DataGrid
+                                    :columns="fieldsNhanVienDaGan"
+                                    :dataSource="dsNhanVienDaGanGetter"
+                                    dataKeyField="NHANVIEN_ID"
+                                    :showColumnCheckbox="true"
+                                    :showFilter="true"
+                                    ref="gridNhanVienDaGan" :panelDataHeight="'450'"
+                                    @selectedItemsChanged="data => gridNhanVienDaGanValues = data"
+                                    :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"
+                                    :editSettings='editSettings' @cellSaved='editGridSave'>
+                                </DataGrid>
+                            </div>
+                            <div class="actions">
+                                <button class="btn" v-on:click="thayDoiTrangThaiNhanVien(2)">
+                                    <span class="-ap icon-chevron-thin-right"></span>
+                                </button>
+                                <button class="btn" v-on:click="thayDoiTrangThaiNhanVien(1)">
+                                    <span class="-ap icon-chevron-thin-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col">
+                                <div class="legend-title">Nhân viên chưa gán</div>
+                                <DataGrid
+                                    :columns="fieldsNhanVienChuaGan"
+                                    :dataSource="dsNhanVienChuaGanGetter"
+                                    dataKeyField="NHANVIEN_ID"
+                                    :showColumnCheckbox="true"
+                                    :showFilter="true"
+                                    ref="gridNhanVienChuaGan" :panelDataHeight="'450'"
+                                    @selectedItemsChanged="data => gridNhanVienChuaGanValues = data"
+                                    :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false">
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal v-model="isShowModal" cancelTitle="Hủy" okTitle="Đồng ý" title="Thông báo" size="md" @ok="docFile()">
+        <span>Bạn thật sự muốn thêm dữ liệu từ file Excel?</span>
+    </b-modal>
+    <ModalXuatDuLieu
+        id="modal-xuat-dulieu"
+        :thuocTinh="dsThuocTinh"
+        :data="exportData">
+    </ModalXuatDuLieu>
+  </b-modal>

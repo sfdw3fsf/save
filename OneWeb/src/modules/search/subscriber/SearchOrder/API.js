@@ -1,0 +1,15 @@
+export default {
+  getDSLoaiKH: (axios,data) => axios.post('/web-thicong/quanlydonhang/sp_lay_ds_loai_kh',data),
+  getDSNguonDon: (axios,data) => axios.post('/web-thicong/quanlydonhang/sp_lay_ds_nguon_don',data),
+  getDSDichVuVT: (axios,data) => axios.get('/web-thicong/quanlydonhang/dsDichVu',data),
+  getDSLoaiHinh : (axios,data) => axios.get(`/web-thicong/quanlydonhang/dsLoaiHinh?dichvuvt_id=${data}`),
+  getDSDonVi: (axios,data) => axios.get('/web-thicong/quanlydonhang/sp_lay_ds_donvi_xulydon',data),
+  getDSNhanVienTheoDonVi: (axios,data) => axios.post('/web-tracuu/quanlydonhang/sp_tracuu_lay_ds_nhanvien',data),
+  getTrangThaiHD: (axios,data) =>  axios.get('/web-tracuu/danhmuc/trangthai_hd'),
+  loadDonHang: (axios,data) => axios.post('/web-tracuu/quanlydonhang/sp_tracuu_dashboard_donhang',data),
+  getDSChiTietPhanGiao: (axios,data) => axios.post('/web-thicong/quanlydonhang/lay_danhsach_phieuth',data),
+  getChiTietDonHang: (axios,data) => axios.post('/web-thicong/quanlydonhang/sp_lay_chitiet_donhang',data),
+  getDSTrangThaiTT: (axios,data) => axios.post('/web-ccdv/tienhopdong/sp_lay_ds_trangthai_tt',data),
+  getDSHinhThucTT: (axios,data) => axios.get('/web-thicong/quanlydonhang/dsHinhthucThanhtoan',data),
+  lay_ds_goi_cv_vnp_v1: (axios, data) => axios.get('/web-bancheo/danhmuc/sp_lay_ds_goi_cv_vnp_v1?vtinh_id='+data.tinh_id+'&vloaitb_id='+data.loaitb_id),
+}

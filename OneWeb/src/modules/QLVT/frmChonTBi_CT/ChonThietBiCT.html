@@ -1,0 +1,124 @@
+<ejs-dialog
+    :enableResize="true"
+    :allowDragging="true"
+    :visible="false"
+    :animationSettings="animationSettings"
+    ref="dlgChonTBCT"
+    width="80%"
+    :open="dialogOpen"
+    :showCloseIcon="true"
+    header='<div class="title"><span class="icon one-notepad"></span> Chọn thiết bị</div>'
+    :target="target"
+    :close="reset"
+>
+    <div class="">
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a class="pointer" @click="btnLayTT">
+                        <span class="icon one-search"></span> Lấy TT
+                    </a>
+                </li>
+                <li :class="{disabled:!btnXacNhanEnabled}">
+                    <a class="pointer" @click="btnXacNhan">
+                        <span class="icon one-save"></span> Xác nhận
+                    </a>
+                </li>
+                <li v-show="btnShowHuyAndHC">
+                    <a class="pointer" @click="btnHuyXN">
+                        <span class="icon one-trash"></span> Hủy bỏ
+                    </a>
+                </li>
+                <li v-show="btnShowHuyAndHC">
+                    <a class="pointer" @click="btnHoanCong">
+                        <span class="icon one-file-search"></span> Chọn
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title mart10">Danh sách vật tư chứng từ</div>
+                <!-- { fieldName: "btnXoa", headerText: "Xóa",  width: 70,textAlign: "center", cellCssClass:"", commands: [ { type: "Delete", buttonOption: { cssClass: "btn-tb-center", iconCss: "red icon nc-icon-glyph  ui-1_simple-remove" } } ] }, -->
+                <DataGrid
+                    ref="gridVatTu"
+                    v-bind:columns='[ { fieldName: "LOHANG", headerText: "Lô hàng", allowFiltering: true,  width: 130 }, 
+                    { fieldName: "MA_VT", headerText: "Mã vật tư", allowFiltering: true,isPrimaryKey:true,  width: 130 }, 
+                    { fieldName: "TEN_VT", headerText: "Tên vật tư", allowFiltering: true,  width: 250 },
+                    { fieldName: "DVI_TINH", headerText: "ĐVT", allowFiltering: true,  width: 80 },
+                    { fieldName: "SOLUONG", headerText: "Số lượng", allowFiltering: true,  width: 130, format: "N0",columnType: "numeric", type: "number" },
+                    { fieldName: "SL_CHON", headerText: "SL Đã chọn", allowFiltering: true,  width: 130, format: "N0",columnType: "numeric", type: "number" }, 
+                    { fieldName: "DONGIA", headerText: "Đơn giá", allowFiltering: true,  width: 130, format: "N0",columnType: "numeric", type: "number" }, 
+                    { fieldName: "TIEN", headerText: "Thành tiền", width: 130,allowEditing: true, format: "N0", type: "number",columnType: "numeric", editType: "numericedit",  }, 
+                    { fieldName: "SOTHANG_PB", headerText: "Số tháng PB", allowFiltering: true,  width: 130,format: "N0",columnType: "numeric", type: "number", editType: "numericedit", allowEditing: true, },
+                    { fieldName: "LOAI_TBI", headerText: "Loại thiết bị", allowFiltering: true,  width: 130 },                     
+                    { fieldName: "HAN_BH", headerText: "Hạn BH", allowFiltering: true,  width: 130 },
+                    { fieldName: "MA_HD", headerText: "Mã HĐ", allowFiltering: true,  width: 130 },
+                    { fieldName: "DUAN", headerText: "Dự án", allowFiltering: true,  width: 130 },
+                    { fieldName: "MA_TH", headerText: "Đợt TH", allowFiltering: true,  width: 130 },
+                    { fieldName: "GHICHU_HD", headerText: "Ghi chú HĐ", allowFiltering: true,  width: 130 },
+                     ]'
+                    v-bind:dataSource="dtVatTu"
+                    :editSettings=" { allowEditing: true,mode:'Batch' }"
+                    :allowPaging="true"
+                    dataKeyField="STT"
+                    :enablePagingServer="false"
+                    :showFilter="true"
+                    @commandClick="gridVatTuCommandClicked"
+                    @cellSaved="gridVatTuCellSaved"
+                ></DataGrid>
+            </div>
+            <div class="box-form">
+                <div class="legend-title mart10">
+                    Danh sách thiết bị tạm ứng
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w30 nowrap">Từ công trình</div>
+                            <div class="value">
+                                <ComboboxGrid
+                                    :columns='[ { fieldName: "CONGTRINH_ID", headerText: "Công trình ID", allowFiltering: true,  width: 80 },
+                                            { fieldName: "TEN_CT", headerText: "Tên công trình", allowFiltering: true,},  ]'
+                                    @selectedChanged="cboCongTrinhSelectChanged"
+                                    :dataSource="cboCongTrinh"
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"
+                                    textField="TEN_CT"
+                                    valueField="CONGTRINH_ID"
+                                ></ComboboxGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <DataGrid
+                    ref="gridDSVTGiao"
+                    v-bind:columns='[  { fieldName: "NGAY_HT", headerText: "Ngày CT", allowFiltering: true,  width: 130 }, 
+                                    { fieldName: "NGAYGIAO", headerText: "Ngày cấp", allowFiltering: true,  width: 130 },
+                                    { fieldName: "TEN_VT", headerText: "Tên vật tư", allowFiltering: true,  width: 220 }, 
+                                    { fieldName: "SERIAL", headerText: "Serial", allowFiltering: true,  width: 130}, 
+                                    { fieldName: "SL_TON", headerText: "Số lượng", allowFiltering: true,  width: 130, format: "N0", type: "number" },                                  
+                                    { fieldName: "DONGIA", headerText: "Đơn giá", allowFiltering: true,  width: 130 ,format: "N0", type: "number"},
+                                    { fieldName: "LUONGCAP", headerText: "SL cấp", allowFiltering: true,  width: 130,  allowEditing: true, editType: "numericedit", format: "N0", type: "number"}, 
+                                    { fieldName: "LOHANG", headerText: "Lô hàng", allowFiltering: true,  width: 130}, 
+                                    { fieldName: "DVI_TINH", headerText: "ĐVT", allowFiltering: true,  width: 130 },
+                                    { fieldName: "MA_TBI", headerText: "Mã Tbị", allowFiltering: true,  width: 130 },
+                                    { fieldName: "SO_PHIEU", headerText: "Số phiếu", allowFiltering: true,  width: 130 },
+                                    { fieldName: "GHICHU", headerText: "Ghi chú", allowFiltering: true,  width: 130 },
+                                    { fieldName: "TEN_CT", headerText: "Công trình", allowFiltering: true,  width: 130 },
+                                    ]'
+                    v-bind:dataSource="dtDSVTGiao"
+                    :editSettings=" { allowEditing: true,mode:'Batch' }"
+                    :showColumnCheckbox="true"
+                    dataKeyField="STT"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    :showFilter="true"
+                    @selectedItemsChanged="selectedItemsGridDSVTGiao"
+                    @rowClicked="rowClickedGridDSVTGiao"
+                    @cellSaved="cellSavedGridDSVTGiao"
+                ></DataGrid>
+            </div>
+        </div>
+    </div>
+</ejs-dialog>

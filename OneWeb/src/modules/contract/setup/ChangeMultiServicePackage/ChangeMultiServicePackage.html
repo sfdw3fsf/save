@@ -1,0 +1,274 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header"/>
+<!--  <ActionTop :actions="actions" @onActionClick="onActionClick"/>-->
+  <div class="list-actions-top">
+    <ul class="list" style="overflow: inherit !important;">
+      <li v-for="item in actions" :key="item.id" @click="onActionClick(item)"
+          :class="{disabled: !item.active}">
+        <a style="cursor: pointer;" :class="{disabled_color: !item.active}" :ref="item.id" v-b-tooltip.hover :title="item.name">
+          <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-md-6 col-sm-6 col-xs-12 ">
+        <div class="box-form">
+          <div class="legend-title">Thông tin khách hàng</div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Mã giao dịch</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="showPopupSearchContract" v-b-tooltip.hover title="Tìm kiếm mã giao dịch">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <SearchContractModal ref="popupSearchContract" :loai_hd_id="modelSearchContract.loai_hd_id"
+                                         :dichvu_id="modelSearchContract.dichvu_id"
+                                         :trangthai_hd="modelSearchContract.trangthai_hd"
+                                         :donvi_id="modelSearchContract.donvi_id"
+                                         :donvi_dl_id="modelSearchContract.donvi_dl_id"
+                                         :ngay_yc="modelSearchContract.ngay_yc" @accept="acceptSearchContract"/>
+                    <input type="text" class="form-control highlight" ref="txtMaGD" v-model="formProps.txtMaGD"
+                           :disabled="disabledBox.txtMaGD"
+                           v-on:keyup.enter="txtMaGD_KeyPress">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">Ngày yêu cầu</div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker v-model="formProps.dtpNgayYeuCau" :disabled="true" format="DD/MM/YYYY" type="date"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Dịch vụ</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="dichvuVTId" :disabled='cboDichVuVT.disable' v-model="cboDichVuVT.value"
+                             :options="cboDichVuVT.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">Loại hình TB</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="LoaiHinhTB" :disabled='cboLoaihinhTB.disable' v-model="cboLoaihinhTB.value"
+                             :options="cboLoaihinhTB.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Kiểu yêu cầu</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="KieuYcId" :disabled='cboKieuLD.disable' v-model="cboKieuLD.value"
+                             :options="cboKieuLD.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">Nghiệp vụ gói</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="NghiepVuID" :disabled='cboNghiepvu.disable' v-model="cboNghiepvu.value"
+                             :options="cboNghiepvu.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Số máy/Acc</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="showPopupSearchContact" v-b-tooltip.hover title="Chọn số máy/Acc">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" class="form-control highlight" ref="txtMaTB" v-model="formProps.txtMaTB"
+                           :disabled="disabledBox.txtMaTB"
+                           v-on:keyup.enter="txtMaTB_KeyPress">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">Mã khách hàng</div>
+                <div class="value">
+                  <input type="text" readonly class="form-control text-view" ref="txtMaKH" v-model="formProps.txtMaKH">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Hiệu lực</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="HieuLucId" :disabled='cboHieuLuc.disable' v-model="cboHieuLuc.value"
+                             :options="cboHieuLuc.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12" v-show="visibleBox.txtSoThang">
+              <div class="info-row">
+                <div class="key">Số tháng</div>
+                <div class="value">
+                  <input type="text" ref="txtSoThang" class="form-control" v-model="formProps.txtSoThang">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key">Tên khách hàng</div>
+            <div class="value">
+              <input type="text" readonly ref="txtTenKH" class="form-control text-view" v-model="formProps.txtTenKH">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Địa chỉ KH</div>
+            <div class="value">
+              <input type="text" readonly class="form-control text-view" ref="txtDiaChiKH" v-model="formProps.txtDiaChiKH">
+            </div>
+          </div>
+          <div class="info-row" v-show="visibleBox.txtGhiChu">
+            <div class="key">Ghi chú</div>
+            <div class="value">
+              <textarea name="" class="form-control" ref="txtGhiChu" style="height: 200px;resize: none;"
+                        v-model="formProps.txtGhiChu"></textarea>
+            </div>
+          </div>
+          <div v-show="dgvGoi_ht.visible">
+            <div class="legend-title">Thông tin gói cước hiện tại</div>
+            <div class="table-content">
+              <DataGrid ref="dgvGoi_ht" v-bind:columns="dgvGoi_ht.headers"
+                        v-bind:dataSource="dgvGoi_ht.data" :showColumnCheckbox="false"
+                        @selectedRowChanged="dgvGoi_ht_SelectionChanged"
+                        :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                        :enabled-select-first-row="true"></DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="box-form">
+          <div class="legend-title">{{ formProps.lineLabel1 }}</div>
+          <div class="info-row">
+            <div class="key">Tên gói</div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="btnTenGoi_Click" v-b-tooltip.hover title="Tên gói">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <div class="select-custom">
+                  <Select2 ref="TenGoi" :disabled='cboTenGoi.disable' v-model="cboTenGoi.value"
+                           :options="cboTenGoi.list" :settings="settingSelect2"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Mô tả</div>
+            <div class="value">
+            <textarea name="" class="form-control" style="height: 100px;resize: none;"
+                      v-model="formProps.txtMoTa"></textarea>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Số máy/Acc</div>
+            <div class="value">
+              <input type="text" class="form-control highlight" ref="txtMaTBHT" v-model="formProps.txtMaTBHT"
+                     :disabled="disabledBox.txtMaTBHT"
+                     v-on:keyup.enter="txtMaTBHT_KeyPress">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Chuyển loại gói</div>
+            <div class="value" v-bind:class="{ disabled: cboTenGoi2.disabled}">
+              <div class="select-custom">
+                <ComboboxGrid :valueField="cboTenGoi2.valueField" :textField="cboTenGoi2.textField"
+                              v-model="cboTenGoi2.selectTenGoi2" :value="cboTenGoi2.selectTenGoi2"
+                              :columns="cboTenGoi2.headers"
+                              :panelDataHeight="cboTenGoi2.panelDataHeight" :enabledSelectFirstRow="true"
+                              :dataSource="cboTenGoi2.data">
+                </ComboboxGrid>
+              </div>
+            </div>
+          </div>
+          <DataGrid ref="dgvGoi" v-bind:class="{ disabled: dgvGoi.disabled}" class="table-result table-gachle"
+                    v-bind:columns="dgvGoi.headers"
+                    v-bind:dataSource="dgvGoi.data" :showColumnCheckbox="false"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    @selectedRowChanged="dgvGoi_SelectionChanged"
+                    @actionComplete="dgvGoiActionComplete"
+                    :enabled-select-first-row="false"></DataGrid>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-xs-12 col-sm-12">
+        <div class="box-form">
+          <div class="legend-title">Danh sách các thuê bao đăng ký thay đổi gói</div>
+          <DataGrid ref="dgrList" class="table-result table-gachle"
+                    v-bind:columns="dgrList.headers"
+                    v-bind:dataSource="dgrList.data"
+                    :showColumnCheckbox="false"
+                    :enable-paging-server="false"
+                    :allowPaging="true"
+                    :showFilter="true"
+                    @selectedRowChanged="dgrList_SelectionChanged"
+                    @actionComplete="dgrListActionComplete"
+                    :enabled-select-first-row="false">
+
+          </DataGrid>
+        </div>
+      </div>
+    </div>
+  </div>
+  <b-modal id="popupComponents" size="xl"
+           hide-footer
+           hide-header
+           hide-header-close
+           body-class="modal-body p-0">
+    <div class="popup-body">
+      <component :is="popupComponent" isPopup="true" @form-close="popupClosed"></component>
+    </div>
+  </b-modal>
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="thongtinemail" :header='"Thông tin Email"'
+              showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <ThongTinEmail :hdkh_id="Number(hdkh_id)" :khachhang_id="khachhang_id" />
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="thongtinlienhe" :header='"Thông tin liên hệ"'
+              showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <ThongTinLienHe :hdkh_id="Number(hdkh_id)" :khachhang_id="khachhang_id"/>
+  </ejs-dialog>
+
+  <DSTBCungMa ref="popupDSTBCungMa"/>
+</div>

@@ -1,0 +1,3 @@
+import PublicUtilityTelecomSubscriber from './PublicUtilityTelecomSubscriber'
+
+export default PublicUtilityTelecomSubscriber

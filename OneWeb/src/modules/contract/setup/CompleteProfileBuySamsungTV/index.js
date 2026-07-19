@@ -1,0 +1,2 @@
+import CompleteProfileBuySamsungTV from './CompleteProfileBuySamsungTV.vue'
+export default CompleteProfileBuySamsungTV

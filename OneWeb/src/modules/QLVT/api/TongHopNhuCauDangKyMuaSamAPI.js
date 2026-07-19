@@ -1,0 +1,18 @@
+export default {
+    getDSDotDangKy: (axios, data) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/danh-sach-dot-dang-ky?thangdk-tu=` + data.tuThang + `&thangdk-den=` + data.denThang),
+    getDSDonVi: (axios) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/danh-sach-don-vi`),
+    getDSMucDich: (axios) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/danh-sach-muc-dich`),
+    getDSDotTongHop: (axios, thangTh) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/danh-sach-dot-tong-hop?thangth=` + thangTh),
+    getDSDangKy: (axios, data) => axios.post(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/danh-sach-nhu-cau-dang-ky-vat-tu`, data),
+    getDSTongHop: (axios, tongHopId) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/ds-tong-hop-nhu-cau-dk-vt/` + tongHopId),
+    kiemTraYeuCauTongHop: (axios, tongHopId) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/tong-hop-vat-tu/` + tongHopId),
+    kiemTraNgayDuyet: (axios, tongHopId) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/tong-hop-vat-tu-da-duyet/` + tongHopId),
+    duyetHuyDuyetTongHop: (axios, data) => axios.put(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/cap-nhat-tong-hop-vat-tu`, data),
+    kiemTraHopDongDaLap: (axios, tongHopId) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/kiem-tra-lap-hop-dong/` + tongHopId),
+    kiemTraChungTuDaLap: (axios, tongHopId) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/kiem-tra-lap-chung-tu/` + tongHopId),
+    kiemTraCungChuKy: (axios, data) => axios.post(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/don-dang-ky-co-cung-chu-ky-tong-hop`, data),
+    tongHopNhuCauDangKy: (axios, data) => axios.post(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/tong-hop-nhu-cau-dang-ky-vat-tu`, data),
+    xoaTongHopDangKy: (axios, listVTDKId) => axios.get(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/xoa-tong-hop-dk-vt/` + listVTDKId),
+    capNhatGhiChu: (axios, data) => axios.put(`/web-qlvt/api/tong-hop-nhu-cau-dang-ky-mua-sam/ghi-chu-cho-nhu-cau-dk-vt-da-tong-hop`, data),
+    getParamsBaoCao: (axios, maBc) => axios.get(`/web-qlvt/api/in-phieu/ds-param-bc?maBc=${maBc}`),
+}

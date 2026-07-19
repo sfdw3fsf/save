@@ -1,0 +1,65 @@
+<div class="table-content">
+    <table class="table-result table-gachle">
+        <tbody>
+            <tr v-for="(hdx,idx) in gridEditors" :key="idx">
+                <td class="w20 center">
+
+                </td>
+                <td class="fw6">{{ hdx.Name }}</td>
+                <td>
+                    <template v-if="hdx.Type=='ButtonEdit'">
+                        <div class="input-more-button -right">
+                            <button class="btn h-auto pad4 lh14 w24" @click.prevent="hdx.ButtonClick(hdx)">
+                                <span class="-ap icon-more_horiz"></span>
+                            </button>
+                            <input type="text" :class="{disabled:hdx.ReadOnly?true:false}" class="form-control padr30  h24 bor0 nocorner bg-none" :value="hdx.Value" @change="v=>hdx.Value=v.target.value">
+                        </div>
+                    </template>
+                    <template v-if="hdx.Type=='TextEdit'">
+                        <input type="text" class="form-control padr30  h24 bor0 nocorner bg-none" :value="hdx.Value" @change="v=>hdx.Value=v.target.value">
+                    </template>
+                    <template v-if="hdx.Type=='CalcEdit'">
+                        <input type="number" class="form-control padr30  h24 bor0 nocorner bg-none" :value="hdx.Value" @change="v=>hdx.Value=v.target.value">
+                    </template>
+                    <template v-if="hdx.Type=='DateEdit'">
+                        <div class="input-icon-right">
+                            <date-picker input-class="form-control h24 bor0 nocorner bg-none" :format="hdx.EditMask" :value-type="hdx.EditMask" v-model="hdx.Value" @change="hdx.EditValueChanged(hdx)"></date-picker>
+                            <span class="icon one-calendar"></span>
+                        </div>
+                    </template>
+                    <template v-if="hdx.Type=='LookUpEdit'">
+                        <!-- LookUpEdit {{hdx.DataSource}} {{hdx.DisplayMember}} {{hdx.ValueMember}} -->
+                        <!-- <SelectExt class="bor0 nocorner bg-none" v-model="hdx.Value" :options="hdx.DataSource.map(x=>({'text':x[hdx.DisplayMember],'id':x[hdx.ValueMember]}))" :dataTextField="hdx.DisplayMember" :dataValueField="hdx.ValueMember" @change="hdx.EditValueChanged"></SelectExt> -->
+                        <template v-if="hdx.DataSource && hdx.DataSource.length>0">
+                            <SelectExt class="bor0 nocorner bg-none" v-model="hdx.Value" :options="hdx.DataSource" dataTextField="text" dataValueField="id" @change="hdx.EditValueChanged(hdx)"></SelectExt>
+                        </template>
+                        <template v-else>
+                            <span style="color:red; font-weight:bold;">Không có dữ liệu! Vui lòng liên hệ admin</span>
+                        </template>
+                    </template>
+                    <template v-if="hdx.Type=='CheckedComboBoxEdit1'">
+                        <!-- Tree {{hdx.DataSource}} {{hdx.DisplayMember}} {{hdx.ValueMember}} -->
+                        <!-- <treeselect :multiple="true" :options="hdx.DataSource.map(x=>({'label':x[hdx.DisplayMember],'id':x[hdx.ValueMember]}))" placeholder="..." v-model="hdx.Value" /> -->
+                        <template v-if="hdx.DataSource && hdx.DataSource.length>0">
+                            <treeselect :multiple="true" :options="hdx.DataSource.map(x=>({'label':x[hdx.DisplayMember],'id':x[hdx.ValueMember]}))" placeholder="..." v-model="hdx.Value" />
+                        </template>
+                        <template v-else>
+                            <span style="color:red; font-weight:bold;">Không có dữ liệu! Vui lòng liên hệ admin</span>
+                        </template>
+                    </template>
+                    <template v-if="hdx.Type=='CheckEdit'">
+                        <input type="checkbox" class="check" :value="hdx.ValueChecked" v-model="hdx.Value" />
+                    </template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <b-modal id="popupComponentsCNTT" ref="popupComponentsCNTT" size="xl"
+    hide-footer
+    show-header
+    show-header-close
+    body-class="modal-body p-0">
+        <component :is="popupComponent" ref="generalPopup" :dulieu="popupComponentData" v-bind="popupComponentAttr" isPopup="true" v-on="popupComponentEvts"></component> <!--v-dynamic-events="popupComponentEvents"-->
+    </b-modal>
+</div>

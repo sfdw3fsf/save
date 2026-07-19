@@ -1,0 +1,210 @@
+<div>
+  <!-- //Modal cáp gốc -->
+  <ModalChonTramThietBiExt ref="ModalChonTramThietBiExt" modalID="ModalChonTramThietBiExt" />
+  <ModalTracnghiemExt ref="ModalTracnghiemExt" modalID="ModalTracnghiemExt" />
+  <ModalChonDSKetCuoiExt modalID="ModalChonDSKetCuoiExt" ref="ModalChonDSKetCuoiExt" />
+  <ModalQLKetCuoiExt modalID="ModalChonDSKetCuoi" ref="ModalQLKetCuoiExt" />
+  <ModalQLCapExt modalID="ModalQLCap" ref="ModalQLCap" />
+  <ModalPhanChiaDoanCapChenKetCuoi modalID="ModalPhanChiaDoanCapChenKetCuoi" ref="ModalPhanChiaDoanCapChenKetCuoi" />
+  <DauNoiCap id="popupDauNoiCap" :capObject="capObject"></DauNoiCap>
+  <TraCuuTBaoCap id="popupTraCuuTBaoCap" :doiTuong="doiTuongCap"></TraCuuTBaoCap>
+  <TraCuuTBaoKetCuoi id="popupTraCuuTBaoKetCuoi" :doiTuong="doiTuongKetCuoi" />
+  <QuanLyCapReNhanh id="popupQuanLyCapReNhanhUPD" :midspanObject="midspanObject" @napGD="napGD"></QuanLyCapReNhanh>
+  <QuanLyTramThietBi id="popupTramThietBiGianDo" :tramTb_id="tramTb_id" @isOk="QuanLyTramThietBiIsOk"> </QuanLyTramThietBi>
+  <!-- //End modal cáp gốc -->
+  <!-- //Modal cống bể -->
+  <ModalQLBe modalId="popupQLBe" :data="dataSend" @xacNhan="xacnhanBe"/>
+  <ModalDsTuyenCB modalId="popupDsTuyenCB" @xacnhan="thayDoiTuyen"/>
+  <ModalQLDoanCongVaOngCong modalId="popupQLDoanCongVaOngCong" :data="dataSend"/>
+  <ModalDsBe modalId="popupDsBe" @xacnhan="xacNhanDsBe"/>
+  <!-- //End modal cống bể -->
+  <!-- //Modal cột -->
+  <ModalQLCot modalId="popupQLCot" :data="dataSend" ref="formQLCot" />
+  <!-- //End modal cột-->
+  <div class="nav tabs tab-over">
+    <a href="#tabB1" data-toggle="tab" class="active" @click="showtabpane=0"> <span class="nc-icon-glyph business_hierarchy-53 inline vcenter f24"></span> Giản đồ </a>
+    <a href="#tabB3" data-toggle="tab" @click="showtabpane=2"> <span class="nc-icon-glyph location_map-pin inline vcenter f24"></span> Bản đồ (VNPT MAPS) </a>
+  </div>
+  <div class="tab-content marb0">
+    <template class="relative" v-if="this.useGraphviz===false || this.giando_config===null">
+      <div class="tab-pane active" id="tabB1" v-show="showtabpane===0">
+        <div id="B1" class="sitemap-chart-canvas relative">
+          <GianDo
+            style="width: 100%; height: 100%"
+            ref="giando"
+            @suaKetcuoi="suaKetcuoi"
+            @suaCap="suaCap"
+            @xoaCap="xoaCap"
+            @chenketcuoi="chenketcuoi"
+            @dauNoiCap="dauNoiCap"
+            @chuyenvaoTrongTram="chuyenvaoTrongTram"
+            @dauNoiBenTrong="dauNoiBenTrong"
+            @thueBaoThuocCap="thueBaoThuocCap"
+            @thueBaoThuocKetCuoi="thueBaoThuocKetCuoi"
+            @chuyennhanhcap="chuyennhanhcap"
+            @daochieuCap="daochieuCap"
+            @suaTram="suaTram"
+            @xemKetcuoi="xemKetcuoi"
+            @TramThietBi="TramThietBi"
+            @thuocTinhBe="thuocTinhBe"
+            @chuyenTuyenCongBe="chuyenTuyenCongBe"
+            @thuocTinhCapCongBe="thuocTinhCapCongBe"
+            @themBe="themBe"
+            @thayDoiBeAB="thayDoiBeAB"
+            @thuocTinhCot="thuocTinhCot"
+          >
+          </GianDo>
+          <div class="zoom-actions">
+            <a href="javascript:void(0)" class="btn btn-main" @click="showTimKiem()">
+              <span class="icon one-search"></span>
+            </a>
+            <a v-show="!isEmptyObj(capgoc)" href="javascript:void(0)" class="btn btn-main" @click="zoomOut()">
+              <span class="icon ui-1_zoom-out nc-icon-outline"></span>
+            </a>
+            <a v-show="!isEmptyObj(capgoc)" href="javascript:void(0)" class="btn btn-main" @click="zoomIn()">
+              <span class="icon ui-1_zoom-in nc-icon-outline"></span>
+            </a>
+          </div>
+          <div class="box-search" v-show="timKiemDT===true">
+            <div class="info-row marb0">
+              <div class="key w80 text-main">Tìm kiếm</div>
+              <div class="value" style="width: 120px">
+                <div class="select-custom">
+                  <select name="" id="" class="form-control" v-model="valueLoaiDT">
+                    <option v-for="(item,index) in dsLoaiDT" :value="item.value">{{item.label}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="value">
+                <div class="dropdown inputdropdown">
+                  <input id="txtTimKiem1" ref="txtTimKiem1" @click="txtTimKiem1_click" type="text" placeholder="Nhập vào đối tượng cần tìm" class="form-control" data-toggle="dropdown" v-model="txtTimKiem" />
+                  <div id="myDropdown1" class="dropdown-menu dropdown-search">
+                    <a v-for="(item,index) in dsDT" href="javascript:void(0)" @click="setTxtTimKiem(item.OBJ_NAME,item.SEARCH_QUERY)">
+                      <span class="title">{{item.OBJ_NAME}}</span>
+                      <span class="desc">{{item.NOTE}}</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="value w20 nowrap">
+                <el-button type="primary" size="small" @click="onTimKiem()" icon="el-icon-search" :loading="isLoadingTimKiem"></el-button>
+                <el-button type="primary" size="small" @click="hideTimKiem()" icon="el-icon-close"></el-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+    <template v-else  class="relative">
+      <div class="tab-pane active" id="tabB1" v-show="showtabpane===0">
+        <div id="B1" class="sitemap-chart-canvas relative">
+          <GraphVizControlGianDo :graphID="graphID" ref="GraphVizControlGianDo" />
+          <div class="box-search" v-show="timKiemDT===true">
+            <div class="info-row marb0">
+              <div class="key w80 text-main">Tìm kiếm</div>
+              <div class="value" style="width: 120px">
+                <div class="select-custom">
+                  <select name="" id="" class="form-control" v-model="valueLoaiDT">
+                    <option v-for="(item,index) in dsLoaiDT" :value="item.value">{{item.label}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="value">
+                <div class="dropdown inputdropdown">
+                  <input id="txtTimKiem1" ref="txtTimKiem1" @click="txtTimKiem1_click" type="text" placeholder="Nhập vào đối tượng cần tìm" class="form-control" data-toggle="dropdown" v-model="txtTimKiem" />
+                  <div id="myDropdown1" class="dropdown-menu dropdown-search">
+                    <a v-for="(item,index) in dsDT" href="javascript:void(0)" @click="setTxtTimKiem(item.OBJ_NAME,item.SEARCH_QUERY)">
+                      <span class="title">{{item.OBJ_NAME}}</span>
+                      <span class="desc">{{item.NOTE}}</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="value w20 nowrap">
+                <el-button type="primary" size="small" @click="onTimKiem()" icon="el-icon-search" :loading="isLoadingTimKiem"></el-button>
+                <el-button type="primary" size="small" @click="hideTimKiem()" icon="el-icon-close"></el-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+    <div class="tab-pane" id="tabB3" v-show="showtabpane===2">
+      <div id="B3" class="sitemap-chart-canvas relative">
+        <BanDoVNPT
+          style="width: 100%; height: 100%"
+          ref="mapVNPT"
+          @daochieuCap="daochieuCap"
+          @xoaCap="xoaCap"
+          @suaCap="suaCap"
+          @luuToaDoBanDo="luuToaDoBanDo"
+          @chenketcuoi="chenketcuoi"
+          @suaKetcuoi="suaKetcuoi"
+          @chuyennhanhcap="chuyennhanhcap"
+          @chuyenvaoTrongTram="chuyenvaoTrongTram"
+          @dauNoiBenTrong="dauNoiBenTrong"
+          @xemKetcuoi="xemKetcuoi"
+          @dauNoiCap="dauNoiCap"
+          @thueBaoThuocCap="thueBaoThuocCap"
+          @thueBaoThuocKetCuoi="thueBaoThuocKetCuoi"
+          @show-timkiemMap="showTimKiemMap"
+          @hide-timkiemMap="hideTimKiemMap"
+          @suaTram="suaTram"
+          @thuocTinhBe="thuocTinhBe"
+          @chuyenTuyenCongBe="chuyenTuyenCongBe"
+          @thuocTinhCot="thuocTinhCot"
+          :vaction="vaction"
+          :vnguon_id="vnguon_id"
+          :vdich_id="vdich_id"
+        >
+        </BanDoVNPT>
+        <div class="box-search-map" v-show="timKiemMap===true">
+          <div>
+            <button class="popup-close-button" type="button" @click="hideTimKiemMap()" aria-label="Close popup">×</button>
+            <div class="table-content" style="height: calc(100% - 90px)">
+              <DataGrid
+                id="gridTimKiemMap"
+                ref="gridTimKiemMap"
+                v-bind:columns="
+                        [
+                            {fieldName: 'TUYEN', width : 120 , headerText: 'Chọn tuyến', allowFiltering: false}
+                        ]"
+                @recordClick="getDSTimKiemMap_CellClick"
+                v-bind:dataSource="getDSTimKiemMap"
+                :showFilter="false"
+                :allowPaging="false"
+              >
+              </DataGrid>
+            </div>
+            <div class="value w20 nowrap">
+              <el-button type="primary" size="mini" @click="onChonMap()" icon="el-icon-success"></el-button>
+            </div>
+          </div>
+        </div>
+        <div class="map-options">
+          <a href="javascript:void(0)" class="image" v-b-tooltip.hover title="Thay đổi nguồn dữ liệu" @click="ctrlThayDoiNguonDuLieu">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp_6mkJlHX8nZiFY5S_9xYVIJPbmpTwi4dKA&usqp=CAU" alt="" />
+          </a>
+          <a href="javascript:void(0)" class="btn btn-main" v-b-tooltip.hover title="Tọa độ mặc định" @click="ctrlPhanCapMang">
+            <span class="nc-icon-glyph location_map-pin"></span>
+          </a>
+          <a
+            href="javascript:void(0)"
+            :class="this.$refs.mapVNPT && this.$refs.mapVNPT.draggable ? 'btn btn-main' : 'btn btn-third'"
+            v-b-tooltip.hover
+            :title="this.$refs.mapVNPT && this.$refs.mapVNPT.draggable ? 'Cho phép di chuyển đối tượng' : 'Dừng di chuyển đối tượng'"
+            @click="ctrlDuyChuyenDoiTuong"
+          >
+            <span class="one-drag"></span>
+          </a>
+          <a href="javascript:void(0)" class="btn btn-main" v-b-tooltip.hover title="Phóng to" @click="BanDoZoomIn()">
+            <span class="icon -ap icon-plus3"></span>
+          </a>
+          <a href="javascript:void(0)" class="btn btn-main" v-b-tooltip.hover title="Thu nhỏ" @click="BanDoZoomOut()">
+            <span class="icon -ap icon-minus3"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

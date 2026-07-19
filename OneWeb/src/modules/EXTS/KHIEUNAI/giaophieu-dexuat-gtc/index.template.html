@@ -1,0 +1,184 @@
+<ejs-dialog
+  :enableResize="true"
+  :visible="false"
+  ref="frmGiaoPhieuGTC"
+  :header='"Giao phiếu đề xuất giảm trừ cước"'
+  showCloseIcon="true"
+  target=".main-wrapper"
+  width="70%"
+  :position="{ X: 'center', Y: 'top' }"
+  :close="dialogClose"
+>
+  <div class="modal-content">
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onClickBtnGiaoPhieu" :disabled="!btnGiaoPhieu.enabled ">
+            <span class="icon  one-file-arrow-right"></span>  Giao phiếu
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onClickBtnHuyGiao" :disabled="!btnHuyGiao.enabled">
+          <a> <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Huỷ giao</a>
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="box-form " id="boxLeft">
+              <div class="legend-title">Thông tin phiếu đề xuất giảm trừ cước</div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w120">ID phiếu ĐXGTC</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="phieuID" disabled/>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">
+                      Mã khiếu nại
+                    </div>
+                    <div class="value">
+                      <div class="input-icon-right">
+                        <input type="text" class="form-control" v-model.trim="maKN" disabled/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w120">
+                      Số máy/Acc
+                    </div>
+                    <div class="value">
+                      <input type="text" v-model.trim="soMayTimKiem" class="form-control" disabled/>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">
+                      Ngày tạo
+                    </div>
+                    <div class="value">
+                      <div>
+                        <ejs-datetimepicker locale="vi" v-model="ngayTao" :format="'dd/MM/y HH:mm:ss'" :enabled="false">
+                        </ejs-datetimepicker>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+          <div class="col-sm-6 col-12">
+          <div class="box-form " id="boxRight">
+            <div class="legend-title">Thông tin giao phiếu</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Hướng giao <span class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="huongGiaoId"
+                      :dataSource="dsHuongGiao"
+                      dataValueField="HUONGGIAO_ID"
+                      dataTextField="HUONGGIAO"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">Ngày giao <span class="required">*</span></div>
+                  <div class="value">
+                    <div>
+                      <ejs-datetimepicker
+                        locale="vi"
+                        v-model="ngayGiaoPhieu"
+                        :format="'dd/MM/y HH:mm:ss'"
+                        :enabled="false"
+                      >
+                      </ejs-datetimepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Đơn vị xử lý <span class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="donViXuLyId"
+                      :dataSource="dsDonViXuLy"
+                      dataValueField="ID"
+                      dataTextField="NAME"
+                      @select="onChangeDV"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">
+                    Người xử lý <span class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="nguoiXuLyId"
+                      :dataSource="dsnguoiXuLy"
+                      dataValueField="NHANVIEN_ID"
+                      dataTextField="TEN_NV"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="box-form">
+          <div class="legend-title">Danh sách phiếu đề xuất giảm trừ cước</div>
+          <DataGrid
+            v-bind:columns="[
+                                        {fieldName: 'PHIEUKN_ID', headerText: 'ID phiếu ĐXGTC', allowFiltering: true, allowSorting: false, width: 150},
+                                        {fieldName: 'NGAY_TN', headerText: 'Ngày tạo', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'DONVI_GIAO', headerText: 'Đơn vị tạo', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'NGUOI_KN', headerText: 'Người tạo', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'MA_KN', headerText: 'Mã khiếu nại', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'MA_TB', headerText: 'Mã thuê bao', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting: false, width: 150},
+                                        {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'MA_KH', headerText: 'Mã khách hàng', allowFiltering: true, allowSorting: false, width: 150},
+                                        {fieldName: 'TENCHUDE', headerText: 'Chủ đề khiếu nại', allowFiltering: true, allowSorting: false, width: 180},
+                                         {fieldName: 'XACMINH', headerText: 'Xác minh cước', allowFiltering: true, allowSorting: false, width: 120},
+                                        {fieldName: 'NGAYGIAO', headerText: 'Ngày giao ', allowFiltering: true, allowSorting: false, width: 150},
+                                        {fieldName: 'NGUOI_GIAO', headerText: 'Người giao', allowFiltering: true, allowSorting: false, width: 180},
+                                    ]"
+            v-bind:dataSource="dsKhieuNai"
+            :showFilter="true"
+            :allowPaging="true"
+            @rowSelected="rowSelected"
+            :enablePagingServer="false"
+            ref="grdDSPhieu"
+          >
+          </DataGrid>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

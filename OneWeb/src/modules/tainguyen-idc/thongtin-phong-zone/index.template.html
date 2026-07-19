@@ -1,0 +1,67 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-if="!isFromModal">
+        <b-link href="javascript:void(0)" @click="btnNewClick" :disabled="!buttons.btnAddNew.enabled">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onDelete" :disabled="!buttons.btnDelete.enabled">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+      <li v-if="!isFromModal">
+        <a @click="btnImportExcel_Click" style="cursor: pointer;"> <span class="icon one-upload"></span> Import </a>
+      </li>
+      <li v-if="!isFromModal">
+        <a @click="btnExportExcel_Click" style="cursor: pointer;"> <span class="icon one-download"></span> Export </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+
+    <!-- DataGrid -->
+    <div class="box-form">
+      <div class="legend-title">Danh sách phòng/zone</div>
+      <DataGrid
+        v-bind:columns="[
+          {fieldName: 'ID', headerText: 'ID', width: 50, textAlign: 'Center'},
+          {fieldName: 'TEN', headerText: 'Tên phòng/zone', allowFiltering: true},
+          {fieldName: 'IDC', headerText: 'IDC', allowFiltering: true},
+          {fieldName: 'TOANHA', headerText: 'Tòa nhà', allowFiltering: true},
+          {fieldName: 'MATSAN', headerText: 'Mặt sàn', allowFiltering: true},
+          {fieldName: 'DIENTICH', width: 60, headerText: 'Diện tích', allowFiltering: true},
+          {fieldName: 'TRANGTHAI_VH', headerText: 'Trạng thái VH', allowFiltering: true, width: 100, textAlign: 'Center'},
+          {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: actionColumn(this), width: 180}
+        ]"
+        :dataSource="dsPhongZone"
+        :showFilter="true"
+        :allowPaging="true"
+        :enablePagingServer="false"
+        :showColumnCheckbox="true"
+        @selectedItemsChanged="onSelectRowCheckbox"
+        @rowSelected="grdItems_RowSelected"
+        dataKeyField="ID"
+        ref="grdItems"
+        :allowExcelExport="true"
+      >
+      </DataGrid>
+    </div>
+  </div>
+
+  <ModalImportExcel
+    ref="modalImportExcel"
+    :title="importConfig.title"
+    :tableColumns="importConfig.tableColumns"
+    :templateFileName="importConfig.templateFileName"
+    :processExcelData="processPhongZoneExcelData"
+    :formatCellValue="formatPhongZoneCellValue"
+    :validationRules="importConfig.validationRules"
+    :checkDataResult="importConfig.checkDataResult"
+    @check-data="handleCheckData"
+  />
+
+  <PopupPhongZoneDetail ref="popupPhongZone" :itemId="selectedItemId" :mode="dialogMode" @saved="handlePopupSaved" />
+</div>

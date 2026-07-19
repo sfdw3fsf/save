@@ -1,0 +1,140 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li :class="{'disable-btn': isNew}">
+        <a href="javascript:void(0)" @click="onClickButtonNhapMoi">
+          <span class="icon one-file-plus"></span> Nhập mới
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="onClickButtonCapNhat">
+          <span class="icon  one-save"></span> Ghi lại
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="onClickButtonHuyBo">
+          <span class="icon  ui-1_circle-remove nc-icon-glyph"></span> Hủy
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="onClickButtonXoa">
+          <span class="icon  one-trash"></span> Xóa
+        </a>
+      </li>
+    </ul>
+    <div class="more">
+      <a href="#">
+        <span class="-ap icon-th-menu"></span>
+      </a>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin port channel</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w90">ID Nhóm <span style="color: red">*</span></div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="dataSelected.idNhom" :disabled="validated == 1">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Mã nhóm <span style="color: red">*</span></div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="dataSelected.maNhom" ref = 'ma-nhom'>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Trạm thiết bị <span style="color: red">*</span></div>
+            <div class="value">
+              <div class="select-custom" ref="cboTramtb">
+                    <SelectExt
+                          v-model="dataSelected.cboTramTB"
+                          :settings="{dropdownParent: $refs['cboTramtb']}"
+                          :dataSource="dsTramTB"
+                          dataTextField="TEN_DV"
+                          @change="onChangeTocboTBi()" :disabled="disable == 1"
+                          dataValueField="DONVI_ID"/>
+                  </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Thiết bị <span style="color: red">*</span></div>
+            <div class="value">
+              <div class="select-custom" ref="cboDslam">
+                    <SelectExt
+                          v-model="dataSelected.cboTB"
+                          :settings="{dropdownParent: $refs['cboDslam']}"
+                          :dataSource="dsTB"
+                          dataTextField="TENDSLAM"
+                          @change="onChangeDsPortGanOrChua($event)"
+                          :disabled="disable == 1"
+                          dataValueField="DSLAM_ID"/>
+                  </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="box-move-select-table">
+            <div class="box-col">
+              <div class="table-content">
+                <DataGrid ref="dagan" v-bind:columns="[
+            {fieldName: 'PORT', headerText: 'Port đã gán', allowFiltering: true, allowSorting: false},
+            ]"
+                          v-bind:dataSource="dsPortDaGan"
+                          dataKeyField="PORTVL_ID"
+                          :showColumnCheckbox="true"
+                          :showFilter="true"
+                          :enabledSelectFirstRow="false"
+                          panelDataHeight=170
+                          @selectedItemsChanged="select_selectedItemsChangedDagan"
+                          ></DataGrid>
+              </div>
+            </div>
+            <div class="actions padt0">
+              <button class="btn btn-main" @click="onClickButtonGoGan">
+                <span class="-ap icon-chevron-thin-right"></span>
+              </button>
+              <button class="btn btn-main" @click="onClickButtonGan">
+                <span class="-ap icon-chevron-thin-left"></span>
+              </button>
+            </div>
+            <div class="box-col">
+              <div class="table-content">
+                <DataGrid ref="chuagan" v-bind:columns="[
+            {fieldName: 'PORT', headerText: 'Port chưa gán', allowFiltering: true, allowSorting: false},
+            ]"
+                          v-bind:dataSource="dsPortChuaGan"
+                          dataKeyField="PORTVL_ID"
+                          :showColumnCheckbox="true"
+                          :showFilter="true"
+                          panelDataHeight=170
+                          :enabledSelectFirstRow="false"
+                          @selectedItemsChanged="select_selectedItemsChangedChuagan"></DataGrid>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách port channel</div>
+      <DataGrid v-bind:columns="[
+            {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: 50 },
+            {fieldName: 'TENDSLAM', headerText: 'Thiết bị', allowFiltering: true},
+            {fieldName: 'MA_KENH', headerText: 'Mã nhóm', allowFiltering: true},
+            {fieldName: 'PORT', headerText: 'Danh sách cổng', allowFiltering: true},
+            ]"
+                v-bind:dataSource="dsPortChanel" :showFilter="true" :allowPaging = true
+                            :enablePagingServer = false @selectedRowChanged="onclickPortChanel"></DataGrid>
+    </div>
+  </div>
+  <b-modal v-model="xacNhanXoa" title="" size="sm" hide-footer>
+    <span>Bạn thật sự muốn xóa dữ liệu không ?</span>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="xacNhanXoa =! xacNhanXoa">Hủy</button>
+      <button type="button" class="btn btn-primary" @click="okXoaPortChanel">Đồng ý</button>
+    </div>
+  </b-modal>
+</div>

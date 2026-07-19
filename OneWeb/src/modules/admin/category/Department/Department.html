@@ -1,0 +1,599 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header"/>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-for="item in actions" :key="item.id" @click="onActionClick(item)"
+          :class="{disabled: !item.active}">
+        <a style="cursor: pointer;" :class="{disabled_color: !item.active}" :ref="item.id" v-b-tooltip.hover.right="item.tooltip">
+          <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+        </a>
+      </li>
+    </ul>
+   </div>
+  <div class="page-content">
+    <div class="grid-stack-box">
+      <Split>
+         <SplitArea :size="30" :minSize="100">
+            <div class="box-form">
+              <div class="legend-title" style="height:30px">
+                <div class="pull-left padt7"> Danh sách đơn vị</div>
+                <div class="pull-right padt7" style="width:25%">
+                  <div class="col-sm-12 col-12">
+                    <div class="info-row">
+                      <div class="value w30">
+                          <div class="check-action" >
+                            <!-- <span id="tooltipText">Bỏ chọn để hiển thị toàn bộ dơn vị </span> -->
+                            <input ref="checkSD" type="checkbox"  class="check" @change="CheckedChanged($event)" title="Tích để hiển thị toàn bộ đơn vị bao gồm các đơn vị ngừng dử dụng" value="44" >
+                           
+                            <span class="name">Tất Cả</span>
+                             
+                              <!-- <span class="tooltiptext">Tooltip text</span> -->
+                            
+                           
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="input-more-button -right">
+                <button class="btn" @click="sortTreeDonVi">
+                  <span class="one-sort f20"></span>
+                </button>
+                <div class="input-icon-right">
+                  <input type="text" class="form-control" v-model="searchDonViValue" @change="searchDonVi">
+                  <span class="icon nc-icon-outline ui-1_zoom"></span>
+                </div>
+              </div>
+              <div class="tree-plus" style="height: 680px;overflow: auto;">
+                <ejs-treeview id="treeview" ref="tree" cssClass='depts-tree-view'
+                              @nodeClicked="nodeClicked"
+                              :fields="this.fields"
+                              :sortOrder="sortOrder"
+                              @nodeSelected="selectDonViFocusedNodeChange"
+                              :allowMultiSelection='true'
+                              :allowTextWrap="true"
+                              @dataBound="dataBound"
+                              :selectedNodes="selectedNodes"
+                              :expandedNodes="expandedNodes"
+                />
+              </div>
+            </div>
+          </SplitArea>
+          <SplitArea :size="70" :minSize="300">
+            <div class="box-form">
+              <div class="legend-title">Thông tin đơn vị</div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w80">Mã đơn vị <span class="text-danger">*</span></div>
+                        <div class="value">
+                          <div class="row">
+                            <div class="col-sm-5 col-12">
+                              <input type="text" class="form-control text-view" readonly v-model="displayDonViId">
+                            </div>
+                            <div class="col-sm-7 col-12">
+                              <input type="text"  class="form-control highlight" ref="txtMaDV"
+                                     :class="{ 'is-invalid': $v.currentDonVi.MA_DV.$error }"
+                                     v-model.trim="currentDonVi.MA_DV" v-on:keyup.enter="txtMaDV_KeyPress">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w70">Mức</div>
+                        <div class="value">
+                          <input type="text" ref="txtMucDV" class="form-control tright" value="0" v-model.trim="currentDonVi.MUC_ID">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-9 col-12">
+                      <div class="info-row">
+                        <div class="key w80">Tên đơn vị <span class="text-danger">*</span></div>
+                        <div class="value">
+                          <input type="text" class="form-control" :class="{ 'is-invalid': $v.currentDonVi.TEN_DV.$error }"
+                                 v-model.trim="currentDonVi.TEN_DV">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                      <div class="info-row">
+                        <div class="key w50">Tiền tố</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.TIENTO">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Địa chỉ <span class="text-danger">*</span></div>
+                    <div class="value">
+                      <div class="input-more-button">
+                        <button class="btn" @click="showChonDiaChiPopup">
+                          <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <input type="text" class="form-control disabled" :class="{ 'is-invalid': $v.currentDonVi.DIACHI_DV.$error }"
+                               v-model.trim="currentDonVi.DIACHI_DV">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Đơn vị cha</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <ComboboxGridCustom :valueField="DmDonViCha.valueField" :textField="DmDonViCha.textField"
+                                      v-model="DmDonViCha.selectDonViCha" :value="DmDonViCha.selectDonViCha"
+                                      :columns="DmDonViCha.headers"
+                                      :panelDataHeight="DmDonViCha.panelDataHeight" :enabledSelectFirstRow="false"
+                                      :dataSource="DmDonViCha.data">
+                        </ComboboxGridCustom>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Tên ĐVQL</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.TEN_DVQL">
+                    </div>
+                    <div class="value w30 padt7 nowrap">
+                      <div class="check-action">
+                        <input type="checkbox" class="check" v-model.trim="currentDonVi.DONVI_QL"
+                               :checked="currentDonVi.DONVI_QL === 1">
+                        <span class="name">Đơn vị QL</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w80">Tỉnh/Tp</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <ejs-dropdownlist
+                          :allowFiltering="true"
+                          v-model="tinhSelected"
+                          :filtering="onFilteringTinh"
+                          :placeholder="waterMarkTinh"
+                          :dataSource="danhsachTinh"
+                          :fields="{ text: 'TENTINH', value: 'TINH_ID' }"/>
+                      </div>
+                    </div>
+                    <div class="value w30 padt7 nowrap">
+                      <div class="check-action">
+                        <input type="checkbox" class="check" v-model.trim="currentDonVi.SUDUNG"  @change="CheckedChanged_Form($event)">
+                        <span class="name">Sử dụng &nbsp</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12 col-12">
+                    <div class="info-row">
+                      <div class="key w80">Ghi chú</div>
+                      <div class="value">
+                        <input type="text" class="form-control" v-model.trim="currentDonVi.GHICHU">
+                      </div>
+      
+                    </div>
+                    </div>
+                    <!-- <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="value w30">
+                            <div class="check-action">
+                              <input type="checkbox" class="check" v-model.trim="currentDonVi.SUDUNG"  @change="CheckedChanged_Form($event)">
+                              <span class="name">Sử dụng</span>
+                            </div>
+                        </div>
+                      </div>
+                    </div> -->
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w100">Người đại diện</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.NGUOI_DD">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w90">Chức vụ</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.CHUCDANH">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w100">Giấy ủy quyền</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.GIAY_UQ">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w90">Giấy phép KD</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.GIAYPHEP_KD">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w100">Ngày cấp</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.NGAYCAP">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w90">Nơi cấp</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.NOICAP">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w100">Số tài khoản</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.STK">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w90">Mã số thuế</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.MST">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w100">Số điện thoại</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.SO_DT" @input="validatePhoneNumbers">
+                          <span v-if="errorMessage" class="error-message">{{ errorMessage }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w90">Fax</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.SO_FAX">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w100">Email</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.EMAIL">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w90">Website</div>
+                        <div class="value">
+                          <input type="text" class="form-control" v-model.trim="currentDonVi.WEBSITE">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w100">Ngân hàng</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <ejs-dropdownlist
+                          :allowFiltering="true"
+                          v-model="nganhangSelected"
+                          :filtering="onFilteringNganHang"
+                          :dataSource="danhsachNganHang"
+                          :placeholder="waterMarkNganHang"
+                          :fields="{ text: 'TEN_NH', value: 'NGANHANG_ID' }"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <LoaiDonVi ref="loai_dv"
+                         :p_donvi_id="this.donviId"/>
+            </div>
+          </SplitArea>
+      </Split>
+    </div>
+    
+    <!-- <div class="row">
+      <div class="col-sm-2 col-12">
+        <div class="box-form">
+          <div class="legend-title">Danh sách đơn vị</div>
+          <div class="input-more-button -right">
+            <button class="btn" @click="sortTreeDonVi">
+              <span class="one-sort f20"></span>
+            </button>
+            <div class="input-icon-right">
+              <input type="text" class="form-control" v-model="searchDonViValue" @change="searchDonVi">
+              <span class="icon nc-icon-outline ui-1_zoom"></span>
+            </div>
+          </div>
+          <div class="tree-plus" style="height: 680px;overflow: auto;">
+            <ejs-treeview id="treeview" ref="tree" cssClass='depts-tree-view'
+                          @nodeClicked="nodeClicked"
+                          :fields="this.fields"
+                          :sortOrder="sortOrder"
+                          @nodeSelected="selectDonViFocusedNodeChange"
+                          :allowMultiSelection='true'
+                          :allowTextWrap="true"
+                          @dataBound="dataBound"
+                          :selectedNodes="selectedNodes"
+                          :expandedNodes="expandedNodes"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-10">
+        <div class="box-form">
+          <div class="legend-title">Thông tin đơn vị</div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Mã đơn vị <span class="text-danger">*</span></div>
+                    <div class="value">
+                      <div class="row">
+                        <div class="col-sm-5 col-12">
+                          <input type="text" class="form-control text-view" readonly v-model="displayDonViId">
+                        </div>
+                        <div class="col-sm-7 col-12">
+                          <input type="text"  class="form-control highlight" ref="txtMaDV"
+                                 :class="{ 'is-invalid': $v.currentDonVi.MA_DV.$error }"
+                                 v-model.trim="currentDonVi.MA_DV" v-on:keyup.enter="txtMaDV_KeyPress">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w70">Mức</div>
+                    <div class="value">
+                      <input type="text" ref="txtMucDV" class="form-control tright" value="0" v-model.trim="currentDonVi.MUC_ID">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-9 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Tên đơn vị <span class="text-danger">*</span></div>
+                    <div class="value">
+                      <input type="text" class="form-control" :class="{ 'is-invalid': $v.currentDonVi.TEN_DV.$error }"
+                             v-model.trim="currentDonVi.TEN_DV">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                  <div class="info-row">
+                    <div class="key w50">Tiền tố</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.TIENTO">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">Địa chỉ <span class="text-danger">*</span></div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="showChonDiaChiPopup">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" class="form-control" :class="{ 'is-invalid': $v.currentDonVi.DIACHI_DV.$error }"
+                           v-model.trim="currentDonVi.DIACHI_DV">
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">Đơn vị cha</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ComboboxGridCustom :valueField="DmDonViCha.valueField" :textField="DmDonViCha.textField"
+                                  v-model="DmDonViCha.selectDonViCha" :value="DmDonViCha.selectDonViCha"
+                                  :columns="DmDonViCha.headers"
+                                  :panelDataHeight="DmDonViCha.panelDataHeight" :enabledSelectFirstRow="false"
+                                  :dataSource="DmDonViCha.data">
+                    </ComboboxGridCustom>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">Tên ĐVQL</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model.trim="currentDonVi.TEN_DVQL">
+                </div>
+                <div class="value w30 padt7 nowrap">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model.trim="currentDonVi.DONVI_QL"
+                           :checked="currentDonVi.DONVI_QL === 1">
+                    <span class="name">Đơn vị QL</span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">Tỉnh/Tp</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ejs-dropdownlist
+                      :allowFiltering="true"
+                      v-model="tinhSelected"
+                      :filtering="onFilteringTinh"
+                      :placeholder="waterMarkTinh"
+                      :dataSource="danhsachTinh"
+                      :fields="{ text: 'TENTINH', value: 'TINH_ID' }"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w80">Ghi chú</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model.trim="currentDonVi.GHICHU">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Người đại diện</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.NGUOI_DD">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Chức vụ</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.CHUCDANH">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Giấy ủy quyền</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.GIAY_UQ">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Giấy phép KD</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.GIAYPHEP_KD">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Ngày cấp</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.NGAYCAP">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Nơi cấp</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.NOICAP">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Số tài khoản</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.STK">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Mã số thuế</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.MST">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Số điện thoại</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.SO_DT">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Fax</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.SO_FAX">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Email</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.EMAIL">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Website</div>
+                    <div class="value">
+                      <input type="text" class="form-control" v-model.trim="currentDonVi.WEBSITE">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Ngân hàng</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ejs-dropdownlist
+                      :allowFiltering="true"
+                      v-model="nganhangSelected"
+                      :filtering="onFilteringNganHang"
+                      :dataSource="danhsachNganHang"
+                      :placeholder="waterMarkNganHang"
+                      :fields="{ text: 'TEN_NH', value: 'NGANHANG_ID' }"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <LoaiDonVi ref="loai_dv"
+                     :p_donvi_id="this.donviId"/>
+        </div>
+      </div>
+    </div> -->
+  </div>
+  <DonViViTri ref="popupDVVT" :donvi-id="modelDonViVT.donviId" :tendonvi="modelDonViVT.tendonvi"/>
+  <GanLoaiChuongTrinh ref="popupLoaiCT" :donvi-id="this.currentDonVi.DONVI_ID"/>
+  <ModalChonDiaChi modalId="popupDiaChi" :data="this.dataSelected" :isStrictMode="true" @xacnhan="getDiaChi"/>
+</div>

@@ -1,0 +1,346 @@
+<div>
+  <div v-if="hasPermission" class="main-wrapper">
+    <div class="breadcrumb-top">
+      <!-- <div class="main-title">Cập nhật quy trình</div> -->
+      <breadcrumb :header="header" />
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="#" @click.prevent="tsbtnNhapMoi_Click" :class="{disabled: !tsbtnNhapMoi}"> <span class="icon one-file-plus"></span>Nhập mới (F5) </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="tsbtnGhiLai_Click" :class="{disabled: !tsbtnGhiLai}"> <span class="icon one-save"></span>Ghi lại (F9) </a>
+        </li>
+
+        <li>
+          <a href="#" @click.prevent="tsbtnHuyBo_Click" :class="{disabled: !tsbtnHuyBo}"> <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy (F7) </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="tsbtnXoa_Click" :class="{disabled: !tsbtnXoa}"> <span class="icon one-trash"></span>Xóa (F8) </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="openModalLuongPhieu"> <span class="icon one-luong"></span>Luồng (F6) </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="openModalHuongGiao"> <span class="icon one-path"></span>Hướng giao </a>
+        </li>
+      </ul>
+    </div>
+    <div class="page-content">
+      <div class="row">
+        <div class="col-sm-4 col-12">
+          <div class="box-form">
+            <div class="legend-title">Thông tin quy trình</div>
+            <div class="info-row">
+              <div class="key w90">Nhóm quy trình</div>
+              <div class="value">
+                <div class="select-custom">
+                  <Select2 ref="nhomQuyTrinh" :disabled="false" v-model="cboNhomQuyTrinh.value" :options="cboNhomQuyTrinh.list" :settings="settingSelect2" @select="cboNhomQT_SelectedValueChanged" />
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Loại HĐ</div>
+              <div class="value">
+                <div class="select-custom">
+                  <Select2 ref="loaiHopDong" :disabled="false" v-model="cboLoaiHopDong.value" :options="cboLoaiHopDong.list" :settings="settingSelect2" @select="cboLoaiHD_EditValueChanged" />
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Tên quy trình</div>
+              <div class="value">
+                <input type="text" class="form-control highlight" v-model="tenQuyTrinh" />
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Dịch vụ VT</div>
+              <div class="value">
+                <div class="select-custom">
+                  <Select2 ref="dichVuVienThong" :disabled="false" v-model="cboDichVuVienThong.value" :options="cboDichVuVienThong.list" :settings="settingSelect2" @select="cboDichVuVT_SelectedValueChanged" />
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Thứ tự</div>
+              <div class="value">
+                <input type="text" class="form-control highlight" v-model="thuTu" />
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Kiểu</div>
+              <div class="value">
+                <div class="list-checks mart7">
+                  <div class="item">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" name="kieu" v-model="checkTheoYeuCau" :checked="checkTheoYeuCau" @change="changeYeuCau($event)" />
+                      <span class="name">Theo YC</span>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" name="kieu" v-model="checkNoCuoc" :checked="checkNoCuoc" @change="changeNoCuoc($event)" />
+                      <span class="name">Nợ cước</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Quy trình</div>
+              <div class="value">
+                <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model="textQuyTrinh"></textarea>
+              </div>
+            </div>
+            <div class="legend-title mart10">Danh sách quy trình</div>
+            <div class="table-content" style="height: 370px;">
+              <DataGrid v-bind:columns="danhSachQuyTrinhTable.header" v-bind:dataSource="danhSachQuyTrinhTable.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :showColumnCheckbox="false" @rowSelected="gview_DanhSach_FocusedRowChanged"> </DataGrid>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8 col-12">
+          <div class="nav tabs tab-over">
+            <a href="#tab1" data-toggle="tab" class="minw0 active show">Tab gán tỉnh</a>
+            <a href="#tab2" data-toggle="tab" class="minw0">Tab gán LH KLĐ</a>
+          </div>
+          <div class="tab-content tab-gan-quy-trinh-content">
+            <div class="tab-pane active show" id="tab1">
+              <div class="box-move-select-table">
+                <div class="wrap-info-row">
+                  <div class="box-col box-form">
+                    <div class="legend-title">Danh sách tỉnh đã gán</div>
+                    <div class="table-content" style="height: 90%;">
+                      <DataGrid ref="danhSachTinhDaGan" v-bind:columns="danh_sach_tinh_da_gan.header" v-bind:dataSource="danh_sach_tinh_da_gan.list" :enable-paging-server="false" :allowPaging="false" :showFilter="true" :showColumnCheckbox="true" :enabledSelectFirstRow="false"> </DataGrid>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn" @click="thaoTacPhanVung(1)">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacPhanVung(0)">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="wrap-info-row">
+                  <div class="box-col box-form">
+                    <div class="legend-title">Danh sách tỉnh chưa gán</div>
+                    <div class="table-content" style="height: 90%;">
+                      <DataGrid ref="danhSachTinhChuaGan" v-bind:columns="danh_sach_tinh_chua_gan.header" v-bind:dataSource="danh_sach_tinh_chua_gan.list" :enable-paging-server="false" :allowPaging="false" :showFilter="true" :showColumnCheckbox="true" :enabledSelectFirstRow="false"> </DataGrid>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab2">
+              <div class="box-move-select-table box-wrap-select justify-content-between">
+                <div class="box-col">
+                  <div class="info-row">
+                    <div class="key w90">Tỉnh</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <Select2 ref="danhSachTinh" :disabled="false" v-model="cboDanhSachTinh.value" :options="cboDanhSachTinh.list" :settings="settingSelect2" @select="changeTinh" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="box-col">
+                  <div class="info-row">
+                    <div class="check-action key w90"><input type="checkbox" class="check" v-model="checkDsGanTinh" /> <span class="name">Gán DS tỉnh</span></div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <!-- <Select2 ref="danhSachTinh" :disabled='!checkDsGanTinh' v-model="cboDanhSachTinh.value"
+                                         :options="cboDanhSachTinh.list" :settings="settingSelect2" :multiple="true" /> -->
+                        <ejs-multiselect
+                          mode="CheckBox"
+                          selectAllText="Chọn tất cả"
+                          unSelectAllText="Bỏ chọn tất cả"
+                          v-model="cboDanhSachGanTinh.value"
+                          locale="vi-VN"
+                          :dataSource="cboDanhSachGanTinh.list"
+                          :allowFiltering="true"
+                          :fields="{value:'id', text: 'text'}"
+                          :showSelectAll="true"
+                          :showDropDownIcon="true"
+                          :readonly="!checkDsGanTinh"
+                        ></ejs-multiselect>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="box-move-select-table">
+                <div class="info-row box-col" :class="showLoaiHinhThuebaoClass">
+                  <div class="key w90">Loại hình TB</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <Select2 ref="loaiHinhThueBao" :disabled="false" v-model="cboLoaiHinhThueBao.value" :options="cboLoaiHinhThueBao.list" :settings="settingSelect2" @select="cboLoaiHinhTB_EditValueChanged" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="box-move-select-table" :class="showThueBaoCoDinhClass">
+                <div class="box-col box-form">
+                  <div class="legend-title">Loại hình đã gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="grid_LoaiTBCDDaGan.header" v-bind:dataSource="grid_LoaiTBCDDaGan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="LoaiTBCDDaGan"> </DataGrid>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="thaoTacGanGoAllQuyTrinhNghiepVu(1, 'QT_LHTB')">
+                    <span class="fa fa-angle-double-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(1, 'QT_LHTB')">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoAllQuyTrinhNghiepVu(0, 'QT_LHTB')">
+                    <span class="fa fa-angle-double-left"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(0, 'QT_LHTB')">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="box-col box-form">
+                  <div class="legend-title">Loại hình chưa gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="grid_LoaiTBCDChuaGan.header" v-bind:dataSource="grid_LoaiTBCDChuaGan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="LoaiTBCDChuaGan"> </DataGrid>
+                  </div>
+                </div>
+              </div>
+              <!-- toc doc thue bao -->
+              <div class="box-move-select-table" :class="showTocDoThueBaoClass">
+                <div class="box-col box-form">
+                  <div class="legend-title">Tốc độ/gói cước đã gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="grid_TocDoDaGan.header" v-bind:dataSource="grid_TocDoDaGan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="tocdo_dagan"> </DataGrid>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="thaoTacGanGoAllQuyTrinhNghiepVu(1, 'QT_LHTB')">
+                    <span class="fa fa-angle-double-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(1, 'QT_LHTB')">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoAllQuyTrinhNghiepVu(0, 'QT_LHTB')">
+                    <span class="fa fa-angle-double-left"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(0, 'QT_LHTB')">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="box-col box-form">
+                  <div class="legend-title">Tốc độ/gói cước chưa gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="grid_TocDoChuaGan.header" v-bind:dataSource="grid_TocDoChuaGan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="tocdo_chuagan"> </DataGrid>
+                  </div>
+                </div>
+              </div>
+              <!-- kieu lap dat -->
+              <div class="box-move-select-table" :class="showKieuLapDatClass">
+                <div class="box-col box-form">
+                  <div class="legend-title">Kiểu lắp đặt đã gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_kieuld_dagan.header" v-bind:dataSource="ds_kieuld_dagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="kieuld_dagan"> </DataGrid>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(1, 'QT_KIEULD')">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(0, 'QT_KIEULD')">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="box-col box-form">
+                  <div class="legend-title">Kiểu lắp đặt chưa gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_kieuld_chuagan.header" v-bind:dataSource="ds_kieuld_chuagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="kieuld_chuagan"> </DataGrid>
+                  </div>
+                </div>
+              </div>
+              <!-- loai hinh kenh -->
+              <div class="box-move-select-table" :class="showLoaiHinhKenhGanClass">
+                <div class="box-col box-form">
+                  <div class="legend-title">Loại hình kênh gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_loaikenh_dagan.header" v-bind:dataSource="ds_loaikenh_dagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="loaiKenhDaGan"> </DataGrid>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(1, 'QT_LOAIKENH')">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(0, 'QT_LOAIKENH')">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="box-col box-form">
+                  <div class="legend-title">Loại hình kênh chưa gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_loaikenh_chuagan.header" v-bind:dataSource="ds_loaikenh_chuagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="loaiKenhChuaGan"> </DataGrid>
+                  </div>
+                </div>
+              </div>
+              <!-- vat tu -->
+              <div class="box-move-select-table" :class="showVatTuClass">
+                <div class="box-col box-form">
+                  <div class="legend-title">Vật tư đã gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_vattu_dagan.header" v-bind:dataSource="ds_vattu_dagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="vatTuDaGan"> </DataGrid>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(1, 'QT_VATTU')">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(0, 'QT_VATTU')">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="box-col box-form">
+                  <div class="legend-title">Vật tư chưa gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_vattu_chuagan.header" v-bind:dataSource="ds_vattu_chuagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="vatTuChuaGan"> </DataGrid>
+                  </div>
+                </div>
+              </div>
+              <!-- chu de khieu nai -->
+              <div class="box-move-select-table" :class="showKhieuNaiClass">
+                <div class="box-col box-form">
+                  <div class="legend-title">Tên khiếu nại đã gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_cdkn_dagan.header" v-bind:dataSource="ds_cdkn_dagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="chuDeKhieuNaiDaGan"> </DataGrid>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(1, 'QT_CDKN')">
+                    <span class="fa fa-angle-right"></span>
+                  </button>
+                  <button class="btn" @click="thaoTacGanGoQuyTrinhNghiepVu(0, 'QT_CDKN')">
+                    <span class="fa fa-angle-left"></span>
+                  </button>
+                </div>
+                <div class="box-col box-form">
+                  <div class="legend-title">Tên khiếu nại chưa gán</div>
+                  <div class="table-content" style="height: 400px;">
+                    <DataGrid v-bind:columns="ds_cdkn_chuagan.header" v-bind:dataSource="ds_cdkn_chuagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false" :showColumnCheckbox="true" ref="chuDeKhieuNaiChuaGan"> </DataGrid>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <authProcess ref="authProcess" />
+    <!-- <baoHanhThietBi ref="baoHanhThietBi"/> -->
+    <luongPhieu :quyTrinhId="quyTrinhId" :tenQuyTrinh="tenQuyTrinh" ref="luongPhieu" />
+    <IntersectionDirectionModal ref="intersectionDirectionModal" :tk_dichvu_id="cboDichVuVienThong.value" :tk_loaihd_id="cboLoaiHopDong.value" :tk_quytrinh_id="quyTrinhId" />
+    <!-- <frmThemLuongPhieu ref="themLuongPhieu" /> -->
+  </div>
+  <password-view style="padding: 10px;" v-else @onPasswordSubmittedSuccessListener="hasPermission=true" />
+</div>

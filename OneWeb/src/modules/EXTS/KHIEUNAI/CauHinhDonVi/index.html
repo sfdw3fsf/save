@@ -1,0 +1,181 @@
+<div>
+  <!-- <div :class="{ 'modal-content popup-box': type == 'modal' }"> -->
+
+    <div class="list-actions-top">
+      <ul class="list">
+        <li v-for="(item, index) in menus" :class="{ disable: !item.enabled, 'btn-action': item.enabled }">
+          <a @click.prevent="onMenuClicked(item)"><span :class="`${item.icon} icon`"></span>{{ item.name }}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="page-content">
+      <div class="row">
+        <div class="col-sm-4 col-12">
+          <div class="box-form" style="height: 1460px; overflow: scroll;">
+            <div class="legend-title">Danh sách đơn vị</div>
+            <div class="tree-plus">
+              <span class="search-input e-input-group e-control-wrapper">
+                <input :disabled="!txtTreeDonViSearch.enabled" class="e-filtertext e-input highlight"
+                  placeholder="Nhập tên đơn vị cần tìm kiếm" v-model="txtTreeDonViSearch.value"
+                  @keypress.enter="onTxtTreeDonViSearchEntered" />
+                <span class="e-clear-icon e-clear-icon-hide" aria-label="close" role="button"></span>
+              </span>
+              <ejs-treeview ref="treeDonVi" :fields="fieldsDonVi" @nodeSelected="onTreeDonViNodeSelected">
+              </ejs-treeview>
+            </div>
+          </div>
+        </div>
+        <!-- Tabs chưa gán - đã gán -->
+        <div class="col-sm-8">
+          <div class="row">
+            <!-- ĐƠN VỊ -->
+            <div class="box-move-select-table">
+              <div class="box-col box-form">
+                <div class="legend-title">Đơn vị nhận đã gán</div>
+                <DataGrid panelDataHeight="240" v-bind:columns="gridDonViDaGan.header"
+                  v-bind:dataSource="gridDonViDaGan.list" :enable-paging-server="false" :allowPaging="true"
+                  :showFilter="true" :showColumnCheckbox="true" ref="gridDonViDaGan" />
+              </div>
+              <div class="actions">
+                <button class="btn" @click="donViMultiLeft">
+                  <span class="fa fa-angle-right"></span>
+                </button>
+                <button class="btn" @click="donViMultiLeftAll">
+                  <span class="fa fa-angle-double-right"></span>
+                </button>
+                <button class="btn" @click="donViMultiRightAll">
+                  <span class="fa fa-angle-double-left"></span>
+                </button>
+                <button class="btn" @click="donViMultiRight">
+                  <span class="fa fa-angle-left"></span>
+                </button>
+              </div>
+              <div class="box-col box-form">
+                <div class="legend-title">Đơn vị nhận chưa gán</div>
+                <DataGrid panelDataHeight="240" v-bind:columns="gridDonViChuaGan.header"
+                  v-bind:dataSource="gridDonViChuaGan.list" :enable-paging-server="false" :allowPaging="true"
+                  :showFilter="true" :showColumnCheckbox="true" ref="gridDonViChuaGan" />
+              </div>
+            </div>
+            <!-- LOẠI THUÊ BAO -->
+            <div class="box-move-select-table">
+              <div class="box-col box-form">
+                <div class="legend-title">Danh sách Loại hình đã gán</div>
+                <div clas="row">
+                  <div class="info-row" style="visibility: hidden;">
+                    <div class="key w100"></div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt />
+                      </div>
+                    </div>
+                  </div>                
+                  <DataGrid panelDataHeight="240" v-bind:columns="gridLoaiHinhDaGan.header"
+                    v-bind:dataSource="gridLoaiHinhDaGan.list" :enable-paging-server="false" :allowPaging="true"
+                    :showFilter="true" :showColumnCheckbox="true" ref="gridLoaiHinhDaGan" />
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" @click="loaiTBMultiLeft">
+                  <span class="fa fa-angle-right"></span>
+                </button>
+                <button class="btn" @click="loaiTBMultiLeftAll">
+                  <span class="fa fa-angle-double-right"></span>
+                </button>
+                <button class="btn" @click="loaiTBMultiRightAll">
+                  <span class="fa fa-angle-double-left"></span>
+                </button>
+                <button class="btn" @click="loaiTBMultiRight">
+                  <span class="fa fa-angle-left"></span>
+                </button>
+              </div>
+              <div class="box-col box-form">
+                <div class="legend-title">Danh sách Loại hình chưa gán</div>
+                <div clas="row">
+                  <div class="info-row">
+                    <div class="key w100"> Dịch vụ </div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt
+                          v-model="cboDichvuVT.value" 
+                          :dataSource="cboDichvuVT.list"
+                          @change="onChangeDichVuVT"
+                          dataValueField="DICHVUVT_ID" dataTextField="TEN_DVVT" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <DataGrid panelDataHeight="240" v-bind:columns="gridLoaiHinhChuaGan.header"
+                    v-bind:dataSource="gridLoaiHinhChuaGan.list" :enable-paging-server="false" :allowPaging="true"
+                    :showFilter="true" :showColumnCheckbox="true" ref="gridLoaiHinhChuaGan" />
+                </div>
+              </div>
+            </div>
+            <!-- CHỦ ĐỀ -->
+            <div class="box-move-select-table">
+              <div class="box-col box-form">
+                <div class="legend-title">Danh sách chủ đề khiếu nại đã gán</div>
+                <div class="row">
+                  <div class="info-row" style="visibility: hidden;">
+                      <div class="key w100"> 
+                      </div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt  />
+                        </div>
+                      </div>
+                  </div>
+                  <DataGrid panelDataHeight="240" v-bind:columns="gridChuDeDaGan.header"
+                    v-bind:dataSource="gridChuDeDaGan.list" :enable-paging-server="false" :allowPaging="true"
+                    :showFilter="true" :showColumnCheckbox="true" ref="gridChuDeDaGan" />
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" @click="chuDeMultiLeft">
+                  <span class="fa fa-angle-right"></span>
+                </button>
+                <button class="btn" @click="chuDeMultiLeftAll">
+                  <span class="fa fa-angle-double-right"></span>
+                </button>
+                <button class="btn" @click="chuDeMultiRightAll">
+                  <span class="fa fa-angle-double-left"></span>
+                </button>
+                <button class="btn" @click="chuDeMultiRight">
+                  <span class="fa fa-angle-left"></span>
+                </button>
+              </div>
+              <div class="box-col box-form">
+                <div class="legend-title">Danh sách chủ đề khiếu nại chưa gán</div>
+                <div clas="'row">
+                  <div class="info-row">
+                    <div class="key w100"> Nhóm chủ đề
+                    </div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <SelectExt 
+                          v-model="cboNhomChuDe.value" 
+                          :dataSource="cboNhomChuDe.list" 
+                          @change="onChangeNhomChuDe"
+                          dataValueField="NHOM_ID" dataTextField="TEN_NHOM" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <DataGrid panelDataHeight="240" v-bind:columns="gridChuDeChuaGan.header"
+                    v-bind:dataSource="gridChuDeChuaGan.list" :enable-paging-server="false" :allowPaging="true"
+                    :showFilter="true" :showColumnCheckbox="true" ref="gridChuDeChuaGan" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title">Danh sách đơn vị nhận xử lý phiếu khiếu nại tự động</div>
+        <DataGrid ref="gridColumn" v-bind:columns="gridColumn.header" v-bind:dataSource="gridColumn.list"
+          :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="true"
+          @selectedRowChanged="gridColumnOnSelectedRowChanged" />
+      </div>
+    </div>
+  <!-- </div> -->
+</div>

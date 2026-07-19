@@ -1,0 +1,167 @@
+<div class='main-wrapper'>
+  <!-- <breadcrumb :header="header" /> -->
+  <div class='list-actions-top' style="padding: 9px;">
+    <h4>Tiếp nhận cuộc gọi tổng đài</h4>
+
+    <div class="info-row" style='width:350px; float: right;margin-right: 40px'>
+      <div class="key">
+        <span  class="badge badge-pill badge-success" :class="{'badge-danger': !reconnect }">{{ statusConnect }}</span>
+      </div>
+      <div class="value">
+        <ejs-dropdowntree ref="refActions" id='dropdowntree' :fields='this.fields' :placeholder="'Chọn Hoạt Động'" cssClass="dropdowntree-icons list-actions" v-on:select='this.changeActions'></ejs-dropdowntree>
+      </div>
+    </div>
+
+    <!-- Example split danger button -->
+    <div class="btn-group" id="list-useripcc" style="margin-right: 40px; float: right;">
+      <button type="button" class="btn btn-info btn-xs" style="color: black;font-style: italic;background: none">{{
+        this.user_ipcc.selected.user_ipcc }} {{ currentStatus && currentStatus != 'LOGOUT' ? ' on ' + this.user_ipcc.selected.line : ''}}
+      </button>
+      <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+      </button>
+      <div class="dropdown-menu" style='border: 0px; min-width: 350px'>
+        <DataGrid
+          v-bind:columns="user_ipcc.header"
+          :gridLines="'Both'"
+          ref="user_ipcc"
+          :dataSource="user_ipcc.list"
+          :showFilter="false"
+          :allowPaging="false"
+          :enablePagingServer="false"
+          :enabledSelectFirstRow="true"
+          @rowSelected="gridUserIpccSelected"
+          @selectedRowChanged="onSelectedAgentChanged"
+          :commandColumn="{headerText: '', width: 50, cellCssClass: 'center', firstColumn: true, show: true}"
+          :commands="user_ipcc.commands"
+          @commandClicked="gridCommand_user_ipcc"
+        >
+        </DataGrid>
+      </div>
+    </div>
+  </div>
+
+  <div class='page-content' style="top: 70px">
+    <div class=''>
+      <div class='row'>
+        <div class='col-12 col-sm-5' style="vertical-align: baseline">
+          <div class='box-form' style="height: calc(100% - 8px)">
+            <div class='legend-title'>Thông tin cuộc gọi</div>
+            <div class='row'>
+              <div class='col-sm-6 col-12'>
+                <div class='info-row'>
+                  <div class='key w80'>Hotline</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' v-model='thongtincuocgoi.Hotline'>
+                  </div>
+                </div>
+              </div>
+              <div class='col-sm-6 col-12'>
+                <div class='info-row'>
+                  <div class='key w80'>Bắt đầu</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' v-model='thongtincuocgoi.TimeStamp'>
+                  </div>
+                </div>
+              </div>
+              <div class='col-12'>
+                <div class='info-row'>
+                  <div class='key w80'>Nhánh</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' v-model='thongtincuocgoi.BranchName'>
+                  </div>
+                </div>
+              </div>
+              <div class='col-sm-6 col-12'>
+                <div class='info-row'>
+                  <div class='key w80'>Số máy</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' v-model='thongtincuocgoi.Caller' @keyup.enter="txt_PhoneNo_KeyPress">
+                  </div>
+                </div>
+              </div>
+              <div class='col-sm-6 col-12'>
+                <div class='info-row'>
+                  <div class='key w80'>Thời lượng</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' v-model='formattedTime'>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='col-12 col-sm-7' style="vertical-align: baseline">
+          <div class='box-form' style="height: calc(100% - 8px)">
+            <div class='legend-title'>Nhận dạng khách hàng</div>
+            <div class='row'>
+              <div class='col-12'>
+                <div class='info-row'>
+                  <div class='key w150'>Tên khách hàng</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' :value="ten_kh" @change="e => ten_kh = e.target.value">
+                  </div>
+                </div>
+              </div>
+              <div class='col-12'>
+                <div class='info-row'>
+                  <div class='key w150'>Địa chỉ</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' :value="diachi_kh" @change="e => diachi_kh = e.target.value">
+                  </div>
+                </div>
+              </div>
+              <div class='col-12'>
+                <div class='info-row'>
+                  <div class='key w150'>Ghi chú</div>
+                  <div class='value'>
+                    <input type='text' class='form-control' :value="ghichu" @change="e => ghichu = e.target.value">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class=''>
+      <div class='nav tabs tab-over'>
+        <a href='#tabHD' data-toggle='tab' @click.prevent='currentTab = 1; tab_Detail_SelectedPageChanged(currentTab)' :class='{active: currentTab===1}'>Tra cứu
+          khách hàng</a>
+        <a href='#tabTB' data-toggle='tab' @click.prevent='currentTab = 2; tab_Detail_SelectedPageChanged(currentTab)' :class='{active: currentTab===2}'>Danh sách
+          thuê bao khách hàng</a>
+        <a href='#tabTB' data-toggle='tab' @click.prevent='currentTab = 3; tab_Detail_SelectedPageChanged(currentTab)' :class='{active: currentTab===3}'>Lịch sử
+          cuộc gọi khách hàng ({{soluong_cuocgoi}})</a>
+        <a href='#tabTB' data-toggle='tab' @click.prevent='currentTab = 4; tab_Detail_SelectedPageChanged(currentTab)' :class='{active: currentTab===4}'>Chi tiết
+          cuộc gọi</a>
+        <a href='#tabTB' data-toggle='tab' @click.prevent='currentTab = 5; tab_Detail_SelectedPageChanged(currentTab)' :class='{active: currentTab===5}'>Tìm kiếm
+          mở rộng</a>
+      </div>
+
+      <div class='tab-content'>
+        <div class='tab-pane' :class='{active: currentTab==1}'>
+          <TraCuuKhachHang ref="TraCuuKhachHang" :danh_muc="DanhMuc" :extend="false" @xacnhan="TraCuu_FocusedRowChanged"/>
+        </div>
+        <div class='tab-pane' :class='{active: currentTab==2}'>
+          <DanhSachThueBaoKhachHang ref="DanhSachThueBaoKhachHang" :dulieu="{so_tb: thongtincuocgoi.Caller, khachhang_id: khachhang_id, tinh_id: tinh_id, DanhMuc: DanhMuc}" @rowSelected="gview_DanhSach_FocusedRowChanged"/>
+        </div>
+        <div class='tab-pane' :class='{active: currentTab==3}'>
+          <LichSuCuocGoiKhachHang ref="LichSuCuocGoiKhachHang" :so_dt="thongtincuocgoi && thongtincuocgoi.Caller ? thongtincuocgoi.Caller : ''"/>
+        </div>
+        <div class='tab-pane' :class='{active: currentTab==4}'>
+          <ChiTietCuocGoi ref="ChiTietCuocGoi" :thongtincuocgoi='thongtincuocgoi' :thongtincuocgoi_end='thongtincuocgoi_end' :is-calling='isCalling' @btnGhiLai_click="btnGhiLaiCTCG_click"/>
+        </div>
+        <div class='tab-pane' :class='{active: currentTab==5}'>
+          <TimKiemMoRong ref="TimKiemMoRong" :danh_muc="DanhMuc" :extend="true" @xacnhan="TraCuuMoRong_FocusedRowChanged"/>
+        </div>
+      </div>
+    </div>
+    <div class="notification-icon" v-show='isCalling == 1'>
+      <div class="notification-icon-inner">
+        <i class="fa fa-phone"></i> <!-- You can use an appropriate icon library or image here -->
+      </div>
+    </div>
+  </div>
+</div>

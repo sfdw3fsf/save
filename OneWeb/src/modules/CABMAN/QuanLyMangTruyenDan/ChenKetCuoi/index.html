@@ -1,0 +1,172 @@
+<b-modal
+  size="xl"
+  no-close-on-backdrop
+  hide-footer
+  hide-header
+  hide-header-close
+  body-class="modal-body p-0"
+  @shown="onShownModal"
+  @hidden="onHiddenModal"
+  :id="id"
+  :key="key"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title"><span class="icon one-notepad"></span> {{title}}</div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide(id)"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="javascript:void(0)" @click="traCuuKT()">
+            <span class="icon one-file-search"></span> {{titleTraCuu}}
+          </a>
+        </li>
+<!--        <li >-->
+<!--          <a href="javascript:void(0)"  @click="xuatExcel()" :class="{'disabled': isDisableBtn}">-->
+<!--            <span class="icon one-xlsx-import"></span>Xuất Excel-->
+<!--          </a>-->
+<!--        </li>-->
+        <download-excel :data="dataExcelEx" id="exportexcel"  style="display: none;">
+          <span class="icon one-xlsx"></span>Xuất Excel
+        </download-excel>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="legend-title">
+          <div class="pull-left">Tìm kiếm kết cuối</div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w90">Kiểu tìm kiếm</div>
+              <div class=" row">
+                <div class="item col-4">
+                  <div class="check-action">
+                    <input name="chkTracuu" type="radio" value="0" v-model="checkrdo" >
+                    <span class="name">Tìm chính xác</span>
+                  </div>
+                </div>
+                <div class="item col-6">
+                  <div class="check-action">
+                    <input name="chkTracuu" type="radio" value="1"  v-model="checkrdo" >
+                    <span class="name">Tìm gần đúng</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w90">Trung tâm VT</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="modelData.mTTVT" :disabled="!isTraCuu"
+                             :dataSource="cboData.cboTTVT"
+                             @change="NAP_DS_TOKT"
+                             dataTextField="TEN_DV"
+                             dataValueField="DONVI_ID"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Ký hiệu</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="mKyHieu" :disabled="!isTraCuu">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w90">Loại kết cuối</div> 
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="modelData.mLoaiKetcuoi"  :disabled="!isTraCuu"
+                             :dataSource="cboData.cboLoaiKetCuoi"
+                             dataTextField="LOAI_KC"
+                             dataValueField="LOAIKC_ID"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Tên kết cuối</div>
+              <div class="value" v-model="mTenKC">
+                <input type="text" class="form-control" :disabled="!isTraCuu">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w90">Dung lượng</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="modelData.mDungLuong" :disabled="!isTraCuu"
+                             :dataSource="cboData.cboDungLuong"
+                             dataTextField="DUNGLUONG"
+                             dataValueField="DUNGLUONG_ID"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title">
+          <div class="pull-left">Danh sách đối tượng</div>
+          <div class="pull-right normal">
+            Hiển thị tối đa <span class="red">100</span> đối tượng
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="table-content">
+          <DataGrid v-bind:columns="[
+                        {fieldName: 'LOAI_DT', width : '10%' , headerText: 'Loại đối tượng ', isGroupedColumn:true},
+                        {fieldName: 'KYHIEU', width : '35%', headerText: 'Ký hiệu (mã)', allowFiltering: true, allowSorting: false},
+                        {fieldName: 'TEN_KC',width : '35%', headerText: 'Tên đối tượng', allowFiltering: true, allowSorting: false},
+                        {fieldName: 'THONGTIN_BS',width : '20%', headerText: 'Thông tin bổ sung', allowFiltering: true,allowHtml : true, cellCssClass: 'text-wrap'}
+                        ]"
+                    v-bind:dataSource="getDS_KETCUOI"
+                    :showFilter="true"
+                    @selectedRowChanged="grid_onSelectedRowChanged"
+                    @commandClicked="grid_onCommandClicked"
+                    @recordDoubleClick="grid_onRowDoubleClicked"
+                    :allowPaging = true
+                    :allowGrouping='true'
+                    :enablePagingServer = false
+          >
+
+          </DataGrid>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="value padl0">
+          <div class="check-action mart10">
+            <input type="checkbox" class="check" :value="0" v-model="XEMCHITIET">
+            <span class="name">Hiển thị thông tin bổ sung</span>
+          </div>
+        </div>
+        <div class="value nowrap padl10 tright">
+
+          <button class="btn-main btn w100 marl10" :disabled="grcDSDT.length<=0"  @click="chonDT">
+            <span class="nc-icon-glyph ui-1_check-simple"></span>Chọn
+          </button>
+          <button class="btn-second btn w100" data-dismiss="modal" @click="$bvModal.hide(id)">
+            <span class="fa fa-times" ></span>Huỷ bỏ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`
+</b-modal>

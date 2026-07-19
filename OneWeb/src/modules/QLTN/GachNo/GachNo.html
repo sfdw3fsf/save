@@ -1,0 +1,701 @@
+<div>
+
+  <app-tra-cuu-thong-tin-thue-bao ref="refTraCuuTTTB" :kycuoc="params.p_kycuoc" :loai_tien="params.p_loaitien"></app-tra-cuu-thong-tin-thue-bao>
+  <app-cac-khoan-no ref="refCacKhoanNo"
+    :ma_tt="params.p_ma_tt"
+    :ma_tb="params.p_acc_somay"
+    :kycuoc="params.p_kycuoc"
+    :db_datcoc="params.p_db_datcoc"
+    :ds_tongno="params.p_ds_tongno"
+    :vkieutra="params.p_kieutra"
+    :vsoluong_tb="params.p_soluong_tb"
+    :vquyen_dd="params.p_quyen_dd"
+    :loai_tien="params.p_loaitien"
+    @beforeOpen="removeGachNoKeyPressHandler"
+    @beforeClose="addGachNoKeyPressHandler"
+    ></app-cac-khoan-no>
+    
+  <app-gach-no-theo-file ref="refGachNoTheoFile" 
+    :nhom_httt="params.p_nhom_httt" 
+    :kycuoc="params.p_kycuoc"
+    :donviqlno_id="params.p_donvi_quanly_id"
+    :dt_thungan="params.p_thungan_options"
+    :dt_loaitien="params.p_loaitien_options"
+    :thuchien_dongbo="params.p_dongbo"
+    @dialogClose="closeGachTheoFileHandler"
+    @beforeOpen="removeGachNoKeyPressHandler"
+    @beforeClose="addGachNoKeyPressHandler"
+    ></app-gach-no-theo-file>
+
+  <app-d-s-phim-tat ref="refDSPhimTat"></app-d-s-phim-tat>
+
+  <app-tim-nhan-vien-thu-cuoc 
+    ref="refTimNVThuCuoc" 
+    :vkieu="2" 
+    :vdonvi="params.p_donvi_quanly_id" 
+    :vnvtc="params.p_nvtc.ma_nvtc" 
+    @beforeOpen="removeGachNoKeyPressHandler"
+    @beforeClose="addGachNoKeyPressHandler"
+    @chonNVTC="chonNVTCHandler"
+    ></app-tim-nhan-vien-thu-cuoc>
+  <app-phieu-huy 
+    ref="refPhieuHuy" 
+    :ma_tt="params.p_ma_tt" 
+    :kycuoc="params.p_kycuoc"
+    :loai_tien="params.p_loaitien"
+    @beforeOpen="removeGachNoKeyPressHandler"
+    @beforeClose="addGachNoKeyPressHandler"
+    ></app-phieu-huy>
+  <app-danh-sach-thue-bao ref="refDanhSachThueBao" :ma_tt="params.p_ma_tt" :kycuoc="params.p_kycuoc" :loai_tien="params.p_loaitien"></app-danh-sach-thue-bao>
+
+  <ChonThanhToan ref="refChonThanhToan" :ds_tt="ds_thanhtoan" @acceptChonMaThanhToan="acceptChonMaThanhToan"></ChonThanhToan>
+  <TraCuuDSThanhToan ref="refTraCuuDSThanhToan" 
+  :nhom_httt_id="params.p_nhom_httt" 
+  :loai_tien="params.p_loaitien"
+  @onSelectRowsAccept="onTraCuuDSThanhToanHandler"></TraCuuDSThanhToan>
+
+  <!-- TOOLBAR -->
+  <div class="list-actions-top">
+    <ul class="list">
+        <li v-if="!f_show_dieuchinh" :class="{ disabled: !config.f_enable_gachno }">
+          <a href="javascript: void(0)" @click="doGachNo">
+            <span class="icon one-sign"></span> Gạch nợ (F9)
+          </a>
+        </li>
+        <li v-if="f_show_dieuchinh">
+          <a href="javascript: void(0)" @click="doDieuChinh">
+            <span class="icon one-file-bookmark"></span> Điều chỉnh (F9)
+          </a>
+        </li>
+        <li v-if="f_show_dieuchinh">
+          <a href="javascript: void(0)" @click="doDieuChinhFile" title="Gạch nợ điều chỉnh theo file">
+            <span class="icon one-book"></span> Đ.c File (F6)
+          </a>
+          <app-dieu-chinh-no-file ref=refDieuChinhNoFile
+            :kycuoc="params.p_kycuoc"
+            :donviqlno_id="this.params.p_donvi_quanly_id"
+            :quaythu_id="this.params.p_quaythu_id"
+            :ngay_bd_gach="this.params.p_ngaybatdau_gach"
+            :ngay_kt_gach="this.params.p_ngayketthuc_gach"
+            :dc_canbang="this.params.p_dieuchinh_canbang"
+            :dong_bo="this.params.p_dongbo"
+            @dialogClose="closeGachTheoFileHandler"
+            ></app-dieu-chinh-no-file>
+        </li>
+        <li :class="{ disabled: !config.f_enable_huy }">
+          <a href="javascript: void(0)" @click="doHuy" title="Hủy thao tác">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="doXoaPhieu">
+                <span class="icon one-trash"></span> Xóa phiếu (F7)
+          </a>
+         <PopupXacNhanXoaPhieu 
+          ref="refXoaPhieuTT" 
+          :kiemtra_matkhau="this.params.p_kiemtra_mk"
+          :kycuoc="this.params.p_kycuoc" 
+          :dsPhieu="dsPhieuCanXoa" 
+          @acceptChange="deletePhieuThuHandler"
+          @beforeOpen="removeGachNoKeyPressHandler"
+          @beforeClose="addGachNoKeyPressHandler"
+          >
+        </PopupXacNhanXoaPhieu>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="doPhieuTra">
+            <span class="icon files_single-content-02 nc-icon-glyph"></span> Phiếu trả (F8)
+          </a>
+          <app-phieu-gach-no-tien-mat
+            ref="refPhieuGachNoTienMat"
+            :header="$data.headerPhieuGachNo"
+            :ma_tt="params.p_ma_tt"
+            :ma_tb="params.p_acc_somay"
+            :kycuoc="params.p_kycuoc"
+            :nhom_httt="params.p_nhom_httt"
+            :thungan="get_thungan"
+            :kieu_ttoan="params.p_loaigach"
+            :ngay_xl="params.p_ngayxoa_lui"
+            :ngay_xl_tt="params.p_ngaygach_lui_thang"
+            :matinh_thuho="params.p_matinh_thuho"
+            :in_biennhan_tt="params.p_in_bbn_tt"
+            :kiemtra_matkhau="params.p_kiemtra_mk"
+            @onDialogClose="phieuGachNoCloseHandler"
+            @beforeOpen="removeGachNoKeyPressHandler"
+            @beforeClose="addGachNoKeyPressHandler"
+            ></app-phieu-gach-no-tien-mat>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="doPhieuHuy">
+                <span class="icon files_single-content-02 nc-icon-glyph"></span> Phiếu hủy
+            </a>
+        </li>
+        <li v-if="params.p_tab_kieugach === 2">
+          <a href="javascript: void(0)" @click="doDocFile" title="Cấu trúc file gồm sheet1: { MA_TT } hoặc { MA_TT, TIEN, GHICHU, CHUNGTU } hoặc { MA_TT, TIEN, THANGTRA (yyyyMMck), GHICHU, CHUNGTU} hoặc { MA_TT, TIEN, THANGTRA (yyyyMMck), GHICHU, CHUNGTU, KHOANMUCTT_ID} hoặc { MA_TT, TIEN, THANGTRA (yyyyMMck), GHICHU, CHUNGTU, KHOANMUCTT_ID,NGAY_TT,NGANHANG_ID,HTTT_ID}'">
+              <span class="icon one-phone"></span> Đọc file
+          </a>
+          <input id="gachno_upload_excel" ref="gachno_upload_excel" @change="uploadFile" type="file" hidden>
+        </li>
+        <li v-if="params.p_tab_kieugach === 2">
+          <a href="javascript: void(0)" @click="doXuatFile">
+            <span class="icon one-phone"></span> Xuất file
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="gachNoTheoFile" title="Gạch nợ theo thuê bao">
+            <span class="icon one-phone"></span> Thuê bao
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="doChenNo" title="Chèn thông tin nợ cũ cho thanh toán">
+            <span class="icon ui-1_circle-add nc-icon-glyph"></span> Chèn nợ
+          </a>
+          <app-chen-no 
+            ref="refChenNo" 
+            :ma_tt="params.p_ma_tt" 
+            :kyhoadon="params.p_kycuoc"
+            @beforeOpen="removeGachNoKeyPressHandler"
+            @beforeClose="addGachNoKeyPressHandler"
+            ></app-chen-no>
+        </li>
+        <li>
+            <a href="javascript: void(0)" @click="openDSPhimTat" title="Danh sách các phím tắt gạch nợ">
+                <span class="icon one-keyboard"></span>Phím tắt
+            </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="doInPhieuThu" title="In phiếu thu">
+              <span class="icon files_single-content-03 nc-icon-glyph"></span>Phiếu thu
+          </a>
+        </li>
+        <li>
+          <a href="javascript: void(0)" @click="doXemThongTinViVNPTPay">
+                <span class="icon one-wallet"></span>Thông tin ví VNPT Pay
+          </a>
+          <ThongTinViVNPTPay ref="refThongTinViVNPTPay" :info="infoViVNPTPay"></ThongTinViVNPTPay>
+        </li>
+    </ul>
+  </div>
+  <!-- CONTENT-->
+  <div class="page-content">
+    <div class="top-form-group block">
+        <div class="pull-left mart10" v-if="params.p_quyen_dd">
+          <div class="label inline fw6 marr10">Gạch CCBS : </div>
+          <div class="list-checks inline">
+            <div class="item" v-show="config.f_gach_dd_loaitt_mtt">
+                <div class="check-action">
+                    <input name="p_gachno_chuan" type="radio" value="0" class="check" v-model="params.p_gachno_chuan">
+                    <span class="name">Mã TT</span>
+                </div>
+            </div>
+            <div class="item" v-show="config.f_gach_dd_loaitt_ckn">
+                <div class="check-action">
+                    <input name="p_gachno_chuan" type="radio" value="2" class="check" v-model="params.p_gachno_chuan">
+                    <span class="name">Mã TT và CKN</span>
+                </div>
+            </div>
+            <div class="item" v-show="config.f_gach_dd_loaitt_matb">
+                <div class="check-action">
+                    <input name="p_gachno_chuan" type="radio" value="1" class="check"  v-model="params.p_gachno_chuan">
+                    <span class="name">Mã TB</span>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="pull-right w120">
+          <app-ky-cuoc-2 :isDisabled=true @chukycuocChange="chukycuocChangeHandler"></app-ky-cuoc-2>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="box-form box-gn-tt">
+        <div class="legend-title">
+          <div class="pull-left">
+              <div class="title">Thông tin thanh toán</div>
+          </div>
+          <div class="pull-right red">
+            {{ params.p_lbl_thongtinthanhtoan}}
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-lg-6 col-md-12 col-xl-6 col-12">
+              <div class="row">
+                  <div class="col-md-12 col-xl-7 col-lg-7 col-12">
+                      <div class="info-row">
+                          <div class="key">
+                              <div class="">
+                                <b-form-checkbox
+                                  v-model = "params.p_chk_ma_tt"
+                                  class = "check"
+                                  value = '1'
+                                  unchecked-value = '0'
+                                >
+                                <span class="name" v-if="params.p_chk_ma_tt === '0'">Mã TT</span>
+                                <span class="name" v-else>Mã vạch</span>
+                                </b-form-checkbox>
+                              </div>
+                          </div>
+                          <div class="value">
+                              <div class="input-more-button">
+                                  <button class="btn" @click="popupTimThongTinTT" title="Tìm kiếm thông tin thanh toán">
+                                    <span class="-ap icon-more_horiz"></span>
+                                  </button>
+                                  <input autofocus v-model="params.p_ma_tt" @keyup.enter="getThongTinTT" ref="frmgachno_p_ma_tt" id="frmgachno_p_ma_tt" type="text" class="form-control highlight">
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-lg-5 col-xl-5 col-sm-5 col-12">
+                    <div class="info-row">
+                      <div class="key">Số máy/Acc<span class="required"></span></div>
+                      <div class="value">
+                        <ejs-autocomplete ref="p_acc_somay" :dataSource='params.p_acc_somay_options' :change="onSomayAccChange" autofill=true filterType="Contains" :fields="config.fieldsSM_ACC" v-model="params.p_acc_somay"></ejs-autocomplete>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12 col-xl-7 col-lg-7 col-12">
+                      <div class="info-row">
+                          <div class="key">
+                              Mã đại diện
+                          </div>
+                          <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="popupDSThueBao">
+                                  <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input v-model="params.p_ma_dd" type="text" class="form-control">
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-lg-5 col-xl-5 col-sm-5 col-12">
+                      <div class="info-row">
+                          <div class="key" title="Lượt thanh toán">Lượt TT</div>
+                          <div class="value">
+                              <div class="input-more-button">
+                                <button class="btn" v-if="f_show_dieuchinh" @click="popupDSPhieuThanhToanTheoNgay" title="Tìm kiếm phiếu trả">
+                                  <span class="one-shape f20"></span>
+                                </button>
+                                <button class="btn" v-if="!f_show_dieuchinh" @click="popupDSPhieuThanhToanTheoNgay" title="Tìm kiếm phiếu trả">
+                                  <span class="-ap icon-uniF162"></span>
+                                </button>
+                                <div class="">
+                                  <div class="input-icon-right calculator-box">
+                                    <vue-numeric class="form-control tright" currency="" separator="," v-model="$data.params.p_luot_tt"></vue-numeric>
+                                    <span class="icon one-calculator" @click="config.isLuotTTCalShow = !config.isLuotTTCalShow"></span>
+                                    <app-calculator @display="$data.params.p_luot_tt = $event" :value="$data.params.p_luot_tt" :is-show="config.isLuotTTCalShow" @close="config.isLuotTTCalShow = !config.isLuotTTCalShow"></app-calculator>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="info-row">
+                  <div class="key">Tên thanh toán</div>
+                  <div class="value">
+                    <input v-model="params.p_ten_tt" type="text" class="form-control" :enabled="false" id="frmgachno_p_ten_tt">
+                  </div>
+              </div>
+              <div class="info-row">
+                  <div class="key" title="Địa chỉ thanh toán">Địa chỉ TT</div>
+                  <div class="value">
+                    <input v-model="params.p_diachi_tt" type="text" class="form-control" id="frmgachno_p_diachi_tt">
+                  </div>
+              </div>
+              <div class="info-row">
+                  <div class="key" title="Địa chỉ báo cước">Địa chỉ BC</div>
+                  <div class="value">
+                    <input v-model="params.p_diachi_baocuoc" type="text" class="form-control" id="frmgachno_p_diachi_baocuoc">
+                  </div>
+              </div>
+              <div class="info-row">
+                  <div class="key">Ngân hàng</div>
+                  <div class="value">
+                    <ejs-dropdownlist :filtering='onFilteringNganHang' :allowFiltering="true" :dataSource='params.p_nganhang_options' :fields="config.fieldsNganHang" v-model = "params.p_nganhang" :placeholder="'Chọn ngân hàng'"></ejs-dropdownlist>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12 col-xl-7 col-lg-7 col-12">
+                      <div class="info-row">
+                          <div class="key">
+                              Mã số thuế
+                          </div>
+                          <div class="value">
+                            <input v-model="params.p_maso_thue" type="text" class="form-control" id="frmgachno_p_maso_thue">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-lg-5 col-xl-5 col-sm-5 col-12">
+                      <div class="info-row">
+                          <div class="key">Tài khoản</div>
+                          <div class="value">
+                            <input v-model="params.p_taikhoan" type="text" class="form-control" id="frmgachno_p_taikhoan">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="info-row">
+                  <div class="key">Hình thức TT</div>
+                  <div class="value">
+                    <div class="vattu_box">
+                      <div class="input-group">
+                          <div class="li input-text">
+                              <div class="select-custom">
+                                  <input ref="ref-httt" readonly v-model="params.p_httt_text" id="root" placeholder="Chọn hình thức thanh toán"
+                                      class="form-control bg-none" @click="onChangeCustomDropDown('#httt-popup')">
+                                  </input>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="vattu_table" id="httt-popup" :class="{ displayNone: config.isHidePopupHTTT }">
+                          <DataGrid3
+                              v-bind:columns="[
+                              {fieldName: 'HTTT_ID', visible: false, allowFiltering: true, allowSorting: false},
+                              {fieldName: 'HINHTHUC', headerText: 'Hình thức', allowFiltering: true, allowSorting: false},
+                              {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, width: 150}]"
+                              v-bind:dataSource="params.p_httt_options" :showFilter="true" :showColumnCheckbox="false"
+                              dataKeyField="NHANVIEN_ID" :defaultColumnCheckboxChecked="false" :selectedRow="-1"
+                              @selectedRowChanged="onSelectHTTT"
+                              :enabledSelectFirstRow="false"
+                              :panelDataHeight='"200"'
+                              ref="tableNvt">
+                          </DataGrid3>
+                          <div class="p-2">
+                              <button type="button" @click="onChangeCustomDropDown('#httt-popup')" class="btn btn-secondary btn-sm"
+                                  aria-label="Close">
+                                  <span aria-hidden="true">×</span>
+                              </button>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="info-row" v-if="!f_show_dieuchinh">
+                  <div class="key">Ghi chú</div>
+                  <div class="value">
+                    <input v-model="params.p_ghichu" type="text" class="form-control" ref="ref_ghichu" id="frmgachno_p_ghichu">
+                  </div>
+              </div>
+          </div>
+          <div class="col-sm-12 col-lg-6 col-md-12 col-xl-6 col-12">
+              <div class="info-row">
+                  <div class="key">Thủ quỹ</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <ejs-dropdownlist :filtering='onFilteringThuNgan' :allowFiltering="true" :dataSource='params.p_thungan_options' :fields="config.fieldsNVThuNgan" v-model = "params.p_thungan" :placeholder="'Chọn thủ quỹ'"></ejs-dropdownlist>
+                    </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                    <div class="info-row">
+                      <div class="key">
+                        Loại tiền
+                      </div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <ejs-dropdownlist :change="onChangeLoaiTien" :allowFiltering="true" :dataSource='params.p_loaitien_options' :fields="config.fieldsLoaiTien" v-model = "params.p_loaitien" :placeholder="'Chọn loại tiền'"></ejs-dropdownlist>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6 col-xl-6 col-12">
+                    <span class="note red bold  block" title="Tổng số tiền gạch, tổng số phiếu trong ngày của 1 user">
+                      <span class="-ap icon-warning3 text-warning f20 mar10"></span> Tổng gạch: {{params.p_tongtien_trongngay | numeral}}; Tổng phiếu: {{params.p_tongphieu_trongngay | numeral}}
+                    </span>
+                  </div>
+              </div>
+              <div class="row" v-if="f_show_ngay_tt">
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                    <div class="info-row">
+                      <div class="key" title="Ngày thanh toán">
+                        Ngày TT
+                      </div>
+                      <div class="value">
+                        <ejs-datepicker
+                          v-model="p_ngay_ttoan"
+                          :value="config.dateConfig.value"
+                          :format="config.dateConfig.format"
+                          :allowEdit=false
+                          :showClearButton=false
+                          :change="onNgayTTChange"
+                          >
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                    <div class="info-row">
+                      <div class="key">
+                          Ngày N.Hàng
+                      </div>
+                      <div class="value">
+                        <ejs-datepicker
+                          v-model="p_ngay_nganhang"
+                          :value="config.dateConfig.value"
+                          :format="config.dateConfig.format"
+                          :allowEdit=false
+                          :showClearButton=false
+                          >
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="row" v-if="f_show_ngay_dc">
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                      <div class="info-row">
+                          <div class="key w110">
+                              Ngày Đ.C
+                          </div>
+                          <div class="value">
+                            <ejs-datepicker
+                              v-model="p_ngay_dchinh"
+                              :value="config.dateConfig.value"
+                              :format="config.dateConfig.format"
+                              :allowEdit=false
+                              :showClearButton=false
+                              :change="onNgayTTChange"
+                              >
+                            </ejs-datepicker>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                          <div class="key w100">
+                              Tháng Đ.C
+                          </div>
+                          <div class="value">
+                            <ejs-datepicker
+                              v-model="p_thang_dchinh"
+                              :max="config.max_kyhoadon"
+                              :start="'Year'"
+                              :depth="'Year'"
+                              :format="'MM/y'"
+                              :change="onThangDChinhChange"
+                              :width="'100%'"
+                            >
+                            </ejs-datepicker>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-sm-2 col-12">
+                      <div class="info-row">
+                          <div class="key w50">
+                              Chu kỳ
+                          </div>
+                          <div class="value">
+                            <b-form-select
+                            v-model="p_chuky_dchinh"
+                            :options="params.p_chuky_dchinh_options"
+                            value-field="CHUKY"
+                            text-field="CHUKY"
+                            class="form-control redcolor w-100">
+                          </b-form-select>
+                          </div>
+                      </div>
+                  </div>  
+              </div>
+              <div class="info-row">
+                  <div class="key">
+                      Đại lý
+                  </div>
+                  <div class="value">
+                      <div class="input-more-button">
+                          <button class="btn" @click="popupTimNVThuCuoc" title="Tìm kiếm thông tin đại lý">
+                              <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <input v-model="params.p_daily" type="text" class="form-control">
+                      </div>
+                  </div>
+              </div>
+              <div class="info-row" v-if="f_show_chungtu">
+                  <div class="key">
+                      Chứng từ
+                  </div>
+                  <div class="value">
+                    <input type="text" class="red form-control" v-model="$data.params.p_chungtu" id="frmgachno_p_chungtu">
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                      <div class="info-row">
+                          <div class="key">
+                              Seri
+                          </div>
+                          <div class="value">
+                            <input v-model="params.p_seri" maxlength="10" :disabled="!f_enable_seri" ref="p_seri" type="text" class="form-control" id="frmgachno_p_seri">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-xl-3 col-lg-3 col-12">
+                      <div class="info-row">
+                          <div class="key w50 nowrap">
+                              Số quyển
+                          </div>
+                          <div class="value">
+                            <input type="number" min="0" :disabled="!f_enable_soquyen" class="red form-control tright" v-model="$data.params.p_so_quyen" id="frmgachno_p_so_quyen">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-xl-3 col-lg-3 col-12">
+                      <div class="info-row">
+                          <div class="key w50 nowrap">
+                              Số seri
+                          </div>
+                          <div class="value">
+                            <input type="number" min="0" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength = "10" :disabled="!f_enable_soseri" class="red form-control tright" v-model="$data.params.p_so_seri" id="frmgachno_p_so_seri">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                      <div class="info-row">
+                          <div class="key text-chartE" title="Tổng tiền gạch trên 1 phiên">
+                              Tổng tiền
+                          </div>
+                          <div class="value">
+                            <div class="input-icon-right calculator-box">
+                              <vue-numeric class="text-chartE form-control tright" currency="" separator="," v-bind:precision="$data.params.p_loaitien==1?0:2" v-model="$data.params.p_tongtien_trongphien" title="Tổng tiền gạch trên 1 phiên"></vue-numeric>
+                              <span class="icon one-calculator" @click="config.isTongTienCalShow = !config.isTongTienCalShow"></span>
+                              <app-calculator @display="$data.params.p_tongtien_trongphien = $event" :value="$data.params.p_tongtien_trongphien" :is-show="config.isTongTienCalShow" @close="config.isTongTienCalShow = !config.isTongTienCalShow"></app-calculator>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                      <div class="info-row">
+                          <div class="key w60 nowrap text-chartE">
+                              Số phiếu
+                          </div>
+                          <div class="value">
+                            <vue-numeric :disabled="true" class="text-chartE form-control tright" currency="" separator="," v-model="$data.params.p_tongphieu_trongphien"></vue-numeric>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="row" v-if="!f_show_dieuchinh">
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                      <div class="info-row">
+                          <div class="key">
+                              Tiền trả
+                          </div>
+                          <div class="value">
+                            <div class="input-icon-right calculator-box">
+                              <ejs-numerictextbox  style="padding-right: 15px" locale="vi-VN"  :showSpinButton="false" :enabled="params.p_loaigach !== 5 && params.p_loaigach !== 4" v-on:focus="params.f_tinhtientra = true" v-on:change="onTienTraChange" class="text-chartE form-control tright" ref="gachno_tientra" v-model="$data.params.p_tien_tra" v-bind:format="$data.params.p_loaitien==1?'N0':'N2'"></ejs-numerictextbox>
+                              <span class="icon one-calculator" @click="config.isTienTraCalShow = params.p_loaigach !== 5 && params.p_loaigach !== 4 && !config.isTienTraCalShow"></span>
+                              <app-calculator @display="$data.params.p_tien_tra = $event" :value="$data.params.p_tien_tra" :is-show="config.isTienTraCalShow" @close="config.isTienTraCalShow = !config.isTienTraCalShow"></app-calculator>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                      <div class="info-row">
+                          <div class="key w60 nowrap" title="Chi phí chuyển khoản">
+                              Chi phí
+                          </div>
+                          <div class="value">
+                            <div class="input-icon-right calculator-box">
+                              <ejs-numerictextbox locale="vi-VN" :enabled="f_show_chiphi" style="padding-right:15px" :showSpinButton="false" class="red form-control tright" v-model="$data.params.p_chiphi" format="N0"></ejs-numerictextbox>
+                              <span class="icon one-calculator" @click="config.isChiPhiCalShow = !config.isChiPhiCalShow"></span>
+                              <app-calculator @display="$data.params.p_chiphi = $event" :value="$data.params.p_chiphi" :is-show="f_show_chiphi && config.isChiPhiCalShow" @close="config.isChiPhiCalShow = !config.isChiPhiCalShow"></app-calculator>
+                            </div>
+                          </div>
+                        </div>
+                  </div>
+              </div>
+              <div class="row" v-if="f_show_dieuchinh">
+                <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Tiền nợ
+                        </div>
+                        <div class="value">
+                          <vue-numeric class="text-chartE form-control tright" :disabled="!f_enable_tienno" ref="p_tien_no" currency="" separator="," v-model="$data.params.p_tien_no" v-bind:precision="$data.params.p_loaitien==1?0:2"></vue-numeric>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-6 col-lg-6 col-12">
+                    <div class="info-row">
+                        <div class="key w60 nowrap">
+                            Tiền ĐC
+                        </div>
+                        <div class="value">
+                          <vue-numeric ref="p_tien_dchinh" class="form-control tright" :disabled="!f_enable_tiendieuchinh" currency="" separator="," v-model="$data.params.p_tien_dchinh" v-bind:precision="$data.params.p_loaitien==1?0:2"></vue-numeric>
+                        </div>
+                      </div>
+                </div>
+            </div>
+            <div class="info-row" v-if="f_show_khoanmuc">
+                <div class="key">
+                    Khoản mục
+                </div>
+                <div class="value">
+                  <ejs-dropdownlist :allowFiltering="false" :dataSource='params.p_khoanmuc_options' :fields="config.fieldsKhoanMuc" v-model = "params.p_khoanmuc"></ejs-dropdownlist>
+                </div>
+            </div>
+          </div>
+          <div class="info-row" v-if="f_show_dieuchinh">
+            <div class="key w60">Lý do</div>
+            <div class="value">
+              <input v-model="params.p_lydo_dchinh" type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="box-form box-tab-horizontal">
+      <div class="nav tabs tab-left">
+          <a href="#tabGachLe" @click="tabGachNoClick(1)" :class="{active: params.p_tab_kieugach === 1}" data-toggle="tab" v-if="f_show_tab(1)">Gạch lẻ</a>
+          <a href="#tabGachDanhSach" @click="tabGachNoClick(2)" :class="{active: params.p_tab_kieugach === 2}" data-toggle="tab" v-if="f_show_tab(2)">Gạch danh sách</a>
+          <a href="#tabDieuChinh" @click="tabGachNoClick(3)" :class="{active: params.p_tab_kieugach === 3}"  data-toggle="tab" v-if="f_show_tab(3)">Điều chỉnh</a>
+      </div>
+      <div class="tab-content" style="height: 600px;">
+        <div id="tabGachLe" class="tab-pane" :class="{active: params.p_tab_kieugach === 1}" v-if="f_show_tab(1)">
+          <tab-gach-no-le
+            ref="tabGachNoLe"
+            :dsThangNo="resultGachLeThangNo"
+            :dsKhoanMuc="resultGachLeKhoanMuc"
+            :dsDichVu="resultGachLeDichVu"
+            :nhom_httt="params.p_nhom_httt"
+            :loai_gach="params.p_current_tab_gachle"
+            :loai_tien="params.p_loaitien"
+            @changeDSGachNoLe="updateDatasourceGachNo"
+          >
+
+          </tab-gach-no-le>
+        </div>
+        <div id="tabGachDanhSach" class="tab-pane" :class="{active: params.p_tab_kieugach === 2}" v-if="f_show_tab(2)">
+          <tab-gach-no-theo-danh-sach ref="appGachNoDanhSach"
+            :dsGachTheoFile="$data.dsGachNoDanhSach"
+            :totalItems="$data.dsGachNoDanhSachTotals"
+            :dsErrors="$data.dsErrors"
+            :totalErrorItems="$data.totalErrorItems"
+            @changeDSGachNo="updateDatasourceGachNo"
+            @triggerCheckAll="checkAllHandler"
+            @triggerUncheckAll="unCheckAllHandler"
+            @triggerReadFile="readFileHandler"
+            @triggerClearGrid="clearGachDSHandler"
+            @triggerExportFile="exportFileDSHandler"
+            @triggerCreateGroup="createGroupCKHandler"
+            @recordClick="gachDSRecordClickHandler"
+            @selectRecord="gachDSelectRecordHandler"
+            @removeTToanGachDanhSach="removeTToanGachDanhSachHandler"
+            >
+
+          </tab-gach-no-theo-danh-sach>
+        </div>
+        <div id="tabDieuChinh" class="tab-pane" :class="{active: params.p_tab_kieugach === 3}" v-if="f_show_tab(3)">
+          <tab-dieu-chinh ref="appDieuChinh" :dsDieuChinh="$data.resultDieuChinh" :loai_tien="params.p_loaitien"></tab-dieu-chinh>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <keep-alive>
+    <component :is="frmTuVanMyTVCom" ref="dialogfrmTuVanMyTV" v-on="frmTuVanMyTVEvents"/>
+  </keep-alive>
+</div>

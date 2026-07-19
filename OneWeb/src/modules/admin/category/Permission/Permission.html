@@ -1,0 +1,245 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="page-content" style="top: 60px;">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">Loại CT</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.loai_ct.list" v-model="listbox.loai_ct.value" @change="SearchChanged">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">Quản lý quyền</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="listbox.ds_quyen.list" v-model="listbox.ds_quyen.value" @change="SearchChanged">
+                                    <option disabled value="0">Select one</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav tabs tab-over">
+                <a href="#tab1" data-toggle="tab" class="active" @click="currenttab='tab1'">Phân quyền menu</a>
+                <a href="#tab2" data-toggle="tab" @click="currenttab='tab2'">Phân quyền báo cáo</a>
+                <a href="#tab3" data-toggle="tab" @click="currenttab='tab3'">Phân quyền gọi hàm</a>
+                <a href="#tab4" data-toggle="tab" @click="currenttab='tab4'">Phân quyền dữ liệu từ điển</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Nhóm menu</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2 class="" :options="filtered_menu.map(x=>({id:x.NHOM_MENU_ID,text:x.NHOM_MENU}))" v-model="listbox.nhom_menu.value" @change="NhomMenuChanged">
+                                            <option disabled value="0">Select one</option>
+                                        </select2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_menu_chuagan_cbClicked"
+                                    :nodes="tree_menu_chuagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_menu_chuagan.text"
+                                    :hsid="tree_menu_chuagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_menu_chuagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenMenu(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenMenu(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_menu_dagan_cbClicked"
+                                    :nodes="tree_menu_dagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_menu_dagan.text"
+                                    :hsid="tree_menu_dagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_menu_dagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Nhóm BC</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2 class="" :options="filtered_bc.map(x=>({id:x.NHOM_BC_ID,text:x.TEN_NHOM}))" v-model="listbox.nhom_bc.value" @change="NhomBCChanged">
+                                            <option disabled value="0">Select one</option>
+                                        </select2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <DataGrid ref="grdSpQuayVong" v-bind:columns="listbox.quyen_baocao.cols_chuagan" :showColumnCheckbox="true"
+                                v-bind:dataSource="listbox.quyen_baocao.chuagan" :showFilter="true" @selectedItemsChanged="grdQuyenChuaGanChanged" :allowPaging="true" :enablePagingServer="false" :totalRecords="listbox.quyen_baocao.chuagan.length">
+                            </DataGrid>
+                            <!-- <gridview id="table1" :datalist="listbox.quyen_baocao.chuagan" :headers="listbox.quyen_baocao.headers_chuagan" :flcol="false" :checkheader="true" :lastcoltemplate="0" :height="400"></gridview> -->
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenBC(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenBC(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <DataGrid ref="grdSpQuayVong" v-bind:columns="listbox.quyen_baocao.cols_dagan" :showColumnCheckbox="true"
+                                v-bind:dataSource="listbox.quyen_baocao.dagan" :showFilter="true" @selectedItemsChanged="grdQuyenDaGanChanged" :allowPaging="true" :enablePagingServer="false" :totalRecords="listbox.quyen_baocao.dagan.length">
+                            </DataGrid>
+                            <!-- <gridview id="table2" :datalist="listbox.quyen_baocao.dagan" :headers="listbox.quyen_baocao.headers_dagan" :flcol="false" :checkheader="true" :lastcoltemplate="0" :height="400"></gridview> -->
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane" id="tab3">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Nhóm Hàm</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2 class="" :options="listbox.nhom_ham.list.map(x=>({id:x.NHOMHAM_ID,text:x.TEN_NHOM}))" v-model="listbox.nhom_ham.value" @change="NhomHamChanged">
+                                            <option disabled value="0">Select one</option>
+                                        </select2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_ham_chuagan_cbClicked"
+                                    :nodes="tree_ham_chuagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_ham_chuagan.text"
+                                    :hsid="tree_ham_chuagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_ham_chuagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenHam(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenHam(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_ham_dagan_cbClicked"
+                                    :nodes="tree_ham_dagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_ham_dagan.text"
+                                    :hsid="tree_ham_dagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_ham_dagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+                <div class="tab-pane" id="tab4">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Bảng từ điển</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2 class="" :options="listbox.nhom_bang.list.map(x=>({id:x.TENBANG,text:x.TENBANG}))" v-model="listbox.nhom_bang.value" @change="NhomBangChanged">
+                                            <option disabled value="0">Select one</option>
+                                        </select2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_bang_chuagan_cbClicked"
+                                    :nodes="tree_bang_chuagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_bang_chuagan.text"
+                                    :hsid="tree_bang_chuagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_bang_chuagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions padt0 block">
+                            <button class="btn btn-main" @click.prevent="UpdateQuyenBang(1)">
+                                <span class="-ap icon-plus3"></span>
+                            </button>
+                            <button class="btn  btn-main" @click.prevent="UpdateQuyenBang(0)">
+                                <span class="-ap icon-minus3"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="form-control h-auto">
+                                <div class="tree-plus tree-icon" style="height: 400px;overflow: auto;">
+                                    <treemenu 
+                                    @cbClicked="tree_bang_dagan_cbClicked"
+                                    :nodes="tree_bang_dagan.childs" 
+                                    :depth="0"   
+                                    :label="tree_bang_dagan.text"
+                                    :hsid="tree_bang_dagan.id"
+                                    :hascheckbox="true"
+                                    :selected="tree_bang_dagan.isSelected"></treemenu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,322 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="tsbtnGhiLai_Click">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnTimKiem_Click">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>           
+        </ul>     
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-3 col-12">
+                <div class="box-form">
+                    <div class="legend-title">Danh sách đơn vị</div>
+                        <div class="input-more-button -right">
+                            <button class="btn" @click="sortTreeDonVi">
+                                <span class="one-sort f20"></span>
+                            </button>
+                            <div class="input-icon-right">
+                                <ejs-textbox v-model="searchDonViValue" @change="searchDonVi"></ejs-textbox>
+                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                            </div>
+                        </div>
+                        <div class="tree-plus" style="height: 680px;overflow: auto;">
+                            <ejs-treeview id="treeview" ref="tree" cssClass='depts-tree-view'
+                                        @nodeClicked="nodeClicked"
+                                        :fields="this.fields"
+                                        @nodeSelected="selectDonViFocusedNodeChange"
+                                        :allowMultiSelection='true'
+                                        :selectedNodes="selectedNodes"
+                                        :expandedNodes="expandedNodes"
+                            />
+                        </div>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12">
+                <div class="box-form">
+                    <div class="box-move-select-table">
+                        <div class="box-col">
+                            <div class="legend-title">Loại nhân viên đã gán</div>
+                            <div class="table-content" style="height: 220px;">
+                                <DataGridCustom
+                                    ref="ds_lnv_dagan"
+                                    v-bind:columns="collumnsLNV"
+                                    v-bind:dataSource="ds_lnv_dagan"
+                                    :showColumnCheckbox="true"
+                                    :showFilter="true"
+                                    :enabledSelectFirstRow="false"
+                                    :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                    panelDataHeight="100"
+                                    @selectedItemsChanged="gridLoaiNVDaGan_SelectRow"
+                                    @actionComplete="gridLoaiNV_complete"
+                                    :allowPaging="true" :enablePagingServer="false"
+                                ></DataGridCustom>   
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="lnvToRight">
+                                <span class="-ap icon-chevron-thin-right"></span>
+                            </button>
+                            <button class="btn" @click="lnvToLeft">
+                                <span class="-ap icon-chevron-thin-left"></span>
+                            </button>
+                        </div>
+                        <div class="box-col">
+                            <div class="legend-title">Loại nhân viên chưa gán</div>
+                            <div class="table-content" style="height: 220px;">
+                                <DataGridCustom
+                                    ref="ds_lnv_chuagan"
+                                    v-bind:columns="collumnsLNV"
+                                    v-bind:dataSource="ds_lnv_chuagan"
+                                    :showColumnCheckbox="true"
+                                    :showFilter="true"
+                                    :enabledSelectFirstRow="false"
+                                    :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                    panelDataHeight="100"
+                                    @selectedItemsChanged="gridLoaiNVChuaGan_SelectRow"
+                                    @actionComplete="gridLoaiNV_complete"
+                                    :allowPaging="true" :enablePagingServer="false"
+                                ></DataGridCustom>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav tabs tab-over">
+                    <a href="#tab1" data-toggle="tab" class="minw0 active">Nhân viên - Loại khách hàng</a>
+                    <a href="#tab2" data-toggle="tab" class="minw0">Nhân viên - Nghành nghề</a>
+                    <a href="#tab3" data-toggle="tab" class="minw0">Nhân viên - Doanh thu</a>
+                    <a href="#tab4" data-toggle="tab" class="minw0">Nhân viên - Điểm tín nhiệm</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab1">
+                        <div class="box-move-select-table">
+                            <div class="box-col">
+                                <div class="legend-title">Loại khách hàng đã gán</div>
+                                <div class="table-content" style="height: 300px;">
+                                    <DataGridCustom
+                                        ref="ds_lkh_dagan"
+                                        v-bind:columns="collumnsLKH"
+                                        v-bind:dataSource="ds_lkh_dagan"
+                                        :showColumnCheckbox="true"
+                                        :showFilter="true"
+                                        :enabledSelectFirstRow="false"
+                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                        panelDataHeight="180"
+                                        @selectedItemsChanged="gridLoaiKHDaGan_SelectRow"
+                                        @actionComplete="gridLoaiKH_complete"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                    ></DataGridCustom>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn" @click="lkhToRight">
+                                    <span class="-ap icon-chevron-thin-right"></span>
+                                </button>
+                                <button class="btn" @click="lkhToLeft">
+                                    <span class="-ap icon-chevron-thin-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col">
+                                <div class="legend-title">Loại khách hàng chưa gán</div>
+                                <div class="table-content" style="height: 300px;">
+                                    <DataGridCustom
+                                        ref="ds_lkh_chuagan"
+                                        v-bind:columns="collumnsLKH"
+                                        v-bind:dataSource="ds_lkh_chuagan"
+                                        :showColumnCheckbox="true"
+                                        :showFilter="true"
+                                        :enabledSelectFirstRow="false"
+                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                        panelDataHeight="180"
+                                        @selectedItemsChanged="gridLoaiKHChuaGan_SelectRow"
+                                        @actionComplete="gridLoaiKH_complete"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                    ></DataGridCustom>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab2">
+                        <div class="box-move-select-table">
+                            <div class="box-col">
+                                <div class="legend-title">Loại nghành nghề đã gán</div>
+                                <div class="table-content" style="height: 300px;">
+                                    <DataGridCustom
+                                        ref="ds_nn_dagan"
+                                        v-bind:columns="collumnsNN"
+                                        v-bind:dataSource="ds_nn_dagan"
+                                        :showColumnCheckbox="true"
+                                        :showFilter="true"
+                                        :enabledSelectFirstRow="false"
+                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                        panelDataHeight="180"
+                                        @selectedItemsChanged="gridNNDaGan_SelectRow"
+                                        @actionComplete="gridNN_complete"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                    ></DataGridCustom>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn" @click="nnToRight">
+                                    <span class="-ap icon-chevron-thin-right"></span>
+                                </button>
+                                <button class="btn" @click="nnToLeft">
+                                    <span class="-ap icon-chevron-thin-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col">
+                                <div class="legend-title">Loại nghành nghề chưa gán</div>
+                                <div class="table-content" style="height: 300px;">
+                                    <DataGridCustom
+                                        ref="ds_nn_chuagan"
+                                        v-bind:columns="collumnsNN"
+                                        v-bind:dataSource="ds_nn_chuagan"
+                                        :showColumnCheckbox="true"
+                                        :showFilter="true"
+                                        :enabledSelectFirstRow="false"
+                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                        panelDataHeight="180"
+                                        @selectedItemsChanged="gridNNChuaGan_SelectRow"
+                                        @actionComplete="gridNN_complete"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                    ></DataGridCustom>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab3">
+                        <div class="box-move-select-table">
+                            <div class="box-col">
+                                <div class="legend-title">Doanh thu đã gán</div>
+                                <div class="table-content" style="height: 300px;">
+                                    <DataGridCustom
+                                        ref="ds_dt_dagan"
+                                        v-bind:columns="collumnsDT"
+                                        v-bind:dataSource="ds_dt_dagan"
+                                        :showColumnCheckbox="true"
+                                        :showFilter="true"
+                                        :enabledSelectFirstRow="false"
+                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                        panelDataHeight="180"
+                                        @rowSelected="gridDT_rowSelected"
+                                        @selectedItemsChanged="gridDTDaGan_SelectRow"
+                                        @actionComplete="gridDT_complete"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                    ></DataGridCustom>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn" @click="dtToRight">
+                                    <span class="-ap icon-chevron-thin-right"></span>
+                                </button>
+                                <button class="btn" @click="dtToLeft">
+                                    <span class="-ap icon-chevron-thin-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col">
+                                <div class="legend-title">Doanh thu chưa gán</div>
+                                <div class="info-row" style="margin-top: 115px !important;">
+                                    <div class="key">Doanh thu từ</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="doanhthu_tu" id="doanhthu_tu"
+                                            @blur="txtDoanhThuTu_Leave" @keydown="checkNumber"
+                                            style="text-align: right !important; padding-right: 5px">
+                                    </div>
+                                    <div class="value w30 nowrap padt7">VNĐ</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key">Doanh thu đến</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="doanhthu_den" id="doanhthu_den"
+                                            @blur="txtDoanhThuDen_Leave" @keydown="checkNumber"
+                                            style="text-align: right !important; padding-right: 5px">
+                                    </div>
+                                    <div class="value w30 nowrap padt7">VNĐ</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab4">
+                        <div class="box-move-select-table">
+                            <div class="box-col">
+                                <div class="legend-title">Điểm tín nhiệm đã gán</div>
+                                <div class="table-content" style="height: 300px;">
+                                    <DataGridCustom
+                                        ref="ds_dtn_dagan"
+                                        v-bind:columns="collumnsDTN"
+                                        v-bind:dataSource="ds_dtn_dagan"
+                                        :showColumnCheckbox="true"
+                                        :showFilter="true"
+                                        :enabledSelectFirstRow="false"
+                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                        panelDataHeight="180"
+                                        @rowSelected="gridDTN_rowSelected"
+                                        @selectedItemsChanged="gridDTNDaGan_SelectRow"
+                                        @actionComplete="gridDTN_complete"
+                                        :allowPaging="true" :enablePagingServer="false"
+                                    ></DataGridCustom>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn" @click="dtnToRight">
+                                    <span class="-ap icon-chevron-thin-right"></span>
+                                </button>
+                                <button class="btn" @click="dtnToLeft">
+                                    <span class="-ap icon-chevron-thin-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col">
+                                <div class="legend-title">Điểm tín nhiệm chưa gán</div>
+                                <div class="info-row" style="margin-top: 115px !important;">
+                                    <div class="key w130">Điểm tín nhiệm từ</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="diemtn_tu" id="diemtn_tu"
+                                            @blur="txtDiemTNTu_Leave" @keydown="checkNumber"
+                                            style="text-align: right !important; padding-right: 5px">
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w130">Điểm tín nhiệm đến</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="diemtn_den" id="diemtn_den"
+                                            @blur="txtDiemTNDen_Leave" @keydown="checkNumber"
+                                            style="text-align: right !important; padding-right: 5px">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="table-content" style="height: 300px;">
+                        <DataGridCustom
+                            ref="ds_nhanvien"
+                            v-bind:columns="collumnsNV"
+                            v-bind:dataSource="ds_nhanvien"
+                            :showColumnCheckbox="true"
+                            :showFilter="true"
+                            :enabledSelectFirstRow="true"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                            panelDataHeight="180"
+                            @rowSelected="gridNV_rowSelected"
+                            :allowPaging="true" :enablePagingServer="false"
+                        ></DataGridCustom>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+    
+    <ejs-dialog :enableResize='true' :visible="false" ref="frmTimKiemNhanVien"
+            :header='"Tìm kiếm"' showCloseIcon=true target=".main-wrapper" width='40%' height="190px">
+        <TimKiemNhanVien ref="ppTimKiemNhanVien" @onTimKiemNhanVien="onTimKiemNhanVien" />
+    </ejs-dialog>
+</div>

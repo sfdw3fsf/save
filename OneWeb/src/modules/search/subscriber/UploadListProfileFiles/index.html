@@ -1,0 +1,186 @@
+<div class="main-wrapper">
+    <!-- breadcrumb -->
+    <breadcrumb :header="header"></breadcrumb>
+    <div class="list-actions-top" style="position: unset;">
+        <ul class="list" style="position: unset;">
+            <li>
+                <a @click="tsbtnNapLai_Click">
+                    <span class="icon fa fa-refresh" ></span>Nạp lại
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnGhiLai_Click">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+
+            <li>
+                <a @click="showPopUpKhoLuuHoSo">
+                    <span class="icon  one-search"></span> Kho hồ sơ
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                Nhập mã giao dịch, chọn file
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Mã GD</div>
+                        <div class="value">
+                            <div class="input-more-button -right">
+                                <button class="btn" @click="showPopupTraCuu">
+                                    <span class="-ap icon-search"></span>
+                                </button>
+                                <input type="text" @keyup.enter="txtMaGD_KeyDown" class="form-control highlight" value="" v-model="maGiaoDich">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Chọn thư mục</div>
+                        <div class="value">
+                            <div class="input-more-button -right">
+                                <button class="btn" @click="uploadFolder">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" v-model="ttUpfile" class="form-control" value="">                            
+                                <input type="file" ref="inputFoderRef" style="display:none" @change="importFolder" id="files" name="files" webkitdirectory directory multiple >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Nhóm file</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="nhomFileChon" :allowFiltering="true"
+                                        dataTextField="nhom_file" dataValueField="nhomfile_id"
+                                        :dataSource="nhomFile">
+                                </SelectExt>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Kho lưu</div>
+                        <div class="value">
+                            <treeselect ref="treeKhoLuu" name="treeKhoLuu" id="treeKhoLuu" v-model="khoLuuChon" :multiple="false" :options="loai_kh_tree"  @select="loaikhChanged" >
+                            </treeselect>   
+                            <!-- <div class="select-custom">
+                                <ejs-treeselect ref="treeKhoLuu" name="treeKhoLuu" id="treeKhoLuu" v-model="value" :multiple="false" :options="loai_kh_tree"  @select="loaikhChanged" ></ejs-treeselect>
+                            </div> -->
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Loại File</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="loaiFileChon" :allowFiltering="true"
+                                        dataTextField="loai_file" dataValueField="loaifile_id"
+                                        :dataSource="loaiFile">
+                                </SelectExt>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Kiểu File</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="kieuFileChon" :allowFiltering="true"
+                                        dataTextField="kieu_file" dataValueField="kieufile_id"
+                                        :dataSource="kieuFile">
+                                </SelectExt>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w120">Tự đồng tìm theo:</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="timTheoChon" :allowFiltering="true"
+                                        dataTextField="kieu_tk" dataValueField="kieutk_id"
+                                        @change="changeKieuTK"
+                                        :dataSource="timTheo">
+                                </SelectExt>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="box-form">
+            <div class="legend-title">Danh sách thuê bao</div>
+
+            <div class="table-content" style="overflow-x: hidden;">
+                <DataGrid id="" ref="gridDS" v-bind:columns="tableConfig.tableCollumns"
+                    v-bind:dataSource="tableConfig.tableData" 
+                    :showFilter="true" 
+                    :allowPaging="true"
+                    :enablePagingServer="false" 
+                    :showColumnCheckbox="true"
+                    :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                    @selectedItemsChanged="gridDS_selectedRowChanged">
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+
+    <ejs-dialog
+        :enableResize='true'
+        :allowDragging='true'
+        :visible='false'
+        ref="popupKhoHoSoRef"
+        showCloseIcon=true
+        :position="position"  
+        width='80%'
+        height='800'
+        target='.main-wrapper'
+    >
+    <UploadEprofile ref="popup_khohoso" :txtMaGD="txtMaGD"/>
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize="true" :allowDragging="true" :visible="false"  ref="popupTraCuuRef" :position="position" :header="'Tra cứu hồ sơ điện tử'" showCloseIcon="true" width="80%" target="#app .main-wrapper">
+    <div class="popup-body">
+      <div class="box-form">
+          <searchEProfile ref="refSearchEProfile" :matb="maGiaoDich" :ispopup="true"></searchEProfile>
+      </div>
+      
+    </div>
+  
+</ejs-dialog>
+
+  
+
+    
+
+</div>

@@ -1,0 +1,227 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="TimKiem" title="Lấy thông tin">
+                    <span class="icon one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li v-if="idSelected == '1'">
+                <a href="#" @click.prevent="DieuChinh" title="Điều chỉnh">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Điều chỉnh
+                </a>
+            </li>
+            <li v-if="idSelected == '1'">
+                <a href="#" @click.prevent="HuyGiamCuoc" title="Trả phiếu">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ giảm cước
+                </a>
+            </li>
+            <li v-if="idSelected == '4'">
+                <a href="#" @click.prevent="XoaPhieu" title="Xóa phiếu">
+                    <span class="icon one-file-trash"></span>Xoá phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="HuongDan">
+                    <span class="icon one-book1"></span>Hướng dẫn
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="pull-right">
+                <div class="inline">
+                    <div class="info-row marb0">
+                        <div class="key fw6 w80">Kỳ hóa đơn</div>
+                        <div class="value">
+                            <ejs-datepicker class="form-control bg-none bor0 fw6 text-red" placeholder="Chọn kỳ hóa đơn"
+                                :format="'MM/y'" :max="max_kyhoadon" :start="'Year'" :depth="'Year'"
+                                :showClearButton="false" v-model="kyHoaDon" :allowEdit="false"
+                                :change="onKyHoaDonChange" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title padb2">
+                <div class="pull-left mart6">Thông tin thanh toán</div>
+                <div class="pull-right">
+                    <div class="select-custom">
+                        <select v-model="idSelected" name="" id="" class="form-control">
+                            <option value="1">Phiếu chưa thanh toán</option>
+                            <option value="4">Phiếu đã thanh toán</option>
+                            <option value="3">Phiếu đã hủy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="grid-stack-box">
+                <Split style="height:300px;">
+                    <SplitArea :size="50" :minSize="100">
+                        <div class="box-col" id="boxLeft">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Mã TT <span class="required">*</span></div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <input ref="maTT" v-model="form.maTT" type="text"
+                                                    class="form-control highlight" @keyup.enter="fetchDSKhieuNai">
+                                                <span class="icon one-search"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Số máy/Acc</div>
+                                        <div class="value">
+                                            <input v-model="form.soMay" type="text" class="form-control" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Tên thanh toán</div>
+                                <div class="value">
+                                    <input v-model="form.tenTT" type="text" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Địa chỉ TT</div>
+                                <div class="value">
+                                    <input v-model="form.diaChiTT" type="text" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Hình thức TT</div>
+                                <div class="value">
+                                    <div class="select-custom">
+
+                                        <SelectExt v-model.trim="form.idHinhThucTT" :dataSource="dsHinhThuc"
+                                            dataTextField="HTTT" dataValueField="HTTT_ID" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">ND Khiếu nại <span class="required">*</span></div>
+                                <div class="value">
+                                    <textarea ref="lyDo" v-model="form.ndKhieuNai" class="form-control"
+                                        style="height: 50px;resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Lý do <span class="required">*</span></div>
+                                <div class="value">
+                                    <textarea ref="lyDo" v-model="form.lyDo" class="form-control"
+                                        style="height: 50px;resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100">Thủ quỹ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="form.idThuQuy" :dataSource="dsThuQuy"
+                                            dataTextField="TEN_NV" dataValueField="NHANVIEN_ID" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SplitArea>
+                    <SplitArea :size="49.5" :minSize="100">
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w80">Ngày TT</div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 fw6 text"
+                                            placeholder="Chọn ngày" :format="'dd/MM/yyyy'" :showClearButton="false"
+                                            v-model="form.ngayTT" :allowEdit="false">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="key w80">Tiền nợ</div>
+                                    <div class="value">
+                                        <vue-numeric class="text-chartE form-control tright" :disabled="true" ref="p_tien_no" currency="" separator="," v-model="form.tienNo" v-bind:precision="$data.form.idLoaiTien==1?0:2"></vue-numeric>
+                                      </div>
+                                    
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w80">Tiền trả</div>
+                                    
+                                        <div class="value">
+                                            <vue-numeric class="text-chartE form-control tright" :disabled="true" ref="p_tien_no" 
+                                            currency="" separator="," 
+                                            v-model="form.tienTra" v-bind:precision="form.idLoaiTien==1?0:2"></vue-numeric>
+                                          </div>
+    
+                                    
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+
+                                <div class="info-row">
+                                    <div class="key w80">Tháng Đ.C</div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 fw6 text-red"
+                                            placeholder="Chọn tháng" :format="'MM/y'" :start="'Year'" :depth="'Year'"
+                                            :showClearButton="false" v-model="form.thangDC" :allowEdit="false"
+                                            :readonly="true" />
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="key w80">Loại tiền</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model.trim="form.idLoaiTien" :dataSource="dsLoaiTien"
+                                                dataTextField="VIETTAT" dataValueField="LOAITIEN_ID" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="table-content" style="height: 150px;">
+                                <DataGrid :columns="this.form.idLoaiTien==1?[{fieldName: 'KY_GCHT', headerText: 'Kỳ giảm', allowFiltering: true, cssClass: 'text-right',width:110},
+                                                                            {fieldName: 'THANG_GCHT', headerText: 'Tháng GC', allowFiltering: true, cssClass: 'text-right',width:110},
+                                                                            {fieldName: 'TIEN', headerText: 'Tiền GC', allowFiltering: true, type:'number',format:'N0',width:100},
+                                                                            {fieldName: 'TIEN_GC', headerText: 'Tiền', allowFiltering: true, type:'number',format:'N0',width:100},
+                                                                            {fieldName: 'VAT_GC', headerText: 'VAT', allowFiltering: true, type:'number',format:'N0',width:100},
+                                                                            {fieldName: 'STATUS', headerText: 'Trạng thái', allowFiltering: true, width:110},
+                                                                            ]:
+                                                                            [{fieldName: 'KY_GCHT', headerText: 'Kỳ giảm', allowFiltering: true, cssClass: 'text-right',width:110},
+                                                                            {fieldName: 'THANG_GCHT', headerText: 'Tháng GC', allowFiltering: true, cssClass: 'text-right',width:110},
+                                                                            {fieldName: 'TIEN', headerText: 'Tiền GC', allowFiltering: true, type:'number',format:'N2',width:100},
+                                                                            {fieldName: 'TIEN_GC', headerText: 'Tiền', allowFiltering: true, type:'number',format:'N2',width:100},
+                                                                            {fieldName: 'VAT_GC', headerText: 'VAT', allowFiltering: true, type:'number',format:'N2',width:100},
+                                                                            {fieldName: 'STATUS', headerText: 'Trạng thái', allowFiltering: true, width:110},
+                                                                            ]" :dataSource="dsGC" :showFilter="true"
+                                    ref="gridGC" :allowPaging="true" :enablePagingServer="false" />
+                            </div>
+
+                        </div>
+
+                    </SplitArea>
+                </Split>
+            </div>
+        </div>
+        <div class="tabs nav tab-over">
+            <a href="javascript: void(0)" class="active">Danh sách khiếu nại</a>
+        </div>
+        <div class="box-form tab-content">
+            <DataGrid :columns="getFields" :dataSource="dsKhieuNai" :showFilter="true" :showColumnCheckbox="true"
+                dataKeyField="KHIEUNAI_ID" @selectedItemsChanged="ds_selectedItemsChanged"
+                @rowClicked="ds_selectedRowChanged" ref="gridDanhsach" :allowPaging="true" :enablePagingServer="false"
+                :enabledSelectFirstRow="false" :selectionSettings="{checkboxOnly: true, type: 'Multiple'}"
+                :key="keyReset" />
+        </div>
+    </div>
+</div>

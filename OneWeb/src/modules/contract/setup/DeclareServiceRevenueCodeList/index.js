@@ -1,0 +1,2 @@
+import DeclareServiceRevenueCodeList from './DeclareServiceRevenueCodeList'
+export default DeclareServiceRevenueCodeList

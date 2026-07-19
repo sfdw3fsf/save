@@ -1,0 +1,3 @@
+import HTHSChangeProfileMegawanOtherProvince from "./HTHSChangeProfileMegawanOtherProvince"
+
+export default HTHSChangeProfileMegawanOtherProvince;

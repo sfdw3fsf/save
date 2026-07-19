@@ -1,0 +1,850 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-if="!isCreateMode">
+        <b-link href="javascript:void(0)" @click="getListKetNoi">
+          <span class="icon nc-icon-glyph design_bullet-list-67"></span> DS công việc
+        </b-link>
+      </li>
+      <!-- <li v-if="(loaicv !== 56 && loaicv !== 30) && action !== 'view'">
+        <b-link href="javascript:void(0)" @click="onChonKetNoi">
+          <span class="icon one-file-back"></span>Chọn kết nối
+        </b-link>
+      </li> -->
+      <li v-if="isThucHienThiCong || phieuThiCongDetail.TRANGTHAI_ID == 21">
+        <b-link
+          href="#"
+          :class="{ 'disable-btn': action === 'view'  || isWaitProcessMode || !isValidForGhiLai }"
+          @click="onGhiLai"
+        >
+          <span class="icon one-save"></span> Ghi Lại
+        </b-link>
+      </li>
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 21">
+        <b-link
+          href="#"
+          :class="{ 'disable-btn': action === 'view' || !daGhiLaiThongTinKetNoi }"
+          @click="onChuyenThucHien"
+        >
+          <span class="icon one-list-arrow-right"></span> Chuyển thực hiện
+        </b-link>
+      </li>
+      <li v-if="!isCreateMode">
+        <b-link href="javascript:void(0)" :class="{ 'disable-btn': action === 'view' || !btnTraPhieuEnabled}" @click="onTraPhieu">
+          <span class="icon one-file-back"></span>Trả phiếu
+        </b-link>
+      </li>
+      <li v-if="!isCreateMode || isWaitProcessMode">
+        <!-- set action to transfer -->
+        <b-link href="javascript:void(0)" @click="onTransferProcess" :class="{ 'disable-btn': action === 'view' || !btnTranferEnabled }">
+          <span class="icon one-list-arrow-right"></span>Chuyển xử lý
+        </b-link>
+      </li>
+      <li v-if="isWaitProcessMode">
+        <b-link href="#" @click="onXacNhanThucHien">
+          <span class="icon one-file-check"></span>Xác nhận thực hiện
+        </b-link>
+      </li>
+      <li v-if="!isCreateMode">
+        <b-link href="javascript:void(0)" :class="{ 'disable-btn': action === 'view' || btnHoanThanhDisabled }" @click="onHoanThanh">
+          <span class="icon fa fa-check-circle"></span>Hoàn thành
+        </b-link>
+      </li>
+      <li v-if="!isCreateMode">
+        <b-link
+          href="javascript:void(0)"
+          :class="{ 'disable-btn': action === 'view' || btnSaveDisabled }"
+          @click="onCancel"
+        >
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <!-- Thông tin công việc thực hiện -->
+    <ThongTinCongViec :phieuThiCongId="phieutc" ref="thongTinCongViec"></ThongTinCongViec>
+    <!-- Thông tin kết nối -->
+    <div class="row">
+      <div class="nav tab-over tabs">
+        <a
+          href="#tabThongTinKetNoi"
+          v-on:click="onChangeTab(1)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 1}"
+          >Thông tin kết nối</a
+        >
+        <a
+          v-if="idKetNoi != null && idKetNoi !== undefined"
+          href="#tabLichSuThayDoi"
+          v-on:click="onChangeTab(2)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 2}"
+          >Lịch sử thay đổi</a
+        >
+      </div>
+      <div class="tab-content">
+        <!-- TAB 1: THÔNG TIN KẾT NỐI -->
+        <div class="tab-pane" id="tabThongTinKetNoi" :class="{active: tab_index == 1}">
+          <div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Kết nối tại IDC# <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="current_item.idc"
+                      :disabled="isThayDoi  || isDisabled"
+                      :class="{ 'is-invalid': controls.idc}"
+                      :dataSource="listIDC"
+                      @change="onIDCChange"
+                      dataTextField="text"
+                      dataValueField="id"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Người tạo kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid': controls.nguoi_taoketnoi }"
+                      :value="nguoiTaoKetNoiDisplay"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Loại kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :value="loaiKetNoiDisplay"
+                      :class="{ 'is-invalid': controls.loai_ketnoi }"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Khoảng cách kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value d-flex align-items-center">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="current_item.khoang_cach"
+                      :disabled="isThayDoi && !isEditThayDoi"
+                      :class="{ 'is-invalid': controls.khoang_cach && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                    <span class="ml-2">(mét)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Hình thức kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="current_item.hinhthuc"
+                      :disabled="isThayDoi  || isDisabled"
+                      :dataSource="listHinhThucKetNoi"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :class="{ 'is-invalid': controls.hinhthuc && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Thời điểm tạo kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <ejs-datepicker
+                      v-model="current_item.thoidiem"
+                      :value="current_item.thoidiem"
+                      ref="datePicker"
+                      :enabled="false"
+                      :cssClass="true ? 'e-error' : ''"
+                      :allowEdit="true"
+                      format="dd/MM/yyyy"
+                    >
+                    </ejs-datepicker>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Loại vật liệu kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="current_item.loai_vat_lieu"
+                      :disabled="isThayDoi  || isDisabled"
+                      :dataSource="listLoaiVatLieuKetNoi"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :class="{ 'is-invalid': controls.loai_vat_lieu && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Trạng thái kết nối vật lý
+                    <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="current_item.trangthai_vl"
+                      :disabled="isThayDoi  || isDisabled"
+                      :dataSource="[...trang_thai_kn_vl_options]"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :class="{ 'is-invalid': controls.trangthai_vl && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Lớp kết nối <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="current_item.lop"
+                      :disabled="isThayDoi || isDisabled"
+                      :dataSource="listLopKetNoi"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :class="{ 'is-invalid': controls.lop && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Trạng thái vận hành <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="current_item.trangthai_vh"
+                      :disabled="(isThayDoi && !isEditThayDoi) "
+                      :dataSource="[...trang_thai_kn_vh_options]"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :class="{ 'is-invalid': controls.trangthai_vh && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">
+                    Căn cứ thực hiện <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="current_item.cancu_thuchien"
+                      :disabled="isThayDoi  || isDisabled"
+                      :class="{ 'is-invalid': controls.cancu_thuchien && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row pt-4">
+                  <div class="key w180"></div>
+                  <div class="value" style="font-weight: bold;">
+                    Hệ thống thiết bị nguồn
+                  </div>
+                </div>
+                <!-- <div class="info-row">
+            <div class="key w180">Hệ thống thiết bị nguồn <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span></div>
+            <div class="value">
+              <SelectExt
+                v-model="current_item.tb_nguon"
+                :disabled="isThayDoi  || isDisabled"
+                :dataSource="listTbi"
+                @change="onTbiNguonChange"
+                dataTextField="text"
+                dataValueField="id"
+                :class="{ 'is-invalid': controls.tb_nguon }"
+              />
+            </div>
+          </div> -->
+                <div class="info-row">
+                  <div class="key w180">
+                    Hệ thống thiết bị nguồn
+                    <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value d-flex align-items-center">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="controls.tb_nguon_id && phieuThiCongDetail.TRANGTHAI_ID !== 21 ? 'is-invalid' : ''"
+                      disabled
+                      v-model="current_item.tb_nguon_ten"
+                    />
+                    <button
+                      :disabled="isThayDoi  || isDisabled"
+                      class="btn btn-sm btn-outline-primary ml-2"
+                      title="Chọn hệ thống thiết bị"
+                      @click="showModalChonTB(1)"
+                    >
+                      <i class="fa fa-ellipsis-h"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- Hệ thống là thiết bị -->
+                <div v-if="current_item.flag_TB_nguon === 0">
+                  <div class="info-row">
+                    <div class="key w180">Hệ thống thiết bị con</div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.tb_nguon_con"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listTbiNguonCon"
+                        @change="onUpdatePortNguon"
+                        dataTextField="text"
+                        dataValueField="id"
+                        :settings="{allowClear:true}"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Loại Port <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.loai_port"
+                        disabled
+                        :dataSource="[...port_type_options]"
+                        :class="{ 'is-invalid': controls.loai_port && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        @change="onUpdatePortNguon"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Port nguồn <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.port_nguon"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listPortNguon"
+                        :class="{ 'is-invalid': controls.port_nguon && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <!-- Hệ thống là rack cho kết nối điện -->
+                <div v-if="current_item.flag_TB_nguon === 1 && (loaicv === 30 || loaicv === 65 || loaicv === 66)">
+                  <div class="info-row">
+                    <div class="key w180">
+                      Thanh nguồn <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.thanh_nguon"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listThanhNguon"
+                        @change="getOCamTheoThanhNguon(1)"
+                        dataTextField="text"
+                        dataValueField="id"
+                        :class="{ 'is-invalid': controls.thanh_nguon && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Loại ổ cắm <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.loai_o_cam_nguon"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listLoaiOCam"
+                        :class="{ 'is-invalid': controls.loai_o_cam_nguon && phieuThiCongDetail.TRANGTHAI_ID !== 21 }"
+                        @change="onChangeLoaiOCam(1)"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Ổ cắm <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.o_cam_nguon"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listOCamNguon"
+                        :class="{ 'is-invalid': controls.o_cam_nguon && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="id"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <!-- Hệ thống là rack cho kết nối mạng -->
+                <div v-if="current_item.flag_TB_nguon === 1 && (loaicv === 56 || loaicv === 67 || loaicv === 68)">
+                  <div class="info-row">
+                    <div class="key w180">Patch Pannel</div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.tb_nguon_con"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listPatchPannelNguon"
+                        @change="onChangePatchPanel(1)"
+                        dataTextField="text"
+                        dataValueField="id"
+                        :class="{ 'is-invalid': controls.tb_nguon_con && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Loại Port <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.loai_port"
+                        disabled
+                        :dataSource="[...port_type_options]"
+                        :class="{ 'is-invalid': controls.loai_port && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Port <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.port_nguon"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listPortNguon"
+                        :class="{ 'is-invalid': controls.port_nguon && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w180">Thiết bị phụ trợ kèm theo</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="current_item.tb_nguon_phutro"
+                      :disabled="isThayDoi  || isDisabled"
+                    />
+                    <!-- <treeselect
+                :multiple="true"
+                v-model="current_item.tb_nguon_phutro"
+                :options="listTbi"
+                :disabled="isThayDoi  || isDisabled"
+                :disable-branch-nodes="false"
+                :append-to-body="true"
+                style="overflow-y:auto;"
+                :normalizer="normalizer"
+                :limit="100"
+              /> -->
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row pt-4">
+                  <div class="key w180"></div>
+                  <div class="value" style="font-weight: bold;">
+                    Hệ thống thiết bị đích
+                  </div>
+                </div>
+                <!-- <div class="info-row">
+            <div class="key w180">Hệ thống thiết bị đích <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span></div>
+            <div class="value">
+              <SelectExt
+                v-model="current_item.tb_dich"
+                :disabled="isThayDoi  || isDisabled"
+                :dataSource="listTbi"
+                @change="onTbiDichChange"
+                dataTextField="text"
+                dataValueField="id"
+                :class="{ 'is-invalid': controls.tb_dich }"
+              />
+            </div>
+          </div> -->
+                <div class="info-row">
+                  <div class="key w180">
+                    Hệ thống thiết bị đích <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                  </div>
+                  <div class="value d-flex align-items-center">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="controls.tb_dich_id && phieuThiCongDetail.TRANGTHAI_ID !== 21? 'is-invalid' : ''"
+                      disabled
+                      v-model="current_item.tb_dich_ten"
+                    />
+                    <button
+                      :disabled="isThayDoi  || isDisabled"
+                      class="btn btn-sm btn-outline-primary ml-2"
+                      title="Chọn hệ thống thiết bị"
+                      @click="showModalChonTB(2)"
+                    >
+                      <i class="fa fa-ellipsis-h"></i>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="current_item.flag_TB_dich === 0">
+                  <div class="info-row">
+                    <div class="key w180">Hệ thống thiết bị con</div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.tb_dich_con"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listTbiDichCon"
+                        @change="onUpdatePortDich"
+                        dataTextField="text"
+                        dataValueField="id"
+                        :settings="{allowClear:true}"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Loại Port <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.loai_port_dich"
+                        disabled
+                        :dataSource="[...port_type_options]"
+                        :class="{ 'is-invalid': controls.loai_port_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        @change="onUpdatePortDich"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Port đích <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.port_dich"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listPortDich"
+                        :class="{ 'is-invalid': controls.port_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div v-if="current_item.flag_TB_dich === 1 && (loaicv === 30 || loaicv === 65 || loaicv === 66)">
+                  <div class="info-row">
+                    <div class="key w180">
+                      Thanh nguồn <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.thanh_nguon_dich"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listThanhNguonDich"
+                        @change="getOCamTheoThanhNguon(2)"
+                        dataTextField="text"
+                        dataValueField="id"
+                        :class="{ 'is-invalid': controls.thanh_nguon_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Loại ổ cắm <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.loai_o_cam_dich"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listLoaiOCam"
+                        :class="{ 'is-invalid': controls.loai_o_cam_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        @change="onChangeLoaiOCam(2)"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Ổ cắm <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.o_cam_dich"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listOCamDich"
+                        :class="{ 'is-invalid': controls.o_cam_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="id"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div v-if="current_item.flag_TB_dich === 1 && (loaicv === 56 || loaicv === 67 || loaicv === 68)">
+                  <div class="info-row">
+                    <div class="key w180">Patch Pannel</div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.tb_dich_con"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listPatchPannelDich"
+                        @change="onChangePatchPanel(2)"
+                        dataTextField="text"
+                        dataValueField="id"
+                        :class="{ 'is-invalid': controls.tb_dich_con && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Loại Port <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.loai_port_dich"
+                        disabled
+                        :dataSource="[...port_type_options]"
+                        :class="{ 'is-invalid': controls.loai_port_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w180">
+                      Port <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+                    </div>
+                    <div class="value">
+                      <SelectExt
+                        v-model="current_item.port_dich"
+                        :disabled="isThayDoi  || isDisabled"
+                        :dataSource="listPortDich"
+                        :class="{ 'is-invalid': controls.port_dich && phieuThiCongDetail.TRANGTHAI_ID !== 21}"
+                        dataTextField="text"
+                        dataValueField="id"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key w180">Thiết bị phụ trợ kèm theo</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="current_item.tb_dich_phutro"
+                      :disabled="isThayDoi  || isDisabled"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- TAB 2: LỊCH SỬ THAY ĐỔI -->
+        <div class="tab-pane" id="tabLichSuThayDoi" :class="{active: tab_index == 2}">
+          <div class="" v-if="idKetNoi != null && idKetNoi !== undefined">
+            <div class="legend-title">Lịch sử tác động</div>
+            <TabHistory :tenBang="'KETNOI_IDC'" :tenCot="''" :khoaDuLieu="idKetNoi" ref="tabHistory"></TabHistory>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Danh sách kết nối -->
+    <div class="row">
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span>Danh sách kết nối {{current_item.loai_ketnoi == 1 ? 'điện' : 'mạng'}} {{isKhachHang ? 'khách hàng' : 'IDC'}}</span>
+            <div>
+              <b-link
+                v-if="phieuThiCongDetail.TRANGTHAI_ID == 21 && !(loaicv == 30 || loaicv == 56)"
+                href="javascript:void(0)"
+                @click="onChonKetNoi"
+                class="btn btn-sm btn-primary"
+              >
+                <span class="fa fa-check"></span> Chọn kết nối
+              </b-link>
+
+              <b-link
+                v-if="(phieuThiCongDetail.TRANGTHAI_ID == 21 || (phieuThiCongDetail.TRANGTHAI_ID == 22 && isKhachHang)) && (loaicv == 30 || loaicv == 56) "
+                href="javascript:void(0)"
+                @click="onClearFormAndAddNew"
+                class="btn btn-sm btn-primary"
+              >
+                <span class="fa fa-plus"></span> Thêm mới
+              </b-link>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <DataGrid
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              v-bind:columns="isKhachHang ? [
+                  { fieldName: 'F_KETNOI_ID', headerText: 'ID kết nối', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'MA_THUE_BAO', headerText: 'Mã thuê bao', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'KHACH_HANG_TEN', headerText: 'Tên khách hàng', textAlign: 'Left', width: '200px' },
+                  { fieldName: 'TB_NGUON_TEN', headerText: 'Thiết bị nguồn', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TB_NGUON_CON_TEN', headerText: 'Tên TB nguồn con', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TB_DICH_TEN', headerText: 'Thiết bị đích', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TB_DICH_CON_TEN', headerText: 'Tên TB đích con', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TRANGTHAI_VL_ID', headerText: 'Trạng thái vật lý', textAlign: 'Left', valueAccessor: mapToTrangThaiVL, width: '150px' },
+                  { fieldName: 'TRANGTHAI_VH_ID', headerText: 'Trạng thái vận hành', textAlign: 'Left', valueAccessor: mapToTrangThaiVH, width: '180px' },
+                  //{fieldName: 'ACTIONS', headerText: 'Thao tác', allowSorting: false, allowFiltering: false, textAlign: 'Center', template: actionColumn(this), width: 100}
+                ] : [
+                { fieldName: 'F_KETNOI_ID', headerText: 'ID kết nối', textAlign: 'Left', width: '150px' },
+                { fieldName: 'TB_NGUON_TEN', headerText: 'Thiết bị nguồn', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TB_NGUON_CON_TEN', headerText: 'Tên TB nguồn con', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TB_DICH_TEN', headerText: 'Thiết bị đích', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TB_DICH_CON_TEN', headerText: 'Tên TB đích con', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TRANGTHAI_VL_ID', headerText: 'Trạng thái vật lý', textAlign: 'Left', valueAccessor: mapToTrangThaiVL, width: '150px' },
+                { fieldName: 'TRANGTHAI_VH_ID', headerText: 'Trạng thái vận hành', textAlign: 'Left', valueAccessor: mapToTrangThaiVH, width: '180px' },
+                //{fieldName: 'ACTIONS', headerText: 'Thao tác', allowSorting: false, allowFiltering: false, textAlign: 'Center', template: actionColumn(this), width: 100}
+                ]"
+              :dataSource="ds_ketnoi"
+              @selectedRowChanged="onRowSelected"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ModalChuyenXuly modalID="ModalChuyenXuly" ref="ModalChuyenXuly" @saved="chuyenXylySuccess"> </ModalChuyenXuly>
+    <ModalChonKetNoi
+      modalID="ModalChonKetNoi"
+      :loaicv="loaicv"
+      :isKhachHang="isKhachHang"
+      ref="ModalChonKetNoi"
+      @chonKetNoi="onKetNoiSelected"
+    >
+    </ModalChonKetNoi>
+    <ModalChonThietBi
+      modalID="ModalChonThietBi"
+      :loaicv="loaicv"
+      :isKhachHang="isKhachHang"
+      :phieucv="phieutc"
+      ref="ModalChonThietBi"
+      @chonThietBi="onThietBiSelected"
+    >
+    </ModalChonThietBi>
+    <ejs-dialog
+      :enableResize="true"
+      :allowDragging="true"
+      :visible="false"
+      ref="popupTraPhieu"
+      :showHeader="false"
+      :showCloseIcon="false"
+      :isModal="true"
+      width="60%"
+      height="auto"
+      :position="{X: 'center', Y: '150'}"
+    >
+      <div class="popup-box">
+        <div class="popup-header">
+          <div class="title">
+            <span class="icon one-notepad"></span>
+            Trả phiếu thi công
+          </div>
+          <div class="close -ap icon-close" data-dismiss="modal" @click="huyTraPhieu"></div>
+        </div>
+        <div class="list-actions-top">
+          <ul class="list">
+            <li>
+              <b-link href="javascript:void(0)" @click="confirmTraPhieu">
+                <span class="icon one-save"></span>Xác nhận
+              </b-link>
+            </li>
+            <li>
+              <b-link href="javascript:void(0)" @click="huyTraPhieu">
+                <span class="icon  nc-icon-glyph ui-1_circle-remove"></span>Hủy
+              </b-link>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-content popup-box" style="border: 0;">
+          <div class="popup-body">
+            <div class="info-row">
+              <div class="key w120">
+                Lý do trả phiếu <span v-if="phieuThiCongDetail.TRANGTHAI_ID !== 21" class="required">*</span>
+              </div>
+              <div class="value">
+                <textarea
+                  class="form-control"
+                  v-model="lyDoTraPhieu"
+                  value="lyDoTraPhieu"
+                  placeholder="Nhập lý do trả phiếu"
+                  style="height: 100px;resize: vertical;"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ejs-dialog>
+  </div>
+</div>

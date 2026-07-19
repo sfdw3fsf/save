@@ -1,0 +1,228 @@
+<div id="danhsach-congviec-idc">
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onSearch"> <span class="icon one-search"></span>Tìm kiếm </b-link>
+      </li>
+       <li>
+        <b-link href="javascript:void(0)" @click="createThiCongHeThong" :class="loaiCvId === 50 ? 'text-primary' : loaiCvId === 23 ? 'text-danger' : 'text-success'"> <span class="fa fa-plus"></span>
+        {{ loaiCvId === 50 ? 'Tạo mới thi công lắp đặt' : (loaiCvId === 23 ? 'Tạo mới thi công tháo dỡ' : 'Tạo mới thi công thay đổi') }}
+       </b-link>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <!-- Search conditions -->
+    <div class="box-form">
+      <div class="row">
+        <div class="legend-title d-flex justify-content-between align-items-center">
+          Điều kiện tìm kiếm
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Phân loại</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.phanloai"
+                placeholder="-- Chọn phân loại --"
+                dataTextField="TEN"
+                dataValueField="ID"
+                :dataSource="[...phanLoaiList]"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Trạng thái thực hiện</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.trangthaiId"
+                placeholder="-- Chọn trạng thái --"
+                dataTextField="TEN"
+                dataValueField="ID"
+                :dataSource="trangThaiList"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Ngày yêu cầu</div>
+            <div class="value">
+                <ejs-datepicker
+                  v-model="searchConditions.ycBatdau"
+                  :format="'dd/MM/yyyy'"
+                  :allowEdit="false"
+                  placeholder="Từ ngày"
+                  style="background: white; color: #495057; width: 100%;"
+                  ref="refNgayYcTu"
+                />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Đến ngày</div>
+              <div class="value">
+                <ejs-datepicker
+                  v-model="searchConditions.ycKetthuc"
+                  :format="'dd/MM/yyyy'"
+                  :allowEdit="false"
+                  placeholder="Đến ngày"
+                  style="background: white; color: #495057; width: 100%;"
+                  ref="refNgayYcDen"
+                />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Đơn vị</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.donviId"
+                placeholder="-- Chọn đơn vị --"
+                dataTextField="TEN_DV"
+                dataValueField="DONVI_ID"
+                :dataSource="donViList"
+                @change="onChangeDonVi"
+              />
+            </div>
+          </div>
+        </div> -->
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">IDC</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.idcId"
+                placeholder="-- Chọn IDC --"
+                dataTextField="TEN"
+                dataValueField="ID"
+                :dataSource="idcList"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Người thực hiện</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.nhanvienId"
+                placeholder="-- Chọn nhân viên thực hiện --"
+                dataTextField="TEN_NV"
+                dataValueField="NHANVIEN_ID"
+                :dataSource="nhanVienList"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Ngày yêu cầu HT</div>
+              <div class="value">
+                <ejs-datepicker
+                  v-model="searchConditions.ychtBatdau"
+                  :format="'dd/MM/yyyy'"
+                  :allowEdit="false"
+                  placeholder="Từ ngày"
+                  style="background: white; color: #495057; width: 100%;"
+                  ref="refNgayYchtTu"
+                />
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w100">Đến ngày</div>
+              <div class="value">
+                <ejs-datepicker
+                  v-model="searchConditions.ychtKetthuc"
+                  :format="'dd/MM/yyyy'"
+                  :allowEdit="false"
+                  placeholder="Đến ngày"
+                  style="background: white; color: #495057; width: 100%;"
+                  ref="refNgayYchtDen"
+                />
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w100">Khách hàng</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="searchConditions.khachhang" placeholder="Nhập mã TB, mã GD, số HĐ, tên TB" />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w100">Công việc</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="searchConditions.congviec" placeholder="Nhập mã/tên công việc" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w100">Tên hệ thống</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="searchConditions.tenHeThong" placeholder="Nhập tên hệ thống" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="box-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            Danh sách nhiệm vụ/ công việc: {{ loaiCvId === 50 ? 'Thi công lắp đặt' : (loaiCvId === 51 ? 'Thi công tháo dỡ' : 'Thi công thay đổi') }} ({{ danhSachCongViec.length }})
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <DataGrid
+              ref="grdNhiemVu"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="danhSachCongViec"
+              v-bind:columns="[
+              {fieldName: 'MA_CV', headerText: 'Mã CV', textAlign: 'Left', width: 60},
+              {fieldName: 'TEN_CV', headerText: 'Hạng mục công việc', textAlign: 'Left', width: 140},
+              {fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left', width: 90},
+              {fieldName: 'NHANVIEN_THUCHIEN', headerText: 'Cá nhân thực hiện', textAlign: 'Left', width: 120},
+              {fieldName: 'PHOIHOP_THUCHIEN', headerText: 'Phối hợp thực hiện', textAlign: 'Left', width: 120, disableHtmlEncode: false, cssClass: 'phoi-hop-thuc-hien'},
+              {fieldName: 'TEN', headerText: 'Hệ thống thiết bị', textAlign: 'Left', width: 140},
+              {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', textAlign: 'Center', width: 100, template: formatDateTimeTemplate(this)},
+              {fieldName: 'NGAY_YCHT', headerText: 'Ngày yêu cầu HT', textAlign: 'Center', width: 100, template: formatDateTimeTemplate(this)},
+              {fieldName: 'KHACHHANG', headerText: 'Khách hàng', textAlign: 'Left', width: 150, disableHtmlEncode: false, template: khachHangTemplate(this)},
+              {fieldName: 'TRANGTHAI_THICONG', headerText: 'Trạng thái thực hiện', textAlign: 'Left', width: 110},
+              {fieldName: 'ACTIONS', headerText: 'Thao tác', allowSorting: false,
+              allowFiltering: false, textAlign: 'Center', template: actionColumn(this), width: 65}
+            ]"
+              :enabledSelectFirstRow="true"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>

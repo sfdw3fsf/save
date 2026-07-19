@@ -1,0 +1,685 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" :class="{disabled:buttonSet && buttonSet!=2 && buttonSet!=3}" @click.prevent="tsbtnNhapMoi_Click">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="SaveClicked" :class="{disabled:buttonSet!=-1 && buttonSet!=1 && buttonSet!=3 && buttonSet!=4}">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="buttonSet=0" :class="{disabled:buttonSet!=-1 && buttonSet!=1 && buttonSet!=3 && buttonSet!=4}">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+            <li>
+                <a href="#" :class="{disabled:buttonSet!=2 && buttonSet!=3}" @click.prevent="tsbtnXoa_Click">
+                    <span class="icon one-trash"></span>Xóa HĐ
+                </a>
+            </li>
+            <li>
+                <a href="#" :class="{disabled:buttonSet!=3}" @click.prevent='ChuyenTrang("Payment",{"magd":khachhang.magd})'>
+                    <span class="icon nc-icon-glyph shopping_credit-card"></span>Thanh toán
+                </a>
+            </li>
+            <!-- <li>
+                <a href="#"   :class="{disabled:buttonSet!=3}">
+                    <span class="icon one-print"></span>Phiếu YC
+                </a>
+            </li> -->
+
+            <li>
+                <a href="#" :class="{disabled:buttonSet!=3 && !buttons.tsbtnThemTB}" @click.prevent="tsbtnThemTB_Click">
+                    <span class="icon one-mobile-plus"></span>Thêm TB
+                </a>
+            </li>
+            <li>
+                <a href="#" :class="{disabled:buttonSet!=3 && !buttons.tsbtnXoaTB}" @click.prevent="tsbtnXoaTB_Click">
+                    <span class="icon one-phone-remove"></span>Xóa TB
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="tsbtnThongTinLH_Click">
+                    <span class="icon nc-icon-glyph business_contacts"></span>Liên hệ
+                </a>
+            </li>
+        </ul>
+
+    </div>
+
+    <div class="page-content">
+        <div class="box-form padt8 padb8 fw6">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap">Mã dự án</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="maduan">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap fw6">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="filterbox.ctv.ischecked" @change="ShowPopupCTV()">
+                                <span class="name">Cộng tác viên</span>
+                            </div>
+                        </div>
+                        <div class="value" :class="{disabled:!filterbox.ctv.ischecked}">
+                            <input type="text" class="form-control" v-model="filterbox.ctv.value">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap fw6">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="filterbox.nguoigt.ischecked" @change="ShowPopupNguoiGT()">
+                                <span class="name">Người giới thiệu</span>
+                            </div>
+                        </div>
+                        <div class="value" :class="{disabled:!filterbox.nguoigt.ischecked}">
+                            <input type="text" class="form-control" v-model="filterbox.nguoigt.value">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w30 nowrap">
+                            Tổng tiền
+                        </div>
+                        <div class="value">
+                            <vue-numeric class="form-control tright" separator="," v-model="tongtienhd" readonly="true" placeholder="0" output-type="Number"></vue-numeric>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid-stack-box">
+            <div class="box-col" id="boxLeft">
+                <div class="box-form">
+                    <div class="legend-title">Thông tin phiếu yêu cầu</div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Mã giao dịch</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="showPopupSearchContract">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" :loai_hd_id="6" :dichvu_id="0" :ngay_yc="NgayYeuCau?NgayYeuCau:''" :ngay_kt="NgayYeuCau?NgayYeuCau:''" :trangthai_hd="1" />
+                                        <input type="text" class="form-control highlight" v-model="khachhang.magd" @keypress.enter="MaGDChanged">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày Y/C</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <date-picker input-class="form-control" :format="dateFormat" :value-type="'format'" v-model="NgayYeuCau" :disabled="true"></date-picker>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Kiểu yêu cầu</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.kieu_ld.value" class="select-custom" :options="listbox.kieu_ld.list.map(ld=>({id:ld.kieuld_id*1,text:ld.ten_kieuld}))"></select2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Mã TN</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click.prevent="popupMaTN" :class="{disabled:!(kieu_ld_kieu!=0)}">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input ref="txtMaTN_ADSL" type="text" class="form-control highlight" v-model="thuebaocd.matn">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">Loại hình thuê bao cũ</div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Dịch vụ</div>
+                                <div class="value">
+
+                                    <select2 v-model="listbox.dichvu_vt.value" @change="cboDichVuVT_SelectedValueChanged"  class="select-custom" :options="listbox.dichvu_vt.list.map(dv=>({id:dv.dichvuvt_id*1,text:dv.ten_dvvt}))"></select2>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại hình</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.loaihinh_tb.value" @change="LoaiHinhTB_Changed" class="select-custom" :options="listbox.loaihinh_tb.list.filter(lh=>(lh.dichvuvt_id==listbox.dichvu_vt.value)).map(lh=>({id:lh.loaitb_id*1,text:lh.loaihinh_tb}))" :disabled="true"></select2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Số máy/Acc</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="ShowSearchAccount">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control" v-model="thuebao.codinh.somay" @keypress.enter="txtMaTB_KeyPress" required title="Bạn chưa nhập Số máy/account">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Trang bị</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.trangbi.valuecd"  class="select-custom" :options="listbox.trangbi.list.map(lc=>({id:lc.trangbi_id,text:lc.tentrangbi}))" :disabled="true"></select2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">Loại hình thuê bao mới</div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Dịch vụ</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.dichvu_vt_moi.value"   class="select-custom" :options="listbox.dichvu_vt_moi.list.map(dv=>({id: dv.dichvuvt_id*1,text:dv.ten_dvvt}))" ></select2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại hình</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.loaihinh_tb_moi.value"  @change="LoaiHinhTB_moi_Changed" class="select-custom" :options="listbox.loaihinh_tb.list.filter(lh=>(lh.dichvuvt_id==listbox.dichvu_vt_moi.value)).map(lh=>({id:lh.loaitb_id*1,text:lh.loaihinh_tb}))"></select2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Mức cước TB</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.muccuoc_tb.value" class="select-custom" :options="listbox.muccuoc_tb.list.map(mc=>({id:mc.muccuoctb_id,text:mc.tenmuccuoc}))"></select2>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Trang bị</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.trangbi.valueims" class="select-custom" :options="listbox.trangbi.list.map(lc=>({id:lc.trangbi_id,text:lc.tentrangbi}))"></select2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Chi tiết DV</div>
+                                <div class="value">
+                                    <select2 ref="cboChiTietDVMoi" v-model="listbox.ht_chitietdv_ims.value" class="select-custom" :disabled="!controls.cboChiTietDVMoi.Visible" :options="listbox.ht_chitietdv_ims.list.map(ct=>({id:ct.ctdv_id,text:ct.chitiet_dv}))"></select2>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Cuộc gọi Đ.Thời</div>
+                                <div class="value">
+                                    <input ref="txtSoLuong" type="number" min="0" oninput="validity.valid||(value='');" class="form-control highlight" :disabled="!controls.txtSoLuong.Visible" v-model="txtSoLuong">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Thiết bị IMS</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.thietbi_ims.value" class="select-custom"  :disabled="!controls.cboThietBiIMS.Visible" :options="listbox.thietbi_ims.list.map(ht=>({id:ht.THIETBI_ID,text:ht.TEN_TBI}))"></select2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">IP</div>
+                                <div class="value">
+                                    <input ref="txtIp_IMS" type="text" oninput="validity.valid||(value='');" class="form-control highlight" v-model="ip_ims"  :disabled="!controls.txtIp_IMS.Visible">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="listbox.trunk.checkbox_value">
+                                        <span class="name">Đường trunk</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <ComboboxGrid
+                                        :class="{disabled: !listbox.trunk.checkbox_value}"
+                                        class="select-custom"
+                                        :columns="[
+                                        {fieldName: 'trunkid', headerText: 'Mã đường trunk', allowFiltering: true, width:'200'},
+                                        {fieldName: 'ma_tb', headerText: 'Thuê bao đại diện', allowFiltering: true, width:'80'}
+                                        ]"
+                                        :dataSource="listbox.trunk.list" textField="ma_tb" valueField="trunkid"
+                                         @selectedChanged="(item)=>{listbox.trunk.value=item.trunkid;}"
+                                        >
+                                    </ComboboxGrid>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Hình thức TC</div>
+                                <div class="value">
+                                    <select2 v-model="listbox.hinhthuc_tc.value" :disabled="!listbox.hinhthuc_tc.enabled" class="select-custom" :options="listbox.hinhthuc_tc.list.filter(x=>x.httc_id==2 || x.httc_id ==3).map(ht=>({id:ht.httc_id,text:ht.hinhthuc_tc}))"></select2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="legend-title">Dịch vụ cộng thêm</div>
+                            <div class="input-more-button">
+                                <button class="btn" @click.prevent="popupDVCongThem">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <ul class="form-control listview" style="height: 110px;resize: none;">
+                                    <li :value="dv" v-for="dv in lvDvgt.list" @click="lvDvgt.value=dv" :class="{active:lvDvgt.value==dv}">{{dv}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="legend-title">Mua thiết bị</div>
+                            <div class="input-more-button">
+                                <button class="btn" @click.prevent="popupMuaTB">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <ul class="form-control listview" style="height: 110px;resize: none;">
+                                    <li :value="dv" v-for="dv in lvMuaThietbi.list" @click="lvMuaThietbi.value=dv" :class="{active:lvMuaThietbi.value==dv}">{{dv}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-col" id="boxRight">
+                <div class="box-form">
+                    <div class="legend-title">Thông tin khách hàng</div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">
+                                    Mã hợp đồng
+                                </div>
+                                <div class="value">
+                                    <input ref="txtMaHD" type="text" class="form-control"  v-model="khachhang.mahd" required :readonly="true" title="Bạn chưa nhập mã hợp đồng">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày lập HĐ</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <date-picker input-class="form-control" :format="dateFormat" :value-type="'format'" v-model="NgayLapHD" :disabled="true"></date-picker>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">
+                                    Mã khách hàng
+                                </div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="khachhang.makh"  :readonly="true" required title="Bạn chưa nhập mã khách hàng">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Số điện thoại</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="khachhang.dienthoai"  required pattern="^0\d{9,}$" title="Số điện thoại không được ít hơn 10 số và phải bắt đầu bằng 0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">
+                            Tên khách hàng
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="khachhang.tenkh" :readonly="true" required title="Bạn chưa nhập tên khách hàng">
+
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">
+                            Địa chỉ KH
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="diachiKH.DIACHI" :readonly="true" required title="Bạn chưa nhập địa chỉ khách hàng">
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                  <div class="nav tabs tab-over">
+                    <a href="#tab1" data-toggle="tab" id="tabThongTin" class="minw0 padl7 padr7 active">
+                      Thông tin
+                    </a>
+                    <a href="#tab2" data-toggle="tab" id="tabThueBao" class="minw0 padl7 padr7">
+                      Thuê bao
+                    </a>
+                  </div>
+                  <div class="tab-content" style="min-height: 478px;">
+                    <div id="tab1" class="tab-pane active">
+                      <div class="row">
+                        <div class="col-sm-7 col-12">
+                          <div class="info-row">
+                            <div class="key">
+                              Tên thuê bao
+                            </div>
+                            <div class="value">
+                              <input ref="txtTenTB" type="text" class="form-control" v-model="thuebao.tentb" :readonly="true" required title="Bạn chưa nhập Tên thuê bao">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                          <div class="info-row">
+                            <div class="key">Đối tượng</div>
+                            <div class="value">
+                              <select2 v-model="listbox.doituong.value" class="select-custom" :options="listbox.doituong.list.map(dt=>({id:dt.doituong_id,text:dt.ten_dt}))"></select2>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="info-row">
+                        <div class="key">
+                          Địa chỉ TB
+                        </div>
+                        <div class="value">
+                          <div class="input-more-button">
+                            <button class="btn" v-b-modal.popupDiaChiTB>
+                              <span class="-ap icon-more_horiz"></span>
+                            </button>
+                            <ModalChonDiaChi modalId="popupDiaChiTB" :data="diachiTB" @xacnhan="getDiaChiTB"/>
+                            <bss-error-marker :has-error="$v.diachiTB.DIACHI.$error">
+                              <input type="text" v-model="$v.diachiTB.DIACHI.$model" class="form-control" required :readonly="true" title="Bạn chưa nhập địa chỉ thuê bao">
+                            </bss-error-marker>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">
+                          Địa chỉ LĐ
+                        </div>
+                        <div class="value">
+                          <div class="input-more-button">
+                            <button class="btn" v-b-modal.popupDiaChiLD disabled>
+                              <span class="-ap icon-more_horiz"></span>
+                            </button>
+                            <ModalChonDiaChi modalId="popupDiaChiLD" :data="diachiLD" @xacnhan="getDiaChiLD"/>
+
+                            <bss-error-marker :has-error="$v.diachiLD.DIACHI.$error">
+                              <input type="text" v-model="$v.diachiLD.DIACHI.$model" class="form-control highlight" :readonly="true" disabled required title="Bạn chưa nhập địa chỉ lắp đặt">
+                            </bss-error-marker>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">
+                          Đơn vị lắp đặt
+                        </div>
+                        <div class="value">
+                          <select2 v-model="listbox.donvi_ql.value" class="select-custom" :options="listbox.donvi_ql.list.map(dv=>({id:dv.donvi_id,text:dv.ten_ht}))"></select2>
+
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-7 col-12">
+                          <div class="info-row">
+                            <div class="key">
+                              Trạm thi công
+                            </div>
+                            <div class="value">
+                              <select2 v-model="listbox.tram_tc.value" class="select-custom" :options="listbox.tram_tc.list.map(dv=>({id:dv.donvi_id*1,text:dv.ten_dv}))"></select2>
+
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                          <div class="info-row">
+                            <div class="key">Khu vực</div>
+                            <div class="value">
+                              <div class="input-more-button" >
+                                <button class="btn" @click.prevent="popupChonKhuVuc">
+                                  <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input ref="txt_KhuVuc" type="text" :disabled="!state.txt_KhuVucEnabled" class="form-control " :readonly="true"  v-model="thuebao.khuvuc" required title='Thông tin khu vực là bắt buộc!'>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="key">
+                          Ghi chú
+                        </div>
+                        <div class="value">
+                          <textarea name="" class="form-control" style="height: 104px;resize: none;"   v-model="thuebao.ghichu"></textarea>
+
+                        </div>
+                      </div>
+
+                    </div>
+                    <div id="tab2" class="tab-pane" >
+                      <div class="info-row">
+                        <div class="table-content" style="height: 400px;">
+                          <table class="table-result table-gachle" style="height: 400px;overflow-y: scroll">
+                            <tbody>
+
+                            <tr v-for="(hdx,idx) in gridEditors" :key="idx">
+                              <td class="w20 center" v-if="hdx.show != false">
+
+                              </td>
+                              <td v-if="hdx.show != false " class="fw6">{{ hdx.Name }}</td>
+                              <td v-if="hdx.show != false">
+                                <template v-if="hdx.Type=='ButtonEdit'">
+                                  <div class="input-more-button -right">
+                                    <button class="btn h-auto pad4 lh14 w24" @click.prevent="hdx.ButtonClick(hdx)">
+                                      <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                    <input type="text" :class="{disabled:hdx.ReadOnly?true:false}" class="form-control padr30  h24 bor0 nocorner bg-none" :value="hdx.Value" @change="v=>hdx.Value=v.target.value">
+                                  </div>
+                                </template>
+                                <template v-if="hdx.Type=='TextEdit' && hdx.DataType!=1">
+                                  <input type="text" class="form-control padr30  h24 bor0 nocorner bg-none" :required="hdx.Name.indexOf('*')>=0 && hdx.ID!='MA_TB'"  :value="hdx.Value" @change="v=>{ hdx.Value=v.target.value; hdx.EditValueChanged(hdx); }" :title="'Bắt buộc nhập thông tin ' + hdx.Name">
+                                </template>
+                                <template v-if="hdx.Type=='CalcEdit' || (hdx.Type=='TextEdit' && hdx.DataType==1)">
+                                  <input type="number" class="form-control padr30  h24 bor0 nocorner bg-none" :required="hdx.Name.indexOf('*')>=0 && hdx.ID!='MA_TB'" :value="hdx.Value" @change="v=>{ hdx.Value=v.target.value; hdx.EditValueChanged(hdx); }" :title="'Bắt buộc nhập thông tin ' + hdx.Name">
+                                </template>
+                                <template v-if="hdx.Type=='DateEdit'">
+                                  <div class="input-icon-right">
+                                    <date-picker input-class="form-control h24 bor0 nocorner bg-none" :format="hdx.EditMask" :value-type="hdx.EditMask" v-model="hdx.Value" @change="hdx.EditValueChanged(hdx)"></date-picker>
+                                    <span class="icon one-calendar"></span>
+                                  </div>
+                                </template>
+                                <template v-if="hdx.Type=='LookUpEdit'">
+                                  <!-- LookUpEdit {{hdx.DataSource}} {{hdx.DisplayMember}} {{hdx.ValueMember}} {{hdx.Value}} -->
+                                  <template v-if="hdx.DataSource && hdx.DataSource.length>0">
+                                    <SelectExt class="bor0 nocorner bg-none" v-model="hdx.Value" :options="hdx.DataSource" dataTextField="text" dataValueField="id" @change="hdx.EditValueChanged(hdx)"></SelectExt>
+                                  </template>
+                                  <template v-else>
+                                    <span style="color:red; font-weight:bold;">Không có dữ liệu! Vui lòng liên hệ admin</span>
+                                  </template>
+                                </template>
+                                <template v-if="hdx.Type=='CheckedComboBoxEdit1'">
+                                  <!-- Tree {{hdx.DataSource}} {{hdx.DisplayMember}} {{hdx.ValueMember}} -->
+                                  <template v-if="hdx.DataSource && hdx.DataSource.length>0">
+                                    <treeselect :multiple="true" :options="hdx.DataSource.map(x=>({'label':x[hdx.DisplayMember],'id':x[hdx.ValueMember]}))" placeholder="..." v-model="hdx.Value" />
+                                  </template>
+                                  <template v-else>
+                                    <span style="color:red; font-weight:bold;">Không có dữ liệu! Vui lòng liên hệ admin</span>
+                                  </template>
+                                </template>
+                                <template v-if="hdx.Type=='CheckEdit'">
+                                  <input type="checkbox" class="check" :value="hdx.ValueChecked" v-model="hdx.Value" />
+                                </template>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+<!--                  <div class="legend-title">Thông tin thuê bao</div>-->
+
+                  <div class="box-form">
+                    <div class="legend-title">Chi tiết tiền khoản mục (có VAT)</div>
+                    <div class="row">
+                      <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                          <div class="key">
+                            Tiền LĐ
+                          </div>
+                          <div class="value">
+                            <vue-numeric class="form-control tright highlight" separator=","  v-model="dtienld" placeholder="0" output-type="Number"></vue-numeric>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                          <div class="key">Tiền DV</div>
+                          <div class="value">
+                            <vue-numeric class="form-control tright" readonly="true" separator="," :value="dichvu.dtien_dv+dichvu.dvat_dv" placeholder="0" output-type="Number"></vue-numeric>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                          <div class="key">
+                            Tiền mua TB
+                          </div>
+                          <div class="value">
+                            <vue-numeric class="form-control tright" readonly="true" separator="," :value="thietbi.dtientbi+thietbi.dvattbi" placeholder="0" output-type="Number"></vue-numeric>
+
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                          <div class="key red">Tổng tiền TB</div>
+                          <div class="value">
+                            <vue-numeric class="form-control tright" readonly="true" separator="," :value="dtienld+dichvu.dtien_dv+dichvu.dvat_dv+thietbi.dtientbi + thietbi.dvattbi" placeholder="0" output-type="Number"></vue-numeric>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                  </div>
+
+        </div>
+
+        <div class="box-form">
+            <div class="legend-title">Danh sách thuê bao</div>
+            <div class="table-content">
+                <DataGrid2
+                    v-bind:columns="[
+                    {fieldName: 'stt', headerText: 'STT', allowFiltering: false, allowSorting: true},
+                    {fieldName: 'ma_gd', headerText: 'Mã GD', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'thuebao_id', headerText: 'ID thuê bao', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'ma_tb', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'ten_tb', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'trangthai_vina', headerText: 'Trạng thái đồng bộ', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'diachi_ld', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, allowSorting: true},
+                    ]"
+                    v-bind:dataSource="lvwThueBao" :showFilter="true" :showColumnCheckbox="false"
+                    :enabledSelectFirstRow="false"
+                    dataKeyField="stt" :defaultColumnCheckboxChecked="false" @rowClicked="dgrThueBao_SelectionChanged"
+                    >
+                </DataGrid2>
+            </div>
+
+        </div>
+    </div>
+     <b-modal id="popupComponents" size="xl"
+        :title="state.modalTitle"
+        body-class="modal-body p-0">
+        <component :is="popupComponent" ref="popupComponent" :dulieu="popupComponentData" isPopup="true" v-on="popupComponentEvts"></component>
+    </b-modal>
+
+    <ejs-dialog :enableResize='true' :visible="false" ref="popupThongTinLienHe" :header='"Thông tin liên hệ"'
+        showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+        <ThongTinLienHe :hdkh_id="khachhang.hdkh_id" :khachhang_id="khachhang.khachhang_id"/>
+    </ejs-dialog>
+
+    <ejs-dialog :enableResize='true' :isModal="true" :allowDragging="true" :visible="false" ref="generalDialog" :header="state.modalTitle" :position="position"
+         showCloseIcon=true target=".main-wrapper" :closeOnEscape="true" width="90%" height="800" v-on="dialogEvts">
+        <div>
+          <component :is="dialogComponent" ref="generalComponent" :data="popupComponentData" v-bind="popupComponentAttr" :isPopup="true" v-on="popupComponentEvts"></component>
+        </div>
+    </ejs-dialog>
+
+    <component :is="dialogComponent" ref="generalComponent" :data="popupComponentData" v-bind="popupComponentAttr" :isPopup="true" v-on="popupComponentEvts"></component>
+</div>

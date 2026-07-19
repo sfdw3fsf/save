@@ -1,0 +1,2 @@
+import SetStaffToReceiveMessages from './SetStaffToReceiveMessages.vue'
+export default SetStaffToReceiveMessages

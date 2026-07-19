@@ -1,0 +1,211 @@
+<ejs-dialog
+  :visible="false"
+  :position="{ X: 'center', Y: '100' }"
+  ref="ModalThongtinBangthongMang"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title"><span class="icon one-notepad"></span>
+        {{
+          currentMode == 'MINUS' ? ' Thu hồi băng thông'
+            : 'Cấp phát băng thông'
+        }}
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2 ">
+      <!-- THÔNG TIN THIẾT BỊ -->
+      <div class="box-form" v-if="currentMode == 'ADD'">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Tại IDC <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.idcId"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :disabled=true
+                  :dataSource="idcList"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Mặt sàn </div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.matSanId"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :disabled=true
+                  :dataSource="matSanList"
+                />
+              </div>
+            </div>
+          </div>
+        </div>          
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">ID Cấp băng thông <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  disabled=true
+                  placeholder="Tự sinh"
+                  v-model="currentItem.idCpBangthong"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Thiết bị mạng <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.thietBiMangId"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :dataSource="thietbiMangList"
+                  @change="onChangeThietBiMang"
+                />
+              </div>
+            </div>
+          </div>
+         
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Gói cước mạng <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :disabled=true                  
+                  v-model="currentItem.goiCuocMangId"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">ID Port <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.thietbiPortId"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :disabled="currentMode == 'ADD' ? false : true"
+                  :dataSource="thietbiPortList"
+                />
+              </div>
+            </div>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Quốc tế </div>
+              <div class="value" style="display: flex; align-items: center;">
+                <input
+                  type="text"
+                  class="form-control"
+                  :disabled=true                  
+                  v-model="currentItem.quocTe"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Ghi chú <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :disabled=true
+                  v-model="currentItem.ghiChu"
+                />
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w140">Trong nước </div>
+              <div class="value" style="display: flex; align-items: center;">
+                <input
+                  type="text"
+                  class="form-control"
+                  :disabled=true
+                  v-model="currentItem.trongNuoc"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12" v-if="currentMode == 'MINUS'">
+            <div class="info-row">
+              <div class="key w140">Trạng thái <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.trangthai"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :dataSource="dsTrangthai"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form" v-if="currentMode == 'MINUS'">
+        <div class="col-12">
+          <div class="box-form">
+            <div class="row">
+              <div class="legend-title row align-items-center">
+                <div class="col-10">
+                  Danh sách băng thông cần thu hồi của khách hàng
+                </div>
+                
+              </div>          
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <DataGrid ref="grd1" :allowPaging="true" :enablePagingServer="false" 
+                  :showColumnCheckbox="true"
+                  v-bind:columns="dataGrid1Columns" v-bind:dataSource="dsBangthong" 
+                  @rowSelected="grd1_RowSelected"
+                  @rowDeselected="grd1_RowDeselected"
+                  :enabledSelectFirstRow="false">
+                </DataGrid>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

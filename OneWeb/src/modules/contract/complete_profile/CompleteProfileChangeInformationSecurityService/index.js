@@ -1,0 +1,2 @@
+import CompleteProfileChangeInformationSecurityService from './CompleteProfileChangeInformationSecurityService.vue'
+export default CompleteProfileChangeInformationSecurityService

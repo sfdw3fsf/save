@@ -1,0 +1,492 @@
+<b-modal
+size="xl"
+no-close-on-backdrop
+hide-footer
+hide-header
+hide-header-close
+body-class="modal-body p-0"
+@shown="onShownModal"
+@hidden="onHiddenModal"
+:id="id"
+:key="key"
+>
+<div class="modal-content popup-box">
+    <div class="popup-header">
+        <div class="title"><span class="icon one-notepad"></span> Đấu nối thiết bị</div>
+            <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide(id)">
+        </div>
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="btnTaoMoi()" :class="{'disabled': !isDisableBtnNhapMoi}">
+                    <span class="icon ui-1_circle-add nc-icon-glyph"></span> Tạo mới
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnGhiLai()" :class="{'disabled': !isDisableBtnCapNhat}">
+                    <span class="icon one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnHuy()" :class="{'disabled': !isDisableBtnHuy}">
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnXoa()" :class="{'disabled': !isDisableBtnXoa}">
+                    <span class="icon one-trash"></span> Xoá
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnDanDo()" :class="{'disabled': !isDisableBtnDanDo}">
+                    <span class="icon one-dando"></span> Dẫn độ
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnHuongDan()">
+                    <span class="icon one-book1"></span> Hướng dẫn
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="popup-body">
+        <div class="row">
+            <div class="col-sm-4 col-12">
+                <div class="box-form page">
+                    <div class="legend-title">Cổng đi</div>
+                    <div class="info-row">
+                        <div class="key w140">Trung tâm viễn thông</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                  <SelectExt v-model="modelCbo.mTTVT" 
+                                  :dataSource="dataCbo.cboTTVT"
+                                    @change="changeTTVT"
+                                   dataTextField="TEN_DV"
+                                   dataValueField="DONVI_ID"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w140">Tổ kỹ thuật</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="modelCbo.mToKT" 
+                                  :dataSource="dataCbo.cboToKT"
+                                  @change="changeToKT"
+                                   dataTextField="TEN_DV"
+                                  dataValueField="DONVI_ID"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w140">Trạm thiết bị</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                 <SelectExt v-model="modelCbo.mTramTB" 
+                                  :dataSource="dataCbo.cboTramTB"
+                                  @change="changeTramTbi"
+                                   dataTextField="TEN_DV"
+                                    dataValueField="DONVI_ID"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w140">Loại thiết bị</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="modelCbo.mLoaiTbi"
+                                 :dataSource="dataCbo.cboLoaiTbi"
+                                  dataTextField="LOAI_TBI"
+                                  dataValueField="LOAITBI_ID"
+                                  @change="changeLoaiThietBi()"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="e-tree-plus cay-sodo-tb" style="height: 315px;overflow: auto;">
+                        <ejs-treeview id='treeview' ref="treeObj" :fields='getField'                      
+                         @nodeExpanding="tree_nodeExpanding" :nodeSelected='nodeclicked'
+                         :nodeTemplate='Template'
+                         ></ejs-treeview>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8 col-12">
+                <div class="box-form">
+                    <div v-show="Visible.tlpDayNhay">
+                        <div class="legend-title">Dây nhảy</div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ký hiệu <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="select-custom" v-show="checkKyHieu" ref="refKyhieu">
+                                            <bss-error-marker :has-error="error.mKyHieu">
+                                            <SelectExt v-model="modelCbo.mKyHieu" 
+                                                :dataSource="dataCbo.cboKyHieu" 
+                                                :settings="{dropdownParent: $refs['refKyhieu']}"                             
+                                                dataTextField="KYHIEU"
+                                                dataValueField="CAPTD_ID" 
+                                                @change="changeKyHieu()"/>
+                                            </bss-error-marker>
+                                        </div>
+                                        <div class="value"  v-show="!checkKyHieu">
+                                            <input type="text" class="form-control" v-model="txtKyhieu" 
+                                            :class="{'form-control':ok, 'is-invalid':error.txtKyhieu}" ref="refKyhieu2">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Tên dây nhảy <span class="red">*</span></div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txtTenCap" 
+                                        :class="{'form-control':ok, 'is-invalid':error.txtTenCap}" ref="refTencap">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="Visible.tlpThuocTinh">
+                        <div class="legend-title mart10">Thuộc tính</div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Kiểu đấu nối <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="list-checks mart7">
+                                            <div class="item">
+                                                <div class="check-action">
+                                                    <input name="chkDayNhay" type="radio" value="0" v-model="rdgKieuDauNoi" :disabled="rdgKieuDauNoi==1">
+                                                    <span class="name">Dây nhảy đơn</span>
+                                                </div>
+                                            </div>
+                                            <div class="item">
+                                                <div class="check-action">
+                                                    <input name="chkDayNhay" type="radio" value="1"  v-model="rdgKieuDauNoi" :disabled="rdgKieuDauNoi==0">
+                                                    <span class="name">Dây nhảy đôi</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Kiểu đầu cắm <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="select-custom" ref="refKieudc">
+                                            <bss-error-marker :has-error="error.mKieuDc">
+                                            <SelectExt v-model="modelCbo.mKieuDc" 
+                                                :dataSource="dataCbo.cboKieuDC" 
+                                                :settings="{dropdownParent: $refs['refKieudc']}"                             
+                                                dataTextField="KIEU_DC"
+                                                dataValueField="KIEUDC_ID"/>
+                                            </bss-error-marker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Loại dây nhảy  <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="select-custom" ref="refLoaicap">
+                                            <bss-error-marker :has-error="error.mLoaiCap">
+                                            <SelectExt v-model="modelCbo.mLoaiCap" 
+                                                :dataSource="dataCbo.cboLoaiCap" 
+                                                :settings="{dropdownParent: $refs['refLoaicap']}"                             
+                                                dataTextField="LOAI_CAP"
+                                                dataValueField="LOAICAP_ID"/>
+                                            </bss-error-marker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Nơi sản xuất   <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="select-custom" ref="refNoisx">
+                                            <bss-error-marker :has-error="error.mNoiSX">
+                                            <SelectExt v-model="modelCbo.mNoiSX" 
+                                                :dataSource="dataCbo.cboNoiSX" 
+                                                :settings="{dropdownParent: $refs['refNoisx']}"                             
+                                                dataTextField="NOI_SX"
+                                                dataValueField="NOISX_ID"/>
+                                            </bss-error-marker>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Chiều dài  <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="input-number-custom">
+                                            <input type="number" class="form-control" value="" v-model="chieudai">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày lắp đặt   <span class="red">*</span></div>
+                                    <div class="value">
+                                        <div class="input-icon-right">
+                                            <ejs-datepicker
+                                                v-model="dtpNgayLD"
+                                                :format="'dd/MM/yyyy'"
+                                            ></ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w110">Ghi chú đấu nối</div>
+                            <div class="value">
+                                <textarea class="form-control" style="height: 60px;" v-model="txtGhiChuDN"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12" v-show="Visible.tlpSoi_1">
+                        <div class="legend-title mart10">Sợi 1 <span class="red">*</span></div>
+                        <div class="info-row">
+                            <div class="key w110">Loại thiết bị</div>
+                            <div class="value">
+                                <div class="select-custom"  ref="refloaithietbi1">
+                                    <bss-error-marker :has-error="error.mLoaiTbi1">
+                                    <SelectExt v-model="modelCbo.mLoaiTbi1" 
+                                                :dataSource="dataCbo.cboLoaiTbi1" 
+                                                :settings="{dropdownParent: $refs['refloaithietbi1']}"                             
+                                                dataTextField="LOAI_TBI"
+                                                dataValueField="LOAITBI_ID"
+                                                @change="cboLoaiTbi_1_EditValueChanged"/>
+                                    </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.thietbi1">
+                            <div class="key w110">Thiết bị</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <bss-error-marker :has-error="error.cboThietbi">
+                                    <SelectExt v-model="modelCbo.mThietbi" 
+                                                :dataSource="dataCbo.cboThietbi" 
+                                                :settings="{dropdownParent: $refs['refthietbi1']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboThietBi_1_EditValueChanged"/>
+                                            </bss-error-marker>    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.frame1">
+                            <div class="key w110">Frame</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refframe1">
+                                    <bss-error-marker :has-error="error.mFrame">
+                                    <SelectExt v-model="modelCbo.mFrame" 
+                                                :dataSource="dataCbo.cboFrame" 
+                                                :settings="{dropdownParent: $refs['refframe1']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboFrame_1_EditValueChanged"/>
+                                    </bss-error-marker>   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.shelf1">
+                            <div class="key w110">Shelf</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refshelf1">
+                                    <bss-error-marker :has-error="error.mShelf">
+                                    <SelectExt v-model="modelCbo.mShelf" 
+                                                :dataSource="dataCbo.cboShelf" 
+                                                :settings="{dropdownParent: $refs['refshelf1']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboShelf_1_EditValueChanged"/>
+                                    </bss-error-marker>   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.card1">
+                            <div class="key w110">Card</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refcard1">
+                                    <bss-error-marker :has-error="error.mCard">
+                                    <SelectExt v-model="modelCbo.mCard" 
+                                                :dataSource="dataCbo.cboCard" 
+                                                :settings="{dropdownParent: $refs['refcard1']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboCard_1_EditValueChanged"/>
+                                    </bss-error-marker>  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.module1">
+                                    <div class="key w110">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkModule" @click="EnabledChkModule1" >
+                                            <span class="name">Module</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom" ref="refmodule1">
+                                            <bss-error-marker :has-error="error.mModule">
+                                            <SelectExt v-model="modelCbo.mModule" 
+                                                :dataSource="dataCbo.cboModule" 
+                                                :settings="{dropdownParent: $refs['refmodule1']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                :disabled="!chkModule"
+                                                @change="cboModule_1_EditValueChanged"/>
+                                            </bss-error-marker>
+                                        </div>
+                                    </div>
+                                </div>
+                        <div class="info-row" v-show="hidden.port1">
+                            <div class="key w110">Cổng</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refcong1">
+                                    <bss-error-marker :has-error="error.mCong">
+                                    <SelectExt v-model="modelCbo.mCong" 
+                                                :dataSource="dataCbo.cboCong" 
+                                                :settings="{dropdownParent: $refs['refcong1']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"/>
+                                            </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12" v-show="Visible.tlpSoi_2">
+                        <div class="legend-title mart10">Sợi 2 <span class="red">(*)</span></div>
+                        <div class="info-row">
+                            <div class="key w110">Loại thiết bị</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refloaithietbi2">
+                                    <bss-error-marker :has-error="error.mLoaiTbi2">
+                                    <SelectExt v-model="modelCbo.mLoaiTbi2" 
+                                                :dataSource="dataCbo.cboLoaiTbi2" 
+                                                :settings="{dropdownParent: $refs['refloaithietbi2']}"                             
+                                                dataTextField="LOAI_TBI"
+                                                dataValueField="LOAITBI_ID"
+                                                @change="cboLoaiTbi_2_EditValueChanged"/>
+                                            </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.thietbi2">
+                            <div class="key w110">Thiết bị</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refthietbi2">
+                                    <bss-error-marker :has-error="error.mThietbi2">
+                                    <SelectExt v-model="modelCbo.mThietbi2" 
+                                                :dataSource="dataCbo.cboThietbi2" 
+                                                :settings="{dropdownParent: $refs['refthietbi2']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboThietBi_2_EditValueChanged"/>
+                                            </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.frame2">
+                            <div class="key w110">Frame</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refframe2">
+                                    <bss-error-marker :has-error="error.mFrame2">
+                                    <SelectExt v-model="modelCbo.mFrame2" 
+                                                :dataSource="dataCbo.cboFrame2" 
+                                                :settings="{dropdownParent: $refs['refframe2']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboFrame_2_EditValueChanged"/>
+                                            </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.shelf2">
+                            <div class="key w110">Shelf</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refshelf2">
+                                    <bss-error-marker :has-error="error.mShelf2">
+                                    <SelectExt v-model="modelCbo.mShelf2" 
+                                                :dataSource="dataCbo.cboShelf2" 
+                                                :settings="{dropdownParent: $refs['refshelf2']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboShelf_2_EditValueChanged"/>
+                                            </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.card2">
+                            <div class="key w110">Card</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refcard2">
+                                    <bss-error-marker :has-error="error.mCard2">
+                                    <SelectExt v-model="modelCbo.mCard2" 
+                                                :dataSource="dataCbo.cboCard2" 
+                                                :settings="{dropdownParent: $refs['refcard2']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                @change="cboCard_2_EditValueChanged"/>
+                                            </bss-error-marker>     
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row" v-show="hidden.module2">
+                                    <div class="key w110">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkModule2"  @click="EnabledChkModule2">
+                                            <span class="name">Module</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom" ref="refmodule2">
+                                            <bss-error-marker :has-error="error.mModule2">
+                                            <SelectExt v-model="modelCbo.mModule2" 
+                                                :dataSource="dataCbo.cboModule2" 
+                                                :settings="{dropdownParent: $refs['refmodule2']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"
+                                                :disabled="!chkModule2"
+                                                @change="cboModule_2_EditValueChanged"/>
+                                            </bss-error-marker>     
+                                        </div>
+                                    </div>
+                                </div>
+                        <div class="info-row" v-show="hidden.port2">
+                            <div class="key w110">Cổng</div>
+                            <div class="value">
+                                <div class="select-custom" ref="refcong2">
+                                    <bss-error-marker :has-error="error.mCong2">
+                                    <SelectExt v-model="modelCbo.mCong2" 
+                                                :dataSource="dataCbo.cboCong2" 
+                                                :settings="{dropdownParent: $refs['refcong2']}"                             
+                                                dataTextField="NAME"
+                                                dataValueField="ID"/>
+                                            </bss-error-marker>     
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<DanDoModal modalId='popupDanDo' :data1="data1"/>
+</b-modal>

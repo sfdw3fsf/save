@@ -1,0 +1,592 @@
+<div id="SearchInstallDetail">
+  <div class="breadcrumb-top">
+    <div class="main-title">tra cứu chi tiết điều hành thi công</div>
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ </a>
+      </li>
+      <li class="breadcrumb-item"><a href="#">Lập hợp đồng</a></li>
+      <li class="breadcrumb-item active">Lắp đặt mới</li>
+    </ul>
+  </div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-if="check_popup" >
+        <a href="#" @click.prevent="closeForm"> <span class="icon one-file-plus"></span>Chấp nhận </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="nhap_moi"> <span class="icon one-file-plus"></span>Nhập mới </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="timkiem"> <span class="icon one-search"></span>Tìm kiếm </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="ThongTinEmail_OnClick"> <span class="icon one-email"></span>Email </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="ThongTinLienHe_OnClick"> <span class="icon nc-icon-glyph business_contacts"></span>Liên hệ </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="tsbtnHen_Click"> <span class="icon one-henld"></span>Hẹn LĐ </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="tsbtnChiTietPort_Click"> <span class="icon one-usb-port"></span>Port </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="tsbtnVatTu_Click"> <span class="icon one-vt"></span>Vật tư </a>
+      </li>
+      <!-- <li>
+        <a href="#" @click.prevent="tsbtnXemThanhToan_Click"> <span class="icon one-vt"></span>Xem thanh toán</a>
+      </li> -->
+      <li id="btnXuatPhieu" @click="btnXuatPhieuClick" ref="btnXuatPhieu">
+        <a href="#"> <span class="icon one-file-download"></span>Xuất phiếu </a>
+        <ejs-contextmenu id="cmenuXuatPhieu" target="#btnXuatPhieu" :items="btnXuatPhieuMenus" :select="onBtnXuatPhieuSelect"></ejs-contextmenu>
+      </li>
+      <li class="drop">
+        <a >
+            <span class="icon one-print"></span>In biên bản
+            <span class="arrow fa fa-angle-down"></span>
+        </a>
+        <ul :class="['dropdown1', isShowInBB ? 'show' : '']" style="color: #0176FF;">
+            <li @click="inBBTWifiToolStripMenuItem_Click">
+                <a>
+                    <span class="dropdown-icon one-print"></span> In BB nghiệm thu wifi
+                </a>
+            </li>
+            <li
+                @click="inBBToolStripMenuItem_Click()">
+                <a>
+                    <span class="dropdown-icon one-print"></span> In BB bàn giao
+                </a>
+            </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" @click.prevent="tsbtnXemTSKT_Click"> <span class="icon one-vt"></span>Xem TSKT</a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="show_diachild" v-b-modal.pop_diachild> <span class="icon nc-icon-glyph location_position-pin"></span>Địa chỉ LĐ </a>
+        <pop_dsbd :list_bd="listbox.ds_bd" @get_dsbd="search_get_dsbd"></pop_dsbd>
+        <pop_diachild :hdtb_id="phieu_yc.hdtb_id" :ma_tb="phieu_yc.acc_moi" :loai_hd="phieu_yc.loai_hd" :ma_gd="phieu_yc.ma_gd" :dichvuvt_id="listbox.dichvu_vt.value" :diachi="diachi_ld" />
+      </li>
+      <li>
+        <a href="#" @click.prevent="show_goidv" v-b-modal.pop_goidv> <span class="icon one-multi"></span>Gói đa dịch vụ </a>
+        <pop_goidv :list_dv="listbox.ds_goidv" />
+      </li>
+      <li>
+        <a href="#" @click.prevent="show_phieuton" v-b-modal.pop_phieuton> <span class="icon one-calendar-number"></span>Tồn phiếu </a>
+        <pop_phieuton :list_phieuton="listbox.ds_phieuton" />
+      </li>
+      <li>
+        <a href="#" @click.prevent="chiTietHDPLDialogOnClick"> <span class="dropdown-icon one-file-detail1"></span> Chi tiết HD/PL </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="tsbtnToaNha_Click"> <span class="dropdown-icon one-building"></span> Tòa nhà </a>
+      </li>
+      <li>
+        <a href="#"> <span class="dropdown-icon one-eye"></span> Xem HĐĐT </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="IT360Information_OnClick"> <span class="dropdown-icon one-building"></span> Thông tin IT360 </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="show_DSTienTrinh"> <span class="dropdown-icon one-building"></span> Tiến trình </a>
+      </li>
+      <li v-show="$root.token.getPhanVungID() == 98">
+        <a href="#" @click.prevent="xemTTTT_BS"> <span class="dropdown-icon one-building"></span> Xem TTTT BS </a>
+      </li>
+      
+    </ul>
+    <!-- <div class="more dropdown">
+      <a href="#" data-toggle="dropdown">
+        <span class="icon -ap  icon-dots-three-vertical"></span>
+      </a>
+      <div class="dropdown-menu">
+        <a href="#" @click.prevent="show_cthd" v-b-modal.pop_chitiethopdong> <span class="dropdown-icon one-file-detail1"></span> Chi tiết HD/PL </a>
+        <pop_chitiethopdong :cthd="chitiethopdong" />
+        <a href="#" @click.prevent="tsbtnToaNha_Click"> <span class="dropdown-icon one-building"></span> Tòa nhà </a>
+        <pop_toanha  :magd="phieu_yc.ma_gd" :sotb="phieu_yc.acc_moi" :tentb="phieu_yc.ten_kh"/>
+        <a href="#"> <span class="dropdown-icon one-eye"></span> Xem HĐĐT </a>
+      </div>
+    </div> -->
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <!-- <div class="row">
+                <div class="col-sm-6 col-12">
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w90">Cộng tác viên</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="phieu_yc.ctv">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row marb0">
+                        <div class="key w90">NV tiếp thị</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="phieu_yc.nv_tiepthi">
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+      <div class="row">
+        <div class="col-sm-3 col-12"></div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row marb0">
+            <div class="key w30 nowrap fw6">
+              Mã dự án
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="phieu_yc.ma_duan" />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row marb0">
+            <div class="key w90">Cộng tác viên</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="phieu_yc.ctv" />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row marb0">
+            <div class="key w90">NV tiếp thị</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="phieu_yc.nv_tiepthi" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Thông tin phiếu yêu cầu</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Dịch vụ</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <!-- <select class="form-control"  v-model="listbox.dichvu_vt.value">
+                                            <option v-for="tk in listbox.dichvu_vt.list" v-bind:value="tk.DICHVUVT_ID   ">{{ tk.TEN_DVVT }}</option>
+                                        </select> -->
+                    <select2 :options="listbox.dichvu_vt.list" v-model="listbox.dichvu_vt.value" :disabled="true">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Mã GD</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click.prevent="showPopupSearchContract">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" :donvi_id="0" :nhanvien_id="0" :donvi_dl_id="donvi_dl_id" />
+                    <input type="text" class="form-control highlight" v-model="phieu_yc.ma_gd" v-on:keyup.enter="timkiem" />
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Loại HĐ/PL</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.loai_hd" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Hướng KN mới</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.huong_kn_moi" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Hướng KN cũ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.huong_kn_cu" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Tốc độ CIR</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <!-- <select class="form-control"  v-model="listbox.kenh_cir.value">
+                                            <option v-for="tk in listbox.kenh_cir.list" v-bind:value="tk.TOCDO_ID">{{ tk.TOCDO + ' '+ tk.DONVI }}</option>
+                                        </select> -->
+                    <select2 :options="listbox.kenh_cir.list" v-model="listbox.kenh_cir.value" :disabled="true">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">
+                  <!-- <div class="check-action">
+                                        <input type="checkbox" class="check" v-on:change="cbo_kenh_checked(1)">
+                                        <span class="name">Tốc độ NIX</span>
+                                    </div> -->
+                  Tốc độ NIX
+                </div>
+                <div class="value">
+                  <div class="select-custom">
+                    <!-- <select class="form-control" :disabled="!listbox.kenh_nix.isEnabled" v-model="listbox.kenh_nix.value">
+                                            <option v-for="tk in listbox.kenh_nix.list" v-bind:value="tk.TOCDO_ID">{{ tk.TOCDO + ' '+ tk.DONVI }}</option>
+                                        </select> -->
+                    <select2 :options="listbox.kenh_nix.list" v-model="listbox.kenh_nix.value" :disabled="!listbox.kenh_nix.isEnabled">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">Ngày YC</div>
+                <div class="value">
+                  <!-- <input type="text" class="form-control" v-model="phieu_yc.ngay_yc"> -->
+                  <div class="input-icon-right">
+                    <!-- <flat-pickr class="form-control" :config="dateconfig" v-model="phieu_yc.ngay_yc" :disabled="true" /> -->
+                    <!-- <span class="icon one-calendar"></span> -->
+                    <KDatePicker format="DD/MM/YYYY HH:mm:ss" v-model="phieu_yc.ngay_yc" :disabled="true"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key">Ngày lập HĐ</div>
+                <div class="value">
+                  <!-- <input type="text" class="form-control" v-model="phieu_yc.ngay_lap_hd"> -->
+                  <div class="input-icon-right">
+                    <!-- <flat-pickr class="form-control" :config="dateconfig" v-model="phieu_yc.ngay_lap_hd" :disabled="true" /> -->
+                    <!-- <span class="icon one-calendar"></span> -->
+                    <KDatePicker format="DD/MM/YYYY HH:mm:ss" v-model="phieu_yc.ngay_lap_hd" :disabled="true"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key">Kiểu LĐ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.kieu_ld" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key">Số máy/Acc mới</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.acc_moi" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key">Số máy/Acc cũ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.acc_cu" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key">
+                  <!-- <div class="check-action">
+                                        <input type="checkbox" class="check" v-on:change="cbo_kenh_checked(2)">
+                                        <span class="name">Tốc độ PIR</span>
+                                    </div> -->
+                  Tốc độ PIR
+                </div>
+                <div class="value">
+                  <div class="select-custom">
+                    <!-- <select class="form-control" :disabled="!listbox.kenh_pir.isEnabled"  v-model="listbox.kenh_pir.value">
+                                            <option v-for="tk in listbox.kenh_pir.list" v-bind:value="tk.TOCDO_ID">{{ tk.TOCDO + ' '+ tk.DONVI }}</option>
+                                        </select> -->
+                    <select2 :options="listbox.kenh_pir.list" v-model="listbox.kenh_pir.value" :disabled="!listbox.kenh_pir.isEnabled">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key">
+                  <!-- <div class="check-action">
+                                        <input type="checkbox" class="check" v-on:change="cbo_kenh_checked(3)">
+                                        <span class="name">Tốc độ ISP</span>
+                                    </div> -->
+                  Tốc độ ISP
+                </div>
+                <div class="value">
+                  <div class="select-custom">
+                    <!-- <select class="form-control" :disabled="!listbox.kenh_isp.isEnabled"  v-model="listbox.kenh_isp.value">
+                                            <option v-for="tk in listbox.kenh_isp.list" v-bind:value="tk.TOCDO_ID">{{ tk.TOCDO + ' '+ tk.DONVI }}</option>
+                                        </select> -->
+                    <select2 :options="listbox.kenh_isp.list" v-model="listbox.kenh_isp.value" :disabled="!listbox.kenh_isp.isEnabled">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key w90">Tên KH</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.ten_kh" :disabled="true" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w90">ĐT liên hệ</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.dt_lien_he" :disabled="true" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key w90">Địa chỉ KH</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.diachi_kh" :disabled="true" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w90">Ứng dụng NT</div>
+                <div class="value">
+                  <input type="text" class="form-control" :disabled="true" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key w90">Người giao</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="phieu_yc.nguoi_giao" :disabled="true" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w90">Ngày YCHT</div>
+                <div class="value">
+                  <!-- <input type="text" class="form-control" v-model="phieu_yc.ngay_ycht"> -->
+                  <div class="input-icon-right">
+                    <KDatePicker format="DD/MM/YYYY HH:mm:ss" v-model="phieu_yc.ngay_ycht" :disabled="true"/>      
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nơi nhận</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="phieu_yc.noi_nhan" :disabled="true" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Người lập HĐ</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="phieu_yc.nguoi_lap_hd" :disabled="true" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Ghi chú</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="phieu_yc.ghi_chu" :disabled="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách thuê bao</div>
+      <div class="pull-right">
+        <div class="list-checks red">
+          <div class="item vcenter">
+            <div class="check-action">
+              <input type="checkbox" class="check" v-model="phieu_yc.nha_cck" />
+              <span class="name">Từ NCC khác chuyển sang</span>
+            </div>
+          </div>
+          <div class="item vcenter"></div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      <!-- <gridview :datalist="listbox.ds_thuebao.list" :headers="listbox.ds_thuebao.header"
+            flcol="false" v-bind:checkheader="false" lastcoltemplate="0" @recordChange="grdThuebaoChanged" ></gridview> -->
+      <DataGrid v-bind:columns="listbox.ds_thuebao.header" v-bind:dataSource="listbox.ds_thuebao.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" @selectedItemsChanged="grdThuebaoChanged" @rowDoubleClicked="onDanhSachThueBaoGridDoubleClicked" @rowSelected="gridDSTB_rowSelected" />
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Chi tiết điều hành thi công</div>
+      <div class="pull-right red">
+        Click đúp phiếu để xem chi tiết nhân viên thực hiện
+      </div>
+      <div class="clearfix"></div>
+      <!-- <gridview :datalist="listbox.ds_chitiet.list" :headers="listbox.ds_chitiet.header"
+            flcol="false" v-bind:checkheader="false" lastcoltemplate="0" @recordChange="grdChitietChanged" ></gridview> -->
+      <DataGrid
+        v-show="listbox.ds_chitiet.list.length > 0"
+        v-bind:columns="listbox.ds_chitiet.header"
+        v-bind:dataSource="ds_chitiet_list"
+        :contextMenuItems="listbox.ds_chitiet.contextMenuItems"
+        @contextMenuClick="cMenuDsChiTietClick"
+        :enable-paging-server="false"
+        :allowPaging="true"
+        :showFilter="true"
+        :allowGrouping="true"
+        @selectedItemsChanged="grdChitietChanged"
+        @rowDoubleClicked="DblClickTree"
+        
+      >
+      </DataGrid>
+      <DataGrid v-show="listbox.ds_chitiet.list.length == 0" v-bind:columns="listbox.ds_chitiet.headerNoData" v-bind:dataSource="[]"> </DataGrid>
+    </div>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" allowDragging="true" :animationSettings="animationSettings" :visible="false" ref="thongtinemail" :header='"Thông tin Email"' showCloseIcon="true" target=".main-wrapper" width="60%" @close="ThongTinEmail_OnClose">
+      <div>
+        <ThongTinEmail v-if="thongTinEmailDialog" mode="view" :hdkh_id="phieu_yc.hdkh_id" :khachhang_id="phieu_yc.khachhang_id" />
+      </div>
+    </ejs-dialog>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" :visible="false" ref="thongtinlienhe" :header='"Thông tin liên hệ"' showCloseIcon="true" target=".main-wrapper" width="60%" @close="ThongTinLienHe_OnClose" allowDragging="true" :animationSettings="animationSettings">
+      <div>
+        <ThongTinLienHe v-if="thongTinLienHeDialog" mode="view" :hdkh_id="phieu_yc.hdkh_id" :khachhang_id="phieu_yc.khachhang_id" />
+      </div>
+    </ejs-dialog>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" allowDragging="true" :animationSettings="animationSettings" :visible="false" ref="TraCuuPortHDTB" :header='"Thông tin port của thuê bao"' showCloseIcon="true" target=".main-wrapper" width="60%">
+      <TraCuuPortHDTB :input_data="listbox.DsPort" />
+    </ejs-dialog>
+    <ThongTinHenKhachHangModal ref="thongTinHenKhachHangModal" :hdkh_id="phieu_yc.hdkh_id" quyenduoc_hen="1"/>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" allowDragging="true" :animationSettings="animationSettings" :visible="false" ref="popupVatTuThueBao" :header='"Cấp vật tư/Thiết bị cho thuê bao"' showCloseIcon="true" target=".main-wrapper" width="60%">
+      <VatTuThueBao :input-data="modelVatTu" />
+    </ejs-dialog>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" allowDragging="true" :animationSettings="animationSettings" :visible="false" ref="popupVatTuHDTB" :header='"Thông tin cấp vật tư cho thuê bao"' showCloseIcon="true" target=".main-wrapper" width="60%">
+      <VatTuHDTB :hdtb_id="phieu_yc.hdtb_id" :baohong_id="0" />
+    </ejs-dialog>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" allowDragging="true" :animationSettings="animationSettings" :visible="false" ref="TraCuuNhanVienTH" :header='"Danh sách nhân viên thực hiện"' showCloseIcon="true" target=".main-wrapper" width="60%">
+      <TraCuuNhanVienTH :input_data="listbox.ds_nhanvienTH" />
+    </ejs-dialog>
+    <ejs-dialog
+      :isModal="true"
+      :enableResize="true"
+      :resizeHandles="['All']"
+      :visible="false"
+      ref="Thuebao_ToaNha"
+      :header='"Tra cứu thông tin tòa nhà"'
+      showCloseIcon="true"
+      target=".main-wrapper"
+      width="60%"
+      allowDragging="true"
+      :animationSettings="animationSettings"
+      @close="ThuebaoToaNha_OnClose"
+    >
+      <Thuebao_ToaNha v-if="thuebaoToaNhaDialog" :ma_gd="phieu_yc.ma_gd" :hdtb_id="phieu_yc.hdtb_id" />
+    </ejs-dialog>
+    <InBienBan ref="InBienBan" :params="popupInBienBanParams" />
+    <ejs-dialog
+      :isModal="true"
+      :enableResize="true"
+      :resizeHandles="['All']"
+      :visible="false"
+      ref="IT360Information"
+      :header='"Tra cứu thông tin JIRA"'
+      showCloseIcon="true"
+      target=".main-wrapper"
+      width="60%"
+      allowDragging="true"
+      :animationSettings="animationSettings"
+      @close="IT360Information_OnClose"
+    >
+      <div>
+        <IT360Information v-if="IT360InformationDialog" />
+      </div>
+    </ejs-dialog>
+    <ejs-dialog
+      :isModal="true"
+      :enableResize="true"
+      :resizeHandles="['All']"
+      :visible="false"
+      ref="DsdkDvGiaTang"
+      :header='"Danh sách đăng ký dịch vụ gia tăng"'
+      showCloseIcon="true"
+      target=".main-wrapper"
+      width="60%"
+      allowDragging="true"
+      :animationSettings="animationSettings"
+      @close="DsdkDvGiaTang_OnClose"
+    >
+      <div>
+        <DsdkDvGiaTang v-if="DsdkDvGiaTangDialog" :hdtb_id="phieu_yc.hdtb_id" />
+      </div>
+    </ejs-dialog>
+    <ejs-dialog
+      :isModal="true"
+      :enableResize="true"
+      :resizeHandles="['All']"
+      :visible="false"
+      ref="chiTietHDPLDialog"
+      :header='"Chi tiết hợp đồng phụ lục"'
+      showCloseIcon="true"
+      target=".main-wrapper"
+      width="60%"
+      allowDragging="true"
+      :animationSettings="chiTietHDPLDialog.animationSettings"
+      @close="chiTietHDPLDialogOnClose"
+    >
+      <div>
+        <ViewChiTietHDPL v-if="chiTietHDPLDialog.visible" v-bind="chiTietHDPLDialog.input"/>
+      </div>
+    </ejs-dialog>
+    <ejs-dialog
+      :isModal="true"
+      :enableResize="true"
+      :resizeHandles="['All']"
+      :visible="false"
+      ref="dlg_DanhSachTienTrinh"
+      :header='"Danh sách tiến trình"'
+      showCloseIcon="true"
+      target=".main-wrapper"
+      width="60%"
+      allowDragging="true"
+      :animationSettings="animationSettings"
+      @close='close_DSTienTrinh'
+    >
+      <div>
+        <popdstientrinh v-if="show_popdstientrinh" :hdtb_id="phieu_yc.hdtb_id"/>
+      </div>
+    </ejs-dialog>
+    <frmThongTinTT ref="frmThongTinTT"/>
+      <!-- <pop_chitiethopdong :cthd="chitiethopdong" /> -->
+  </div>
+  <footer class="footer">
+    VNPT-IT &copy; 2021
+  </footer>
+  <ejs-dialog
+      ref="ejsDialog"
+      :visible="false"
+      :isModal="true"
+      target="#SearchInstallDetail"
+      :enableResize="ejsDialog.config.enableResize"
+      :resizeHandles="['All']"
+      :header="ejsDialog.header"
+      showCloseIcon="true"
+      :width="ejsDialog.config.width"
+      :height="ejsDialog.config.height"
+      :minHeight="ejsDialog.config.minHeight"
+      :allowDragging="ejsDialog.config.allowDragging"
+      :position="ejsDialog.config.position"
+      :animationSettings="ejsDialog.config.animationSettings"
+      @beforeOpen="ejsDialogBeforeOpen"
+      @beforeClose="ejsDialogBeforeClose"
+    >
+      <div v-if="ejsDialog.name" :key="uuidv4()" style="overflow-y: scroll;">
+        <frmXemTSKT v-if="ejsDialog.name == 'frmXemTSKT'" ref="frmXemTSKT" v-bind="frmXemTSKT.input" />
+        <!-- <frmXemTSKT v-if="ejsDialog.name == 'frmThongTinTT'" ref="frmThongTinTT" v-bind="frmThongTinTT.input" /> -->
+      </div>
+    </ejs-dialog>
+</div>

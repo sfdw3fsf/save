@@ -1,0 +1,495 @@
+<div>
+  <div class="list-actions-top">
+      <ul class="list">
+          <li>
+              <a href="#" v-on:click.prevent="onClickDanhSach">
+                  <span class="icon nc-icon-glyph design_bullet-list-67"></span> Danh sách
+              </a>
+          </li>
+          <li v-bind:style="[currentTab == 3 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" v-on:click.prevent="onClickHuyTraTronBo">
+                  <span class="icon one-file-money"></span> Hủy trả trọn bộ
+              </a>
+          </li>
+          <li v-bind:style="[currentTab == 1 || currentTab == 7 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" @click.prevent="onClickNhapExcel" title="Nhập Excel - File Excel nhập vào phải đúng định dạng! \r\n- Chỉ có 3 trường theo thứ tự : MA_TT, LYDO_ID, GHICHU">
+                  <span class="icon one-xlsx"></span> Nhập Excel
+              </a>
+              <input type="file" @change="onChangeFile" ref="fileInput" accept=".xlsx, .xls" id="upload"
+                  style="display: none" />
+          </li>
+          <li
+              v-bind:style="[currentTab == 1 || currentTab == 4  || currentTab == 7 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" v-on:click.prevent="onClickTraGiayBao">
+                  <span class="icon one-file-back1"></span> Trả giấy báo
+              </a>
+          </li>
+          <li v-bind:style="[currentTab == 1 || currentTab == 4 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" v-on:click.prevent="onClickTraHoaDon">
+                  <span class="icon one-file-money"></span> Trả hóa đơn
+              </a>
+          </li>
+          <li v-bind:style="[currentTab == 2 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" v-on:click.prevent="onClickHuyTraHoaDon">
+                  <span class="icon one-file-money"></span> Hủy trả hóa đơn
+              </a>
+          </li>
+          <li v-bind:style="[currentTab == 1 || currentTab == 4 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" v-on:click.prevent="onClickTraTronBo">
+                  <span class="icon one-wallet"></span> Trả trọn bộ
+              </a>
+          </li>
+          <li v-bind:style="[currentTab != 6 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" v-on:click.prevent="onClickCapNhat" title="Cập nhật ngày nhận giấy báo, ngày hẹn trả, lý do">
+                  <span class="icon one-reload1"></span> Cập nhật
+              </a>
+          </li>
+          <li v-bind:style="[currentTab != 1 && currentTab != 6 ? {display: 'inline-block'} : {display: 'none'}]">
+              <a href="#" @click.prevent="onClickNhapExcel"  title="Cấu trúc file gồm MA_TT, NVQL_XL">
+                  <span class="icon one-book"></span>Đọc file
+              </a>
+          </li>
+          <li>
+              <a href="#" v-on:click.prevent="onClickExport">
+                  <span class="icon one-xlsx-import"></span> Xuất Excel
+              </a>
+          </li>
+          <li>
+              <a href="#"  v-on:click.prevent="conClickNhatKy">
+                  <span class="icon one-remider"></span> Nhật ký
+              </a>
+          </li>
+      </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form padt8 padb8">
+      <div class="pull-right w120">
+        <app-ky-cuoc @chukycuocChange="chukycuocChangeHandler"></app-ky-cuoc>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title"><span class="icon fa" :class="showSearch ? 'fa-angle-down' : 'fa-angle-up'" @click="onToggleSearchForm"></span> Thông tin tìm kiếm</div>
+      <div class="search-content" v-show="showSearch">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w120">Nhân viên QLDB</div>
+              <div class="value">
+                <ejs-multiselect
+                  :dataSource='dsNVTC'
+                  :fields='configs.nvtc.fields'
+                  v-model="dsNVTCId"
+                  :mode="configs.nvtc.mode"
+                  :showSelectAll="configs.nvtc.showSelectAll"
+                  :showDropDownIcon="configs.nvtc.showDropDownIcon"
+                  :filterBarPlaceholder="configs.nvtc.filterBarPlaceholder"
+                  :allowFiltering="configs.nvtc.allowFiltering"
+                  :filtering="onNVTCFiltering"
+                  @change="onNVTCChange"
+                ></ejs-multiselect>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w120">Lượt giao</div>
+                  <div class="value">
+                      <div class="vattu_box">
+                          <div class="input-group">
+                              <div class="li input-text">
+                                  <div class="select-custom">
+                                      <input ref="luotGiao" readonly v-model="searchForm.idLuotGiao"
+                                          class="form-control bg-none" @click="onChangeLuotGiao">
+                                      </input>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="vattu_table" :class="{ displayNone: showTable }">
+                              <DataGrid
+                                  v-bind:columns="[
+                                    {fieldName: 'TEN_NV', headerText: 'NVTC', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SOLUONG_GBC', headerText: 'Giấy báo', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number'},
+                                    {fieldName: 'SOLUONG_HD', headerText: 'HĐ giao', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number'},
+                                    {fieldName: 'TONGTIEN_HD', headerText: 'Tiền HĐ giao', allowFiltering: true, allowSorting: false, format: 'N0', type: 'number'}]"
+                                  v-bind:dataSource="dsLuotGiao" :showFilter="true" :showColumnCheckbox="true"
+                                  dataKeyField="GIAOPHIEU_ID" :defaultColumnCheckboxChecked="false"
+                                  @selectedItemsChanged="onSelectRowCheckbox" ref="table">
+                              </DataGrid>
+                              <div class="p-2">
+                                  <button type="button" @click="onChangeLuotGiao" class="btn btn-secondary btn-sm"
+                                      aria-label="Close">
+                                      <span aria-hidden="true">×</span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại phiếu</div>
+                  <div class="value">
+                      <div class="select-custom">
+                          <select name="" id="" v-model="searchForm.idLoaiPhieu" @change="onChangeLoaiPhieu"
+                              class="form-control">
+                              <option v-for="dv in dsLoaiPhieu" v-bind:value="dv.LOAIPHIEU_ID">{{dv.LOAIPHIEU}}
+                              </option>
+                          </select>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w150">
+                  <div class="check-action">
+                      <input type="checkbox" class="check" v-model="searchForm.ckbNgayNhanGiayBao">
+                      <span class="name">Ngày nhận giấy báo</span>
+                  </div>
+              </div>
+              <div class="value">
+                  <div class="input-icon-right">
+                      <ejs-datepicker :enabled="searchForm.ckbNgayNhanGiayBao"
+                          class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark"
+                          :format="dateFormat" :showClearButton="false" v-model="searchForm.ngayNhanGiayBao">
+                      </ejs-datepicker>
+                  </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w150">
+                  <div class="check-action">
+                      <input type="checkbox" class="check" v-model="searchForm.ckbNgayHenTra">
+                      <span class="name">Ngày hẹn trả</span>
+                  </div>
+              </div>
+              <div class="value">
+                  <div class="input-icon-right">
+                      <ejs-datepicker :enabled="searchForm.ckbNgayHenTra"
+                          class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark"
+                          :format="dateFormat" :showClearButton="false" v-model="searchForm.ngayHenTra">
+                      </ejs-datepicker>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w150 check-action">
+                <input name="p_loai_tt" type="radio" value="0" class="check" v-model="searchForm.p_loai_chuyen">
+                <span class="name">Chưa chuyển</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="list-checks inline">
+                <div class="item">
+                    <div class="key check-action" style="width:200px!important">
+                        <input name="p_loai_tt" type="radio" value="1" class="check" v-model="searchForm.p_loai_chuyen">
+                        <span class="name">Đồng ý chuyển TTVT</span>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="key w150 check-action">
+                        <input name="p_loai_tt" type="radio" value="2" class="check"  v-model="searchForm.p_loai_chuyen">
+                        <span class="name">Đề nghị chêm</span>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+        <div class="nav tab-over tabs">
+            <a href="#tab1" @click="switchTab(1)" class="active" data-toggle="tab">Thuê bao đặt cọc</a>
+            <a href="#tab2" @click="switchTab(2)" data-toggle="tab">Trả hóa đơn</a>
+            <a href="#tab3" @click="switchTab(3)" data-toggle="tab">Trả trọn bộ</a>
+            <a href="#tab4" @click="switchTab(4)" data-toggle="tab">Phiếu hẹn</a>
+            <a href="#tab5" @click="switchTab(5)" data-toggle="tab">Trả giấy báo</a>
+            <a href="#tab6" @click="switchTab(6)" data-toggle="tab">Các phiếu thu được</a>
+            <a href="#tab7" @click="switchTab(7)" data-toggle="tab">Khách hàng còn nợ</a>
+            <a href="#tab8" @click="switchTab(8)" data-toggle="tab">Khách hàng đã TT</a>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+                <div class="table-content">
+                    <DataGrid3
+                      :columns="GRID_COLUMS[1]" v-bind:dataSource="tabData[1]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                        {field: 'TIENNO_QL', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoQLAgg},
+                        ]"
+                      ref="grid1"
+                      :showFilter="true" dataKeyField="MA_TT"
+                      :selectedRow="indexFocus" :showColumnCheckbox="true"
+                      :enablePagingServer="false"
+                      :allowPaging="true"
+                      :selectionSettings="configs.selectionSettings"
+                      :totalRecords="tabPageInfo[1].totalElement"
+                      :pageIndex="tabPageInfo[1].pageIndex"
+                      :pageSize="tabPageInfo[1].pageSize"
+                      :key="tabKey[1]"
+                      @selectedItemsChanged="checkedGrid01"
+                      @selectedRowChanged="onSelectRowGrid"
+                      @rowSelected="onRowSelected"
+                      @rowDeselected="onRowDeselected"
+                      :panelDataHeight='"400"'
+                      >
+                    </DataGrid3>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab2">
+                <div class="table-content">
+                    <DataGrid :columns="GRID_COLUMS[2]" v-bind:dataSource="tabData[2]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                        {field: 'TIENNO_QL', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoQLAgg},
+                        ]"
+                      ref="grid2"
+                      :showFilter="true" dataKeyField="MA_TT"
+                      :selectedRow="indexFocus" :showColumnCheckbox="true"
+                      :enablePagingServer="false"
+                      :allowPaging="true"
+                      :selectionSettings="configs.selectionSettings"
+                      :totalRecords="tabPageInfo[2].totalElement"
+                      :pageIndex="tabPageInfo[2].pageIndex"
+                      :pageSize="tabPageInfo[2].pageSize"
+                      @selectedItemsChanged="checkedGrid01"
+                      @selectedRowChanged="onSelectRowGrid" 
+                      @rowSelected="onRowSelected"
+                      @rowDeselected="onRowDeselected"
+                      :panelDataHeight='"400"'
+                      >
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="tab-pane " id="tab3">
+                <div class="table-content">
+                    <DataGrid :columns="GRID_COLUMS[3]" v-bind:dataSource="tabData[3]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                        {field: 'TIENNO_QL', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoQLAgg},
+                        ]"
+                      ref="grid3"
+                      :showFilter="true" dataKeyField="MA_TT"
+                      :selectedRow="indexFocus" :showColumnCheckbox="true"
+                      :enablePagingServer="false"
+                      :allowPaging="true"
+                      :selectionSettings="configs.selectionSettings"
+                      :totalRecords="tabPageInfo[3].totalElement"
+                      :pageIndex="tabPageInfo[3].pageIndex"
+                      :pageSize="tabPageInfo[3].pageSize"
+                      @selectedItemsChanged="checkedGrid01"
+                      @selectedRowChanged="onSelectRowGrid"
+                      @rowSelected="onRowSelected"
+                      @rowDeselected="onRowDeselected"
+                      :panelDataHeight='"400"'
+                      >
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab4">
+                <div class="table-content">
+                    <DataGrid :columns="GRID_COLUMS[4]" v-bind:dataSource="tabData[4]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                        {field: 'TIENNO_QL', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoQLAgg},
+                        ]"
+                      ref="grid4"
+                      :showFilter="true" dataKeyField="MA_TT"
+                      :selectedRow="indexFocus" :showColumnCheckbox="true"
+                      :enablePagingServer="false"
+                      :allowPaging="true"
+                      :selectionSettings="configs.selectionSettings"
+                      :totalRecords="tabPageInfo[4].totalElement"
+                      :pageIndex="tabPageInfo[4].pageIndex"
+                      :pageSize="tabPageInfo[4].pageSize"
+                      @selectedItemsChanged="checkedGrid01"
+                      @selectedRowChanged="onSelectRowGrid"
+                      @rowSelected="onRowSelected"
+                      @rowDeselected="onRowDeselected"
+                      :panelDataHeight='"400"'
+                      >
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab5">
+                <div class="table-content">
+                    <DataGrid :columns="GRID_COLUMS[5]" v-bind:dataSource="tabData[5]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                        {field: 'TIENNO_QL', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoQLAgg},
+                        ]"
+                      ref="grid5"
+                      :showFilter="true" dataKeyField="MA_TT"
+                        :selectedRow="indexFocus" :showColumnCheckbox="true"
+                        :enablePagingServer="false"
+                        :allowPaging="true"
+                        :selectionSettings="configs.selectionSettings"
+                        :totalRecords="tabPageInfo[5].totalElement"
+                        :pageIndex="tabPageInfo[5].pageIndex"
+                        :pageSize="tabPageInfo[5].pageSize"
+                        @selectedItemsChanged="checkedGrid01"
+                        @selectedRowChanged="onSelectRowGrid"
+                        @rowSelected="onRowSelected"
+                        @rowDeselected="onRowDeselected"
+                        :panelDataHeight='"400"'
+                        >
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab6">
+                <div class="table-content">
+                    <DataGrid :columns="GRID_COLUMS[6]" v-bind:dataSource="tabData[6]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIENTRA', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        ]"
+                      ref="grid6"
+                      :showFilter="true" dataKeyField="MA_TT"
+                        :selectedRow="indexFocus" :showColumnCheckbox="true"
+                        :enablePagingServer="false"
+                        :allowPaging="true"
+                        :selectionSettings="configs.selectionSettings"
+                        :totalRecords="tabPageInfo[6].totalElement"
+                        :pageIndex="tabPageInfo[6].pageIndex"
+                        :pageSize="tabPageInfo[6].pageSize"
+                        @selectedItemsChanged="checkedGrid01"
+                        @selectedRowChanged="onSelectRowGrid"
+                        @rowSelected="onRowSelected"
+                        @rowDeselected="onRowDeselected"
+                        :panelDataHeight='"400"'
+                        >
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab7">
+                <div class="table-content">
+                    <DataGrid :columns="GRID_COLUMS[7]" v-bind:dataSource="tabData[7]"
+                      v-bind:aggregates="[
+                        {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                        {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                        {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                        {field: 'NO_PS', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPSAgg},
+                        {field: 'NO_PS_2', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPS2Agg},
+                        {field: 'NO_PS_3', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPS3Agg},
+                        {field: 'NO_PS_4', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPS4Agg},
+                        {field: 'NO_DK', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoDKAgg},
+                        ]"
+                      ref="grid7"
+                      :showFilter="true" dataKeyField="MA_TT"
+                        :selectedRow="indexFocus" :showColumnCheckbox="true"
+                        :enablePagingServer="false"
+                        :allowPaging="true"
+                        :selectionSettings="configs.selectionSettings"
+                        :totalRecords="tabPageInfo[7].totalElement"
+                        :pageIndex="tabPageInfo[7].pageIndex"
+                        :pageSize="tabPageInfo[7].pageSize"
+                        @selectedItemsChanged="checkedGrid01"
+                        @selectedRowChanged="onSelectRowGrid"
+                        @rowSelected="onRowSelected"
+                        @rowDeselected="onRowDeselected"
+                        :panelDataHeight='"400"'
+                        >
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab8">
+              <div class="table-content">
+                  <DataGrid :columns="GRID_COLUMS[8]" v-bind:dataSource="tabData[8]"
+                    v-bind:aggregates="[
+                      {field: 'MA_TT', type: 'Custom', footerTemplate: this.countSelectedRows, customAggregateFn: this.countSelectedRowsAgg},
+                      {field: 'TIEN', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienAgg},
+                      {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienHDAgg},
+                      {field: 'NO_PS', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPSAgg},
+                      {field: 'NO_PS_2', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPS2Agg},
+                      {field: 'NO_PS_3', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPS3Agg},
+                      {field: 'NO_PS_4', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienPS4Agg},
+                      {field: 'NO_DK', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoDKAgg},
+                      {field: 'TIENNO_QL', type: 'Custom', footerTemplate: this.sumSelectedRows, customAggregateFn: this.sumTienNoQLAgg},
+                      ]"
+                    ref="grid8"
+                    :showFilter="true" dataKeyField="MA_TT"
+                      :selectedRow="indexFocus" :showColumnCheckbox="true"
+                      :enablePagingServer="false"
+                        :allowPaging="true"
+                        :selectionSettings="configs.selectionSettings"
+                        :totalRecords="tabPageInfo[8].totalElement"
+                        :pageIndex="tabPageInfo[8].pageIndex"
+                        :pageSize="tabPageInfo[8].pageSize"
+                        @selectedItemsChanged="checkedGrid01"
+                        @selectedRowChanged="onSelectRowGrid"
+                        @rowSelected="onRowSelected"
+                        @rowDeselected="onRowDeselected"
+                        :panelDataHeight='"400"'
+                        >
+                  </DataGrid>
+              </div>
+          </div>
+        </div>
+    </div>
+  </div>
+  <b-modal id="modal-error" hide-footer hide-header no-close-on-backdrop>
+      <div>
+          <div>
+              <button type="button" @click="$bvModal.hide('modal-error')" class="close mb-2" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <div>
+              <table class="table-result table-gachle">
+                  <thead class="center">
+                      <tr>
+                          <th class="w10">STT</th>
+                          <th>Mã thanh toán</th>
+                          <th>Lỗi</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr v-for="(item, index) in dsLoiExcel">
+                          <td>{{index + 1}}</td>
+                          <td>{{item.MA_TT}}</td>
+                          <td>{{item.LOI}}</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </b-modal>
+
+  <b-modal id="modal-export" hide-footer modal-class="modal-export"  title="Xuất dữ liệu" no-close-on-backdrop size="lg">
+      <div>
+        <div>
+          <ModalExport :data="dataExport" :columnsIn="columnsExport"></ModalExport>
+        </div>
+      </div>
+  </b-modal>
+  <b-modal id="modal-nhatky" modal-class="modal-nhatky" hide-footer hide-header no-close-on-backdrop size="lg">
+      <div>
+          <NhatKy v-on:close="onCloseModal"
+          :dsLyDoTra="dsLyDoTra"
+          :rowData="rowChosen"
+          :passParam="passParam"
+          >
+      </NhatKy>
+      </div>
+  </b-modal>
+</div>

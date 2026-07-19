@@ -1,0 +1,230 @@
+<div >
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="onSearch" title="Danh sách">
+                    <span class="icon one-clipart-1"></span>Danh sách
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="onUpdate" title="Sửa thông tin ghi chú" :class="{'disabled': !params.capNhatBtn_Enable}">
+                    <span class="icon one-reload1"></span>Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onDelete" title="Xóa phiếu" :class="{'disabled': !params.xoaBtn_Enable}">
+                    <span class="icon one-file-trash"></span>Xóa phiếu
+                </a>
+                <XoaPhieu ref="dlgXoaPhieuTT" 
+                    :kycuoc="thongtinKyHoaDon.kyHoaDonSelected" 
+                    :dsPhieu="phieuTT_grid.checked"
+                    @acceptChange="deletePhieuThuHandler">
+                </XoaPhieu>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onChangeDate" title="Sửa lại ngày thanh toán">
+                    <span class="icon one-change-date"></span>Đổi ngày
+                </a>
+                <SuaNgayTT ref="dlgThayDoiNgayTT" 
+                    :kycuoc="thongtinKyHoaDon.kyHoaDonSelected" 
+                    :dsPhieu="phieuTT_grid.checked"
+                    @acceptChange="updateDatePhieuThuHandler">
+                </SuaNgayTT>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onChangeDetail" title="Sửa thông tin phiếu trả">
+                    <span class="icon one-file-edit"></span>Sửa TT
+                </a>
+                <PopupThayDoiThongTinThanhToan ref="dlgThayDoiThongTinTT" 
+                    :phieu="phieuTT_grid.checked[0]"
+                    @acceptChange="changeDetailProcess($event)">
+                </PopupThayDoiThongTinThanhToan>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onExcelExport" title="Xuất excel">
+                    <span class="icon one-xlsx"></span>Xuất Excel
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onSyncVNP" title="Đồng bộ VNP">
+                    <span class="icon one-sync1"></span>Đồng bộ VNP
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb8">
+            <div class="pull-right">
+                <app-ky-cuoc :isTextRed="true"></app-ky-cuoc>
+            </div>
+            <div class="clearfix">
+            </div>
+        </div>
+        <div class="box-form box-gn-tt">
+            <div class="legend-title">
+                <div class="title" style="font-weight: 600!important">Thông tin thanh toán</div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Ngày thanh toán
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker
+                                v-model="params.ngayTT"
+                                :value="params.today"
+                                :format="'dd/MM/y'"
+                                :showClearButton="false"
+                            >
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="params.denNgay_Checked">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker
+                                v-model="params.denNgay"
+                                :value="params.today"
+                                :format="'dd/MM/y'"
+                                :enabled="params.denNgay_Checked"
+                                :showClearButton="false"
+                            >
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Tổng trả
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right calculator-box">
+                                <vue-numeric currency='' separator=',' v-model="params.tongTra" class="screen-cal form-control tien-tra font-weight-bold"></vue-numeric>
+                                <span class="icon one-calculator" @click="params.isCalculatorShow = !params.isCalculatorShow"></span>
+                                <Calculator @display="params.tongTra = $event" :value="params.tongTra" :is-show="params.isCalculatorShow" @close="params.isCalculatorShow = !params.isCalculatorShow"></Calculator>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-2 col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w30 nowrap">
+                            Mã TT
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control highlight" v-model="params.maTT" ref="maTT" @keyup.enter="onMaTTKeyPress">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xl-4 col-lg-4 col-12">
+                    <div class="note"><span class="-ap icon-warning3 text-warning f20 mar10"></span> Kỳ cước {{ kyCuoc }}, chu kỳ {{ this.thongtinKyHoaDon.chuKySelected }} tính từ ngày {{ common_params.ngay_BD }} - đến ngày {{ common_params.ngay_KT }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form box-gn-tt" style="padding-left: 0px;padding-right: 0px;">
+            <ejs-splitter id='nested-splitter' width='100%' height='100%' :created="onCreate">
+                <e-panes>
+                    <e-pane content ='#leftPane' size ='30%'></e-pane>
+                    <e-pane content ='#rightPane' size ='70%'></e-pane>
+                </e-panes>
+            </ejs-splitter>
+
+            <div id="leftPane">
+                <div id ='vertical_splitter' class="vertical_splitter">
+                    <div class="box-col box-form marb0 table-responsive" id="boxTop">
+                        <div class="legend-title" style="font-weight: 600!important"><span class="title">Danh sách nhân viên thu cước</span></div>
+                        <div class="table-content">
+                            <DataGrid v-bind:columns="[
+                                {fieldName: 'TEN_NVTC', headerText: 'Nhân viên', allowFiltering: true, allowSorting: false, width: 150},
+                                {fieldName: 'TONGPHIEU', headerText: 'Tổng phiếu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right', format: 'N0', type: 'number'},
+                                {fieldName: 'TONGTIEN', headerText: 'Tổng tiền', allowFiltering: true, allowSorting: false, width: 110, cssClass: 'tien-tra', format: 'N0', type: 'number'},
+                                {fieldName: 'LOAI_TIEN', headerText: 'Loại tiền', allowFiltering: true, allowSorting: false, width: 60}
+                            ]"
+                                v-bind:dataSource="NVTC_grid.items"
+                                dataKeyField="MANV_TC"
+                                :showFilter="true"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                                :aggregates="TNAggregatesColumns"
+                                ref="NVTCGrid"
+                                @selectedRowChanged="onNVTCSelect"
+                                :key="NVTC_grid.key"
+                            >
+                            </DataGrid>
+                        </div>
+                    </div>
+                    <div class="box-col box-form marb0 table-responsive" id="boxBottom">
+                        <div class="legend-title" style="font-weight: 600!important"><span class="title">Danh sách lượt thanh toán</span></div>
+                        <div class="table-content"  style="height: calc(100% - 80px);">
+                             <DataGrid v-bind:columns="[
+                                {fieldName: 'HINHTHUC_TT', headerText: 'Hình thức', allowFiltering: false, allowSorting: false, isGroupedColumn: true},
+                                {fieldName: 'LUOT_TT', headerText: 'Lượt TT', allowFiltering: true, allowSorting: false, width: 120},
+                                {fieldName: 'TONGPHIEU', headerText: 'Tổng phiếu', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-right', format: 'N0', type: 'number'},
+                                {fieldName: 'TONGTIEN', headerText: 'Tổng tiền', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-right', format: 'N0', type: 'number'}
+                            ]"
+                                v-bind:dataSource="hinhThucTT_grid.items"
+                                dataKeyField="HTTT_ID"
+                                :showFilter="true"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                                :aggregates="TNAggregatesColumns"
+                                ref="hinhThucGrid"
+                                @selectedRowChanged="onHTTTSelect"
+                                :key="hinhThucTT_grid.key"
+                            >
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="rightPane">
+                <div class="box-col box-form marb0 table-responsive" id="boxRight">
+                    <div class="legend-title" style="font-weight: 600!important"><span class="title">Danh sách phiếu thanh toán</span></div>
+                    <DataGrid v-bind:columns="[
+                        {fieldName: 'CHON', headerText: '', allowFiltering: false, allowSorting: false, width: 40, template: checkboxColumnTTTemplate , cssClass: 'text-center'},
+                        {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: false, width: 70, cssClass: 'text-right'},
+                        {fieldName: 'NGAY_TT', headerText: 'Ngày trả', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'TIEN_TRA', headerText: 'Tiền trả', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'tien-tra', format: 'N0', type: 'number'},
+                        {fieldName: 'SO_HD', headerText: 'Số HĐ', allowFiltering: true, allowSorting: false, width: 90},
+                        {fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'NGUOI_CN', headerText: 'Người gạch', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'CHUNGTU', headerText: 'Chứng từ', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-left'},
+                        {fieldName: 'THUNGAN', headerText: 'Thu ngân', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'NGAY_CN', headerText: 'Ngày CN', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'HDDT', headerText: 'HĐĐT', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, width: 100, allowEditing: true},
+                        {fieldName: 'DOITAC', headerText: 'Đối tác', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'PHIEU_ID_NEO', headerText: 'Phiếu ID NEO', allowFiltering: true, allowSorting: false, width: 130, cssClass: 'text-right'},
+                        {fieldName: '', headerText: 'Trạng thái', allowFiltering: true, allowSorting: false, width: 105, freeze: 'right', template: statusTemplate, cssClass: 'text-center'}
+                    ]"
+                        v-bind:dataSource="phieuTT_grid.items"
+                        dataKeyField="MA_TT"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :allowExcelExport="true"
+                        :aggregates="PTAggregatesColumns"
+                        :editSettings='{ allowEditing: true, mode: "Batch" }'
+                        @cellSaved='onEditGhiChu'
+                        ref="phieuTraGrid"
+                        :key="phieuTT_grid.key"
+                    >
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

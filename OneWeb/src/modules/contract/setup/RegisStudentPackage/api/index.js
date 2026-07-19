@@ -1,0 +1,30 @@
+export default {
+  lay_danhmuc_tr_tt_dk_goi_hssv: async (axios, data) => axios.post("/web-quantri/danhmuc-form/LAY_DANHMUC_TR_TT_DK_GOI_HSSV/TRUONG", data),
+  lay_danhmuc_tr_tt_dk_goi_hssv_tinhtrang: async (axios, data) => axios.post("/web-quantri/danhmuc-form/LAY_DANHMUC_TR_TT_DK_GOI_HSSV/TINHTRANG", data),
+
+  kiemtra_thuebao_lap_hopdong_khac: async (axios, data) => axios.post("/web-hopdong/hopdong/kiemtra_thuebao_lap_hopdong_khac", data),
+  lay_danhba_theo_matb: async (axios, data) => axios.post("/web-hopdong/hopdong/lay_danhba_theo_matb", data),
+  lay_ds_db_dd_theo_tbid: async (axios, data) => axios.post("/web-tracuu/danhba/lay_ds_db_dd_theo_tbid", data),
+  lay_ds_dbtb_theo_tbid: async (axios, data) => axios.post("/web-hopdong/phattrienthuebao/lay_ds_dbtb_theo_tbid", data),
+  lay_dshd_theo_ma_gd: async (axios, data) => axios.post("/web-hopdong/hopdong/lay_dshd_theo_ma_gd", data),
+  lay_ds_hdtb_theo_hdkh_tthd: async (axios, data) => axios.post("/web-hopdong/hopdong/lay_ds_hdtb_theo_hdkh_tthd", data),
+  lay_danhmuc_tt_dk_goi_hssv: async (axios) => axios.get("/web-hopdong/hopdong/lay_danhmuc_tt_dk_goi_hssv"),
+  capnhat_hopdong_dd: async (axios, data) => axios.post("/web-hopdong/hopdong/capnhat_hopdong_dd", data),
+  themmoi_hopdong_dd: async (axios, data) => axios.post("/web-hopdong/hopdong/themmoi_hopdong_dd", data),
+  hths_dk_goicuoc_sv: async (axios, hdtbId) => axios.get(`/web-hopdong/hopdong/hths_dk_goicuoc_sv?hdtb_id=${hdtbId}`),
+  xoa_hopdong: async (axios, data) => axios.post("/web-hopdong/hopdong/khoa_mo_thuebao_no_cuoc/xoa_hopdong", data),
+  tt_7_dk_hssv_lay_thongtin: async (axios, data) => axios.post("/ccbs/executor/tt_7_dk_hssv_lay_thongtin", data),
+  tt_7_dk_hssv_lskm: async (axios, data) => axios.post("/ccbs/executor/tt_7_dk_hssv_lskm", data),
+  ts_lichsu_capnhat_thuebao_tratruoc: async (axios, data) => axios.post("/ccbs/executor/ts_lichsu_capnhat_thuebao_tratruoc", data),
+  app_tb_image_dktt: async (axios, data) => axios.post("/ccbs/oneBss/app_tb_image_dktt", data),
+  tt_18_ma_xac_thuc: async (axios, data) => axios.post("/ccbs/oneBss/app_tb_xacthuc_otp", data),
+  ts_dk_hssv_dk: async (axios, data) => axios.post("ccbs/executor/ts_dk_hssv_dk", data),
+  ts_dk_hssv_huy: async (axios, data) => axios.post("ccbs/executor/ts_dk_hssv_huy", data),
+  upload_anh: async (axios, data) => axios.post("/ccbs/prepaid/ts_upload_img_tt_khcn", data),
+  fn_tt_loai_gt: async (axios, data) => axios.post("/web-tratruoc/thongtin_tratruoc_dn/fn_tt_loai_gt", data),
+  lay_thongtin_sinhvien_dd: async (axios, data) => axios.post("/web-hopdong/lapdatmoi/lay_ds_dl_nghiepvu", data),
+  sinh_magd_v2: async (axios, data) => axios.post("/web-tratruoc/thongtin_tratruoc_dn/sinh_magd_v2", data),
+  get_keys: async (axios, data) => axios.post("/web-hopdong/khoiphucthanhly/get_keys", data),
+  upload_file: async (axios, data, header) => axios.post("/web-quantri/upload", data, header)
+
+}

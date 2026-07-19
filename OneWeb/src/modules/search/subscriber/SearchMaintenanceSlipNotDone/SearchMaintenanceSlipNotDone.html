@@ -1,0 +1,250 @@
+<!-- <div class="main-wrapper"> -->
+<div class="main-wrapper">
+  <div class="breadcrumb-top">
+    <div class="main-title">Tra cứu phiếu bảo dưỡng</div>
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ </a>
+      </li>
+      <li class="breadcrumb-item"><a href="#">Lập hợp đồng</a></li>
+      <li class="breadcrumb-item active">Lắp đặt mới</li>
+    </ul>
+  </div>
+  <div class="list-actions-top">
+    <LayDuLieu ref="popupLayDuLieuTraCuuPhieuBaoDuong" />
+    <ul class="list">
+      <li>
+        <a href="#" @click="btnTimKiem_Click"> <span class="icon one-search"></span>Tìm kiếm </a>
+      </li>
+      <li>
+        <a href="#" @click="handleExportFile"> <span class="icon one-excel"></span>Xuất Excel </a>
+      </li>
+      <!-- <li>
+                <a href="#">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li> -->
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="grid-stack-box clearboxform">
+      <div class="box" id="boxLeft">
+        <div class="box-form">
+          <div class="legend-title">Chọn đơn vị</div>
+          <div class="tree-plus mart10">
+            <span class="search-input e-input-group e-control-wrapper">
+              <input class="e-filtertext e-input highlight" placeholder="Nhập tên đơn vị cần tìm kiếm" v-model="keywordSearchUnit" @keypress.enter="searchUnitTreeView" />
+              <span class="e-clear-icon e-clear-icon-hide" aria-label="close" role="button"></span>
+            </span>
+            <ejs-treeview ref="treeViewDonVi" @nodeSelected="changeDonViTreeView" :selectedNodes="selectedDonViArray" :fields="{ dataSource: danhSachDonViTreeView, id: 'donvi_id', text: 'ten_dv', child: 'children' }"> </ejs-treeview>
+          </div>
+        </div>
+      </div>
+      <div class="box" id="boxMid">
+        <div class="box-form">
+          <div class="legend-title">Thông tin tìm kiếm</div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key w90">Mã CT/BD</div>
+                <div class="value">
+                  <input type="text" v-model="form.maHSCC" class="form-control highlight" @keyup.enter="onEnter" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Trạng thái CC</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="donviQLId" v-model="form.ttcc_id" :options="trangThaiCC" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w60">Từ ngày</div>
+                <div class="value padt7 w20">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="checkedDate" />
+                    <span class="name"></span>
+                  </div>
+                </div>
+
+                <div class="value">
+                  <div class="select-custom">
+                    <date-picker style="width: 100%" placeholder="dd/mm/yyyy" :formatter="momentFormat" valueType="momentFormat" v-model="form.tuNgay"> </date-picker>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w70">Đến ngày</div>
+                <div class="value padt7 w18"></div>
+                <div class="value" disabled>
+                  <date-picker style="width: 100%" placeholder="dd/mm/yyyy" :formatter="momentFormat" valueType="momentFormat" v-model="form.denNgay"> </date-picker>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-title mart10">Danh sách phần tử mạng</div>
+          <div class="table-content marb0 grid-ext" style="overflow-x: hidden;">
+            <DataGrid v-show="danhSachPhanTuMang.data.length > 0" :columns="danhSachPhanTuMang.headers" :dataSource.sync="danhSachPhanTuMang.data" :enable-paging-server="false" :allowPaging="true" :showFilter="true"></DataGrid>
+            <DataGrid v-show="danhSachPhanTuMang.data.length == 0" :columns="danhSachPhanTuMang.headersNoData" :dataSource="[]" :enable-paging-server="false" :allowPaging="true" :showFilter="true"></DataGrid>
+          </div>
+        </div>
+      </div>
+      <div class="box" id="boxRight" style="min-height:450px; height: auto">
+        <div class="box-form h-auto">
+          <div class="legend-title">Danh sách tiến trình xử lý</div>
+          <div class="tabs nav tab-over">
+            <a href="#tab1" style="min-width: 195px;" class="active" data-toggle="tab">Tiến trình</a>
+            <a href="#tab2" style="min-width: 195px;" data-toggle="tab">Giao việc</a>
+          </div>
+
+          <div class="tab-content">
+            <div id="tab1" class="tab-pane active">
+              <div class="table-content grid-ext">
+                <DataGrid :columns="danhSachTienTrinh.headers" :dataSource.sync="danhSachTienTrinh.data" :enable-paging-server="false" :allowPaging="true" :showFilter="true"> </DataGrid>
+                <!-- <ejs-grid
+                  ref="danhSachTienTrinh"
+                  :dataSource="danhSachTienTrinh.data"
+                  :allowPaging="true"
+                  :pageSettings="pageSettings"
+                  :allowSorting="false"
+                  :allowFiltering="true"
+                  :allowTextWrap="false"
+                  :selectionSettings="selectionOptionsSingle"
+                  :pagerTemplate="pagerTemplate"
+                  :selectedRowIndex="0"
+                  :allowResizing="true"
+                  gridLines="Both"
+                >
+                  <e-columns>
+                    <e-column field="nguoi_cn" headerText="Người cập nhật" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+                    <e-column field="ngay_cn" headerText="Ngày cập nhật" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="donvi_cn" headerText="Đơn vị" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+                    <e-column field="ngay_dukien_bd" headerText="Ngày dự kiến BD" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="ngay_dukien_kt" headerText="Ngày dự kiến KT" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="noidung" headerText="Nội dung" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                  </e-columns>
+                </ejs-grid> -->
+              </div>
+            </div>
+            <div id="tab2" class="tab-pane">
+              <div class="table-content grid-ext">
+                <DataGrid :columns="danhSachGiaoViec.headers" :dataSource.sync="danhSachGiaoViec.data" :enable-paging-server="false" :allowPaging="true" :showFilter="true"> </DataGrid>
+                <!-- <ejs-grid
+                  ref="danhSachGiaoViec"
+                  :dataSource="danhSachGiaoViec.data"
+                  :allowPaging="true"
+                  :pageSettings="pageSettings"
+                  :allowSorting="false"
+                  :allowFiltering="true"
+                  :allowTextWrap="false"
+                  :selectionSettings="selectionOptionsSingle"
+                  :pagerTemplate="pagerTemplate"
+                  :selectedRowIndex="0"
+                  :allowResizing="true"
+                  gridLines="Both"
+                >
+                  <e-columns>
+                    <e-column field="ten_nv" headerText="Tên nhân viên" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+                    <e-column field="so_dt" headerText="ĐT liên hệ" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="ngaygiao" headerText="Ngày giao" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+                    <e-column field="nhiemvu" headerText="Nhiệm vụ" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="ketqua_xl" headerText="Kết quả XL" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="nd_tontai" headerText="ND Tồn tại" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="nd_dexuat" headerText="ND Đề xuất" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="ghichu_xl" headerText="Ghi chú XL" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                    <e-column field="trangthai_xl" headerText="Trạng thái TH" :filter="filterOptions" width="160" textAlign="center"></e-column>
+                  </e-columns>
+                </ejs-grid> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form mart10 h-auto">
+      <div class="legend-title">Danh sách phiếu yêu cầu</div>
+      <div class="table-content marb0 grid-ext" style="overflow-x: hidden;">
+        <DataGrid :columns="danhSachPhieuYeuCau.headers" :dataSource="danhSachPhieuYeuCau.data" @selectedItemsChanged="danhSachPhieuYeuCauSelectedChanged" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :allowGrouping="true"> </DataGrid>
+        <!-- <DataGrid
+          ref="danhSachPhieuYeuCau"
+          :dataSource="danhSachPhieuYeuCau.data"
+          :enable-paging-server="false"
+          :allowPaging="true" 
+          :pageSettings="pageSettings"
+          :allowSorting="false"
+          :allowFiltering="true"
+          :allowTextWrap="false"
+          :selectionSettings="selectionOptionsSingle"
+          :pagerTemplate="pagerTemplate"
+          @rowSelected="rowSelectedEvent"
+          :frozenColumns="columns"
+          :selectedRowIndex="0"
+          :allowResizing="true"
+          gridLines="Both"
+        >
+          <e-columns>
+            <e-column field="loai_hs_cc" headerText="Loại HSCC" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="ma_hs_cc" headerText="MÃ HSCC" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="trangthai_cc" headerText="Trạng thái" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="ttvt" headerText="Đơn vị" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ngay_yc" headerText="Ngày YC" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ten_kieu" headerText="Kiểu CC" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="nguoi_cn" headerText="Người YC" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="so_dt" headerText="Số ĐT" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ten_yc" headerText="Đơn vị YC" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="nv_giao" headerText="Nhân viên giao" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="dv_giao" headerText="Đơn vị giao" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="nd_giao" headerText="Nội dung giao" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="ghichu" headerText="Ghi chú" :filter="filterOptions" width="160" textAlign="center"></e-column>
+          </e-columns>
+        </DataGrid> -->
+      </div>
+    </div>
+    <div class="box-form mart10 h-auto">
+      <div class="legend-title">Chi tiết điều hành thi công</div>
+      <div class="table-content marb0 grid-ext" style="overflow-x: hidden;">
+        <DataGrid v-show="danhSachChiTietDieuHanhThiCong.data.length > 0" :columns="danhSachChiTietDieuHanhThiCong.headers" :dataSource.sync="danhSachChiTietDieuHanhThiCong.data" :enable-paging-server="false" :allowPaging="true" :showFilter="true"> </DataGrid>
+        <DataGrid v-show="danhSachChiTietDieuHanhThiCong.data.length == 0" :columns="danhSachChiTietDieuHanhThiCong.headersNoData" :dataSource="[]" :enable-paging-server="false" :allowPaging="true" :showFilter="true"> </DataGrid>
+        <!-- <ejs-grid
+          ref="danhSachPhieuYeuCau"
+          :dataSource="danhSachChiTietDieuHanhThiCong.data"
+          :allowPaging="true"
+          :pageSettings="pageSettings"
+          :allowSorting="false"
+          :allowFiltering="true"
+          :allowTextWrap="false"
+          :selectionSettings="selectionOptionsSingle"
+          :pagerTemplate="pagerTemplate"
+          :selectedRowIndex="0"
+          gridLines="Both"
+          :allowGrouping="true"
+          :allowResizing="true"
+          :groupSettings="groupOptions"
+        >
+          <e-columns>
+            <e-column field="dvg" headerText="Group" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="ngay_giao" headerText="Ngày giao" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="nv_giao" headerText="Người giao" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="nd_giao" headerText="Nội dung giao" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="dvn" headerText="Đơn vị nhận" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="trangthai_ph" headerText="Trạng thái phiếu" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ngay_tra" headerText="Ngày trả" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="nd_tra" headerText="Nội dung trả" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="lydotra" headerText="Lý do trả" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="dv_giao" headerText="Ngày CN" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="nv_th" headerText="Người thực hiện" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="so_dt" headerText="Điện thoại liên hệ" :filter="filterOptions" width="160" textAlign="center"> </e-column>
+            <e-column field="ghichu" headerText="Ghi chú" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ghichu" headerText="Kết quả XL" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ghichu" headerText="Ứng dụng" :filter="filterOptions" width="160" textAlign="center"></e-column>
+            <e-column field="ghichu" headerText="Người xử lý" :filter="filterOptions" width="160" textAlign="center"></e-column>
+          </e-columns>
+        </ejs-grid> -->
+      </div>
+    </div>
+  </div>
+</div>

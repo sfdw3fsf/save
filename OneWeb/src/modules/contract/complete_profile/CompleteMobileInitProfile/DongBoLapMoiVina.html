@@ -1,0 +1,126 @@
+<div>
+  <breadcrumb v-if="!isPopup || isPopup == false" :header="header" />
+
+  <div class="list-actions-top">
+    <ul class="list">
+        <li>
+            <a href="#" @click.prevent="tlstpRefresh_Click">
+                <span class="icon one-file-attach1"></span>Lấy DS
+            </a>
+        </li>
+        <li v-if="controls.tsbtnUploadAnh.visible">
+            <a href="#" @click.prevent="tsbtnUploadAnh_Click" :class="{'disabled':(!controls.tsbtnUploadAnh.enabled || state.selectedPhieu == 0)}">
+                <span class="icon one-upload"></span>Upload ảnh 
+            </a>
+        </li>
+        <li v-if="controls.tsbtnDongBoHD.visible">
+            <a href="#" @click.prevent="tsbtnCapNhat_Click" :class="{'disabled':(!controls.tsbtnDongBoHD.enabled || state.selectedPhieu == 0)}">
+                <span class="icon one-sync1"></span>Đồng bộ
+            </a>
+        </li>
+        <li v-if="controls.tsbtnHoanThien.visible">
+            <a href="#" @click.prevent="tsbtnDongBoHDHT_Click" :class="{'disabled':(!controls.tsbtnHoanThien.enabled)}">
+                <span class="icon one-file-check"></span>Hoàn thiện
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="box-form">
+        <div class="legend-title">Thông tin tra cứu HĐ/PL</div>
+        <div class="row">
+            <div class="col-sm-6 col-12"> 
+              <div class="info-row">
+                <div class="key w90">Loại HĐ/PL</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select2 :options="controls.cboLoaiHD.list" v-model="controls.cboLoaiHD.value" @change="cboLoaiHD_EditValueChanged"> 
+                    </select2>
+                  </div>
+                </div>
+              </div>
+                <div class="info-row"> 
+                    <div class="key w90">Loại thuê bao</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <select2 :options="controls.cboLoaiTB.list" v-model="controls.cboLoaiTB.value" @change="cboLoaiTB_EditValueChanged"> 
+                        </select2>
+                      </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Kiểu yêu cầu</div>
+                    <div class="value">
+                        <select2 :options="controls.cboKieuLD.list" v-model="controls.cboKieuLD.value" @change="dtKieuLD_EditValueChanged" :disabled="!controls.cboKieuLD.enabled"> 
+                        </select2>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key">Trạng thái</div>
+                    <div class="value">
+                        <div class="list-checks mart7">
+                            <div class="item" v-if="controls.rdoCatMo.visible">
+                                <div class="check-action" >
+                                    <input name="dongbo" type="radio" class="check" value="rdoCatMo" v-model="radioStatus" @change="radioStatus_changed">
+                                    <span class="name">Chưa gửi cắt mở</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input name="dongbo" type="radio" ref="rdoChuaKH" class="check" value="rdoChuaKH"  v-model="radioStatus" @change="radioStatus_changed">
+                                    <span class="name">Chưa đồng bộ</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input name="dongbo" type="radio" class="check" value="rdoDaKH"  v-model="radioStatus" @change="radioStatus_changed">
+                                    <span class="name">Đã đồng bộ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="table-content">
+                    <DataGrid ref="grcDichVuGT" v-bind:columns="controls.grcDichVuGT.headers"
+                            v-bind:dataSource="controls.grcDichVuGT.dataSource" :showColumnCheckbox="false"
+                            :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                            :enabled-select-first-row="true" 
+                            > 
+                    </DataGrid> 
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="box-form">
+        <div class="legend-title">Danh sách thuê bao</div>
+        <div class="table-content">
+            <!-- gridviewThueBao -->
+            <DataGrid ref="gridviewThueBao" v-bind:columns="controls.gridviewThueBao.headers"
+                  v-bind:dataSource="controls.gridviewThueBao.dataSource" :showColumnCheckbox="false"
+                  :enable-paging-server="false" :allowPaging="true" :showFilter="true" :allowResizing='true'
+                  :enabled-select-first-row="true" @selectedRowChanged="gridviewThueBao_FocusedRowChanged" 
+                  >
+                <!-- @rowDoubleClicked="gridviewVatTuRowDoubleClick" -->
+            </DataGrid> 
+                  
+        </div> 
+    </div> 
+
+    <GuiCatMoModal ref="frmGuiCatMo" />
+    <ChonAnhHoSoModal ref="frmChonAnhHoSo" @onSelectedFiles="onSelectedFiles"/>
+    <UploadAnhModal ref="frmUploadAnh" @onUploadSuccess="onUploadSuccess"/>
+  
+    <b-modal id="popupComponents" size="xl" 
+        hide-footer
+        hide-header
+        hide-header-close
+        body-class="modal-body p-0 model-css">
+        <component :is="popupComponent" ref="generalPopup" :dulieu="popupComponentData" v-bind="popupComponentAttr" :ispopup="true" isPopup="false" :isPopup="false" v-on="popupComponentEvts"></component> <!--v-dynamic-events="popupComponentEvents"-->
+    </b-modal>
+  </div> 
+</div>
+
+

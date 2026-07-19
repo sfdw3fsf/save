@@ -1,0 +1,2 @@
+import HandOverTicketVerifyCombine from './HandOverTicketVerifyCombine.vue'
+export default HandOverTicketVerifyCombine

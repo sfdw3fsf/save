@@ -1,0 +1,325 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <button class="btn" title="Lấy thông tin mới" @click="btnLayTT_Click">
+          <span class="icon one-file-attach"></span>Lấy TT (F5)
+        </button>
+      </li>
+      <li>
+        <button class="btn" title="Ghi lại" @click="btnCapNhat_Click">
+          <span class="icon one-save"></span>Cập nhật
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnGiaoViec.visible">
+        <button class="btn" title="Giao việc cho nhân viên thực hiện" @click="btnGiaoViec_Click">
+          <span class="icon one-flag"></span>Giao việc
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnGiaoPhieu.visible">
+        <button class="btn" title="Giao phiếu thi công" :disabled="!dsFormControls.tsbtnGiaoPhieu.enabled"
+          @click="btnGiaoPhieu_Click">
+          <span class="icon one-flag"></span>Giao phiếu
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnTraPhieu.visible">
+        <button class="btn" title="Trả phiếu" @click="btnTraPhieu_Click">
+          <span class="icon one-file-back"></span> Trả phiếu
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnThemPTM.visible">
+        <button class="btn" title="Thêm phần tử mạng" @click="btnThemPTM_Click">
+          <span class="icon one-file-plus"></span>Thêm PTM
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnThemPTM_V2.visible">
+        <button class="btn" title="Thêm PTM Mới" @click="btnThemPTMV2_Click">
+          <span class="icon one-file-plus"></span>Thêm PTM
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnXoaPTM.visible">
+        <button class="btn" title="Xóa chi tiết phần tử mạng" @click="btnXoaPTM_Click">
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Xóa PTM
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnHoanThanhPTM.visible">
+        <button class="btn" title="Hoàn thành phần tử mạng" @click="btnHoanThanhPTM_Click">
+          <span class="icon one-file-arrow-right1"></span>Hoàn thành PTM
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnHoanCong.visible">
+        <button class="btn" title="Hoàn công" @click="btnHoanCong_Click">
+          <span class="icon one-file-arrow-right1"></span>Hoàn công
+        </button>
+      </li>
+      <li v-if="dsFormControls.tsbtnThemHSCC.visible">
+        <button class="btn" title="Thêm hồ sơ Cải tạo/Bảo dưỡng" @click="btnThemHS_Click">
+          <span class="icon one-file-plus"></span>Thêm HS
+        </button>
+      </li>
+      <li>
+        <button class="btn" @click="btnXuatFile_Click"><span class="icon one-excel"></span>Xuất
+          File</button>
+      </li>
+      <li v-if="dsFormControls.tsbtnSmsTBAnhHuong.visible">
+        <button class="btn" @click="btnSmsThueBao_Click"><span class="icon one-email"></span>SMS tới TB bị ảnh
+          hưởng</button>
+      </li>
+      <li v-if="dsFormControls.tsbtnGuiZalo.visible">
+        <button class="btn" @click="btnNhanTinKH_Click"><span class="icon one-email"></span>Nhắn tin KH</button>
+      </li>
+      <li v-if="dsFormControls.tsbtnDuyet.visible">
+        <button class="btn" title="Duyệt" @click="btnDuyet_Click">
+          <span class="icon one-file-arrow-right1"></span>Duyệt
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-6 p-1">
+        <div class="box-form">
+          <div class="legend-title">Danh sách phần tử mạng</div>
+          <div class="row">
+            <div class="col-5 info-row">
+              <div class="key w90">Ngày bắt đầu</div>
+              <div class="value w20 padt7">
+                <div class="check-action">
+                  <input type="checkbox" v-model="dsFormControls.chkNgayDuKien.checked" class="check"
+                    :disabled="!dsFormControls.chkNgayDuKien.enabled">
+                  <span class="name"></span>
+                </div>
+              </div>
+              <div class="value">
+                <ejs-datetimepicker format="dd/MM/yyyy HH:mm:ss" v-model="dsFormControls.dtpNgayDuKien.BD"
+                  :enabled="chkNgayDuKienState">
+                </ejs-datetimepicker>
+              </div>
+            </div>
+            <div class="col-5 info-row">
+              <div class="key w90">Ngày kết thúc</div>
+              <div class="value">
+                <ejs-datetimepicker format="dd/MM/yyyy HH:mm:ss" v-model="dsFormControls.dtpNgayDuKien.KT"
+                  :enabled="chkNgayDuKienState">
+                </ejs-datetimepicker>
+              </div>
+            </div>
+            <div class="col-2 text-right">
+              <button class="btn btn-primary" :disabled="!chkNgayDuKienState" @click="btnCapNhatPTM_Click">Cập
+                nhật</button>
+            </div>
+          </div>
+          <div class="row">
+            <!-- Khong ho tro vua group, vua freeze. {fieldName: 'GR', isGroupedColumn: true}, -->
+            <DataGrid ref="gridPhanTuMang" :dataSource="dsPhanTuMang" panelDataHeight="220px" :showColumnCheckbox="true"
+              :columns="[
+            {fieldName: 'LOAI_TBI', headerText: 'Loại PTM', width: 100, visible: false},
+            {fieldName: 'TEN_TBI', headerText: 'Tên phần tử mạng'},
+            {fieldName: 'SOLUONG', headerText: 'Số lượng', width: 100, visible: false},
+            {fieldName: 'DVI_TINH', headerText: 'Đợn vị tính', width: 110, visible: false},
+            {fieldName: 'TINHTRANG', headerText: 'Tình trạng', width: 105},
+            {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', width: 105},
+            {fieldName: 'NGAY_HS', headerText: 'Ngày cập nhật', width: 135},
+            {fieldName: 'NGUOI_CN', headerText: 'Người cập nhật', width: 150},
+            {fieldName: 'NGAY_BD', headerText: 'Ngày BĐ', width: 135},
+            {fieldName: 'NGAY_KT', headerText: 'Ngày KT', width: 135},
+            {fieldName: 'TRANGTHAI_GV', headerText: 'Trạng thái giao việc'}
+            ]" @rowSelected="gridPhanTuMang_RowSelected" :commands="gridPhanTuMangCommands"
+              :commandColumn="gridPhanTuMangCommandColumn" @commandClicked="gridPhanTuMang_CommandClicked"
+              :enabledSelectFirstRow="false" :columnCheckboxFreeze="true" :allowPaging="true" :enablePagingServer="false"></DataGrid>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 p-1">
+        <div class="box-form">
+          <div class="legend-title">Thông tin giao việc - tiến trình</div>
+          <div class="nav tabs tab-over">
+            <a href="#tabGV" data-toggle="tab" class="active" @click="refreshGrid(0)">Giao việc</a>
+            <a href="#tabTT" data-toggle="tab" @click="refreshGrid(1)">Tiến trình</a>
+            <a href="#tabTBAH" data-toggle="tab" @click="refreshGrid(2)">Thuê bao ảnh hưởng</a>
+          </div>
+          <div class="tab-content box-form" style="margin-bottom: 0px;">
+            <div id="tabGV" class="tab-pane active">
+              <div class="row">
+                <div class="col-6 info-row" style="padding: 0 10px;">
+                  <div class="key w90">Ngày GV</div>
+                  <div class="value w20 padt7">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="dsFormControls.chkNgayGV.checked"
+                        :disabled="!dsFormControls.chkNgayGV.enabled">
+                      <span class="name"></span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <ejs-datetimepicker format="dd/MM/yyyy HH:mm:ss" v-model="dsFormControls.dtpNgayGV.value"
+                      :enabled="chkNgayGVState">
+                    </ejs-datetimepicker>
+                  </div>
+                </div>
+                <div class="col-6 info-row" style="padding: 0 10px;">
+                  <div class="key w90">Ngày TH</div>
+                  <div class="value w20 padt7">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="dsFormControls.chkNgayBG.checked"
+                        :disabled="!dsFormControls.chkNgayBG.enabled">
+                      <span class="name"></span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <ejs-datetimepicker format="dd/MM/yyyy HH:mm:ss" v-model="dsFormControls.dtpNgayBG.value"
+                      :enabled="chkNgayBGState">
+                    </ejs-datetimepicker>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="info-row">
+                  <div class="key w90">Người GV</div>
+                  <div class="value">
+                    <SelectExt :dataSource="dsNhanVienGiaoViec" v-model="currentItem.nhanVienGVID"
+                      dataTextField="TEN_NV" dataValueField="NHANVIEN_ID" />
+                  </div>
+                </div>
+              </div>
+              <DataGrid ref="gridGiaoViec" :dataSource="dsGiaoViec" panelDataHeight="112px" :columns="[
+                                  {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', freeze: 'left'},
+                                  {fieldName: 'SO_DT', headerText: 'ĐT liên hệ', width: 120, freeze: 'left'},
+                                  {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', width: 160, type:'date', format: {type:'date', format:'dd/MM/yyyy HH:mm:ss'}, textAlign: 'right'},
+                                  {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ'},
+                                  {fieldName: 'KQXL_ID', headerText: 'Kết quả XL', template: getColumnKQXLTemplate()},
+                                  {fieldName: 'ND_TONTAI', headerText: 'Tồn tại', template: getColumnTTTemplate()},
+                                  {fieldName: 'ND_DEXUAT', headerText: 'Đề xuất', template: getColumnDXTemplate()},
+                                  {fieldName: 'GHICHU_XL', headerText: 'Ghi chú XL'},
+                                  {fieldName: 'TRANGTHAI', headerText: 'Trạng thái TH', width: 130},
+                                  {fieldName: 'TRANGTHAI_SMS', headerText: 'Nhắn tin', width: 130}
+                                ]" :commands="[
+                                {name: 'CAPNHAT_GHICHU', title: 'Cập nhật ghi chú xử lý', cssClass: 'btn-primary fa fa-ellipsis-h', width: 20},
+                                {name: 'CAPNHAT_KETQUAXL', title: 'Cập nhật kết quả xử lý', cssClass: 'btn-primary fa fa-check', width: 20},
+                                {name: 'NHANTIN_SMS', title: 'Gửi tin nhắn SMS', cssClass: 'btn-primary fa fa-commenting', width: 20}
+                                ]" :commandColumn="{headerText: ' ', width: 110, show: true, freeze: true}"
+                @commandClicked="gridGiaoViec_CommandClicked" :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer="false" />
+            </div>
+            <div id="tabTT" class="tab-pane">
+              <DataGrid ref="gridTienTrinh" :dataSource="dsTienTrinh" panelDataHeight="187px" :columns="[
+                                  {fieldName: 'NGUOI_CN', headerText: 'Người CN', width: 150, freeze: 'left'},
+                                  {fieldName: 'NGAY_CN', headerText: 'Ngày CN', width: 160, freeze: 'left', type:'date', format: {type:'date', format:'dd/MM/yyyy HH:mm:ss'}, textAlign: 'right'},
+                                  {fieldName: 'DONVI_CN', headerText: 'Đơn vị'},
+                                  {fieldName: 'NGAY_DUKIEN_BD', headerText: 'Ngày dự kiến BĐ', visible: false},
+                                  {fieldName: 'NGAY_DUKIEN_KT', headerText: 'Ngày dự kiến KT', visible: false},
+                                  {fieldName: 'NOIDUNG', headerText: 'Nội dung'},
+                                  {fieldName: 'TIENTRINHCC_ID', headerText: 'Tiến trình Cắt chuyển ID', visible: false}
+                                ]" :commands="[
+                                {name: 'SUA', cssClass: 'btn-primary fa fa-pencil-square-o', width: 20},
+                                {name: 'XOA', cssClass: 'btn-danger fa fa-trash-o', width: 20}
+                                ]" :commandColumn="{headerText: ' ', width: 70, show: true, freeze: true}"
+                @commandClicked="gridTienTrinh_CommandClicked" :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer="false" />
+            </div>
+            <div id="tabTBAH" class="tab-pane">
+              <DataGrid ref="gridThueBaoAnhHuong" :dataSource="dsThueBaoAnhHuong" panelDataHeight="187px" :columns="[
+                                  {fieldName: 'DKCC_ID', headerText: 'ID', width: 95},
+                                  {fieldName: 'MA_TB', headerText: 'Mã thuê bao', width: 150},
+                                  {fieldName: 'TEN_TB', headerText: 'Tên thuê bao'},
+                                  {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ LĐ'},
+                                  {fieldName: 'NGAY_YC', headerText: 'Ngày YC', width: 160},
+                                  {fieldName: 'TEN_KIEU', headerText: 'Kiểu cắt chuyển', width: 160},
+                                  {fieldName: 'TRANGTHAI_CC', headerText: 'Trạng thái cắt chuyển'}
+                                ]" :commands="[
+                                {name: 'DOI_THONGTINCAP', cssClass: 'btn-primary btn-text', text: 'Đổi thông tin cáp'}
+                                ]" :commandColumn="{headerText: '', width: 80, show: true, freeze: true}"
+                @commandClicked="gridThueBaoAnhHuong_CommandClicked" :enabledSelectFirstRow="false"
+                :showColumnCheckbox="true" :columnCheckboxFreeze="true" :allowPaging="true" :enablePagingServer="false"
+                :paginationCommands="[{text: 'Đổi cáp hàng loạt', name: 'DOI_CAP_HANG_LOAT'}]"
+                @paginationCommandClick="gridThueBaoAnhHuong_PaginationCommandClick" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row p-1">
+      <div class="box-form">
+        <div class="legend-title">Danh sách hồ sơ cải tạo bảo dưỡng</div>
+        <DataGrid ref="gridDanhSachHoSo" :dataSource="dsDanhSachHoSo" :allowExcelExport="true" :columns="[
+            {fieldName: 'LOAI_HS_CC', headerText: 'Loại HSCC', freeze: 'left'},
+            {fieldName: 'MA_HS_CC', headerText: 'Mã HSCC', width: 150, freeze: 'left'},
+            {fieldName: 'TEN_HS', headerText: 'Tên HSCC'},
+            {fieldName: 'TRANGTHAI_CC', headerText: 'Trạng thái'},
+            {fieldName: 'TTVT', headerText: 'Đơn vị'},
+            {fieldName: 'NGAY_YC', headerText: 'Ngày YC', type:'date', format: {type:'date', format:'dd/MM/yyyy'}, width: '120px', textAlign: 'right'},
+            {fieldName: 'TEN_KIEU', headerText: 'Kiểu CC', width: 130},
+            {fieldName: 'NV_YC', headerText: 'Người YC', width: 150},
+            {fieldName: 'SO_DT', headerText: 'Số ĐT', width: 110},
+            {fieldName: 'TEN_YC', headerText: 'Đơn vị YC'},
+            {fieldName: 'NV_GIAO', headerText: 'Nhân viên giao', width: 150},
+            {fieldName: 'DV_GIAO', headerText: 'Đơn vị giao'},
+            {fieldName: 'ND_GIAO', headerText: 'Nội dung giao'},
+            {fieldName: 'GHICHU', headerText: 'Ghi chú'},
+            {fieldName: 'GV', headerText: 'Giao việc'},
+            {fieldName: 'MUCDO', headerText: 'Mức độ', width: 100}
+            ]" @rowSelected="gridDanhSachHoSo_rowSelected" :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer="false" @rowDataBound="gridDanhSachHoSo_rowDataBound">
+        </DataGrid>
+      </div>
+    </div>
+  </div>
+  <b-modal id="modalNoiDung" ref="modalNoiDung" title="Nội dung tiến trình cải tạo/bảo dưỡng" centered hide-footer
+    modal-class="bss-modal" @shown="modalNoiDung_Show" @ok="modalNoiDung_Save">
+    <template #default="{ ok }">
+      <div class="list-actions-top">
+        <ul class="list">
+          <li>
+            <a href="javascript:void(0)" @click="modalNoiDung_refresh"><span class="fa fa-refresh"></span> Làm mới
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" @click="ok()"><span class="fa fa-floppy-o"></span> Ghi
+              lại
+            </a>
+          </li>
+        </ul>
+      </div>
+      <NoiDungTTCC ref="formNoiDung"></NoiDungTTCC>
+    </template>
+  </b-modal>
+  <b-modal id="modalGhiChuPTM" ref="modalGhiChuPTM" title="Cập nhật ghi chú xử lý phần tử mạng" centered
+    @shown="modalGhiChuPTM_Show" @ok="modalGhiChuPTM_Save" ok-title="Xác nhận" cancel-title="Hủy bỏ">
+    <template>
+      <NoiDungTTCC ref="formGhiChuPTM" title="Ghi chú"></NoiDungTTCC>
+    </template>
+  </b-modal>
+  <b-modal id="modalGhiChuXLNV" ref="modalGhiChuXLNV" title="Cập nhật ghi chú xử lý cải tạo/ bảo dưỡng (nhân viên)"
+    centered @shown="modalGhiChuXLNV_Show" @ok="modalGhiChuXLNV_Save" ok-title="Xác nhận" cancel-title="Hủy bỏ">
+    <template>
+      <NoiDungTTCC ref="formGhiChuXLNV" title="Ghi chú"></NoiDungTTCC>
+    </template>
+  </b-modal>
+  <b-modal id="modalHoanCong" ref="modalHoanCong" title="Nội dung hoàn công" centered @shown="modalHoanCong_Show"
+    @ok="modalHoanCong_Save" ok-title="Xác nhận" cancel-title="Hủy bỏ">
+    <template>
+      <NoiDungTTCC ref="formHoanCong" title="Ghi chú"></NoiDungTTCC>
+    </template>
+  </b-modal>
+  <TraPhieuVT modalId="formTraPhieuVT" :data="{phieu_id:currentItem.phieuCCID,hscc_id:currentItem.hsccID}"></TraPhieuVT>
+
+  <b-modal id="modal-Giaophieu" ref="formGiaophieu" title="Giao phiếu cải tạo/ bảo dưỡng phần tử mạng" centered
+    hide-footer size="xl" modal-class="bss-modal" @ok="modalGiaoPhieu_Ok" @shown="modalGiaoPhieu_Show">
+    <template #default="{ ok }">
+      <GiaoPhieuCC ref="formgiaophieu" @ok="ok"></GiaoPhieuCC>
+    </template>
+  </b-modal>
+  <FrmThemPhanTuMang ref="frmThemPhanTuMang"></FrmThemPhanTuMang>
+  <frmCTHoSoDauChuyen id="frmCTHoSoDauChuyen" ref="frmCTHoSoDauChuyen" @NAP_DS_HOSO_CATCHUYEN="btnLayTT_Click"></frmCTHoSoDauChuyen>
+  <NhanTin_TB_AnhHuong modalId="frmNhanTinAnhHuong" ref="frmNhanTinAnhHuong" :data="currentItem.chiTietCCID">
+  </NhanTin_TB_AnhHuong>
+  <b-modal ref="modalDauNoiThueBao" size="xl" no-close-on-backdrop hide-footer hide-header hide-header-close
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box hoso-dauchuyen-daunoi-thuebao">
+      <div class="popup-header">
+        <div class="title">Đấu nối thuê bao vào tuyến cáp</div>
+        <div class="close -ap icon-close" data-dismiss="modal" @click="$refs['modalDauNoiThueBao'].hide()"></div>
+      </div>
+      <DauNoiThueBao ref="frmDauNoiThueBao" :object="dataDauNoiThueBao" @NHAP_CAP_THUEBAO="dataDauNoiThueBao_NhapCapThueBao" />
+    </div>
+  </b-modal>
+  <ModalDoiCapHangLoat modal-id="id-modal-doicap-hangloat" :ds-thue-bao-dau-noi="dsThueBaoNhapCapHangLoat" @change="modalDoiCapHangLoat_Change"/>
+  <FrmGiaoPhieuCCNV ref="frmGiaoPhieuCC_NV"></FrmGiaoPhieuCCNV>
+  <frmCapVatTu_PTM ref="frmCapVatTu_PTM" :input-data="modelVatTu"/>
+</div>

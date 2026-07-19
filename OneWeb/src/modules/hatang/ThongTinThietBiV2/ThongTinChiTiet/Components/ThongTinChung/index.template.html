@@ -1,0 +1,207 @@
+<div class="row">
+  <div class="col-12">
+    <div class="legend-title">Thông tin chung</div>
+  </div>
+  <div class="col-6">
+    <div class="info-row">
+      <div class="key w150">Mã thiết bị</div>
+      <div class="value">
+        <input type="text" class="form-control" disabled v-model="currentItem.mathietbi" />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Tên thiết bị <span class="red">*</span></div>
+      <div class="value">
+        <input
+          type="text"
+          class="form-control"
+          v-model="currentItem.ten"
+          :disabled="!controls.txt_ten.enabled"
+          :class="{ invalidBox: controls.txt_ten.invalid }"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Ký hiệu TB</div>
+      <div class="value">
+        <input type="text" class="form-control" v-model="currentItem.kyhieu" :disabled="!controls.txt_kyhieu.enabled" />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Mã TB CĐS ĐHIT</div>
+      <div class="value">
+        <input
+          type="text"
+          class="form-control"
+          v-model="currentItem.mathietbi_infra"
+          :disabled="!controls.txt_mathietbi_infra.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Thiết bị cha <span v-if="isOther" class="red">*</span></div>
+      <div class="value">
+        <SelectExt
+          :dataSource="parentDeviceList"
+          dataTextField="ten"
+          dataValueField="id"
+          v-model="currentItem.thietbicha_id"
+          :disabled="!controls.select_thietbicha_id.enabled"
+          :class="{ invalidBox: controls.select_thietbicha_id.invalid }"
+        />
+      </div>
+    </div>
+    <!-- Show khi loại thiết bị là tủ đĩa -->
+    <div v-show="isDiskShelf" class="info-row">
+      <div class="key w150">Loại tủ đĩa<span class="red">*</span></div>
+      <div class="value">
+        <SelectExt
+          :dataSource="discTypeList"
+          dataTextField="TEN"
+          dataValueField="ID"
+          v-model="currentItem.loaitudia_id"
+          :disabled="!controls.select_loaitudia_id.enabled"
+          :class="{ invalidBox: controls.select_loaitudia_id.invalid }"
+        />
+      </div>
+    </div>
+    <!-- Show khi loại thiết bị là thiết bị mạng -->
+    <div v-show="isNetwork" class="info-row">
+      <div class="key w150">Chủng loại thiết bị<span class="red">*</span></div>
+      <div class="value">
+        <SelectExt
+          :dataSource="equipmentCategoryList"
+          dataTextField="MODEL"
+          dataValueField="ID"
+          v-model="currentItem.chungloaithietbi_id"
+          :disabled="!controls.select_chungloaithietbi_id.enabled"
+          :class="{ invalidBox: controls.select_chungloaithietbi_id.invalid }"
+        />
+      </div>
+    </div>
+    <!-- Cho phép chọn nhiều -->
+    <div class="info-row">
+      <div class="key w150">IP Quản trị</div>
+      <div class="value">
+        <treeselect
+          :multiple="true"
+          v-model="currentItem.ip_ids"
+          :options="IPAddressList"
+          placeholder="IP Address"
+          :disable-branch-nodes="false"
+          :append-to-body="true"
+          style="overflow-y:auto;"
+          :disabled="!controls.select_ip_ids.enabled"
+          :normalizer="normalizer"
+          :limit="100"
+        ></treeselect>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="row">
+      <div class="info-row col-6">
+        <div class="key w150">Hiệu lực</div>
+        <div class="value padt4">
+          <div class="check-action">
+            <input
+              type="checkbox"
+              class="check"
+              :true-value="1"
+              :false-value="0"
+              v-model="currentItem.hieu_luc"
+              :disabled="!controls.checkbox_hieu_luc.enabled"
+            /><span class="name"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Show khi loại thiết bị là thiết bị máy chủ -->
+      <div v-show="isServer" class="info-row col-6">
+        <div class="key w150">Thiết bị HSM</div>
+        <div class="value padt4">
+          <div class="check-action">
+            <input
+              type="checkbox"
+              class="check"
+              :true-value="1"
+              :false-value="0"
+              v-model="currentItem.hsm"
+              :disabled="!controls.checkbox_hsm.enabled"
+            /><span class="name"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Loại thiết bị <span class="red">*</span></div>
+      <div class="value">
+        <SelectExt
+          :dataSource="deviceTypeList"
+          dataTextField="TEN"
+          dataValueField="ID"
+          v-model="currentItem.loaithietbi_id"
+          :disabled="!controls.select_loaithietbi_id.enabled"
+          :class="{ invalidBox: controls.select_loaithietbi_id.invalid }"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Loại khách hàng</div>
+      <div class="value">
+        <SelectExt
+          :dataSource="customerTypeList"
+          dataTextField="name"
+          dataValueField="id"
+          v-model="currentItem.loaikhachhang"
+          :disabled="!controls.select_loaikhachhang.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Serial Number</div>
+      <div class="value">
+        <input
+          type="text"
+          class="form-control"
+          v-model="currentItem.serial_number"
+          :disabled="!controls.txt_serial_number.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Model thiết bị</div>
+      <div class="value">
+        <input
+          type="text"
+          class="form-control"
+          v-model="currentItem.model"
+          :disabled="!controls.txt_part_number.enabled"
+        />
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="key w150">Part Number</div>
+      <div class="value">
+        <input
+          type="text"
+          class="form-control"
+          v-model="currentItem.part_number"
+          :disabled="!controls.txt_model.enabled"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="col-12 px-3">
+    <div class="info-row">
+      <div class="key w150">Ghi chú</div>
+      <div class="value">
+        <input
+          type="text"
+          class="form-control"
+          v-model="currentItem.ghi_chu"
+          :disabled="!controls.txt_ghi_chu.enabled"
+        />
+      </div>
+    </div>
+  </div>
+</div>

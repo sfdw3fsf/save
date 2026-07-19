@@ -1,0 +1,2 @@
+import GachNoKhachHangViPhamCamKet from './GachNoKhachHangViPhamCamKet'
+export default GachNoKhachHangViPhamCamKet

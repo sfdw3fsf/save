@@ -1,0 +1,2 @@
+import SearchSubcriberByNoAppMyVNPT from './SearchSubcriberByNoAppMyVNPT'
+export default SearchSubcriberByNoAppMyVNPT

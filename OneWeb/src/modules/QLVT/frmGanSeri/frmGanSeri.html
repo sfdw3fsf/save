@@ -1,0 +1,176 @@
+<!-- <div class="modal" id="popupTCTTTB"> -->
+    <!-- <div class="modal-dialog" style="width: 100%; max-width: 1200px;"> -->
+        <div class="modal-content popup-box">
+            <div class="popup-header">
+                <div class="title"><span class="icon one-appstore"></span> {{ Text.title}}</div>                
+            </div>
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li>
+                        <a @click='tsbtnGhiLai_Click'>
+                            <span class="icon one-save"></span> Ghi lại
+                        </a>
+                    </li>
+                    <li v-if="Visible.tsbtnNhapExcel">
+                        <b-form-file id="fileUpload_frmGanSeri" v-model="arrayImportFile.filexcel" ref="fileUpload_frmGanSeri" @change="this.onChange" accept=".xls, .xlsx" class="-ap icon-more_horiz hidden" plain></b-form-file>
+                        <a @click='tsbtnNhapExcel_Click'>
+                            <span class="icon one-xlsx"></span>Nhập từ Excel
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="popup-body" >
+                <div class="box-form">
+                    <div >
+                        <div v-if="!Visible.Panel1Collapsed">
+                            <div class="legend-title">
+                                Kho vật tư
+                            </div>
+                            <div class="info-row marb10">
+                                <div class="key w80">Từ kho</div>
+                                <div class="value">
+                                    <div class="row">
+                                        <div class="col-sm-5 col-12">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist
+                                                    class="form-control"
+                                                    locale='vi'
+                                                    v-model="params.p_TuKho"
+                                                    :dataSource='cboTuKho' 
+                                                    :fields="{value:'khoID', text: 'tenKho'}"
+                                                    :allowFiltering="true"
+                                                    >
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2 col-12">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist
+                                                    class="form-control"
+                                                    locale='vi'
+                                                    v-model="params.p_CheDoQuet"
+                                                    :dataSource='cboCheDoQuet' 
+                                                    :fields="{value:'CHEDO_ID', text: 'CHEDO'}"
+                                                    :allowFiltering="true"
+                                                    >
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5 col-12">
+                                            <input type="text" class="form-control" v-model="params.p_txtQuetSerial" @keyup.enter="txtQuetSerial_KeyPress" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                
+                                    <div class="box-col box-form col-sm-9 col-12" >
+                                        <div id="div-seri">
+                                            <DataGrid                                     
+                                                ref="gridViewVatTu" 
+                                                class="table-result table-gachle tree-grid-2"     
+                                                v-bind:columns="[         
+
+                                                    {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, allowSorting: true , isGroupedColumn:true},
+                                                    {fieldName: '', headerText: '', allowSorting:false , allowFiltering:false, cssClass: 'text-center',width: 43, headerTemplate:colCheckboxAllVatTuSerial ,template:colCheckboxVatTuSerial},
+                                                    {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true}, 
+                                                    {fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true, allowSorting: true}, 
+                                                    {fieldName: 'MA_TBI', headerText: 'Mã TBI', allowFiltering: true, allowSorting: true},
+                                                    {fieldName: 'SERIAL', headerText: 'Serial', allowFiltering: true, allowSorting: true},
+                                                    {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true, allowSorting: true},
+                                                    {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, allowSorting: true},
+                                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},
+                                                    {fieldName: 'MATHUNG', headerText: 'Mã thùng', allowFiltering: true, allowSorting: true, visible: Visible.colMaThung},
+                                                    {fieldName: 'THIETBI_ID', headerText:'', visible:false, isPrimaryKey:true}                              
+                                                    ]" 
+                                                dataKeyField="THIETBI_ID"
+                                                v-bind:dataSource="gridVatTu" 
+                                                :showFilter="true"                                 
+                                                :showColumnCheckbox='false'
+                                                :allowPaging="true"
+                                                :enablePagingServer="false"
+                                                :enabledSelectFirstRow="false"   
+                                                :selectionSettings="{ type: 'Multiple' }"      
+                                                @selectedItemsChanged="gridDSVatTuCheckBox"                                              
+                                                >
+                                            </DataGrid>
+                                        </div>
+                                    </div>
+                                    <div class="box-col box-form col-sm-3 col-12" id="boxRight">
+                                        <DataGrid                                     
+                                            ref="gridViewDSchon" 
+                                            class="table-result table-gachle tree-grid-2"     
+                                            v-bind:columns="[                                     
+                                                
+                                                {fieldName: 'TENVT', headerText: 'Tên VT', allowFiltering: true, allowSorting: true}, 
+                                                {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: true, width:120}, 
+                                                                            
+                                                ]" 
+                                            dataKeyField=""
+                                            v-bind:dataSource="DSChonVT" 
+                                            :showFilter="true"                                 
+                                            :showColumnCheckbox='false'
+                                            :allowPaging="true"
+                                            :enablePagingServer="false"
+                                            :enabledSelectFirstRow="false"   
+                                            :selectionSettings="{persistSelection: true }"  
+                                            :aggregates="TongSL"                                                                                    
+                                            >
+                                        </DataGrid>
+                                    </div>
+                                    
+                            </div>
+                                                        
+                        </div>
+                        <div v-if="!Visible.Panel2Collapsed">
+                            <div class="legend-title">
+                                Danh sách cuộn cáp
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="col-3 d-flex align-items-center">
+                                    {{Text.lblSL}}
+                                </div>
+                                <div class="col-9 d-flex align-items-center">
+                                    <div class="key w80">Từ kho</div>
+                                    <div class="value flex-grow-1">
+                                        <input type="text" class="form-control" v-model="params.p_txtTenKho" readonly='true'>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <DataGrid
+                                ref="grvDS_ThietBi" 
+                                v-bind:columns="[
+                                    {fieldName: '', headerText: '', allowSorting:false , allowFiltering:false, cssClass: 'text-center',width: 43, headerTemplate:colCheckboxAllVatTuCap ,template:colCheckboxVatTuCap, freeze: 'Left'}, 
+                                    {fieldName: 'STT', headerText: 'STT', allowFiltering: true, allowSorting: true, freeze: 'Left', width: '100'}, 
+                                    {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, allowSorting: true, }, 
+                                    {fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true, allowSorting: true, }, 
+                                    {fieldName: 'MA_TBI', headerText: 'Mã Tbi', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SL_TON', headerText: 'Số lượng', allowFiltering: true, allowSorting: true,type:'number' , format:'N3'},
+                                    {fieldName: 'SL_XUAT', headerText: 'SL xuất', allowFiltering: true, allowSorting: true, allowEditing: true , editType: 'numericedit', type:'number' ,format:'N3'},
+                                    {fieldName: 'THIETBI_ID', headerText:'', visible:false, isPrimaryKey:true} 
+                                    
+                                    ]" 
+                                dataKeyField="THIETBI_ID"
+                                v-bind:dataSource="grcDS_ThietBi" 
+                                :editSettings="editSettings"
+                                :showFilter="true"                                 
+                                :showColumnCheckbox='false'
+                                :enabledSelectFirstRow="false"                            
+                                :allowPaging="true"
+                                :enablePagingServer="false"   
+                                @cellSaved="editGridThietBi"                 
+                                >
+                            </DataGrid>
+                            <!-- @selectedItemsChanged="grvDS_ThietBi_checked" -->
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+    <!-- </div> -->
+<!-- </div> -->

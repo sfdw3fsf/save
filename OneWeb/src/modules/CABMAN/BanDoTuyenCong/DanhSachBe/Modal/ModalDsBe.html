@@ -1,0 +1,138 @@
+<b-modal
+  :id="modalId"
+  @shown="showModal"
+  size="xl"
+  no-close-on-backdrop
+  hide-footer
+  hide-header
+  hide-header-close
+  body-class="modal-body p-0">
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span> Tra cứu thông tin bể cáp
+      </div>
+      <div
+        class="close -ap icon-close"
+        data-dismiss="modal"
+        @click="$bvModal.hide(modalId)">
+      </div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="javascript:void(0)" @click="tracuuBe()">
+            <span class="icon one-file-search"></span> Tra cứu
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="legend-title">
+          Tra cứu theo tuyến/tổ quản lý
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div style="display: flex">
+              <div class="key w40" style="margin-top: 5px">TTVT</div>
+              <div class="value" style="width: calc(100% - 40px)">
+                <div class="select-custom" ref="dsbe-ttvt">
+                  <SelectExt v-model.trim="dataSelected.ttvt"
+                             :settings="{dropdownParent: $refs['dsbe-ttvt']}"
+                             :dataSource="dsTTVT" dataTextField="TEN_DV"
+                             dataValueField="DONVI_ID" @change="onChangeTTVT($event)"/>
+                  <!--                                    <select class="form-control" v-model="dataSelected.ttvt" @change="onChangeTTVT()">-->
+                  <!--                                        <option v-for="(item,index) in dsTTVT" :value="item.DONVI_ID">{{item.TEN_DV}}</option>-->
+                  <!--                                      </select>-->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div style="display: flex">
+              <div class="key w70" style="margin-top: 5px">Tổ quản lý</div>
+              <div class="value" style="width: calc(100% - 70px)">
+                <div class="select-custom" ref="dsbe-toql">
+                  <SelectExt v-model.trim="dataSelected.toql"
+                             :settings="{dropdownParent: $refs['dsbe-toql']}"
+                             :dataSource="dsToQL" dataTextField="TEN_DV"
+                             dataValueField="DONVI_ID" @change="onChangeToQL($event)"/>
+                  <!--                                    <select class="form-control" v-model="dataSelected.toql" @change="onChangeToQL()">-->
+                  <!--                                        <option v-for="(item,index) in dsToQL" :value="item.DONVI_ID">{{item.TEN_DV}}</option>-->
+                  <!--                                      </select>-->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div style="display: flex">
+              <div class="key w120" style="margin-top: 5px; margin-right: 5px">
+                <div class="check-action">
+                  <input type="checkbox" class="check" v-model="isTuyen">
+                  <span class="name">Tuyến cống-bể</span>
+                </div>
+              </div>
+              <div class="value" style="width:calc(100% - 125px)" v-if="isTuyen">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="dataSelected.tuyen_id"
+                             :settings="{dropdownParent: $refs['dsbe-tuyen']}"
+                             :dataSource="dsTuyenCong" dataTextField="TUYEN_CB"
+                             dataValueField="TUYENCB_ID" @change="onChangeTuyen($event)"/>
+                  <!--                                    <select class="form-control" v-model="dataSelected.tuyen_id" @change="onChangeTuyen()">-->
+                  <!--                                        <option v-for="(item,index) in dsTuyenCong" :value="item.TUYENCB_ID">{{item.TUYEN_CB}}</option>-->
+                  <!--                                      </select>-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="box-form">
+        <div class="legend-title">
+          Tìm kiếm
+        </div>
+        <div class="input-more-button">
+          <button class="btn" @click="timKiem()">
+            <span class="one-search"></span>
+          </button>
+          <input type="text" v-on:keyup.enter="onKeyEnter()" v-model="querys" class="form-control " placeholder="Nhập vào tên, ký hiệu hoặc địa chỉ bể để tìm kiếm">
+        </div>
+
+      </div>
+      <div class="box-form">
+        <div class="legend-title">
+          {{tieuDe}}
+        </div>
+
+        <DataGrid v-bind:columns="[
+                {fieldName: 'STT', headerText: 'STT', allowFiltering: true, width: '70px'},
+                {fieldName: 'BECAP_ID', headerText: 'ID', allowFiltering: true},
+                {fieldName: 'MA_BC', headerText: 'Mã bể cáp', allowFiltering: true},
+                {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                {fieldName: 'TEN_BC', headerText: 'Tên bể cáp', allowFiltering: true},
+                {fieldName: 'TUYEN_CB', headerText: 'Tuyến cống bể', allowFiltering: true},
+                {fieldName: 'TENVT_DB', headerText: 'Vị trí đặt bể cáp', allowFiltering: true},
+                {fieldName: 'LOAI_BC', headerText: 'Loại bể cáp', allowFiltering: true},
+                {fieldName: 'DIACHI', headerText: 'Địa chỉ', allowFiltering: true},
+                {fieldName: 'TRANGTHAI_SD', headerText: 'Trạng thái sử dụng', allowFiltering: true},
+                {fieldName: 'SOHIEU_CT', headerText: 'Dự án', allowFiltering: true},
+                {fieldName: 'TEN_TS', headerText: 'Tài sản', allowFiltering: true},
+                {fieldName: 'TENCHUQUAN', headerText: 'Chủ quản', allowFiltering: true},
+                ]"
+                  v-bind:dataSource="dsBe" :showFilter="true" @selectedRowChanged="grid_selectedRowChanged"></DataGrid>
+      </div>
+      <div class="box-form">
+        <div class="group-buttons -bottom tright mart0">
+          <button class="btn btn-main" :class="{'disabled': isDisableBtnChon}" @click="chonBe()">
+            <span class="nc-icon-glyph ui-1_check-circle-08"></span> Chọn
+          </button>
+          <button class="btn btn-main"  @click="$bvModal.hide(modalId)">
+            <span class="nc-icon-glyph ui-1_circle-remove"></span> Hủy bỏ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</b-modal>

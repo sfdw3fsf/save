@@ -1,0 +1,3 @@
+import AccessPlanInformationLookup from "./AccessPlanInformationLookup.vue"
+
+export default AccessPlanInformationLookup

@@ -1,0 +1,287 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <b-link href="javascript:void(0)" @click="onAddNew" :disabled="!buttons.btnAddNew.enabled">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onSave" :disabled="!buttons.btnSave.enabled">
+                    <span class="icon one-save"></span>Ghi lại
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onCancel" :disabled="!buttons.btnCancel.enabled">
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onEdit" :disabled="!buttons.btnEdit.enabled">
+                    <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onDelete" :disabled="!buttons.btnDelete.enabled">
+                    <span class="icon one-trash"></span>Xóa
+                </b-link>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+      <div class="row">
+        <div class="col-12">
+          <div class="box-form">
+            <div class="row">
+              <div class="legend-title">Thông tin chung </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">Tên NFS<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" :disabled="!controls.txtTen.enabled"
+                    v-model="currentItem.ten" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">Hiệu lực</div>
+                  <div class="value padt4">
+                    <div class="check-action">
+                      <input type="checkbox" class="check"
+                        :disabled="!controls.chkHieuLuc.enabled" v-model="currentItem.hieuLuc"
+                        :true-value="1" :false-value="0" /><span class="name"></span>
+                    </div>
+                  </div>
+                </div>
+                </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w150">Đường dẫn</div>
+                        <div class="value">
+                          <input type="text" class="form-control" :disabled="!controls.chkHieuLuc.enabled"
+                    v-model="currentItem.linkBackup" />
+                        </div>
+                    </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Mã phiếu yêu cầu</div>
+                    <div class="value">
+                       <SelectExt v-model="currentItem.phieuYeuCauId" 
+                                        dataTextField="MA" dataValueField="ID" 
+                                        :dataSource="dsPhieuYeuCau"
+                                        :disabled="!controls.chkHieuLuc.enabled"
+                                        :class="controls.chkHieuLuc.invalid ? 'is-invalid' : ''" />
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Ghi chú</div>
+              <div class="value">
+              <input type="text" class="form-control" :disabled="!controls.txtGhiChu.enabled" v-model="currentItem.ghiChu" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Thông tin Năng lực -->
+       <div class="box-form" v-if="nguon_yeucau !== 1">
+        <div class="row">
+          <div class="legend-title">Thông tin năng lực</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Loại hạ tầng lưu trữ</div>
+              <div class="value">
+                <SelectExt placeholder="Tủ đĩa, Tự dựng"
+                  :dataSource="dsLoaiHaTangLuuTru"
+                  dataTextField="TEN" dataValueField="ID"
+                  :disabled="!controls.chkHieuLuc.enabled"
+                  @change="loaiLuuTruOnChange"
+                  v-model="currentItem.loaiHaTangLuuTruId"/>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Loại lưu trữ</div>
+              <div class="value">
+              <SelectExt :dataSource="dsLoaiLuuTru"
+                  dataTextField="TEN" dataValueField="ID"
+                  :disabled="!controls.chkHieuLuc.enabled"
+                  @change="loaiLuuTruOnChange" 
+                  v-model="currentItem.loaiLuuTruId" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Hạ tầng lưu trữ</div>
+              <div class="value">
+              <SelectExt :dataSource="dsHaTangLuuTru"
+                  dataTextField="MAHATANG_INFRA" dataValueField="ID"
+                  :disabled="!controls.chkHieuLuc.enabled"
+                  @change="haTangLuuTruOnChange"
+                  v-model="currentItem.haTangLuuTruId" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Dung lượng cấp</div>
+              <div class="value">
+              <input type="text" class="form-control" v-model="currentItem.dungLuong" @input="dungLuongValid"/>
+              </div>
+              <span style="margin: 0 10px;" class="currency-label">GB</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Khả năng cấp phát</div>
+              <div class="value">
+              <input type="text" class="form-control" :disabled="true" v-model="currentItem.khaNangCapPhat" />
+              </div>
+              <span style="margin: 0 10px;" class="currency-label">GB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end năng lưc -->
+      <!-- Thông tin quản lý -->
+          <div class="box-form" v-if="nguon_yeucau !== 1">
+            <div class="row">
+                <div class="legend-title">Thông tin quản lý
+                </div>
+            </div>
+            <!-- Đơn vị quản lý - Cá nhân quản lý -->
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w150">Đơn vị quản lý <span class="red">*</span></div>
+                      <div class="value">
+                        <input type="text" class="form-control" :disabled="true"
+                          v-model="currentItem.donViQuanly" />
+                      </div>
+                  </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w150">Chủ quản dịch vụ</div>
+                      <div class="value">
+                          <input type="text" class="form-control" :disabled="true" v-model="currentItem.nguoiQuanLy"/>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <!-- cá nhân quản lý-->
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w150">Cá nhân quản lý</div>
+                      <div class="value">
+                        <input type="text" class="form-control" :disabled="true"
+                          v-model="currentItem.nguoiQuanLy" />
+                      </div>
+                  </div>
+              </div>
+             </div>
+
+          </div>
+          <!-- end  Thông tin quản lý -->
+      <!-- Thông tin biến động -->
+      <div class="box-form" v-if="nguon_yeucau !== 1">
+        <div class="row">
+            <div class="legend-title">Thông tin biến động dung lượng tài nguyên NFS</div>
+        </div>
+        <div class="row">
+          <DataGrid ref="grdBienDong" v-bind:columns="colsBienDong" v-bind:dataSource="dsBienDong"
+              :showColumnCheckbox="false" :showFilter="true"
+              :allowPaging="true" :enablePagingServer="false"
+              ></DataGrid>
+      </div>
+      </div>
+        </div>
+      <!-- Danh sách TAB  -->
+      <div class="row" v-if="nguon_yeucau !== 1">
+        <div class=''>
+            <div class='nav tabs tab-over'>
+                <a href='#tab1' data-toggle='tab'
+                    :class='{active: currentTab===1}'>Máy ảo </a>
+                <a href='#tabHistory' data-toggle='tab'
+                    :class='{active: currentTab===7}'>Lịch sử thay đổi</a>
+            </div>
+
+            <div class='tab-content'>
+                <!-- tab Hạ tầng -->
+                <div class='tab-pane' id="tab1" :class='{active: currentTab===1}'>
+                    <div class="row">
+                        <div class="box-form">
+                            <DataGrid :columns="colsMayAo" :dataSource="dsMayAo"
+                                :showColumnCheckbox="false" :showFilter="true"
+                                ref="grdMayAo" :allowPaging="true" :enablePagingServer="false">
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+          <!-- tab lịch sử thay đổi -->
+            <div class='tab-pane' id="tabHistory" :class='{active: currentTab===2}'>
+              <div class="box-form">
+                  <div class="row">
+                      <DataGrid ref="grdHistory" v-bind:columns="colsHistory" v-bind:dataSource="dsHistory"
+                          :showColumnCheckbox="false" :showFilter="true"
+                          :allowPaging="true" :enablePagingServer="false"
+                          @selectedRowChanged=""></DataGrid>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+        <!-- DS tài nguyên NFS -->
+      <div class="row">
+          <div class="col-12">
+              <div class="box-form">
+                  <div class="row">
+                      <div class="legend-title">Danh sách tài nguyên NFS
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-12">
+                          <DataGrid ref="grdItems" :allowPaging="true"
+                            :enablePagingServer="false"
+                            :showColumnCheckbox="true"
+                            v-bind:columns="[
+                            {fieldName: 'TEN', headerText: 'Tên NFS', textAlign: 'Left'},
+                            {fieldName: 'LINK_BACKUP', headerText: 'Đường dẫn', textAlign: 'Left'},
+                            {fieldName: 'DUNGLUONG', headerText: 'Dung lượng', textAlign: 'Left'},
+                            {fieldName: 'LOAI_LUUTRU', headerText: 'Loại dung lượng', textAlign: 'Left'},
+                            {fieldName: 'HATANG_LUUTRU', headerText: 'Hạ tầng lưu trữ', textAlign: 'Left'},
+                            {fieldName: 'TEN_HATANG_LUUTRU', headerText: 'Loại hạ tầng lưu trữ', textAlign: 'Left'},
+                            {fieldName: 'GHI_CHU', headerText: 'Ghi chú', textAlign: 'Left'},
+                            {fieldName: 'HIEU_LUC', headerText: 'Hiệu lực', width: 50, template: getColumnHieuLucTemplate(), textAlign: 'Left'}
+                            ]" v-bind:dataSource="dataSource"
+                                @rowSelected="grdItems_RowSelected"
+                                @rowDeselected="grdItems_RowDeselected">
+                          >
+                          </DataGrid>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+</div>

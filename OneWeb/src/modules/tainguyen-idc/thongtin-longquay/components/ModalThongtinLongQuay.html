@@ -1,0 +1,599 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalThongTinLongQuay"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="70%"
+  height="auto"
+  :target="target"
+  :isModal="true"
+  :position="{ X: 'center', Y: 'center' }"
+  :zIndex="1050"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title" style="font-weight: 600;">
+        {{ actionMode === 3 ? 'Thêm mới lồng quây' : actionMode === 2 ? 'Sửa lồng quây' : 'Chi tiết lồng quây' }}
+      </div>
+      <div class="close -ap icon-close" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link
+            href="javascript:void(0)"
+            @click="btnGhiLai_Click"
+            :disabled="!buttons.btnGhiLai.enabled || currentTab !== 1"
+          >
+            <span class="icon one-save"></span> Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link
+            href="javascript:void(0)"
+            @click="btnHuy_Click"
+            :disabled="!buttons.btnHuy.enabled || currentTab !== 1"
+          >
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy
+          </b-link>
+        </li>
+        <li>
+          <b-link
+            href="javascript:void(0)"
+            @click="btnSua_Click"
+            :disabled="!buttons.btnSua.enabled || currentTab !== 1"
+          >
+            <span class="icon one-print"></span>Sửa
+          </b-link>
+        </li>
+      </ul>
+    </div>
+
+    <div class="popup-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-12">
+              <div class="nav tabs tab-over">
+                <a
+                  href="#tabChiTietLongQuay"
+                  data-toggle="tab"
+                  :class="{active: currentTab===1}"
+                  @click="onChangeTab(1)"
+                  >Thông tin lồng quây</a
+                >
+                <a
+                  href="#tabDSRack"
+                  data-toggle="tab"
+                  :class="{active: currentTab===2, disabled: actionMode === 3 }"
+                  @click="onChangeTab(2)"
+                  >Danh sách Rack</a
+                >
+                <a
+                  href="#tabDSThietBi"
+                  data-toggle="tab"
+                  :class="{active: currentTab===3, disabled: actionMode === 3 }"
+                  @click="onChangeTab(3)"
+                  >Danh sách thiết bị</a
+                >
+                <a
+                  href="#tabCongSuatDien"
+                  data-toggle="tab"
+                  :class="{active: currentTab===4, disabled: actionMode === 3 }"
+                  @click="onChangeTab(4)"
+                  >Công suất điện</a
+                >
+                <a
+                  href="#tabColocation"
+                  data-toggle="tab"
+                  :class="{active: currentTab===5, disabled: actionMode === 3 }"
+                  @click="onChangeTab(5)"
+                  >Khách hàng</a
+                >
+                <a
+                  href="#tabLichSu"
+                  data-toggle="tab"
+                  :class="{active: currentTab===6, disabled: actionMode === 3 }"
+                  @click="onChangeTab(6)"
+                  >Lịch sử thay đổi</a
+                >
+              </div>
+              <div class="tab-content">
+                <div class="tab-pane" :class="{active: currentTab===1}" id="tabChiTietLongQuay">
+                  <div class="row">
+                    <div class="legend-title">Thông tin chung</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="key w160">ID lồng quây:<span class="red">*</span></div>
+                        <div class="value">
+                          <input type="text" class="form-control" disabled v-model="currentItem.LONGQUAY_ID" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Loại lồng quây:<span class="red">*</span></div>
+                        <div class="value">
+                          <SelectExt
+                            v-model="currentItem.LOAILQ_ID"
+                            dataTextField="ten"
+                            dataValueField="id"
+                            :dataSource="listLoaiLongQuay"
+                            :disabled="actionMode === 1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Hiệu lực</div>
+                        <div class="form-check ">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            v-model="currentItem.SUDUNG"
+                            :disabled="actionMode === 1"
+                          />
+                        </div>
+                      </div>
+                      <!-- <div class="info-row">
+                        <div class="key w160">Hiệu lực:</div>
+                        <div class="value padt4">
+                          <div class="check-action">
+                            <input
+                              type="checkbox"
+                              v-model.trim="currentItem.SUDUNG"
+                              :disabled="actionMode === 1"
+                              :true-value="1"
+                              :false-value="0"
+                            /><span class="name"></span>
+                          </div>
+                        </div>
+                      </div> -->
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Tên lồng quây:<span class="red">*</span></div>
+                        <div class="value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :disabled="actionMode === 1"
+                            v-model.trim="currentItem.TEN"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Chiều dài (cm):<span class="red">*</span></div>
+                        <div class="value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :disabled="actionMode === 1"
+                            v-model="currentItem.CHIEUDAI"
+                            v-on:keypress="isNumber($event)"
+                            @paste.prevent="handlePaste('CHIEUDAI', $event)"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Chiều rộng (cm):<span class="red">*</span></div>
+                        <div class="value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :disabled="actionMode === 1"
+                            v-model="currentItem.CHIEURONG"
+                            v-on:keypress="isNumber($event)"
+                            @paste.prevent="handlePaste('CHIEURONG', $event)"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Chiều cao (cm):<span class="red">*</span></div>
+                        <div class="value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :disabled="actionMode === 1"
+                            v-model="currentItem.CHIEUCAO"
+                            v-on:keypress="isNumber($event)"
+                            @paste.prevent="handlePaste('CHIEUCAO', $event)"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Camera giám sát:<span class="red">*</span></div>
+                        <!-- <div class="value">
+                          <SelectExt
+                            v-model="currentItem.CAMERA"
+                            dataTextField="ten"
+                            dataValueField="id"
+                            :dataSource="listCamera"
+                            :disabled="actionMode === 1"
+                          />
+                        </div> -->
+                        <div class="form-check pt-1" style="padding-left: 26px;">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            v-model="currentItem.CAMERA"
+                            :disabled="actionMode === 1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Khóa:<span class="red">*</span></div>
+                        <div class="value">
+                          <SelectExt
+                            v-model="currentItem.KHOA_ID"
+                            dataTextField="ten"
+                            dataValueField="id"
+                            :dataSource="listKhoa"
+                            :disabled="actionMode === 1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Sở hữu Rack:<span class="red">*</span></div>
+                        <div class="value">
+                          <SelectExt
+                            v-model.trim="currentItem.DONVISH_ID"
+                            dataTextField="TEN"
+                            dataValueField="ID"
+                            :dataSource="listSoHuu"
+                            :disabled="actionMode === 1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Trạng thái vận hành:<span class="red">*</span></div>
+                        <div class="value">
+                          <SelectExt
+                            v-model.trim="currentItem.TRANGTHAI_VH"
+                            dataTextField="TEN"
+                            dataValueField="ID"
+                            :dataSource="listTrangThaiVanHanh"
+                            :disabled="actionMode === 1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12 col-12">
+                      <div class="info-row">
+                        <div class="key w160">Mô tả lồng quây:</div>
+                        <div class="value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :disabled="actionMode === 1"
+                            v-model.trim="currentItem.MOTA"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Vị trí lồng quây -->
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="legend-title">Vị trí lồng quây</div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-6 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Đơn vị IDC:<span class="red">*</span></div>
+                            <div class="value">
+                              <!-- <input type="text" class="form-control" disabled v-model="currentItem.TEN_IDC" /> -->
+                              <SelectExt
+                                v-model.trim="currentItem.DV_IDC_ID"
+                                @change="onChangeDVIDC()"
+                                dataTextField="TEN"
+                                dataValueField="ID"
+                                :dataSource="listDVIDC"
+                                :disabled="actionMode === 1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                          <div class="info-row">
+                            <div class="key w160">IDC: <span class="red">*</span></div>
+                            <div class="value">
+                              <SelectExt
+                                v-model.trim="currentItem.IDC_ID"
+                                dataTextField="TEN"
+                                dataValueField="ID"
+                                :dataSource="listIDC"
+                                :disabled="actionMode === 1"
+                                @change="onChangeIDC()"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-6 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Tòa nhà: <span class="red">*</span></div>
+                            <div class="value">
+                              <SelectExt
+                                v-model.trim="currentItem.TOANHA_ID"
+                                dataTextField="TEN"
+                                dataValueField="ID"
+                                :dataSource="listToaNha"
+                                :disabled="actionMode === 1"
+                                @change="onChangeToaNha()"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Mặt sàn: <span class="red">*</span></div>
+                            <div class="value">
+                              <SelectExt
+                                v-model.trim="currentItem.MATSAN_ID"
+                                @change="onChangeMatSan()"
+                                dataTextField="TEN"
+                                dataValueField="ID"
+                                :dataSource="listMatSan"
+                                :disabled="actionMode === 1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-6 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Phòng/Zone: <span class="red">*</span></div>
+                            <div class="value">
+                              <SelectExt
+                                v-model.trim="currentItem.PHONG_ID"
+                                dataTextField="TEN"
+                                dataValueField="ID"
+                                :dataSource="listPhong"
+                                :disabled="actionMode === 1"
+                                @change="onChangePhong()"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Tọa độ: <span class="red">*</span></div>
+                            <div class="value">
+                              <input type="text" class="form-control" disabled v-model.trim="currentItem.TOADO" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- <div class="row">
+                        <div class="col-sm-12 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Vị trí lồng quây:</div>
+                            <div class="value">
+                              <input
+                                type="text"
+                                class="form-control"
+                                :disabled="actionMode === 1"
+                                v-model.trim="currentItem.VITRI_LONG_QUAY"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div> -->
+                      <div class="row">
+                        <div class="col-sm-12 col-12">
+                          <div class="info-row">
+                            <div class="key w160">Chọn Rack:</div>
+                            <div class="value">
+                              <!-- <SelectExt
+                                v-model="currentItem.RACK_ID"
+                                dataTextField="TEN"
+                                dataValueField="ID"
+                                :dataSource="listRack"
+                                :disabled="actionMode === 1"
+                              /> -->
+                              <treeselect
+                                :multiple="true"
+                                v-model="currentItem.RACK_ID"
+                                :options="listRack"
+                                :disabled="actionMode === 1"
+                                placeholder="Chọn Rack"
+                                :disable-branch-nodes="false"
+                                :append-to-body="true"
+                                style="overflow-y:auto;"
+                                :normalizer="normalizer"
+                                :limit="100"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="tabDSRack" :class="{active: currentTab===2}">
+                  <div class="row">
+                    <div class="legend-title">Danh sách Rack trong Lồng Quây</div>
+                  </div>
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      :columns="columnsRack"
+                      v-bind:dataSource="dsRackTrongLongQuay"
+                      :allowPaging="true"
+                      :pageSettings="{ pageSize: 20, pageSizes: [10, 20, 50] }"
+                      ref="grdRacks"
+                      :showColumnCheckbox="false"
+                    >
+                    </DataGrid>
+                  </div>
+                </div>
+                <div class="tab-pane" id="tabDSThietBi" :class="{active: currentTab===3}">
+                  <div class="row">
+                    <div class="legend-title">Danh sách thiết bị vật lý trong Lồng Quây</div>
+                  </div>
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      :columns="columnsThietBi"
+                      v-bind:dataSource="dsThietBi"
+                      :allowPaging="true"
+                      :pageSettings="{ pageSize: 20, pageSizes: [10, 20, 50] }"
+                      ref="grdThietBi"
+                      :showColumnCheckbox="false"
+                    >
+                    </DataGrid>
+                  </div>
+                </div>
+                <div class="tab-pane" id="tabCongSuatDien" :class="{active: currentTab===4}">
+                  <div class="row">
+                    <div class="box-form">
+                      <div class="row">
+                        <div class="legend-title">
+                          Tổng quan công suất điện của Lồng Quây<br />
+                          <span style="font-weight: lighter;"
+                            >Tổng hợp từ các thanh nguồn rPDU lắp đặt trên các rack</span
+                          >
+                        </div>
+                      </div>
+                      <div class="row">
+                        <!-- Tổng công suất định danh -->
+                        <div class="col-md-4">
+                          <div class="card card-box text-primary bg-light-blue">
+                            <div class="card-body">
+                              <h6 class="card-title mb-1">Tổng công suất định danh (kW)</h6>
+                              <h2 class="fw-bold mb-0">{{thongTinCongSuat.tongCongSuat}}</h2>
+                              <small class="text-muted">Từ {{thongTinCongSuat.soThanhNguon}} rPDU</small>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Công suất đã sử dụng -->
+                        <div class="col-md-4">
+                          <div class="card card-box text-danger bg-light-red">
+                            <div class="card-body">
+                              <h6 class="card-title mb-1">Công suất đã sử dụng (kW)</h6>
+                              <h2 class="fw-bold mb-0">{{thongTinCongSuat.tongCSDaSuDung}}</h2>
+                              <small class="text-muted">{{thongTinCongSuat.tyLeSuDung}}% đã sử dụng</small>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Công suất khả dụng -->
+                        <div class="col-md-4">
+                          <div class="card card-box text-success bg-light-green">
+                            <div class="card-body">
+                              <h6 class="card-title mb-1">Công suất khả dụng (kW)</h6>
+                              <h2 class="fw-bold mb-0">{{thongTinCongSuat.tongCSConLai}}</h2>
+                              <small class="text-muted">Còn trống</small>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="box-form">
+                      <div class="row">
+                        <div class="legend-title">Danh sách thanh nguồn rPDU</div>
+                      </div>
+                      <div class="row">
+                        <DataGrid
+                          :enablePagingServer="false"
+                          :columns="columnsCongSuat"
+                          v-bind:dataSource="dsCongSuatDien"
+                          :allowPaging="true"
+                          :pageSettings="{ pageSize: 20, pageSizes: [10, 20, 50] }"
+                          ref="grdCongSuatDien"
+                          :showColumnCheckbox="false"
+                        >
+                        </DataGrid>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="tabColocation" :class="{active: currentTab===5}">
+                  <div class="row">
+                    <div class="legend-title">Thông tin cung cấp dịch vụ Colocation</div>
+                  </div>
+                  <div class="row">
+                    <DataGrid
+                      :enablePagingServer="false"
+                      :columns="columnsKhachHang"
+                      v-bind:dataSource="dsKhachHang"
+                      :allowPaging="true"
+                      :pageSettings="{ pageSize: 20, pageSizes: [10, 20, 50] }"
+                      ref="grdKhachHang"
+                      :showColumnCheckbox="false"
+                    >
+                    </DataGrid>
+                  </div>
+                </div>
+                <div class="tab-pane" id="tabLichSu" :class="{active: currentTab===6}">
+                  <div class="row">
+                    <TabHistory
+                      :tenBang="'LONGQUAY'"
+                      :tenCot="''"
+                      :khoaDuLieu="currentItem.LONGQUAY_ID"
+                      ref="grdLichSu"
+                    ></TabHistory>
+                    <!-- <DataGrid
+                      :enablePagingServer="false"
+                      :columns="columnsLichSu"
+                      v-bind:dataSource="dsLichSuThayDoi"
+                      :allowPaging="true"
+                      :pageSettings="{ pageSize: 20, pageSizes: [10, 20, 50] }"
+                      ref="grdLichSu"
+                      :showColumnCheckbox="false"
+                    >
+                    </DataGrid> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Chi tiết Rack  -->
+  <rack-detail-modal ref="rackDetailModal" :rackDetail="selectedRackDetail" @close="onModalClose" />
+  <!-- Chi tiết thiết bị  -->
+  <ModalChiTietThietBi :thietBiId="selectedThietbiId" ref="modalChiTietThietBi" @close="closeDeviceModal" />
+  <!-- Chi tiết thanh nguồn rPDU -->
+  <ThanhNguonModal ref="popupThanhNguon" />
+</ejs-dialog>

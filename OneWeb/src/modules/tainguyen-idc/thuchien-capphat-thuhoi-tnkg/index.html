@@ -1,0 +1,183 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <b-link href="javascript:void(0)">
+                    <span class="icon one-save"></span>Ghi lại
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)">
+                    <span class="icon one-file-back"></span>Trả phiếu
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)">
+                    <span class="icon one-file-check"></span>Hoàn thành
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)">
+                    <span class="icon one-file-arrow-right"></span>Chuyển xử lý
+                </b-link>
+            </li>
+        </ul>
+    </div>
+
+    <div class="page-content">
+        <div class="row">
+            <div class="col-12">
+
+                <!-- Chọn loại công việc -->
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="row align-items-center">
+                                <div class="col-sm-6 col-12">Thực hiện cấp phát / thu hồi / chuyển đổi tài nguyên</div>
+                                <div class="col-sm-6 col-12">
+                                   <SelectExt v-model="selectedLayout"  dataTextField="TEN"
+                                    dataValueField="ID" 
+                                    :dataSource="layoutOptions" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chọn phạm vi IDC -->
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="row align-items-center">
+                        <div class="col-sm-6 col-12">Phạm vi IDC</div>
+                        <div class="col-sm-6 col-12">
+                            <SelectExt v-model="selectedIDC" @change="onIDCSelectionChange()" dataTextField="ten"
+                                dataValueField="id" :dataSource="idcOptions" :disabled="currentMode == 'VIEW'" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- First DataGrid -->
+        <div class="row datagrid-section">
+            <div class="col-12">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="legend-title">Danh sách nhiệm vụ / công việc: Cấp phát / Thu hồi / Chuyển đổi tài nguyên không gian</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <DataGrid ref="grdListOfWorks" :allowPaging="true" :enablePagingServer="false" :showColumnCheckbox="false"
+                                v-bind:columns="dataGrid1Columns" v-bind:dataSource="dataGrid1Items" @rowSelected="grdListOfWorks_RowSelected"
+                                :enabledSelectFirstRow="false">
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form with 12 fields in 2 columns -->
+        <div class="row form-section">
+            <div class="col-12">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="legend-title">Thông tin công việc thực hiện</div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Left column - 7 fields -->
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w160">Mã công việc (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field1" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Loại công việc (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field2" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Hạng mục triển khai (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field3" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Căn cứ Phiếu yêu cầu (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field4" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Mã công việc cha</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field5" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Khách hàng</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field6" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Mã thuê bao</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field7" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right column - 5 fields -->
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w160">Đơn vị thực hiện (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field8" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Người thực hiện (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field9" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Ngày tạo</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field10" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Trạng thái thực hiện (*)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field11" />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w160">Thời điểm hoàn thành</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="currentMode == 'VIEW'" v-model="formData.field12" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout Components -->
+        <cap-phat-rack v-if="selectedLayout == 1" :currentMode="currentMode"></cap-phat-rack>
+        <thu-hoi-rack v-if="selectedLayout == 2" :currentMode="currentMode"></thu-hoi-rack>
+        <cap-phat-u v-if="selectedLayout == 3" :currentMode="currentMode"></cap-phat-u>
+        <thu-hoi-u v-if="selectedLayout == 4" :currentMode="currentMode"></thu-hoi-u>
+
+    </div>
+</div>

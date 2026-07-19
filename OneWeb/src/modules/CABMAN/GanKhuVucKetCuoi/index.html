@@ -1,0 +1,154 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header" />
+  <Modal modalId="popupImportByFile" />
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a v-b-modal.popupImportByFile><span class="icon one-template"></span>Nhập từ File </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Lọc theo cáp gốc</div>
+      <div class="row">
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key w80">TTVT</div>
+            <div class="value">
+              <div class="select-custom">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="dataSelected.TTVT" :dataSource="dsTTVT" dataTextField="TEN_DV" dataValueField="DONVI_ID" @change="onChangeTTVT($event)" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w80">Nhóm</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt v-model.trim="dataSelected.NhomCap" :dataSource="dsNhomCap" dataTextField="loai_cap" dataValueField="loai_cap" @change="onChangeNhomCap()" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-9 col-12">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; box-sizing: border-box; margin-bottom: 5px; gap: 10px;">
+            <div style="display: flex;">
+              <div class="key w90">Tổ QL</div>
+              <div class="select-custom" style="width: 100%; padding-left: 15px;">
+                <SelectExt v-model.trim="dataSelected.ToQL" :dataSource="dsToQL" dataTextField="TEN_DV" dataValueField="DONVI_ID" @change="onChangeToQL($event)" />
+              </div>
+            </div>
+            <div style="display: flex; gap: 20px">
+              <div class="key w90" style="white-space: nowrap;">Tổng đài</div>
+              <div class="select-custom" style="width: 100%">
+                <SelectExt v-model.trim="dataSelected.TongDai" :dataSource="dsTongDai" dataTextField="TEN_DV" dataValueField="DONVI_ID" @change="onChangeTongDai($event)" />
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Cáp gốc</div>
+            <ComboboxGrid
+              ref="cap-goc"
+              v-bind:columns="[
+                      {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                      {fieldName: 'TEN_CAP', headerText: 'Tên cáp', allowFiltering: true},
+                      ]"
+              v-bind:dataSource="dsCapGoc"
+              textField="TEN_CAP"
+              valueField="CAP_ID"
+              @selectedChanged="cbb_selectedChanged"
+            ></ComboboxGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="display: flex; justify-content: space-between">
+      <div style="width: 47.5%">
+        <div class="box-form">
+          <div class="legend-title">Kết cuối chưa gán khu vực</div>
+
+          <div class="row">
+            <DataGrid
+              v-bind:columns="[
+
+                        {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                        {fieldName: 'DUNGLUONG', headerText: 'Dung lượng', allowFiltering: true},
+                        {fieldName: 'DIACHI', headerText: 'Địa chỉ', allowFiltering: true},
+                        ]"
+              v-bind:dataSource="dsKetCuoiChuaPhan"
+              :showColumnCheckbox="true"
+              dataKeyField="KETCUOI_ID"
+              @selectedItemsChanged="selectCP_selectedItemsChanged"
+              :showFilter="true"
+            ></DataGrid>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; width: 5%">
+        <div class="box-move-select-table">
+          <div class="box-col" style="display: flex; justify-content: center">
+            <div class="actions" style="width: 60px">
+              <button class="btn" @click="RightOne" style="height: 40px; width: 40px">
+                <span class="fa fa-angle-right" style="font-size: 20px"></span>
+              </button>
+              <button class="btn" @click="RightAll" style="height: 40px; width: 40px">
+                <span class="fa fa-angle-double-right" style="font-size: 20px"></span>
+              </button>
+              <button class="btn" @click="LeftOne" style="height: 40px; width: 40px">
+                <span class="fa fa-angle-left" style="font-size: 20px"></span>
+              </button>
+              <button class="btn" @click="LeftAll" style="height: 40px; width: 40px">
+                <span class="fa fa-angle-double-left" style="font-size: 20px"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width: 47.5%">
+        <div class="box-form">
+          <div class="legend-title">Kết cuối đã gán khu vực</div>
+          <div class="row">
+            <div class="info-row">
+              <div class="key">Khu vực</div>
+              <div class="select-custom" ref="khuvuc">
+                <SelectExt v-model.trim="dataSelected.KhuVuc" :dataSource="dsKhuVuc" dataTextField="TEN_HIEN_THI" dataValueField="KHUVUC_ID"
+                  @change="onChangeKhuVuc()" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="info-row">
+              <div class="key"></div>
+              <div class="value">
+                <input hidden type="text" class="form-control" />
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 27px"></div>
+          <div class="row">
+            <DataGrid
+              ref="grid"
+              v-bind:columns="[
+
+                                {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                                {fieldName: 'DUNGLUONG', headerText: 'Dung lượng', allowFiltering: true},
+                                {fieldName: 'DIACHI', headerText: 'Địa chỉ', allowFiltering: true},
+                                {fieldName: 'MA_KV', headerText: 'Mã khu vực', allowFiltering: true,cellCreatedEventEnabled: true},
+                                ]"
+              v-bind:dataSource="dsKetCuoiDaPhan"
+              :showFilter="true"
+              :showColumnCheckbox="true"
+              dataKeyField="KETCUOI_ID"
+              @selectedItemsChanged="selectDP_selectedItemsChanged"
+            ></DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">VNPT-IT &copy; 2021</footer>
+  <script type="application/javascript" src="../vendor/jquery/split.js"></script>
+</div>

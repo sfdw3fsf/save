@@ -1,0 +1,256 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="LayDS" title="Lấy danh sách">
+                    <span class="icon one-file-search"></span> Danh sách
+                </a>
+            </li>
+            <li v-if="selectedTab == 1">
+                <a href="#" @click.prevent="GhiLai" title="Ghi lại" :class="{disabled : (idTrangThai_ChuaThu != 1) }">
+                    <span class="icon one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="GiaoPhieu" title="Giao phiếu cho đại lý"
+                    :class="{disabled : (selectedTab == 0 && idTrangThai_nvtc == 2) || (selectedTab == 1 && idTrangThai_ChuaThu != 1)}">
+                    <span class="icon one-file-arrow-right"></span> Giao phiếu
+                </a>
+            </li>
+            <li v-if="selectedTab == 1">
+                <a href="#" @click.prevent="HoanThanh" title="Hoàn thành"
+                    :class="{disabled : (idTrangThai_ChuaThu != 1) }">
+                    <span class="icon one-check"></span> Hoàn thành
+                </a>
+            </li>
+            <li v-if="selectedTab == 1">
+                <a href="#" @click.prevent="DieuHong" title="Điều hỏng"
+                    :class="{disabled : (idTrangThai_ChuaThu != 1) }">
+                    <span class="icon one-reload1"></span> Điều hỏng
+                </a>
+            </li>
+            <li v-if="(selectedTab == 0 && idTrangThai_nvtc == 2) || (selectedTab == 1 && idTrangThai_ChuaThu == 2)">
+                <a href="#" @click.prevent="HuyGiao" title="Hủy giao phiếu đại lý">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy giao
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="XuatExcel" title="Xuất Excel">
+                    <span class="icon one-excel"></span> Xuất Excel
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="tabs nav tab-over">
+            <a href="#tab1" data-toggle="tab" class="active" @click="changeTab(0)">Danh sách giao NVTC</a>
+            <a href="#tab2" data-toggle="tab" @click="changeTab(1)">Danh sách chưa thu được</a>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title">
+                                Thông tin tìm kiếm
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Trạng thái
+                                        </div>
+                                        <div class="value">
+                                            <div>
+                                                <div class="select-custom">
+                                                    <select v-model="idTrangThai_nvtc" name="" id=""
+                                                        class="form-control">
+                                                        <option value="1">Chưa giao </option>
+                                                        <option value="2">Đã giao </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Tháng
+                                        </div>
+                                        <div class="value">
+                                            <ejs-datepicker v-model="thang" class="form-control bg-none bor0 fw6 text"
+                                                placeholder="Chọn ngày" :format="'MM/y'" :showClearButton="false"
+                                                :allowEdit="false" :enabled="false">
+                                            </ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title">
+                                Thông tin cập nhật
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Nội dung giao
+                                        </div>
+                                        <div class="value">
+                                            <input v-model="ndGiao_ntvc" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Ngày giao
+                                        </div>
+                                        <div class="value">
+                                            <ejs-datepicker v-model="ngayGiao"
+                                                class="form-control bg-none bor0 fw6 text" placeholder="Chọn ngày"
+                                                :format="'dd/MM/yyyy'" :showClearButton="false" :allowEdit="false">
+                                            </ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend-title">
+                    Danh sách phiếu
+                </div>
+                <DataGrid :columns="[
+                {fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true},
+                {fieldName: 'MA_TB', headerText: 'Số máy/ Acc', allowFiltering: true},
+                {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+                {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ lắp đặt', allowFiltering: true},
+                {fieldName: 'DOTGIAO_ID', headerText: 'Đợt giao', allowFiltering: true},
+                {fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true},
+                {fieldName: 'DATCOC_CSD', headerText: 'Tiền trả trước', allowFiltering: true, type:'number',format:'N0'},
+                {fieldName: 'SO_THANG', headerText: 'Số tháng trả trước', allowFiltering: true},
+                {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true},
+                {fieldName: 'THANG_KT', headerText: 'Tháng KTĐC', allowFiltering: true},
+                {fieldName: 'TRANGTHAI_PH', headerText: 'Trạng thái phiếu', allowFiltering: true},
+                {fieldName: 'ND_GIAO', headerText: 'Nội dung giao', allowFiltering: true},
+                ]" :dataSource="dsPhieu_nvtc" :showFilter="true" :showColumnCheckbox="true" :allowPaging="false"
+                    :enablePagingServer="false" ref="gridDSNVTC" :enabledSelectFirstRow="false" />
+            </div>
+            <div class="tab-pane" id="tab2">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title">
+                                Thông tin tìm kiếm
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Trạng thái
+                                        </div>
+                                        <div class="value">
+                                            <div>
+                                                <div class="select-custom">
+                                                    <select v-model="idTrangThai_ChuaThu" name="" id=""
+                                                        class="form-control">
+                                                        <option value="1">Chưa giao </option>
+                                                        <option value="2">Đã giao </option>
+                                                        <option value="4">Đã hoàn thành </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Đến ngày
+                                        </div>
+                                        <div class="value">
+                                            <ejs-datepicker v-model="denNgay" class="form-control bg-none bor0 fw6 text"
+                                                placeholder="Chọn ngày" :format="'dd/MM/yyyy'" :showClearButton="false"
+                                                :allowEdit="false">
+                                            </ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    Hướng giao
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="idHuongGiao" :dataSource="dsHuongGiao"
+                                            dataTextField="HUONGGIAO" dataValueField="HUONGGIAO_ID"
+                                            placeholder="Chọn hướng giao" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    Nội dung giao
+                                </div>
+                                <div class="value">
+                                    <input v-model="ndGiao_chuathu" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title">
+                                Thông tin cập nhật
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    Lý do
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="idLyDo" :dataSource="dsLyDo" dataTextField="KETQUA_XL"
+                                            dataValueField="KQXL_ID" placeholder="Chọn lý do" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    Ghi chú
+                                </div>
+                                <div class="value">
+                                    <textarea v-model="ghiChu" class="form-control"
+                                        style="height: 100px;resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend-title">
+                    Danh sách phiếu
+                </div>
+                <DataGrid :columns="[
+                {fieldName: 'MA_TB', headerText: 'Số máy/ Acc', allowFiltering: true},
+                {fieldName: 'SO_DT', headerText: 'Liên hệ', allowFiltering: true},
+                {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+                {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ lắp đặt', allowFiltering: true},
+                {fieldName: 'MA_NV', headerText: 'Tuyến thu', allowFiltering: true},
+                {fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true},
+                {fieldName: 'NHOM_KQ', headerText: 'Nhóm lý do', allowFiltering: true},
+                {fieldName: 'KETQUA_XL', headerText: 'Lý do', allowFiltering: true},
+                {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                {fieldName: 'GIOHEN_TU', headerText: 'Ngày hẹn từ', allowFiltering: true},
+                {fieldName: 'GIOHEN_DEN', headerText: 'Ngày hẹn đến', allowFiltering: true},
+                {fieldName: 'TEN_NV', headerText: 'Người CN', allowFiltering: true},
+                {fieldName: 'TEN_DV', headerText: 'Đơn vị CN', allowFiltering: true},
+                {fieldName: 'ND_GIAO', headerText: 'Nội dung giao', allowFiltering: true},
+                {fieldName: 'NHANVIEN_NHAN', headerText: 'Người nhận', allowFiltering: true},
+                {fieldName: 'DONVI_NHAN', headerText: 'Đơn vị nhận', allowFiltering: true},
+                ]" :dataSource="dsPhieu_chuathu" :showFilter="true" :allowPaging="false" :enablePagingServer="false"
+                    ref="gridDSChuaThu" @selectedRowChanged="chuathu_selectedRowChanged" />
+            </div>
+        </div>
+    </div>
+</div>

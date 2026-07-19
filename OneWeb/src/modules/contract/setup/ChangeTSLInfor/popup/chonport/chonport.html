@@ -1,0 +1,610 @@
+<b-modal 
+    ref="ref-modal"
+    size="xl" 
+    centered
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box frm-chon-port" ref="ref-modal-content">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span> Chọn Port</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="hide">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="tsbtnNhapMoi_Click" style="padding-left: 5px;">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li @click="btnLayTTMoi_Click">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-attach"></span>Lấy TT
+                    </a>
+                </li>
+                <li @click="tsbtnChapNhan_Click">
+                    <a href="javascript:void(0)">
+                        <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !tsbtnCapNhat.Enabled}" @click="tsbtnCapNhat_Click" >
+                    <a href="javascript:void(0)">
+                        <span class="icon one-reload1"></span>Cập nhật
+                    </a>
+                </li>
+                <li @click="tsbtnSinhPass_Click">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-circle-key"></span>Sinh pass
+                    </a>
+                </li>
+                <li @click="tsbtnTBCungDoiCap_Click" style="padding-right: 5px;">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-reload-mobile"></span>TB cùng cáp
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin tìm kiếm</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key">
+                                Phường/Xã
+                            </div>
+                            <div class="value w20 padt7">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkPhuongXa.Checked">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <combobox-grid
+                                    ref="ref-combo-phuong"
+                                    gridPanelDataHeight="300"
+                                    :columns="[
+                                        {fieldName: 'phuong_id', headerText: '', visible: false, isPrimaryKey: true },
+                                        {fieldName: 'ten_phuong', headerText: 'Tên phường/xã', allowFiltering: true, width: '48%' },
+                                        {fieldName: 'ma_phuong', headerText: 'Mã phường', allowFiltering: true, width: '48%' }    
+                                    ]"
+                                    :dataSource="cboPhuong.DataSource"
+                                    :enabled="cboPhuong.Enabled"
+                                    :enabledSelectFirstRow="false"
+                                    valueField="phuong_id"
+                                    textField="ten_phuong"
+                                    @selectedChanged="onSelectPhuong"></combobox-grid>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Đường/Phố
+                            </div>
+                            <div class="value w20 padt7">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkPho.Checked" :disabled="!chkPho.Enabled">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <combobox-grid
+                                    ref="ref-combo-pho"
+                                    gridPanelDataHeight="300"
+                                    :columns="[
+                                        {fieldName: 'pho_id', headerText: '', visible: false, isPrimaryKey: true },
+                                        {fieldName: 'ten_pho', headerText: 'Tên phố', allowFiltering: true, width: '48%' },
+                                        {fieldName: 'ma_pho', headerText: 'Mã phố', allowFiltering: true, width: '48%' }    
+                                    ]"
+                                    :dataSource="cboDuongPho.DataSource"
+                                    :enabled="cboDuongPho.Enabled"
+                                    :enabledSelectFirstRow="false"
+                                    valueField="pho_id"
+                                    textField="ten_pho"
+                                    @selectedChanged="onSelectPho"></combobox-grid>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Tổ thi công
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <input class="form-control" :disabled="true" :value="cboTramVT.Text" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Đơn vị QL
+                            </div>
+                            <div class="value" ref="ref-select-don-vi-quan-ly">
+                                <SelectExt
+                                    :key="cboDonViQLTK.Key"
+                                    :settings="{dropdownParent: $refs['ref-select-don-vi-quan-ly']}"
+                                    v-model="cboDonViQLTK.Value" 
+                                    :dataSource="cboDonViQLTK.DataSource" 
+                                    dataValueField="donvi_id"
+                                    dataTextField="ten_ht" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Tổ QL thiết bị
+                            </div>
+                            <div class="value" ref="ref-select-to-quan-ly">
+                                <SelectExt
+                                    :key="cboToQL.Key"
+                                    :settings="{dropdownParent: $refs['ref-select-to-quan-ly']}"
+                                    v-model="cboToQL.Value" 
+                                    :dataSource="cboToQL.DataSource" 
+                                    dataValueField="donvi_id"
+                                    dataTextField="ten_dv" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Trạng thái
+                            </div>
+                            <div class="value" ref="ref-select-trang-thai">
+                                <SelectExt
+                                    :key="cboTrangthai.Key"
+                                    :settings="{dropdownParent: $refs['ref-select-trang-thai']}"
+                                    v-model="cboTrangthai.Value" 
+                                    :dataSource="cboTrangthai.DataSource" 
+                                    dataValueField="tt_port_id"
+                                    dataTextField="trangthai_port" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        System
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control fw6 text highlight" v-model="txtSystem.Text" v-on:keyup.enter="txtSystem_KeyPress">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w60">
+                                        IP
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control fw6 text highlight" v-model="txtIP.Text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Rack
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control fw6 text highlight" v-model="txtRack.Text" v-on:keyup.enter="txtRack_KeyPress">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w60">
+                                        Shelf
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control fw6 text highlight" v-model="txtShelf.Text" v-on:keyup.enter="txtShelf_KeyPress">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Slot
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control fw6 text highlight" v-model="txtSlot.Text" v-on:keyup.enter="txtSlot_KeyPress">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w60">
+                                        Port
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control fw6 text highlight" v-model="txtPort.Text" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key text-main">
+                                        Tìm port fix thuê bao có sẵn
+                                    </div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button class="btn" @click="btnThueBao_Click">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <input type="text" class="form-control " style="background-color:#F9E6E6;" v-model="txtThuebao.Text" v-on:keyup.enter="txtThuebao_KeyPress">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w60">
+                                        Kết cuối
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control " style="background-color:#F9E6E6;" v-model="txtKetCuoi.Text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key">
+                                Ngõ/Ấp
+                            </div>
+                            <div class="value w20 padt7">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkAp.Checked" :disabled="!chkAp.Enabled">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <combobox-grid
+                                    ref="ref-combo-ngo"
+                                    gridPanelDataHeight="300"
+                                    :columns="[
+                                        {fieldName: 'pho_id', headerText: '', visible: false, isPrimaryKey: true },
+                                        {fieldName: 'ten_pho', headerText: 'Tên phố', allowFiltering: true, width: '48%' },
+                                        {fieldName: 'ma_pho', headerText: 'Mã phố', allowFiltering: true, width: '48%' }    
+                                    ]"
+                                    :dataSource="cboNgo.DataSource"
+                                    :enabled="cboNgo.Enabled"
+                                    :enabledSelectFirstRow="false"
+                                    valueField="pho_id"
+                                    textField="ten_pho"
+                                    @selectedChanged="onSelectNgo"></combobox-grid>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Khu
+                            </div>
+                            <div class="value w20 padt7">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkKhu.Checked" :disabled="!chkKhu.Enabled">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <combobox-grid
+                                    ref="ref-combo-khu"
+                                    gridPanelDataHeight="300"
+                                    :columns="[
+                                        {fieldName: 'pho_id', headerText: '', visible: false, isPrimaryKey: true },
+                                        {fieldName: 'ten_pho', headerText: 'Tên phố', allowFiltering: true, width: '48%' },
+                                        {fieldName: 'ma_pho', headerText: 'Mã phố', allowFiltering: true, width: '48%' }    
+                                    ]"
+                                    :dataSource="cboKhu.DataSource"
+                                    :enabled="cboKhu.Enabled"
+                                    :enabledSelectFirstRow="false"
+                                    valueField="pho_id"
+                                    textField="ten_pho"
+                                    @selectedChanged="onSelectKhu"></combobox-grid>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-9 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Trạm thiết bị
+                                    </div>
+                                    <div class="value" ref="ref-select-ve-tinh">
+                                        <SelectExt
+                                            :key="cboVetinh.Key"
+                                            :settings="{dropdownParent: $refs['ref-select-ve-tinh']}"
+                                            v-model="cboVetinh.Value" 
+                                            :dataSource="cboVetinh.DataSource" 
+                                            dataValueField="donvi_id"
+                                            dataTextField="ten_dv" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">
+                                        Công nghệ
+                                    </div>
+                                    <div class="value" id="container-cong-nghe" ref="ref-select-cong-nghe">
+                                        <SelectExt
+                                            :key="cboCongNghe.Key"
+                                            ref="cbo-cong-nghe"
+                                            :settings="{ dropdownParent: $refs['ref-select-cong-nghe'] }"
+                                            v-model="cboCongNghe.Value" 
+                                            :dataSource="cboCongNghe.DataSource" 
+                                            dataValueField="congnghe_id"
+                                            dataTextField="congnghe" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                Dslam
+                            </div>
+                            <div class="value" ref="ref-select-dslam">
+                                <SelectExt
+                                    :key="cboDslam.Key"
+                                    :settings="{dropdownParent: $refs['ref-select-dslam']}"
+                                    ref="ref-cbo-dslam"
+                                    v-model="cboDslam.Value" 
+                                    :dataSource="cboDslam.DataSource" 
+                                    dataValueField="dslam_id"
+                                    dataTextField="tendslam" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key">
+                                D/U Link
+                            </div>
+                            <div class="value">
+                                <combobox-grid
+                                    ref="ref-combo-dulink"
+                                    gridPanelDataHeight="300"
+                                    :columns="[
+                                        {fieldName: 'portvl_id', headerText: '', visible: false, isPrimaryKey: true },
+                                        {fieldName: 'link_code', headerText: 'Link', allowFiltering: true, width: '100' },
+                                        {fieldName: 'loai_tbi', headerText: 'Loại Tbi', allowFiltering: true, width: '100' },
+                                        {fieldName: 'thamso', headerText: 'Tham số', allowFiltering: true, width: '100' },
+                                        {fieldName: 'tendslam', headerText: 'Thiết bị đích', allowFiltering: true, width: '100' },
+                                    ]"
+                                    :dataSource="cboDownUpLink.DataSource"
+                                    :enabledSelectFirstRow="true"
+                                    placeHolder="[Chưa chọn giá trị]"
+                                    valueField="portvl_id"
+                                    textField="tendslam"
+                                    @selectedChanged="onSelectDownUpLink"></combobox-grid>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Vpi/Svlan
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight" v-model="txtVpi.Text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">
+                                        Vci/Cvlan
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight" v-model="txtVci.Text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Self
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">
+                                        OLT Slot
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        OLT Port
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">
+                                        ONUID
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        ADSL Port
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="form-control highlight" v-model="txtAdsl_Port.Text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">
+                                        Onu Pass
+                                    </div>
+                                    <div class="value">
+                                        <bss-error-marker :has-error="$v.txtOnuPass.Text.$error">
+                                            <input type="text" class="form-control highlight" ref="ref-txt-onu-pass" v-model="txtOnuPass.Text">
+                                        </bss-error-marker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9 col-12">
+                                <div class="info-row">
+                                    <div class="key">
+                                        Spliter
+                                    </div>
+                                    <div class="value w20 padt7">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkKetCuoi.Checked">
+                                            <span class="name"></span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <combobox-grid
+                                            ref="ref-combo-ketcuoi"
+                                            gridPanelDataHeight="300"
+                                            :columns="[
+                                                {fieldName: 'ketcuoi_id', headerText: '', visible: false, isPrimaryKey: true },
+                                                {fieldName: 'kyhieu', headerText: 'Ký hiệu', allowFiltering: true, width: '100' },
+                                                {fieldName: 'diachi', headerText: 'Địa chỉ', allowFiltering: true, width: '150' },
+                                                {fieldName: 'ten_kc', headerText: 'Tên kết cuối', allowFiltering: true, width: '100' },
+                                            ]"
+                                            :dataSource="cboKetCuoi.DataSource"
+                                            :enabled="cboKetCuoi.Enabled"
+                                            :enabledSelectFirstRow="true"
+                                            placeHolder="[Chưa chọn giá trị]"
+                                            valueField="ketcuoi_id"
+                                            textField="ten_kc"
+                                            @selectedChanged="onSelectKetCuoi"></combobox-grid>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">
+                                        Vị trí
+                                    </div>
+                                    <div class="value w20 padt7">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkViTri.Checked">
+                                            <span class="name"></span>
+                                        </div>
+                                    </div>
+                                    <div class="value" ref="ref-select-vi-tri">
+                                        <SelectExt
+                                            :key="cboViTri.Key"
+                                            :settings="{dropdownParent: $refs['ref-select-vi-tri']}"
+                                            ref="ref-cbo-vitri"
+                                            v-model="cboViTri.Value" 
+                                            :disabled="!cboViTri.Enabled"
+                                            :dataSource="cboViTri.DataSource" 
+                                            dataValueField="id"
+                                            dataTextField="mota" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">
+                        Danh sách Port Fix
+                    </div>
+                    <div class="pull-right normal">
+                        <div class="info-row">
+                            <div class="key nowrap text-main">Tìm kiếm Vlan quy hoạch theo thuê bao</div>
+                            <div class="value">
+                                <input type="text" v-on:keyup.enter="txtTKVlan_KeyPress" class="form-control" style="width: 170px;background-color: #F9E6E6;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content">
+                    <DataGrid
+                        ref="ref-grid-danh-sach"
+                        panelDataHeight="300"
+                        class="table-result"
+                        v-bind:columns="[
+                            {fieldName: '', headerText: 'Chọn', textAlign: 'Center', allowFiltering: false, width: '100', template: getColumnTemplateChon(this)},
+                            {fieldName: 'ten_card', headerText: 'Card', allowFiltering: true, width: '130' },
+                            {fieldName: 'vitri', headerText: 'Vị trí Port', allowFiltering: true, width: '130' },
+                            {fieldName: 'slot', headerText: 'Slot', allowFiltering: true, width: '130' },
+                            {fieldName: 'port', headerText: 'Port', allowFiltering: true, width: '130' },
+                            {fieldName: 'vpi', headerText: 'Vpi/Svlan', allowFiltering: true, width: '130' },
+                            {fieldName: 'vci', headerText: 'Vci/Cvlan', allowFiltering: true, width: '130' },
+                            {fieldName: 'rack', headerText: 'Rack', allowFiltering: true, width: '130' },
+                            {fieldName: 'shelf', headerText: 'Shelf', allowFiltering: true, width: '130' },
+                            {fieldName: 'selfid01', headerText: 'SelfID', allowFiltering: true, width: '130' },
+                            {fieldName: 'selfid02', headerText: 'OLT Slot', allowFiltering: true, width: '130' },
+                            {fieldName: 'selfid03', headerText: 'OLT Port', allowFiltering: true, width: '130' },
+                            {fieldName: 'selfid04', headerText: 'ONU ID', allowFiltering: true, width: '130' },
+                            {fieldName: 'adsl_port', headerText: 'ADSL Port', allowFiltering: true, width: '130' },
+                            {fieldName: 'ont_id', headerText: 'ONT ID', allowFiltering: true, width: '130' },
+                            {fieldName: 'port_mdf', headerText: 'Port MDF', allowFiltering: true, width: '130' },
+                            {fieldName: 'trangthai_port', headerText: 'Trạng thái', allowFiltering: true, width: '130' },
+                            {fieldName: 'ds_ma_tb', headerText: 'DS thuê bao', allowFiltering: true, width: '130' },
+                            {fieldName: 'tb_cungport', headerText: 'TB cùng Port', allowFiltering: true, width: '130' },
+                            {fieldName: 'onu_password', headerText: 'Onu Pass', allowFiltering: true, width: '130' },
+                            {fieldName: 'system', headerText: 'System', allowFiltering: true, width: '130' },
+                            {fieldName: 'ten_kc', headerText: 'Spliter', allowFiltering: true, width: '130' },
+                            {fieldName: 'ketcuoi_id', headerText: 'KETCUOI_ID', allowFiltering: true, width: '130' },
+                            {fieldName: 'port_id', headerText: 'Port Logic ID', allowFiltering: true, width: '130' },
+                            {fieldName: 'portvl_id', headerText: 'Port Vật lý ID', allowFiltering: true, width: '130' },
+                            {fieldName: 'key', headerText: '', visible: false, isPrimaryKey: true },
+                        ]"        
+                        v-bind:dataSource="gridDanhSach.DataSource"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        @selectedRowChanged="gridviewDanhSach_FocusedRowChanged"
+                        @queryCellInfo="gridviewDanhSach_QueryCellInfo"></DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ChonThueBao ref="ref-chon-thue-bao" @select="onSelectThueBao"></ChonThueBao>
+    <ChonThueBao ref="ref-chon-thue-bao-vlan" @select="onSelectThueBaoVlan"></ChonThueBao>
+    <ThueBaoCungCap id="frm-chon-port-thue-bao-cung-cap" :data="ThueBaoCungCapData"></ThueBaoCungCap>
+    <b-modal ref="ref-modal-xacnhan-sinh-pass" centered title="Thông báo" size="sm">        
+        <span>Bạn thật sự muốn cập nhật Pass Onu cho Port đã chọn không?</span>
+        <template #modal-footer="{ cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="okSinhPass">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal ref="popupSearchAccount" size="xl" hide-footer hide-header hide-header-close body-class="modal-body p-0 frm-chon-port">
+        <SearchAccount @form-close="acceptSearchAccount" :isPopup="true"/>
+    </b-modal>
+</b-modal>

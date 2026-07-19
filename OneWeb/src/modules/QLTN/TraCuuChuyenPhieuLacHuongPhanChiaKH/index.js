@@ -1,0 +1,3 @@
+import TraCuuChuyenPhieuLacHuongPhanChiaKH from './TraCuuChuyenPhieuLacHuongPhanChiaKH'
+
+export default TraCuuChuyenPhieuLacHuongPhanChiaKH

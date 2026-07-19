@@ -1,0 +1,80 @@
+<div>
+	<b-modal 
+	    id="modalId" 
+	    size="xl" 
+	    no-close-on-backdrop
+	    hide-footer 
+	    hide-header 
+	    hide-header-close 
+	    body-class="modal-body p-0"
+	    @hidden="onHiddenModal"
+	    @shown="onShownModal">
+	    <div class="modal-content popup-box">
+	        <div class="popup-header">
+	            <div class="title">Cập nhật thông tin dịch vụ CNTT</div>
+	            <div
+	                class="close -ap icon-close"
+	                data-dismiss="modal"
+	                @click="$bvModal.hide('modalId')">
+	            </div>
+	        </div>
+	        <div class="list-actions-top"> 
+	            <ul class="list">
+	                <li @click="onClickBtnChapNhan" :class="{disabled:gridEditors.length==0?true:false}">
+	                    <a href="javascript:void(0)">
+	                        <span class="icon one-save"></span> Ghi lại
+	                    </a>
+	                </li>
+	            </ul>
+	        </div>
+
+	        <div class="popup-body">
+	            <div class="box-form">
+	                <table class="table-result table-gachle">
+						<tbody>
+							<tr v-for="item in gridEditors">
+								<td  class="fw6">{{ item.CAPTION }}</td>
+								<td>
+									<template v-if="item.ATT==5">
+										<div class="input-more-button -right">
+											<button class="btn h-auto pad4 lh14 w24" @click.prevent="item.doAction">
+												<span class="-ap icon-more_horiz"></span>
+											</button>
+											<input type="text" :class="{disabled:item.EDITABLE?false:true}" class="form-control padr30  h24 bor0 nocorner bg-none" :value="item.EDIT_VALUE" @change="v=>item.EDIT_VALUE=v.target.value">
+										</div>
+									</template>
+									<template v-if="item.ATT==0 && item.DATA_TYPE!=1">
+										<input type="text" class="form-control padr30  h24 bor0 nocorner bg-none"  :value="item.EDIT_VALUE" @change="v=>{ item.EDIT_VALUE=v.target.value; item.doAction(); }">
+									</template>
+									<template v-if="item.ATT==1 || (item.ATT==0 && item.DATA_TYPE==1)">
+										<input type="number" class="form-control padr30  h24 bor0 nocorner bg-none" :value="item.EDIT_VALUE" @change="v=>{ item.EDIT_VALUE=v.target.value; item.doAction(); }">
+									</template>
+									<template v-if="item.ATT==2 || item.ATT==9">
+										<div class="input-icon-right">
+											<ejs-datepicker 
+												v-model="item.EDIT_VALUE"
+												:format="item.ATT==2?'dd/MM/yyyy':'dd/MM/yyyy HH:mm:ss'"
+												@change="item.doAction"
+												>
+											</ejs-datepicker>
+										</div>
+									</template>
+									<template v-if="item.ATT==4 && item.EDIT_DATASOURCE && item.EDIT_DATASOURCE.length>0">
+										<ejs-combobox @change='item.doAction' :allowFiltering='true' :fields="{text: 'label', value:'id'}" :dataSource="item.EDIT_DATASOURCE.map(x=>({'label':x[item.PARENT_DESCFIELD],'id':x[item.PARENT_KEYFIELD]}))" v-model="item.EDIT_VALUE"></ejs-combobox>
+									</template>
+									<template v-if="item.ATT==10 && item.EDIT_DATASOURCE && item.EDIT_DATASOURCE.length>0">
+										<treeselect :multiple="true" :options="item.EDIT_DATASOURCE.map(x=>({'label':x[item.PARENT_DESCFIELD],'id':x[item.PARENT_KEYFIELD]}))" placeholder="..."  
+											v-model="item.EDIT_VALUE" v-on:select="item.doAction"/>
+									</template>
+									<template v-if="item.ATT==7">
+										<input type="checkbox" class="check"  v-model="item.EDIT_VALUE" @change="item.doAction" />
+									</template>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+	            </div>
+	        </div>
+	    </div>
+	</b-modal>
+</div>

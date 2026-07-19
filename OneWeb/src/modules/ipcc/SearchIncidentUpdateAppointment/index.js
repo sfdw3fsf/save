@@ -1,0 +1,2 @@
+import SearchIncidentUpdateAppointment from './SearchIncidentUpdateAppointment.vue'
+export default SearchIncidentUpdateAppointment

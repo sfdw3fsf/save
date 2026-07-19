@@ -1,0 +1,228 @@
+<div >
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="getHoaDon()">
+                    <span class="icon nc-icon-glyph design_bullet-list-67"></span>Danh sách
+                </a>
+            </li>
+            <li v-show="(tabNumber === 1 || tabNumber === 3)">
+                <a href="javascript:void(0)" @click="docFile()">
+                    <input
+                        ref="fileInput"
+                        type="file"
+                        id="upload"
+                        style="display: none"
+                        @change="onChangeFile"
+                        accept=".xls, .xlsx"
+                    />
+                    <span class="icon one-xlsx1"></span>Nhập từ Excel
+                </a>
+            </li>
+            <li v-show="(tabNumber === 2)">
+                <a href="javascript:void(0)" @click="huyTraHoaDon()">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ trả hoá đơn
+                </a>
+            </li>
+            <li v-show="(tabNumber === 1)">
+                <a href="javascript:void(0)" @click="capNhatTraPhieu()">
+                    <span class="icon one-file-money"></span>Trả hoá đơn
+                </a>
+            </li>
+            <li v-show="(tabNumber === 3)">
+                <a href="javascript:void(0)" @click="huyHoaDon()" title="Hủy hóa đơn phát được">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ HĐ phát được
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="capNhat()" title="Cập nhật ngày nhận hóa đơn, lý do, ghi chú">
+                    <span class="icon one-reload1"></span>Cập nhật
+                </a>
+            </li>
+
+            <li>
+                <a href="javascript:void(0)" @click="onExcelExport()">
+                    <span class="icon one-xlsx-import"></span>Xuất Excel
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt10 padb10">
+            <div class="pull-right">
+                <div class="inline">
+                    <div class="info-row marb0">
+                        <div class="key fw6 w70 red">Tìm kiếm</div>
+                        <div class="value">
+                            <input
+                                type="text"
+                                class="form-control red"
+                                v-model.trim="searchString"
+                                v-on:keyup.enter="searchHoaDon()"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w140">
+                            Nhân viên thu cước
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <ComboboxGrid
+                                    v-bind:columns="[
+                      {fieldName: 'MA_NV', headerText: 'Mã nhân viên', allowFiltering: true, allowSorting: false},
+                      {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, allowSorting: false},
+                      ]"
+                                    v-bind:dataSource="listNVTCGetter"
+                                    textField="TEN_NV"
+                                    valueField="MA_NV"
+                                    @selectedChanged="NVTC_selectedChanged"
+                                ></ComboboxGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Lượt giao
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <ComboboxGrid
+                                    v-bind:columns="[
+                  {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'SOLUONG_GBC', headerText: 'Giấy báo', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'SOLUONG_HD', headerText: 'HĐ giao', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'TONGTIEN_HD', headerText: 'Tiền HĐ giao', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'TRA_HD', headerText: 'Trả hóa đơn', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'TRA_TB', headerText: 'Trả trọn bộ', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'DS_DOT', headerText: 'Đợt giao', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'TUYENDUONG', headerText: 'Tuyến đường', allowFiltering: true, allowSorting: false},
+                  ]"
+                                    v-bind:dataSource="listLuotGiaoGetter"
+                                    textField="GIAOPHIEU_ID"
+                                    valueField="GIAOPHIEU_ID"
+                                    @selectedChanged="luotgiao_selectedChanged"
+                                ></ComboboxGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w150">
+                            <div class="check-action -color">
+                                <input
+                                    type="checkbox"
+                                    v-model="checkNgayNhan"
+                                    class="check"
+                                />
+                                <span class="name">Ngày nhận hoá đơn</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    v-model="ngayNhanHoaDon"
+                                    :format="config.dateConfig.format"
+                                    :showClearButton="false"
+                                    :value="config.dateConfig.value"
+                                    :enabled="checkNgayNhan"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav tabs tab-over">
+            <a
+                href="javascript:;"
+                :class="{ active: tabNumber === 1 }"
+                @click="tabNumber = 1"
+                >Phiếu chưa xác nhận</a
+            >
+            <a
+                href="javascript:;"
+                :class="{ active: tabNumber === 2 }"
+                @click="tabNumber = 2"
+                >Trả hoá đơn</a
+            >
+            <a
+                href="javascript:;"
+                :class="{ active: tabNumber === 3 }"
+                @click="tabNumber = 3"
+                >Hoá đơn phát được</a
+            >
+        </div>
+        <div class="box-form">
+            <DataGrid
+                ref="grid"
+                :columns="fieldLanTao"
+                :dataSource="listHoaDon"
+                :showFilter="true"
+                dataKeyField="PHIEUTRA_ID"
+                :showColumnCheckbox="true"
+                @selectedRowChanged="onPhieuThanhToanRowChange"
+                @selectedItemsChanged="onPhieuThanhToanChange"
+                :allowPaging="true" :enablePagingServer="false"
+                :enabledSelectFirstRow="false"
+            ></DataGrid>
+        </div>
+    </div>
+    <template>
+        <b-modal
+            id="modal-docfile"
+            size="lg"
+            hide-footer
+            hide-header
+            hide-header-close
+            body-class="modal-body p-0"
+        >
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">
+                        <span class="icon one-notepad"></span>Chọn lý do
+                    </div>
+                    <div
+                        class="close -ap icon-close"
+                        data-dismiss="modal"
+                        @click="close()"
+                    ></div>
+                </div>
+                <div class="popup-body">
+                    <div class="box-form">
+                        <div class="info-row">
+                            <div class="key w40">Lý do</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select
+                                        v-model="idLyDo"
+                                        class="form-control"
+                                    >
+                                        <!-- <option value="0">Chọn lý do</option> -->
+                                        <option
+                                            v-for="item in listLyDoTraGetter"
+                                            :value="item.LYDOTRA_ID"
+                                            >{{item.NOIDUNG}}</option
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </b-modal>
+    </template>
+</div>

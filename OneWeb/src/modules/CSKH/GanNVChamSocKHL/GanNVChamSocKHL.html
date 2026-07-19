@@ -1,0 +1,264 @@
+<div class="">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    @click="onLayDSClicked"
+                    :class="{'disabled': !btnStatus.tsbtnLayDS}"
+                    data-toggle="tooltip"
+                    title="Lấy danh sách khách hàng lớn"
+                >
+                    <span class="icon one-file-attach"></span>Lấy DS
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    @click="onGhiLaiClicked"
+                    :class="{'disabled': !btnStatus.tsbtnGhiLai}"
+                    data-toggle="tooltip"
+                    title="Ghi lại"
+                >
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    v-b-modal.popup-uploadDsGan
+                    data-toggle="tooltip"
+                    title='File gồm 3 cột "MA_KH", "MA_NV", "MA_CT"'
+                >
+                    <span class="icon one-book"></span>Đọc file
+                </a>
+                <appUploadDSGan
+                    :kyHoaDon="this.thongtinKyHoaDon.kyHoaDonSelected"
+                />
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    data-toggle="tooltip"
+                    title="Xuất file"
+                >
+                    <downloadexcel
+                        :fields="exportExcelFields"
+                        :data="this.dsKHL"
+                        worksheet="export"
+                        name="export.xls"
+                    >
+                        <span class="icon one-download"></span>Xuất file
+                    </downloadexcel>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb6">
+            <div class="box-form">
+                <div class="pull-right w120">
+                    <KyCuoc ref="kyCuocInput" :isTextBold="true" />
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Điều kiện lọc khách hàng</div>
+                    <div class="pull-right">
+                        <div class="list-checks">
+                            <div class="item">
+                                <div class="check-action">
+                                    <input
+                                        type="radio"
+                                        name="rd1"
+                                        class="check"
+                                        :value="0"
+                                        v-model="cboDaGan"
+                                    />
+                                    <span class="name">Chưa gán</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input
+                                        type="radio"
+                                        name="rd1"
+                                        class="check"
+                                        :value="1"
+                                        v-model="cboDaGan"
+                                    />
+                                    <span class="name">Đã gán</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w70">Loại KH <span class="required">*</span></div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <app-select2 :options="dsLoaiKH" v-model="optLoaiKHSelected"
+                                        class="form-control">
+                                    </app-select2> -->
+                                    <ejs-multiselect
+                                        mode="CheckBox"
+                                        selectAllText="Chọn tất cả"
+                                        unSelectAllText="Bỏ chọn tất cả"
+                                        v-model="optLoaiKHSelected"
+                                        locale="vi-VN"
+                                        :dataSource="dsLoaiKH"
+                                        :allowFiltering="true"
+                                        :fields="{value:'id', text: 'text'}"
+                                        :showSelectAll="true"
+                                        :showDropDownIcon="true"
+                                    ></ejs-multiselect>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Loại KHL <span class="required">*</span></div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <app-select2 :options="dsLoaiKHLon" v-model="optLoaiKHLonSelected"
+                                        class="form-control">
+                                    </app-select2> -->
+                                    <ejs-multiselect
+                                        mode="CheckBox"
+                                        selectAllText="Chọn tất cả"
+                                        unSelectAllText="Bỏ chọn tất cả"
+                                        v-model="optLoaiKHLonSelected"
+                                        locale="vi-VN"
+                                        :dataSource="dsLoaiKHLon"
+                                        :allowFiltering="true"
+                                        :fields="{value:'id', text: 'text'}"
+                                        :showSelectAll="true"
+                                        :showDropDownIcon="true"
+                                    ></ejs-multiselect>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w70">Đơn vị <span class="required">*</span></div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <app-select2
+                                        :options="dsDonVi"
+                                        v-model="optDonViSelected"
+                                        class="form-control"
+                                        @input="onDsDonViChanged"
+                                    >
+                                    </app-select2> -->
+                                    <SelectExt v-model.trim="optDonViSelected" :dataSource="dsDonVi"
+                                            dataTextField="text" dataValueField="id" @change="onDsDonViChanged"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Nhân viên <span class="required">*</span></div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <app-select2
+                                        :options="dsNhanVien"
+                                        v-model="optNhanVienSelected"
+                                        class="form-control"
+                                    >
+                                    </app-select2> -->
+                                    <SelectExt v-model.trim="optNhanVienSelected" :dataSource="dsNhanVien"
+                                            dataTextField="text" dataValueField="id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w70">
+                                <div class="check-action">
+                                    <input
+                                        type="checkbox"
+                                        class="check"
+                                        v-model="cboQuanHuyenEnabled"
+                                    />
+                                    <span class="name">Quận</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-multiselect
+                                        mode="CheckBox"
+                                        selectAllText="Chọn tất cả"
+                                        :enabled="cboQuanHuyenEnabled"
+                                        unSelectAllText="Bỏ chọn tất cả"
+                                        v-model="optQuanHuyenSelected"
+                                        locale="vi-VN"
+                                        :dataSource="dsQuanHuyen"
+                                        :allowFiltering="true"
+                                        :fields="{value:'id', text: 'text'}"
+                                        :showSelectAll="true"
+                                        :showDropDownIcon="true"
+                                    ></ejs-multiselect>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Chương trình<span class="required">*</span></div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <app-select2
+                                        :options="dsChuongTrinhCSKH"
+                                        v-model="optChuongTrinhCSKHSelected"
+                                        class="form-control"
+                                    >
+                                    </app-select2> -->
+                                    <SelectExt v-model.trim="optChuongTrinhCSKHSelected" :dataSource="dsChuongTrinhCSKH"
+                                            dataTextField="text" dataValueField="id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách khách hàng</div>
+                <div class="table-content">
+                    <DataGrid
+                        v-bind:columns="[
+                                {fieldName: 'TEN_CT', headerText: 'Tên chương trình', allowFiltering: true, allowSorting: false},
+                                {fieldName: 'MA_KH', headerText: 'Mã KH', allowFiltering: true},
+                                {fieldName: 'TEN_KH', headerText: 'Tên khách hàng', allowFiltering: true},
+                                {fieldName: 'DIACHI_KH', headerText: 'Địa chỉ KH', allowFiltering: true},
+                                {fieldName: 'BINHQUAN_DT_TEXT', headerText: 'Bình quân DT', allowFiltering: true, cellCssClass: 'text-right'},
+                                ]"
+                        v-bind:dataSource="this.dsKHL"
+                        :showFilter="true"
+                        :showColumnCheckbox="true"
+                        dataKeyField="KHACHHANG_ID"
+                        :defaultColumnCheckboxChecked="cboDaGan==1"
+                        ref="gridKHL"
+                        :enablePagingServer="true"
+                        :allowPaging="true"
+                        :totalRecords="dsKHLTotalElements"
+                        @pageChanged="DSKhachHang_gridChanged"
+                        @selectedItemsChanged="dsKHLSelectedItems"
+                    ></DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

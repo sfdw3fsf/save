@@ -1,0 +1,199 @@
+<b-modal
+  ref="frmCapNhatNoiDungTruyenThong"
+  size="xl"
+  hide-header
+  hide-header-close
+  hide-footer
+  body-class="p-0"
+  centered
+  no-close-on-backdrop
+  @show="handleShowModal"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span> {{ headerTitle }}
+      </div>
+      <div class="close -ap icon-close" @click="hideModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li @click="btnLayDL_Click">
+          <a style="cursor: pointer;">
+            <span class="icon one-search"></span> Lấy TT
+          </a>
+        </li>        
+        <li>
+          <a href="javascript:;" v-on:click="tsbtnUpdate_Click" >
+            <span class="icon one-save"></span> Ghi lại
+          </a>
+        </li> 
+        <li>
+          <a href="javascript:;" v-on:click="Clear" >
+            <span class="icon one-save"></span> Hủy
+          </a>
+        </li> 
+        <li @click="btnExportExcel_Click">
+          <a style="cursor: pointer;">
+            <span class="icon one-file-excel"></span> Xuất Excel
+          </a>
+        </li>
+        <li>
+          <a style="cursor: pointer;" @click="hideModal">
+            <span class="icon one-cancel"></span> Thoát
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <vue-card label="Kịch bản truyền thông">
+        <div class="row">
+          <div class="info-row">
+              <div class="key">Sự cố</div>
+              <div class="value">
+                  <label>{{label_suco}}</label>
+              </div>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="info-row">
+              <div class="key">Tiêu đề</div>
+              <div class="value">
+                  <input type="text" class="form-control" v-model="tieude">
+              </div>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="info-row">
+              <div class="key">Nội dung</div>
+              <div class="value">
+                <textarea class="form-control" v-model="noidung" style="height: 120px;resize: none;"></textarea>
+              </div>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="info-row">
+              <div class="key">Văn bản</div>
+              <div class="value">
+                <div class="input-more-button -right">
+                    <label class="btn" for="upload-file">
+                        <span class="-ap icon-more_horiz"></span>
+                        <input type="file" ref="files" class="hidden" id="upload-file"
+                            :accept="formAllowFileType" @change="UploadFileHoSo">
+                    </label>
+                    <input type="text" class="form-control" v-model="vanban">
+                </div>
+                  
+              </div>              
+          </div> 
+        </div>
+      </vue-card>
+      <vue-card label="Thông tin tra cứu">
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">Phân loại:</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="cboPhanLoai.value"
+                             :allowFiltering="true"
+                             :dataSource="cboPhanLoai.data"
+                             dataValueField="ma_loai"
+                             dataTextField="ten_loai"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">Mã sự cố:</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="txtMaSuCo">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Trạng thái xử lý:</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="cboTrangThai.value"
+                             :allowFiltering="true"
+                             :dataSource="cboTrangThai.data"
+                             dataValueField="ma_loai"
+                             dataTextField="ten_loai"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">Từ ngày:</div>
+              <div class="">
+                <vue-date type="date"
+                          format="DD/MM/YYYY"
+                          v-model="dateFrom"/>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">Đến ngày:</div>
+              <div class="">
+                <vue-date type="date"
+                          format="DD/MM/YYYY"
+                          v-model="dateTo"/>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w120">Nguồn sự cố:</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="cboNguonSuCo.value"
+                             :allowFiltering="true"
+                             :dataSource="cboNguonSuCo.data"
+                             dataValueField="nguonsc_id"
+                             dataTextField="mota"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">          
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">Nội dung TT:</div>
+              <div class="value">
+                <div class="select-custom">
+                  
+                  <ejs-dropdownlist 
+                  locale='vi-VN' 
+                  v-model="cboNoidungTT.value"
+                  :dataSource='cboNoidungTT.data' 
+                  :allowFiltering='true' 
+                  :fields="{value:'noidungtt_id', text: 'ten'}" >
+                  </ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </vue-card>
+
+      <vue-card label="Danh sách thông báo sự cố">
+        <DataGrid :dataSource="dsSuCo"
+                  :columns="cols"
+                  :allowPaging="true"
+                  :enablePagingServer="false"      
+                  :allow-excel-export="true"                         
+                  @rowSelected="dsSuCo_Click"     
+                  ref="gridDanhSach"/>
+      </vue-card>
+    </div>
+  </div>
+</b-modal>

@@ -1,0 +1,304 @@
+<b-modal
+    id="frmDieuChuyen"
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    modal-class="modal-fullscreen"
+    body-class="modal-body p-0"
+    @hidden="onHiddenModal"
+    @shown="onShownModal"
+>
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span>  Tiếp nhận điều chuyển thiết bị phụ trợ
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide('frmDieuChuyen')">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="javascript:void(0)" @click="layTT" title="Lấy TT" :class="{'disabled': !btnEnabled.layTT}">
+                        <span class="icon one-file-attach"></span>Lấy TT
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="nhapMoi" title="Nhập mới" :class="{'disabled': !btnEnabled.nhapMoi}">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="capNhap" title="Cập nhập" :class="{'disabled': !btnEnabled.capNhap}">
+                        <span class="icon one-save"></span>Cập nhập
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="xoa" title="Xóa" :class="{'disabled': !btnEnabled.xoa}">
+                        <span class="icon one-trash"></span>Xóa
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="huy" title="Hủy">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="hoanThanh" title="Hoàn thành" :class="{'disabled': !btnEnabled.hoanThanh}">
+                        <span class="icon ui-1_check-circle-08 nc-icon-glyph"></span>Hoàn thành
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="page-content">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Thông tin tiếp nhận</div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Ký hiệu</div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button class="btn" @click="onLayMaTbi">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <input type="text" class="form-control highlight font-weight-bold" @keyup.enter="layTT" v-model="ma_ts">
+                                            <TraCuuTBi modalId="formTraCuuTBi" @chapNhanTraCuu="onChapNhanMaTbi"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Ngày YC</div>
+                                    <div class="value">
+                                        <ejs-datepicker
+                                            v-model="ngayYC"
+                                            :value="today"
+                                            :format="'dd/MM/y'"
+                                            :showClearButton="false"
+                                        ></ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Đơn vị QL</div>
+                            <div class="value">
+                                <input class="form-control highlight font-weight-bold" readonly v-model="donViQL">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Nội dung</div>
+                            <div class="value">
+                                <input class="form-control" v-model="noiDung">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Đề xuất</div>
+                            <div class="value">
+                                <input class="form-control" v-model="deXuat">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Ghi chú</div>
+                            <div class="value">
+                                <input class="form-control" v-model="ghiChu">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">
+                                <label for="upload" class="btn" style="padding-left: 0;">
+                                    <u style="color: blue;">Chọn file</u>
+                                    <input ref="fileInput" type="file" id="upload" style="display: none" @change="onChonFile"
+                                        @click="$refs.fileInput.value=null"/>                                    
+                                </label>
+                            </div>
+                            <div class="value">
+                                <DataGrid v-bind:columns="[
+                                        {fieldName: '', headerText: '', allowFiltering: true, allowSorting: false, width: 40, template: actionTemplate, cssClass: 'text-center'},
+                                        {fieldName: 'TENFILE', headerText: '', allowFiltering: true, allowSorting: false},
+                                    ]"
+                                    v-bind:dataSource="gcDSFile"
+                                    :showFilter="false"
+                                    :allowPaging="false"
+                                    ref="fileGrid"
+                                    panelDataHeight="110px"
+                                >
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-form">
+                        <div class="legend-title">Thông tin thiết bị</div>
+                        <DataGrid
+                            v-bind:columns="[
+                                {fieldName: 'ThuocTinh', headerText: 'Thuộc tính', allowFiltering: false, width: 120, cssClass: 'text-bold'},
+                                {fieldName: 'GiaTri.Value', headerText: 'Giá trị', allowFiltering: false,width: 120},
+                            ]"
+                            :dataSource="gridValue"
+                            :enable-paging-server="false"
+                            :allow-paging="true"
+                            :showFilter="false"
+                            panelDataHeight="195px"
+                            ref="valueGrid">
+                        </DataGrid>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Thông tin đơn vị chuyển</div>
+                        <div class="info-row">
+                            <div class="key w130">Đơn vị</div>
+                            <div class="value">
+                                <SelectExt 	
+                                    :settings="{dropdownParent: $refs['ref-modal-content']}"
+                                    :dataSource="cbo_donvi" 
+                                    v-model="vdonvi_id"
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w130">Tổ quản lý</div>
+                            <div class="value">
+                                <SelectExt 	
+                                    :settings="{dropdownParent: $refs['ref-modal-content']}"
+                                    :dataSource="cbo_tramTC" 
+                                    v-model="vdonvicon_id"
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w130">Trạm</div>
+                            <div class="value">
+                                <SelectExt 	
+                                    :settings="{dropdownParent: $refs['ref-modal-content']}"
+                                    :dataSource="cbo_tramVT" 
+                                    v-model="donvi_nhan_id"
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w130">Thiết bị cha</div>
+                            <div class="value">
+                                <SelectExt 	
+                                    :settings="{dropdownParent: $refs['ref-modal-content']}"
+                                    :dataSource="cbo_thietBiCha" 
+                                    v-model="thietbi_cha_id"
+                                    dataValueField="THIETBI_ID"
+                                    dataTextField="MOTA" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-form">
+                        <div class="legend-title">Kết quả</div>
+                        <div class="info-row">
+                            <div class="key w130">Kết quả thẩm định</div>
+                            <div class="value">
+                                <textarea class="form-control" v-model="ketQuaTD"></textarea>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w130">Kết quả</div>
+                            <div class="value">
+                                <input class="form-control" v-model="ketQua">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w130">Tổng tiền</div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button :class="['btn', {'disabled': !btnEnabled.tongTien}]" @click="onTongTien">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <vue-numeric currency='' separator=',' class="form-control highlight font-weight-bold tright" v-model="tongTien"></vue-numeric>
+                                            <VanHanh_KM modalId="formVanHanhKM" :vanhanh_id='vvanhanh_id' @chapNhan="onChapNhanTongTien"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Ngày HT</div>
+                                    <div class="value">
+                                        <ejs-datepicker
+                                            v-model="ngayHT"
+                                            :value="today"
+                                            :format="'dd/MM/y'"
+                                            :showClearButton="false"
+                                        ></ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-form">
+                        <div class="legend-title">Lịch sử điều chuyển</div>
+                        <DataGrid
+                            v-bind:columns="[
+                                {fieldName: 'LOAI_VH', headerText: 'Loại vận hành', allowFiltering: true},
+                                {fieldName: 'MA_VH', headerText: 'Mã vận hành', allowFiltering: true},
+                                {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', allowFiltering: true},
+                                {fieldName: 'THIETBI_ID', headerText: 'Ký hiệu', allowFiltering: true},
+                                {fieldName: 'NOIDUNG', headerText: 'Nội dung', allowFiltering: true},
+                                {fieldName: 'NGAY_HT', headerText: 'Ngày hoàn thành', allowFiltering: true},
+                                {fieldName: 'DEXUAT', headerText: 'Đề xuất', allowFiltering: true},
+                                {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                                {fieldName: 'MA_TBI', headerText: 'Mã tài sản', allowFiltering: true},
+                                {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true},
+                                {fieldName: 'KETQUA_TD', headerText: 'Kết quả thẩm định', allowFiltering: true},
+                                {fieldName: 'KETQUA', headerText: 'Kết quả', allowFiltering: true},
+                                {fieldName: 'TRANGTHAI_VH', headerText: 'Tình trạng vận hành', allowFiltering: true},
+                            ]"
+                            :dataSource="gridLichSu"
+                            :enable-paging-server="false"
+                            :allow-paging="true"
+                            :showFilter="true"
+                            panelDataHeight="100px"
+                            ref="LichSuGrid">
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách tiếp nhận</div>
+                <DataGrid
+                    v-bind:columns="[
+                        {fieldName: 'THIETBI_ID', headerText: 'Ký hiệu', allowFiltering: true},
+                        {fieldName: 'MA_VH', headerText: 'Mã vận hành', allowFiltering: true},
+                        {fieldName: 'TEN_VT', headerText: 'Đối tượng', allowFiltering: true},
+                        {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true},
+                        {fieldName: 'MA_TBI', headerText: 'Mã tài sản', allowFiltering: true},
+                        {fieldName: 'LOAI_VH', headerText: 'Loại vận hành', allowFiltering: true},
+                        {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', allowFiltering: true},
+                        {fieldName: 'NOIDUNG', headerText: 'Nội dung', allowFiltering: true},
+                        {fieldName: 'DEXUAT', headerText: 'Đề xuất', allowFiltering: true},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                        {fieldName: 'VITRIDAT', headerText: 'Vị trí đặt', allowFiltering: true},
+                        {fieldName: 'LYDOTRA', headerText: 'Lý do trả', allowFiltering: true},
+                        {fieldName: 'ND_TRA', headerText: 'Nội dung trả', allowFiltering: true},
+                    ]"
+                    :dataSource="gridTiepNhan"
+                    :enable-paging-server="false"
+                    :allow-paging="true"
+                    :showFilter="true"
+                    @selectedRowChanged="gridTiepNhanSelectedRowChanged"
+                    :enabledSelectFirstRow="false"
+                    ref="TiepNhanGrid">
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+</b-modal>

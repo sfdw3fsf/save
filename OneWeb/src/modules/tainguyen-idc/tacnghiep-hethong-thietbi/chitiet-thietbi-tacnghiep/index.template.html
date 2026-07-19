@@ -1,0 +1,562 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChiThietThietBiTacNghiep"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="70%"
+  height="auto"
+  :target="target"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        Chi tiết thiết bị tác nghiệp
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2 ">
+      <!-- THÔNG TIN THIẾT BỊ -->
+      <div class="box-form">
+        <div class="legend-title">Thông tin thiết bị</div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Tên thiết bị <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtTenThietBi.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.TEN_THIET_BI"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Loại thiết bị <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.loaiThietBiId"
+                  @change="onChangeLoaiThietBi()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectLoaiThietBi.invalid ? 'is-invalid' : ''"
+                  :dataSource="loaiThietBiList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Mảng thiết bị <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.mangThietBiId"
+                  @change="onChangeMangThietBi()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectMangThietBi.invalid ? 'is-invalid' : ''"
+                  :dataSource="mangThietBiList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Model</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtDongSanPham.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.dongSanPham"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Serial Number<span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtSerialNumber.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.serialNumber"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Tag Number</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtTagNumber.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.tagNumber"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Hãng sản xuất <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.hangSanXuatId"
+                  @change="onChangeHangSanXuat()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectHangSanXuat.invalid ? 'is-invalid' : ''"
+                  :dataSource="hangSanXuatList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Năm sản xuất <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtNamSanXuat.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.namSanXuat"
+                  min="1900"
+                  max="2030"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Cấu hình chi tiết</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtCauHinhChiTiet.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.cauHinhChiTiet"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Công suất thiết kế <span class="red">(*)</span></div>
+              <div class="value" style="display: flex; align-items: center;">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtCongSuatThietKe.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.congSuatThietKe"
+                  step="0.01"
+                />
+                <div style="margin-left: 5px;">KW</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Số công nguồn đầu vào <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtSoCongNguonDauVao.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.soCongNguonDauVao"
+                  min="0"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Số công nguồn đầu ra <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtSoCongNguonDauRa.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.soCongNguonDauRa"
+                  min="0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Trạng thái Tài sản <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.trangThaiTaiSanId"
+                  @change="onChangeTrangThaiTaiSan()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectTrangThaiTaiSan.invalid ? 'is-invalid' : ''"
+                  :dataSource="trangThaiTaiSanList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Trạng thái Vận hành <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.trangThaiVanHanhId"
+                  @change="onChangeTrangThaiVanHanh()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectTrangThaiVanHanh.invalid ? 'is-invalid' : ''"
+                  :dataSource="trangThaiVanHanhList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Icons</div>
+              <div class="value d-flex align-items-center">
+                <input
+                  type="file"
+                  class="form-control-file ml-2"
+                  @change="onFileChange($event, 'icons')"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THÔNG TIN LẮP ĐẶT -->
+      <div class="box-form">
+        <div class="legend-title">Thông tin lắp đặt</div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Lắp đặt tại IDC <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.lapDatTaiIdcId"
+                  @change="onChangeLapDatTaiIdc()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectLapDatTaiIdc.invalid ? 'is-invalid' : ''"
+                  :dataSource="lapDatTaiIdcList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Toà nhà <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.toaNhaId"
+                  @change="onChangeToaNha()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectToaNha.invalid ? 'is-invalid' : ''"
+                  :dataSource="toaNhaList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Mặt sàn</div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.matSanId"
+                  @change="onChangeMatSan()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectMatSan.invalid ? 'is-invalid' : ''"
+                  :dataSource="matSanList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Phòng/ Zone</div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.phongZoneId"
+                  @change="onChangePhongZone()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectPhongZone.invalid ? 'is-invalid' : ''"
+                  :dataSource="phongZoneList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Rack</div>
+              <div class="value d-flex align-items-center">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtRack.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.rack"
+                />
+                <button class="btn btn-sm btn-outline-primary ml-2" title="Chọn rack" @click="showModalChonRack">
+                  <i class="fa fa-ellipsis-h"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">U Trên</div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.uTrenId"
+                  @change="onChangeUTren()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectUTren.invalid ? 'is-invalid' : ''"
+                  :dataSource="uTrenList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Thời điểm lắp đặt <span class="red">(*)</span></div>
+              <div class="value">
+                <ejs-datepicker
+                  v-model="currentItem.thoiDiemLapDat"
+                  :format="currentItem.ATT==2?'dd/MM/yyyy':'dd/MM/yyyy HH:mm:ss'"
+                  :enabled="currentMode !== 'VIEW'"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Căn cứ lắp đặt <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.canCuLapDatId"
+                  @change="onChangeCanCuLapDat()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectCanCuLapDat.invalid ? 'is-invalid' : ''"
+                  :dataSource="canCuLapDatList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">U Dưới</div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.uDuoiId"
+                  @change="onChangeUDuoi()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectUDuoi.invalid ? 'is-invalid' : ''"
+                  :dataSource="uDuoiList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-12">
+            <div class="info-row">
+              <div class="key w130">Mã thẻ Tài sản <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtMaTheTaiSan.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.maTheTaiSan"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THÔNG TIN QUẢN LÝ -->
+      <div class="box-form">
+        <div class="legend-title">Thông tin quản lý</div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Phạm vi IDC <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.phamViIdcId"
+                  @change="onChangePhamViIdc()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectPhamViIdc.invalid ? 'is-invalid' : ''"
+                  :dataSource="phamViIdcList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Hệ thống <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.heThongId"
+                  @change="onChangeHeThong()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectHeThong.invalid ? 'is-invalid' : ''"
+                  :dataSource="heThongList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">Loại khách hàng <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.loaiKhachHangId"
+                  @change="onChangeLoaiKhachHang()"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectLoaiKhachHang.invalid ? 'is-invalid' : ''"
+                  :dataSource="loaiKhachHangList"
+                  :disabled="currentMode == 'VIEW'"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w130">Đơn vị quản lý<span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtDonViQuanLy.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.donViQuanLy"
+                  placeholder="IDC Miền Bắc"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w130">Người Quản lý</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtNguoiQuanLy.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.nguoiQuanLy"
+                  placeholder="Vũ Duy Hưng"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-12">
+            <div class="info-row">
+              <div class="key w130">Ghi chú</div>
+              <div class="value">
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  :class="controls.txtGhiChu.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.ghiChu"
+                  placeholder="Nhập ghi chú về thiết bị..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

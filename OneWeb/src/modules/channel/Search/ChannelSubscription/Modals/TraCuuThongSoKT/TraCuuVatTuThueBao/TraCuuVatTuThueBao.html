@@ -1,0 +1,288 @@
+<b-modal id="popup-tracuuvattuthuebao" size="xl" hide-footer hide-header hide-header-close body-class="modal-body p-0"> 
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span>Tra cứu vật tư thuê bao</div>
+            <div class="close -ap icon-close" data-dismiss="modal" v-on:click="resetData()" @click="$bvModal.hide('popup-tracuuvattuthuebao')">
+            </div>
+        </div>
+
+        <!-- List button -->
+        <div class="list-actions-top">
+            <ul class="list">
+                <li v-on:click="btnTraCuu()">
+                    <a >
+                        <span class="icon one-file-search"></span> Tra cứu
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tile FORM -->
+        <div class="popup-body">
+
+            <!-- FORM Search -->
+            <div class="nav tabs tab-over">
+                <a href="#khach-hang" data-toggle="tab" v-on:click="onChangeTabSearch('khachhang')">Khách hàng</a>
+                <a href="#thanh-toan" data-toggle="tab" v-on:click="onChangeTabSearch('thanhtoan')">Thanh toán</a>
+                <a href="#thue-bao" data-toggle="tab" class="active" v-on:click="onChangeTabSearch('thuebao')">Thuê bao</a>
+            </div>
+
+            <div class="box-form tab-content">
+                <!-- FORM KHÁCH HÀNG -->
+                <div class="tab-pane" id="khach-hang">
+                    <div class="box-form tab-content">
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Mã KH <span class="required">*</span></div>
+                                    <div class="value">
+                                        <input id="maKhachHang"  v-model="p_ma_kh" type="text" class="form-control" @keyup.enter="btnTraCuu"  >
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w105">Tên khách hàng</div>
+                                    <div class="value">
+                                        <input type="text" v-model="p_ten_kh" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Địa chỉ KH</div>
+                                    <div class="value">
+                                        <input v-model="p_dia_chi_kh" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORM Thanh Toán -->
+                <div class="tab-pane" id="thanh-toan">
+                    <div class="box-form tab-content">
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Mã TT <span class="required">*</span></div>
+                                    <div class="value">
+                                        <input type="text" id="maThanhToan" v-model="p_ma_tt" class="form-control" value="p_ma_tt" @keyup.enter="btnTraCuu"  >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên thanh toán</div>
+                                    <div class="value">
+                                        <input type="text" v-model="p_ten_tt" class="form-control" value="p_ten_tt">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Địa chỉ TT</div>
+                                    <div class="value">
+                                        <input type="text" v-model="p_dia_chi_tt" class="form-control"
+                                            value="p_dia_chi_tt">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORM Thuê Bao -->
+                <div class="tab-pane active" id="thue-bao">
+                    <div class="box-form tab-content">
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Dịch vụ <span class="required">*</span></div>
+                                    
+                                   
+                                    <div class="select-custom" ref="title-dich-vu">
+                                        <input type="text" class="form-control" :value="p_dich_vu_id != 0 ? (p_dich_vu_id + ' - ' + p_dich_vu).trim()  : '...Chọn dịch vụ...'  " readonly style="cursor:default; background-color: #fff !important;" />
+                                        <!-- <input type="hidden" :value="p_dich_vu_id" /> -->
+                                    </div>
+                                    <div ref="table-dich-vu" style="z-index: 999999; background-color: white; border: 1px solid #ddd; padding: 5px; width: 100%;" :style="{display: showDichVu}">
+                                        <div style="height: 300px; overflow: auto; border: 1px solid #ddd; margin-bottom: 5px;">
+                                            <DataGrid3 ref="tbDonVi" class="table-result table-gachle" v-bind:columns="[
+                                                {fieldName: 'dichVuId', headerText: 'ID', allowFiltering: true , width: 90},
+                                                {fieldName: 'dichVu', headerText: 'Tên dịch vụ', allowFiltering: true},                                
+                                                ]" 
+                                                v-bind:dataSource="this.list_dich_vu" 
+                                                :showFilter="true" 
+                                                dataKeyField="p_dich_vu_id"
+                                                @selectedRowChanged="onChangeDichVu" >
+                                            </DataGrid3>
+                                        </div>
+                                    </div>      
+                                </div>
+                            </div>
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Loại hình</div>
+                                    <div class="value" style="position: absolute; z-index: 999; width: 85%;">                            
+                                        <div class="select-custom" ref="title-loai-hinh">
+                                            <input type="text" class="form-control" :value="p_loai_hinh_id != 0 ? (p_loai_hinh_id + ' - ' + p_loai_hinh).trim()  : '...Chọn loại hình...'  " readonly style="cursor:default; background-color: #fff !important;" />
+                                            <!-- <input type="hidden" :value="params.p_don_vi" /> -->
+                                        </div>
+                                        <div ref="table-loai-hinh" style="z-index: 999999; background-color: white; border: 1px solid #ddd; padding: 5px; width: 100%;" :style="{display: showLoaiHinh}">
+                                            <div style="height: 300px; overflow: auto; border: 1px solid #ddd; margin-bottom: 5px;">
+                                                <DataGrid3 ref="tbDonVi" class="table-result table-gachle" v-bind:columns="[
+                                                    {fieldName: 'loaiTBId', headerText: 'Loại TB ID', allowFiltering: true },
+                                                    {fieldName: 'loaiHinhTB', headerText: 'Tên loại hình TB', allowFiltering: true},                                
+                                                    ]" 
+                                                    v-bind:dataSource="this.list_loai_hinh" 
+                                                    :showFilter="true" 
+                                                    dataKeyField="loaiTBId"
+                                                    @selectedRowChanged="onChangeLoaiHinh" >
+                                                </DataGrid3>
+                                            </div>
+                                        </div>                                      
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Số máy/Acc <span class="required">*</span></div>
+                                    <div class="value">
+                                        <input type="text" id="soMay" v-model="p_so_may" class="form-control" @keyup.enter="btnTraCuu" autofocus>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Tên thuê bao</div>
+                                    <div class="value">
+                                        <input type="text" v-model="p_ten_tb" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Địa chỉ TB</div>
+                                    <div class="value">
+                                        <input type="text" v-model="p_dia_chi_tb" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- FORM data -->
+            <div class="box-form">
+
+                <div class="nav tabs tab-over">
+                    <a href="#ds-thue-bao" data-toggle="tab" :class="{ active: tabActive === 'thuebao' }">Danh sách thuê
+                        bao</a>
+                    <a href="#ds-vat-tu" data-toggle="tab" :class="{ active: tabActive === 'vattu' }">Danh sách vật
+                        tư</a>
+                    <a href="#bien-dong-vt" data-toggle="tab" v-if="bienDongVTIsVisible"
+                        :class="{ active: tabActive === 'biendong' }">Biến động vật tư thuê bao</a>
+                    <a href="#ds-lich-su" data-toggle="tab" :class="{ active: tabActive === 'lichsu' }">Lịch sử đơn giá vật tư</a>
+                </div>
+
+                <div class="box-form tab-content">
+                    <!-- FORM Vật Tư -->
+                    <div class="tab-pane" :class="{ active: tabActive === 'vattu' }" id="ds-vat-tu">
+
+                        <DataGrid3 ref="TableVatTu" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: 'MA_TB', headerText: 'Mã thiết bị', allowFiltering: true, allowSorting: false },
+                            {fieldName: 'LOAI_TBI', headerText: 'Thiết bị', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'NGAY_SD', headerText: 'Ngày SD', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'KIEU_TBI', headerText: 'Kiểu thiết bị', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'TINHTRANG_TBI', headerText: 'Tình Trạng', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'SL', headerText: 'Số Lượng', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'DON_VI', headerText: 'Đơn giá', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'TENTRANGBI', headerText: 'Trang bị', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'SERI_GP', headerText: 'Serial GP', allowFiltering: true, allowSorting: true},
+                            ]" 
+                            v-bind:dataSource="this.DSVatTu" 
+                            :showFilter="true" 
+                            dataKeyField="MA_TB"
+                            @selectedRowChanged="gridViewVatTuTB_FocusedRowChanged"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            >
+                        </DataGrid3>
+                    </div>
+
+                    <!-- FORM  Thuê Bao-->
+                    <div class="tab-pane" :class="{ active: tabActive === 'thuebao' }" height="auto" id="ds-thue-bao">                       
+                        <DataGrid3 ref="grid" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: 'MA_TB', headerText: 'Số Máy/Acc', allowFiltering: true, allowSorting: false },
+                            {fieldName: 'TEN_TB', headerText: 'Tên TB', allowFiltering: true, allowSorting: true}                            
+                            ]" 
+                            v-bind:dataSource="this.DSThueBao" 
+                            :showFilter="true" 
+                            dataKeyField="MA_TB"
+                            @selectedRowChanged=""
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            :childGrid='childGrid'
+                            @detailDataBound='onDetailDataBound' 
+                            @rowDataBound='rowDataBound'
+                            >
+                        </DataGrid3>
+                    </div>
+
+
+                    <!-- FORM Biến động -->
+                    <div class="tab-pane" id="bien-dong-vt" :class="{ active: tabActive == 'biendong' }">
+                        <DataGrid3 ref="TableBienDong" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'TEN_VT', headerText: 'Tên VT', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'NGAY_CN', headerText: 'Ngày biến động', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'NGUOI_CN', headerText: 'Người biến động', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'TINHTRANG_TBI', headerText: 'Tình Trạng', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'KIEU_TBI', headerText: 'Kiểu biến động', allowFiltering: true, allowSorting: true},                            
+                            ]" 
+                            v-bind:dataSource="this.DSBienDong" 
+                            :showFilter="true" 
+                            dataKeyField="MA_VT"
+                            @selectedRowChanged=""
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            >
+                        </DataGrid3>
+                    </div>
+
+                    <div class="tab-pane" id="ds-lich-su" :class="{ active: tabActive == 'lichsu' }">
+                        <DataGrid3 ref="TableBienDong" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'TEN_VT', headerText: 'Tên VT', allowFiltering: true, allowSorting: true}, 
+                            {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, allowSorting: true}, 
+                                                    
+                            ]" 
+                            v-bind:dataSource="DSLichSu" 
+                            :showFilter="true" 
+                            dataKeyField="MA_VT"
+                            @selectedRowChanged=""
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            >
+                        </DataGrid3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</b-modal>

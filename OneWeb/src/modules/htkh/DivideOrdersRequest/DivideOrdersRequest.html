@@ -1,0 +1,443 @@
+<div>
+  <breadcrumb :header="header"/>
+  <vue-nav>
+    <div class="d-flex flex-row align-items-center">
+      <ul class="list">
+        <li
+          v-for="action in actions"
+          v-show="action.visible"
+          :key="action.id"
+          @click="onClickAction(action.id)"
+        >
+          <a style="cursor: pointer;">
+            <span class="icon" :class="action.icon"></span> {{ action.name }}
+          </a>
+        </li>
+      </ul>
+      <!-- <ul class="list" style="overflow: unset" v-show="isShowLapHopDong">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown">Phân Giao Đơn Hàng</a>
+          <ul class="dropdown-menu">
+            <li v-for="item in lapHopDongMenus">
+              <template v-if="item.children">
+                <a class="dropdown-item dropdown-toggle"> {{ item.name }} </a>
+                <ul class="submenu dropdown-menu">
+                  <li v-for="child in item.children">
+                    <a class="dropdown-item" @click="onLapHopDongMenuAction(child.frame, child.href, child.tag)">
+                      {{ child.name }}
+                    </a>
+                  </li>
+                </ul>
+              </template>
+             
+              <template v-else>
+                <a class="dropdown-item" @click="onLapHopDongMenuAction(item.frame, item.href, item.tag)">
+                  {{ item.name }}
+                </a>
+              </template>
+            </li>
+          </ul>
+        </li>
+      </ul> -->
+    </div>
+  </vue-nav>
+
+  <div class="page-content">
+
+    <div class="row">
+      <!-- Thong tin đơn hàng -->
+      <div class="col-sm-6 col-12">
+        <div class="box-form"  style="height: 680px;">
+          <div class="legend-title"> Thông tin đơn hàng</div>
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w100">Nguồn đơn</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt
+                      dataValueField="ungdung_id"
+                      dataTextField="ten_ungdung"
+                      class="font-weight-bold"
+                      v-model.number="tuVanFilter.ungDungId"
+                      :settings="{ dropdownParent: $refs['ungDungId'] }"
+                      :dataSource="ungDungOptions"
+                      :disabled="true"
+
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w95">Trạng thái</div>
+                <div class="value">
+                  <div class="list-checks red mart7">
+                    <div class="item" v-for="check in checkActions" :key="check.value" v-show="check.isShow">
+                      <div class="check-action">
+                        <input
+                          type="radio"
+                          class="check"
+                          v-model="trangThaiPhieu"
+                          :value="check.value"
+                          :checked="check.value === trangThaiPhieu"
+                          @click="onChangeTrangThai(check.value)"
+                        />
+                        <span class="name">{{ check.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom: -4px !important;">
+            <div class="col-sm-5 col-12">
+              <vue-input labelWidth="100" label="Mã ĐH" v-model="tuVanFilter.maDonHang" :disable="true" />
+            </div>
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w100">{{ ngayLabel }}</div>
+                <vue-date
+                  type="date"
+                  labelWidth="100"
+                  v-model="tuVanFilter.ngayYC"
+                  :format="'DD/MM/YYYY'"
+                  :checkbox="false"
+                  :disable="true"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <vue-input labelWidth="100" label="Tên KH" v-model="tuVanFilter.tenKH" :disable="true" />
+            </div>
+            <div class="col-sm-7 col-12">
+              <vue-input labelWidth="100" label="Số ĐT" v-model="tuVanFilter.soDienThoai" :disable="true" />
+            </div>
+          </div>
+          <vue-input labelWidth="100" label="Địa chỉ KH" v-model="tuVanFilter.diaChiKH" :disable="true" />
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <div class="info-row" >
+                <div class="key w100">Dịch vụ</div>
+                <div class="value">
+                  <div class="select-custom" ref="dichVuId">
+                    <SelectExt
+                      dataValueField="id"
+                      dataTextField="text"
+                      v-model="tuVanFilter.dichVuId"
+                      :settings="{ dropdownParent: $refs['dichVuId'] }"
+                      :dataSource="dichVuOptions"
+                      :disabled="true"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w100">Loại hình</div>
+                <div class="value">
+                  <div class="select-custom" ref="loaiHinhId">
+                    <SelectExt
+                      dataValueField="id"
+                      dataTextField="text"
+                      v-model="tuVanFilter.loaiHinhId"
+                      :settings="{ dropdownParent: $refs['loaiHinhId'] }"
+                      :dataSource="loaiHinhTBOptions"
+                      :disabled="true"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <vue-input labelWidth="100" label="Mã thuê bao" v-model="tuVanFilter.maTB" :disable="true" />
+
+            </div>
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w100 ">Cước/Thời gian</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="tuVanFilter.cuoc_thoigian_camket"
+                    disabled />
+                </div>
+              </div>
+             
+              <!-- <vue-input labelWidth="100" label="Cước/Thời gian (Cam kết)" v-model="tuVanFilter.thoigian_camket" :disable="true" /> -->
+            </div>
+          </div>
+            <div class="info-row">
+              <div class="key w100">Gói cước</div>
+              <div class="value">
+                  <input
+                  type="text"
+                  class="form-control"
+                  v-model="tuVanFilter.goiCuoc"
+                  disabled />
+              </div>
+            </div>
+            <div class="info-row"  style="margin-bottom: 2px !important;">
+              <vue-input labelWidth="100" label="Gói đa DV" v-model="tuVanFilter.goiDaDV" :disable="true"/>
+            </div>
+            <div class="row">
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w100">Giá gói</div>
+                  <div class="value">
+                      <vue-numeric class="form-control tright tongtien" separator="." decimal-separator="," :precision="0" v-model="tuVanFilter.giaGoi" placeholder="0" output-type="Number" disabled></vue-numeric>
+                   </div>      
+               </div>
+              </div>
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w100">Loại sim</div>
+                  <div class="value">
+                    <div class="select-custom" ref="loaiSimId">
+                      <SelectExt
+                        dataValueField="id"
+                        dataTextField="text"
+                        v-model="tuVanFilter.loaiSimId"
+                        :dataSource="loaiSimOptions"
+                        :disabled="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w100">Tổng tiền</div>
+                <div class="value">
+                    <vue-numeric class="form-control tright tongtien" separator="." decimal-separator="," :precision="0" v-model="tuVanFilter.tongtien" placeholder="0" output-type="Number" disabled ></vue-numeric>
+                 </div>      
+             </div>
+            </div>
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w100">Hình thức TT</div>
+                <div class="value">
+                  <div class="select-custom" ref="hinhThucTTId">
+                    <SelectExt
+                      dataValueField="id"
+                      dataTextField="text"
+                      v-model="tuVanFilter.hinhThucTTId"
+                      :dataSource="hinhThucTTOptions"
+                      :disabled="true"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w100">Trạng thái TT</div>
+                <div class="value">
+                  <div class="select-custom" ref="trangThaiId">
+                    <SelectExt
+                      dataValueField="id"
+                      dataTextField="text"
+                      v-model="tuVanFilter.trangThaiTTId"
+                      :settings="{ dropdownParent: $refs['trangThaiId'] }"
+                      :dataSource="trangThaiTTOptions"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-7 col-12">
+              
+              <div class="info-row">
+                <div class="key w100">Ngày TT</div>
+                <vue-date
+                  type="date"
+                  labelWidth="100"
+                  v-model="tuVanFilter.ngayTT"
+                  :format="'DD/MM/YYYY'"
+                  :checkbox="false"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+
+            <div class="key w100 ">Hình thức GH</div>
+            <div class="value">
+              <div class="select-custom" ref="hinhThucGiaoHangId">
+                <SelectExt
+                  id="ketQuaCbo"
+                  class="font-weight-bold"
+                  dataValueField="id"
+                  dataTextField="text"
+                  v-model.number="tuVanFilter.hinhThucGiaoHang"
+                  :settings="{ dropdownParent: $refs['hinhThucGiaoHang'] }"
+                  :dataSource="hinhThucGiaoHangOptions"
+                  :disabled="true"
+                />
+              </div>
+            </div>
+          </div>
+          <vue-input labelWidth="100" label="Ghi chú" v-model="tuVanFilter.ghiChu" />
+          <div class="info-row" v-show="show.isShowKetQua">
+            <div class="key w100 font-weight-bold text-primary">Kết quả</div>
+            <div class="value">
+              <div class="select-custom" ref="ketQuaId">
+                <SelectExt
+                  id="ketQuaCbo"
+                  class="font-weight-bold"
+                  dataValueField="ketqua_id"
+                  dataTextField="ten_ketqua"
+                  v-model.number="tuVanFilter.ketQuaId"
+                  :settings="{ dropdownParent: $refs['ketQuaId'] }"
+                  :dataSource="ketQuaOptions"
+                  @change="onChangeKetQua"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="info-row" v-show="show.isShowLyDoTra">
+            <div class="key w100">Lý do trả</div>
+            <div class="value">
+              <div class="select-custom" ref="lyDoTra">
+                <SelectExt
+                  dataValueField="lydotra_id"
+                  dataTextField="lydotra"
+                  v-model="tuVanFilter.lyDoTra"
+                  :settings="{ dropdownParent: $refs['lyDoTra'] }"
+                  :dataSource="lyDoTraOptions"
+                />
+              </div>
+            </div>
+          </div> 
+          <div class="info-row" v-show="show.isShowLyDoTT">
+            <div class="key w100">Lý do TT</div>
+            <div class="value">
+              <div class="select-custom" ref="lyDoTT">
+                <SelectExt
+                  dataValueField="id"
+                  dataTextField="text"
+                  v-model="tuVanFilter.lyDoTT"
+                  :settings="{ dropdownParent: $refs['lyDoTT'] }"
+                  :dataSource="lyDoTTOptions"
+                />
+              </div>
+            </div>
+          </div>      
+          <div class="info-row" v-show="show.isShowDonViTH">
+            <div class="key w100">Đơn vị TH</div>
+            <div class="value">
+              <div class="select-custom" ref="donViTHId">
+                <SelectExt
+                  dataValueField="id"
+                  dataTextField="text"
+                  v-model="tuVanFilter.donViTHId"
+                  :settings="{ dropdownParent: $refs['donViTHId'] }"
+                  :dataSource="donViTHOptions"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="info-row" v-show="show.isShowDonViNhan">
+            <div class="key w100">Đơn vị nhận</div>
+            <div class="value">
+              <div class="select-custom" ref="donViNhan">
+                <SelectExt
+                  dataValueField="id"
+                  dataTextField="text"
+                  v-model.number="tuVanFilter.donViNhanId"
+                  :settings="{ dropdownParent: $refs['donViNhan'] }"
+                  :dataSource="donViNhanOptions"
+                />
+              </div>
+            </div>
+          </div>
+
+          <vue-input
+            ref="noiDungRef"
+            labelWidth="100"
+            label="Nội dung"
+            v-model="tuVanFilter.noiDung"
+          />
+        </div>
+      </div>
+
+      <!-- Thông tin giao việc -->
+      <div class="col-sm-6 col-12" v-show="show.isShowThongTinGiaoViec">
+        <div class="box-form" style="height: 680px;" >
+          <div class="legend-title">Thông tin giao việc</div>
+          <div class="table-content" >
+            <DataGrid
+              :columns="dataGrid.danhSachGiaoViec.headers"
+              :dataSource="dataGrid.danhSachGiaoViec.dataSources"
+              :showColumnCheckbox="false"
+              :enable-paging-server="false"
+              :allowPaging="true"
+              :showFilter="true"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Thông tin tra cứu -->
+    <ThongTinTraCuu :dichVuOptions="dichVuOptions" :ungDungOptions="ungDungOptions" @searchInfo-change="handleThongTinTraCuuChange" ref="componentThongTinTraCuu"/>
+    
+    <!-- Danh sách đơn hàng -->
+    <DanhSachDonHang @on-select-row="onSelectedRowChanged" ref="componentDanhSachDonHang" :ungDungId="tuVanFilter.ungDungId" :trangThaiPhieu="trangThaiPhieu"/>
+    
+  </div>
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupGiaoViec"
+    :header='"Giao việc"'
+    showCloseIcon=true
+    width='80%'
+    height='800'
+    target='.main-wrapper'
+    :position="position"
+    @close="onAfterClosePopupGiaoViec"
+  >
+    <popup-giao-viec
+      ref="giaoViec"
+      :phieuId="phieuId"
+      :donViId="donViId"
+      :nhanVienId="nhanVienId"
+      :ngayGiao="ngayGiao"
+      @onClose="onClosePopupGiaoViec"
+    />
+  </ejs-dialog>
+
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupThongTinGT"
+    :header='"Cập nhật thông tin giới thiệu cho hợp đồng tư vấn"'
+    showCloseIcon=true
+    width='60%'
+    height='800'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <popup-thong-tin-gt ref="thongTinGT" :hdkhId="hdkhId" />
+  </ejs-dialog>
+  <popupHuyDonHang @success="reloadDanhSachDonHang()" ref="popupHuyDonHang" />
+  <popupPhanGiamSat @success="reloadDanhSachDonHang()" ref="popupPhanGiamSat" />
+  <popupPhanDonHang @success="reloadDanhSachDonHang()" ref="popupPhanDonHang" />
+</div>

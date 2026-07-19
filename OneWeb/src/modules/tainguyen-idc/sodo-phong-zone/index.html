@@ -1,0 +1,179 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave"> <span class="icon one-save"></span>Ghi lại </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onManageAisles">
+           <i class="fa fa-road"></i> Quản lý hành lang
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onOpenQuatCotModal">
+          <span class="icon one-clipart-1"></span> Quản lý Quạt & Cột
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onZoomIn" :class="{ disabled: isZoomInDisabled }"> <i class="fa fa-search-plus"></i> Phóng to </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onZoomOut" :class="{ disabled: isZoomOutDisabled }"> <i class="fa fa-search-minus"></i> Thu nhỏ </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onReset"> <span class="icon one-refresh"></span>Đặt lại </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onAddNewPhongZone">
+          <span class="icon one-file-plus"></span> Nhập mới Phòng/Zone
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onEditPhongZone">
+          <span class="icon one-edit"></span> Chỉnh sửa Phòng/Zone
+        </b-link> 
+      </li>
+      
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <div class="diagram-workspace">
+      <!-- Symbol Palette -->
+      <div class="palette-container">
+        <div v-show="!isDataLoaded" style="padding: 20px; text-align: center; color: #999">
+          Đang tải dữ liệu rack...
+        </div>
+        <div v-show="isDataLoaded" style="width: 100%; height: 100%">
+          <ejs-symbolpalette
+            id="symbolpalette"
+            ref="symbolpalette"
+            :symbolHeight="100"
+            :symbolWidth="80"
+            :getNodeDefaults="getNodeDefaults"
+            :getSymbolInfo="getSymbolInfo"
+            :palettes="palettes"
+          ></ejs-symbolpalette>
+        </div>
+      </div>
+
+      <!-- Diagram Canvas -->
+      <div class="diagram-container">
+        <ejs-diagram
+          id="diagram"
+          ref="diagramObj"
+          :width="'100%'"
+          :height="'100%'"
+          :tool="7"
+          :snapSettings="snapSettings"
+          :scrollSettings="scrollSettings"
+          :pageSettings="pageSettings"
+          :selectedItems="selectedItems"
+          :contextMenuSettings="contextMenuSettings"
+          :commandManager="commandManager"
+          :getNodeDefaults="getDiagramNodeDefaults"
+          :drop="onDrop"
+          :positionChange="onPositionChange"
+          :contextMenuOpen="onContextMenuOpen"
+          :contextMenuClick="onContextMenuClick"
+        ></ejs-diagram>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rack Detail Modal -->
+  <rack-detail-modal ref="rackDetailModal" :rackDetail="selectedRackDetail" @close="onModalClose" />
+
+  <!-- Equipment Detail Modal -->
+  <ModalChiTietThietBi
+    :thietBiId="selectedEquipmentDetail && selectedEquipmentDetail.id ? selectedEquipmentDetail.id.replace('node_', '') : 0"
+    @close="onEquipmentModalClose"
+    ref="equipmentDetailModal"
+  />
+
+  <!-- Cage Detail Modal
+  <cage-detail-modal ref="cageDetailModal" :cageDetail="selectedCageDetail" @close="onCageModalClose" /> -->
+
+  <!-- Select Cage Modal -->
+  <select-cage-modal ref="selectCageModal" @confirm="onCageSelected" />
+
+  <!-- Draw Cage Polygon Modal -->
+  <draw-cage-polygon-modal
+    ref="drawCagePolygonModal"
+    :roomWidth="getPolygonBounds().width"
+    :roomHeight="getPolygonBounds().height"
+    @confirm="onCagePolygonConfirm"
+    @cancel="onCagePolygonCancel"
+  />
+
+  <!-- Draw Aisle Polygon Modal -->
+  <draw-aisle-polygon-modal
+    ref="drawAislePolygonModal"
+     :roomWidth="getPolygonBounds().width"
+    :roomHeight="getPolygonBounds().height"
+    :roomPolygon="roomPolygon"
+    @confirm="onAislePolygonConfirm"
+    @cancel="onAislePolygonCancel"
+  />
+
+  <ModalThongtinLongQuay
+    ref="ModalThongTinLongQuay"
+    :longquayId="selectedCageDetail && selectedCageDetail.id ? selectedCageDetail.id.replace('cage_', '') : 0"
+  ></ModalThongtinLongQuay>
+
+  <ModalThongtinHanhLang
+    ref="ModalThongtinHanhLang"
+    :aisleDetail="selectedAisleDetail"
+    @close="onAisleModalClose"
+  ></ModalThongtinHanhLang>
+
+  <!-- Modal CRUD Hành lang -->
+  <ModalCRUDHanhLang ref="modalCRUDHanhLang" :roomId="modalItemID" @refresh="onAisleRefresh" />
+
+  <!-- Modal chọn rack từ danh sách chồng lên -->
+  <b-modal
+    id="stackedRacksModal"
+    ref="stackedRacksModal"
+    title="Chọn rack"
+    size="md"
+    hide-footer
+    centered
+  >
+    <div v-if="stackedRacksList.length > 0">
+      <p style="margin-bottom: 10px;">Có <strong>{{ stackedRacksList.length }}</strong> rack tại vị trí này:</p>
+      <div class="stacked-racks-list">
+        <div
+          v-for="(rack, index) in stackedRacksList"
+          :key="rack.id"
+          class="rack-item"
+          @click="selectStackedRack(rack)"
+        >
+          <div class="rack-info">
+            <div class="rack-number">{{ index + 1 }}</div>
+            <div class="rack-details">
+              <div class="rack-name">{{ rack.name}}</div>
+              <div class="rack-meta">
+                <span class="badge badge-secondary">{{ rack.totalU }}U</span>
+              </div>
+            </div>
+          </div>
+          <i class="fa fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </b-modal>
+  <b-modal v-model="showEditModal" :title="modalTitle" size="xl" hide-footer @hidden="handleModalClose"
+    modal-class="modal-edit-phong">
+    <FormPhong v-if="showEditModal" :key="'edit-modal-' + modalComponentKey" :itemId="selectedPhongId"
+      :mode="modalMode" @saveSuccessed="handleModalSave" @cancelSave="handleModalClose" />
+  </b-modal>
+
+  <!-- Modal Quản lý Quạt và Cột -->
+  <modal-quan-ly-quat-cot
+    v-if="isDataLoaded"
+    ref="modalQuanLyQuatCot"
+    :room-id="modalItemID"
+    :room-polygon="roomPolygon"
+    @close="onQuatCotModalClose"
+  />
+</div>

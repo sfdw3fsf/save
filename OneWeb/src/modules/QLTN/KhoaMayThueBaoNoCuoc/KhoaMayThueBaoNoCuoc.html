@@ -1,0 +1,419 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li @click="TimKiem()">
+        <a href="javascript:;" title="Tìm kiếm">
+          <span class="icon one-search"></span> Tìm kiếm
+        </a>
+      </li>
+      <li>
+        <a href="javascript:;" @click="TaoDS()" :class="{disabled: dsKhoaThueBao.length <= 0}" title="Tạo danh sách khóa thuê bao">
+          <span class="icon  one-file-check1"></span> Tạo DS
+        </a>
+      </li>
+      <li @click="GiaoPhieu()">
+        <a href="javascript:;" title="Giao phiếu">
+          <span class="icon one-file-arrow-right"></span> Giao phiếu
+        </a>
+      </li>
+      <li @click="DocFile()">
+        <a href="javascript:;" title="Đọc file khóa máy">
+          <span class="icon   one-book"></span> Đọc file
+        </a>
+        <PopupDocFileKhoaMay @sendData="sendData" />
+      </li>
+      <li @click="XuatFile()">
+        <a href="javascript:;" title="Xuất File">
+          <span class="icon  one-download"></span> Xuất File
+        </a>
+        <appModalXuatDuLieu id="modal-xuat-dulieu" :thuocTinh="dsThuocTinh" :data="dsKhoaThueBao"/>
+      </li>
+      <li @click="InDS()">
+        <a href="javascript:;" title="In danh sách">
+          <span class="icon  one-print"></span> In DS
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="pull-right custom-kycuoc">
+        <app-ky-cuoc @handleChangeKyCuoc="handleKyHoaDon"></app-ky-cuoc>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="grid-stack-box">
+      <div class="box-col box-form col-sm-6" id="boxLeft1">
+        <div class="legend-title">
+          <div class="title pull-left">Thông tin khoá thuê bao</div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w90">Đơn vị QL</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="donviQL" :dataSource="danhsachDonViQL" dataTextField="TEN_HIENTHI"
+                    dataValueField="DONVI_ID" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="check-action">
+              <input v-model="checkMoMay" type="checkbox" class="check">
+              <span class="name">Mở máy trong ngày</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w90">Dịch vụ</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="dichVu" :dataSource="danhSachDichVuVienThong" dataTextField="TEN_DVVT"
+                    dataValueField="DICHVUVT_ID" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="checkLoaiHinh" type="checkbox" class="check">
+                  <span class="name">Loại hình</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                    v-model="loaiHinh" locale='vi-VN' :dataSource='danhSachLoaiHinhThueBao' :allowFiltering='true'
+                    :fields="{value:'LOAITB_ID', text: 'TEN_LOAIHINH'}" showSelectAll="true" :showDropDownIcon="true"
+                    :enabled="checkLoaiHinh" :value="loaiHinh" placeholder="Chọn loại hình" :close='onClose' :created='onDropdownCreate'></ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w90">Hình thức</div>
+              <div class="value">
+                <div class="select-custom">
+                  <select v-model="hinhThuc" name="" id="" class="form-control">
+                    <option value="5">Nợ phát sinh</option>
+                    <option value="0">Nợ đầu kỳ</option>
+                    <option value="1">Tổng nợ</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="checkKHLon" type="checkbox" class="check">
+                  <span class="name">KH lớn</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <!-- <select v-model="KhLon" name="" id="" class="form-control" :disabled="!checkKHLon">
+                    <option value="">Chọn KH lớn</option>
+                    <option v-for="(item, index) in danhSachKhLon" :key="index" :value="item.KHLON_ID">{{item.TEN_LKHL}}
+                    </option>
+                  </select> -->
+                  <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                    v-model="KhLon" locale='vi-VN' :dataSource='danhSachKhLon' :allowFiltering='true'
+                    :fields="{value:'KHLON_ID', text: 'TEN_LKHL'}" showSelectAll="true" :showDropDownIcon="true"
+                    :enabled="checkKHLon" :value="KhLon" placeholder="Chọn KH lớn"></ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w90">Từ số tiền</div>
+              <div class="value">
+                <!-- <div class="select-custom">
+                              <select name="" id="" class="form-control">
+                                  <option value=""></option>
+                              </select>
+                          </div> -->
+                <div class="input-icon-right calculator-box">
+                  <vue-numeric currency='' separator=',' v-model="tuTien" class="screen-cal form-control tright red"
+                    type="numeric">
+                  </vue-numeric>
+                  <span class="icon one-calculator" @click="isCalculatorShowTuTien = !isCalculatorShowTuTien"></span>
+                  <Calculator @display="tuTien = $event" :value="tuTien" :is-show="isCalculatorShowTuTien"
+                    @close="isCalculatorShowTuTien = !isCalculatorShowTuTien"></Calculator>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="checkDenTien" type="checkbox" class="check">
+                  <span class="name">Đến tiền</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="input-icon-right calculator-box">
+                  <vue-numeric currency='' separator=',' v-model="denTien" class="screen-cal form-control tright red"
+                    :disabled="!checkDenTien"></vue-numeric>
+                  <span class="icon one-calculator" @click="checkDenTien && (isCalculatorShowDenTien = !isCalculatorShowDenTien)"></span>
+                  <Calculator @display="denTien = $event" :value="denTien" :is-show="isCalculatorShowDenTien"
+                    @close="isCalculatorShowDenTien = !isCalculatorShowDenTien"></Calculator>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w90">Quy trình </div>
+          <div class="value">
+            <div class="select-custom">
+              <SelectExt v-model.trim="quyTrinh" :dataSource="danhsachQuyTrinh" dataTextField="QUYTRINH"
+                dataValueField="QUYTRINH_ID" />
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w90">Điểm TN từ</div>
+              <div class="value">
+                <div class="input-icon-right calculator-box">
+                  <vue-numeric currency='' separator=',' v-model="tuTN" class="screen-cal form-control tright red">
+                  </vue-numeric>
+                  <span class="icon one-calculator" @click="isCalculatorShowTuTN = !isCalculatorShowTuTN"></span>
+                  <Calculator @display="tuTN = $event" :value="tuTN" :is-show="isCalculatorShowTuTN"
+                    @close="isCalculatorShowTuTN = !isCalculatorShowTuTN"></Calculator>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="checkDenTN" type="checkbox" class="check">
+                  <span class="name">Đến</span>
+                </div>
+              </div>
+              <div class="value">
+                <!-- <div class="select-custom">
+                              <select name="" id="" class="form-control">
+                                  <option value=""></option>
+                              </select>
+                          </div> -->
+                <div class="input-icon-right calculator-box">
+                  <vue-numeric currency='' separator=',' v-model="denTN" class="screen-cal form-control tright red"
+                    :disabled="!checkDenTN"></vue-numeric>
+                  <span class="icon one-calculator" @click="checkDenTN && (isCalculatorShowDenTN = !isCalculatorShowDenTN)"></span>
+                  <Calculator @display="denTN = $event" :value="denTN" :is-show="isCalculatorShowDenTN"
+                    @close="isCalculatorShowDenTN = !isCalculatorShowDenTN"></Calculator>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-col box-form col-sm-6" id="boxRight1">
+        <div class="legend-title">&nbsp;</div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w110">Loại phiếu</div>
+              <div class="value">
+                <div class="select-custom">
+                  <select v-model="loaiPhieu" id="" class="form-control">
+                    <option value="0">Phát</option>
+                    <option value="1">Thu</option>
+                    <option value="2">Tất cả</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">Chiều khóa</div>
+              <div class="value">
+                <div class="select-custom">
+                  <select v-model="chieuKhoa" id="" class="form-control" :disabled="!disabledChieuKhoa1">
+                    <option value="1">Khóa 1 chiều gọi đi</option>
+                    <option value="2">Khóa 2 chiều</option>
+                    <!-- <option value="0">Khóa 1 chiều + khóa 2 chiều</option>
+                    <option value="3">Thanh lý</option> -->
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w110">
+                <div class="check-action">
+                  <input v-model="checkLoaiKH" type="checkbox" class="check">
+                  <span class="name">Loại KH</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model.trim="loaiKH" :dataSource="danhSachLoaiKH" dataTextField="TEN_LOAIKH"
+                    dataValueField="LOAIKH_ID" :disabled="!checkLoaiKH" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="checkQuan" type="checkbox" class="check">
+                  <span class="name">Quận</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                    v-model="quan" locale='vi-VN' :dataSource='danhMucQuanHuyen' :allowFiltering='true'
+                    :fields="{value:'QUAN_ID', text: 'TEN_QUAN'}" showSelectAll="true" :showDropDownIcon="true"
+                    :enabled="checkQuan" :value="quan" placeholder="Chọn quận"></ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w110">
+                <div class="check-action">
+                  <input v-model="checkXN" type="checkbox" class="check">
+                  <span class="name">Trạng thái XN</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <select v-model="trangThai" name="" id="" class="form-control" :disabled="!checkXN">
+                    <option value="1">Chưa xác nhận</option>
+                    <option value="2">Đã xác nhận</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                Chiều khóa
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <select v-model="kieuMotChieu" name="" id="" class="form-control" :disabled="!disabledChieuKhoa2">
+                    <option value="1">Tất cả</option>
+                    <option value="2">Khóa 1 chiều yêu cầu</option>
+                    <option value="3">Khóa 1 chiều nợ cước</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-12">
+            <div class="info-row">
+              <div class="key w110">
+                <div class="check-action">
+                  <input v-model="checkTuNgay" type="checkbox" class="check" :disabled="!disabledChieuKhoa2">
+                  <span class="name">Từ ngày</span>
+                </div>
+              </div>
+              <div class="value">
+                <ejs-datepicker class="form-control bg-none bor0 fw6 text" v-model="tuNgay" :value="today" :max="today"
+                  :format="'dd/MM/y'" :showClearButton="false" :enabled="checkTuNgay">
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="checkDenNgay" type="checkbox" class="check" :disabled="!disabledChieuKhoa2">
+                  <span class="name">Đến ngày</span>
+                </div>
+              </div>
+              <div class="value">
+                <!-- <div class="input-icon-right">
+                              <input type="text" class="form-control">
+                              <span class="icon one-calendar"></span>
+                          </div> -->
+                <ejs-datepicker class="form-control bg-none bor0 fw6 text" v-model="denNgay" :value="today" :max="today"
+                  :format="'dd/MM/y'" :showClearButton="false" :enabled="checkDenNgay">
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w110">
+            Loại bỏ
+          </div>
+          <div class="value">
+            <div class="select-custom">
+              <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                v-model="loaiBo" locale='vi-VN' :dataSource='dsLoaiBo' :allowFiltering='true'
+                :fields="{value:'id', text: 'text'}" showSelectAll="true" :showDropDownIcon="true" :value="loaiBo"
+                placeholder="Chọn loại bỏ"></ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="box-move-select-table">
+        <div class="box-col">
+          <div class="legend-title">
+            <div class="title pull-left">Danh sách khoá thuê bao
+                <span style="margin-left: 20px;" class="red">Thời gian tạo: 00:00:00</span>
+            </div>
+            <div class="pull-right red">Số lượng tạo: {{dsKhoaThueBao.length}}</div>
+            <div class="clearfix"></div>
+          </div>
+          <DataGrid ref="dsach_DaKhoa" :columns="fields" :dataSource="dsKhoaThueBao" :showFilter="true" :showColumnCheckbox="true"
+            dataKeyField="THUEBAO_ID" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false" @queryCellInfo="onDSKhoaTBCellInfo"/>
+        </div>
+        <div class="actions">
+          <button class="btn" @click="move()">
+            <span class="-ap icon-chevron-thin-right"></span>
+          </button>
+          <button class="btn" @click="unmove()">
+            <span class="-ap icon-chevron-thin-left"></span>
+          </button>
+        </div>
+        <div class="box-col">
+          <div class="legend-title">
+            <div class="title pull-left">Danh sách không khóa</div>
+            <div class="clearfix"></div>
+          </div>
+          <DataGrid ref="dsach_ChuaKhoa" :columns="fieldsKhongKhoa" :dataSource="dsKhongKhoa" :showFilter="true" :showColumnCheckbox="true"
+            dataKeyField="THUEBAO_ID" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

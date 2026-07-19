@@ -1,0 +1,130 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChonKetNoi"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+  :position="{ X: 'center', Y: 'top' }"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        Chọn kết nối tác nghiệp
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSearch"> <span class="icon one-search"></span> Tìm kiếm </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onChonKetNoi" :class="{ disabled: ds_ketnoi.length == 0 }">
+            <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chọn
+          </b-link>
+        </li>
+        <!-- <li>
+          <b-link href="javascript:void(0)" @click="closeModal">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li> -->
+      </ul>
+    </div>
+    <div class="modal-content p-2">
+      <div class="box-form">
+        <div class="legend-title">Thông tin công việc thực hiện</div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w180">IDC</div>
+              <div class="value">
+                <SelectExt
+                  v-model="searchForm.idcId"
+                  dataTextField="text"
+                  dataValueField="id"
+                  :dataSource="idcList"
+                  placeholder="Chọn IDC"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w180">Mã thuê bao</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="searchForm.maTB" placeholder="Nhập mã thuê bao..." />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="loaicv !== 65 && loaicv !== 68">
+          <div class="col-sm-6 col-12" v-if="loaicv !== 66 && loaicv !== 67">
+            <div class="info-row">
+              <div class="key w180">Trạng thái kết nối vật lý</div>
+              <div class="value">
+                <SelectExt
+                  v-model="searchForm.trangthai_vl"
+                  :dataSource="[...trang_thai_kn_vl_options]"
+                  dataTextField="text"
+                  dataValueField="id"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w180">Trạng thái vận hành</div>
+              <div class="value">
+                <SelectExt
+                  v-model="searchForm.trangthai_vh"
+                  :dataSource="[...trang_thai_kn_vh_options]"
+                  dataTextField="text"
+                  dataValueField="id"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <DataGrid
+        ref="grdItems"
+        :allowPaging="true"
+        :enablePagingServer="false"
+        :showColumnCheckbox="true"
+        v-bind:columns="isKhachHang ? [
+                  { fieldName: 'F_KETNOI_ID', headerText: 'ID kết nối', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'MA_THUE_BAO', headerText: 'Mã thuê bao', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'KHACH_HANG_TEN', headerText: 'Tên khách hàng', textAlign: 'Left', width: '200px' },
+                  //{ fieldName: 'LOAIKN_ID', headerText: 'Loại kết nối', textAlign: 'Left', valueAccessor: mapToTenLoaiKN, width: '120px' },
+                  //{ fieldName: 'HINHTHUCKN_TEN', headerText: 'Hình thức', textAlign: 'Left',width: '150px' },
+                  //{ fieldName: 'LOPKN_TEN', headerText: 'Lớp', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'TB_NGUON_TEN', headerText: 'Thiết bị nguồn', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TB_NGUON_CON_TEN', headerText: 'Tên TB nguồn con', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TB_DICH_TEN', headerText: 'Thiết bị đích', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TB_DICH_CON_TEN', headerText: 'Tên TB đích con', textAlign: 'Left', width: '180px' },
+                  //{ fieldName: 'NGUOITHUCHIEN_TEN', headerText: 'Nhân viên thực hiện', textAlign: 'Left', width: '200px' },
+                  { fieldName: 'TRANGTHAI_VL_ID', headerText: 'Trạng thái vật lý', textAlign: 'Left', valueAccessor: mapToTrangThaiVL, width: '150px' },
+                  { fieldName: 'TRANGTHAI_VH_ID', headerText: 'Trạng thái vận hành', textAlign: 'Left', valueAccessor: mapToTrangThaiVH, width: '180px' },
+                ] : [
+                { fieldName: 'F_KETNOI_ID', headerText: 'ID kết nối', textAlign: 'Left', width: '150px' },
+                { fieldName: 'TB_NGUON_TEN', headerText: 'Thiết bị nguồn', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TB_NGUON_CON_TEN', headerText: 'Tên TB nguồn con', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TB_DICH_TEN', headerText: 'Thiết bị đích', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TB_DICH_CON_TEN', headerText: 'Tên TB đích con', textAlign: 'Left', width: '180px' },
+                { fieldName: 'TRANGTHAI_VL_ID', headerText: 'Trạng thái vật lý', textAlign: 'Left', valueAccessor: mapToTrangThaiVL, width: '150px' },
+                { fieldName: 'TRANGTHAI_VH_ID', headerText: 'Trạng thái vận hành', textAlign: 'Left', valueAccessor: mapToTrangThaiVH, width: '180px' },
+                ]"
+        :dataSource="ds_ketnoi"
+        :enabledSelectFirstRow="false"
+        @selectedRowChanged="onSelectedRowChanged"
+      >
+      </DataGrid>
+    </div>
+  </div>
+</ejs-dialog>

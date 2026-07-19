@@ -1,0 +1,2 @@
+import AssignLocationEmployeeHPG from './AssignLocationEmployeeHPG.vue'
+export default AssignLocationEmployeeHPG

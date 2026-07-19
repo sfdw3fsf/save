@@ -1,0 +1,17 @@
+export default {
+    getDSDichVu: (axios) => axios.get(`/web-qlvt/api/cap-vat-tu-thue-bao/ds-dich-vu-vat-tu`),
+    getDSNhanVien: (axios, data) => axios.get(`/web-qlvt/api/cap-vat-tu-thue-bao/ds-nhan-vien-giao-nhan/${data.donViId}/${data.nhanVienId}`),
+    getDSKieuLapDat: (axios) => axios.get(`/web-qlvt/api/ds-quyet-toan-vt/danh-muc-kieu-lap-dat`),
+    getDSDeNghiQuyetToan: (axios, data) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/ds-de-nghi-quyet-toan?trangThaiQt=${data.trangThaiQt}&loaiPhieuId=${data.loaiPhieuId}`),
+    getDSKhoTheoNV: (axios, data) => axios.get(`/web-qlvt/api/tra-cuu-vat-tu/ds-kho-theo-nhanvien/${data.nhanVienId}/${data.donViId}`),
+    getDSLoaiHinhThueBao: (axios, dichVuId) => axios.get(`/web-qlvt/api/ds-quyet-toan-vt/ds-loai-hinh-thue-bao/${dichVuId}`),
+    getDSLyDoCap: (axios,data) => axios.post(`/web-qlvt/api/ds-quyet-toan-vt/ds-ly-do-cap`,data),
+    capNhatQuyetToanChungTu: (axios,data) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/cap-nhat-qt-chi-tiet`,data),
+    ghiLaiDeNghiQuyetToan: (axios,data) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/ghi-lai-de-nghi-quyet-toan`,data),
+    xoaDeNghiQuyetToan: (axios, quyetToanId) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/xoa-de-nghi-quyet-toan?quyetToanId=${quyetToanId}`),
+    kiemTraQuyetToanChungTu: (axios, quyetToanId) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/kiem-tra-qt-ct?quyetToanId=${quyetToanId}`),
+    layQuyTrinhHuongGiao: (axios, loaiPhieuId) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/ds-quytrinh-hg-tn?loaiPhieuId=${loaiPhieuId}`),
+    layHuongGiaoTiepTheo: (axios, huongGiaoId) => axios.get(`/web-qlvt/api/nhap-xuat-vt/huong-giao-tiep-theo?huong-giao-id=${huongGiaoId}`),
+    getDSBaoCaoQuyetToan: (axios,data) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/ds-bc-quyet-toan`,data),
+    getDSBaoCaoThuHoi: (axios,data) => axios.post(`/web-qlvt/api/de-nghi-quyet-toan/ds-bc-thu-hoi`,data),
+}

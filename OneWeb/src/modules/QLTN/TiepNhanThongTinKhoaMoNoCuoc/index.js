@@ -1,0 +1,3 @@
+import TiepNhanThongTinKhoaMoNoCuoc from './TiepNhanThongTinKhoaMoNoCuoc'
+
+export default TiepNhanThongTinKhoaMoNoCuoc

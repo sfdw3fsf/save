@@ -1,0 +1,201 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">Khai báo BTS</div>
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ </a></li>
+          <li class="breadcrumb-item"><a href="#">Quản lý tài nguyên mạng</a></li>
+          <li class="breadcrumb-item">Khai báo BTS</li>
+        </ul>
+      </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="btnLayTT_Click">
+                    <span class="icon one-search"></span> Lấy danh sách
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnNhapMoi_Click">
+                    <span class="icon one-file-plus"></span> Nhập mới
+                </a>
+            </li><i class="fa-solid fa-pen-line"></i>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnSua_Click">
+                    <span class="dropdown-icon nc-icon-glyph ui-1_edit-74"></span> Sửa
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnDelete_click">
+                    <span class="icon  one-trash"></span> Xóa
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnImportFile">
+                    <span class="icon one-xlsx-import"></span> Import file BTS
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="btnExportFile">
+                    <span class="icon one-excel"></span> Export file BTS
+                </a>
+            </li>
+            <ejs-dialog
+                :visible=false
+                ref="popup_frmCapNhatBTS"
+                :animationSettings="{ effect: 'Zoom' }"
+                :showCloseIcon=false 
+                :enableResize=true
+                :allowDragging=true
+                width='80%'
+                :isModal='true'
+                :cssClass="'popup-box'"
+                zIndex=100
+                >
+                
+                <!-- <b-modal
+                    size="xl"    
+                    no-close-on-backdrop
+                    hide-footer
+                    hide-header
+                    hide-header-close
+                    ref="popup_frmCapNhatBTS"
+                    body-class="modal-body p-0"> -->
+                    <ManageBTS ref="frmCapNhatBTS" class=""></ManageBTS>
+                <!-- </b-modal> -->
+            </ejs-dialog>
+
+        </ul>
+    </div>
+    <input ref="fileInput" id="file" type="file" @change="onChangeFile($event)" accept=".xls, .xlsx" style="display:none" class="form-control ">
+    <div class="page-content row">
+        <div class="col-sm-9 col-12">
+            <div class="box-form">
+                <div class="row">
+                    <div class="legend-title">Điều kiện lọc</div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="key w100">Phân loại </div>
+                            <div class="value">
+                                <ejs-dropdownlist
+                                    class="form-control"
+                                    locale='vi-VN'
+                                    v-model="params.p_PhanLoai"
+                                    :dataSource='cboPhanLoai' 
+                                    :fields="{value:'MA_LOAI', text: 'TEN_LOAI'}"
+                                    :allowFiltering="true"
+                                    >
+                                </ejs-dropdownlist> 
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                <span class="name">Mã node</span>
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.p_Ma_Node">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                <span class="name">Tên thiết bị</span>
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.p_Ten_thietbi">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">
+                                <span class="name">Địa chỉ</span>
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.p_Diachi">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                    <div class="info-row">
+                        <div class="key w100">UPE </div>
+                        <div class="value">
+                            <ejs-dropdownlist
+                                class="form-control"
+                                locale='vi-VN'
+                                v-model="params.p_UPE"
+                                :dataSource='cboUPE' 
+                                :fields="{value:'DSLAM_ID', text: 'TENDSLAM'}"
+                                :allowFiltering="true"
+                                >
+                            </ejs-dropdownlist> 
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="key w100">SwitchL2 </div>
+                        <div class="value">
+                            <ejs-dropdownlist
+                                class="form-control"
+                                locale='vi-VN'
+                                v-model="params.p_SWL2"
+                                :dataSource='cboSWL2' 
+                                :fields="{value:'DSLAM_ID', text: 'TENDSLAM'}"
+                                :allowFiltering="true"
+                                @change="cboSWL2_EditValueChanged"
+                                >
+                            </ejs-dropdownlist>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách thiết bị</div>
+                <DataGrid
+                    class=""
+                    v-bind:columns="[
+                    {fieldName: 'PHAN_LOAI', headerText: 'Loại', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'SYSTEM_NAME', headerText: 'System name', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'MA_NODE', headerText: 'Mã Node', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_KHUVUC', headerText: 'Khu vực', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_KHUVUC_XULY', headerText: 'Khu vực xử lý', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_NV', headerText: 'Tên người QL', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'SDT_NV', headerText: 'Số ĐT', textAlign: 'Left', allowFiltering: true},
+    
+                    {fieldName: 'TRANGTHAI_HOATDONG', headerText: 'Trạng thái hoạt động', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_QL', headerText: 'Tên thiết bị quản lý', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'CAUHINH', headerText: 'Cấu hình', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_UPE', headerText: 'UPE', textAlign: 'Left', allowFiltering: true},
+    
+                    {fieldName: 'TEN_SWL2', headerText: 'SwitchL2', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_THIETBI_HETHONG', headerText: 'Tên trên hệ thống', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'MA_NODE_CHA', headerText: 'Mã node cha', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'BANGTAN', headerText: 'Băng tần', textAlign: 'Left', allowFiltering: true},
+    
+                    {fieldName: 'TEN_QUANHUYEN', headerText: 'Quận huyện', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TEN_PHUONGXA', headerText: 'Phường xã', textAlign: 'Left', allowFiltering: true},
+                    ]"
+                    v-bind:dataSource="gridBTS"
+                    ref="grvBTS"
+                    :showColumnCheckbox='false'
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer='false'
+                    @selectedRowChanged="grvBTS_FocusedRowChanged"
+                    @recordDoubleClick="grvBTS_DoubleClick"
+                    @rowDataBound="rowDataBound"
+                    :allowExcelExport="true"
+                    >
+                </DataGrid>
+            </div>
+        </div>
+        <div class="col-sm-3 col-12 d-flex">
+            <div class="box-form">
+                <div class="legend-title">Thông số kỹ thuật</div>
+                <div class="file-canvas" v-html="wbrChiTietThietBi">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

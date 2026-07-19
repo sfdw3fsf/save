@@ -1,0 +1,770 @@
+<b-modal 
+    ref="ref-modal"
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box frm-danhmuc-tuyen-truyen-dan">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span> {{title}}</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="hide">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li :class="{'disable-btn': !btnNhapMoi.enabled}" @click="onClickBtnNhapMoi">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnSua.enabled}" @click="onClickBtnSua">
+                    <a href="javascript:void(0)">
+                        <span class="icon nc-icon-glyph ui-1_edit-74"></span> Sửa
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnGhiLai.enabled}" @click="onClickBtnGhiLai">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnHuyBo.enabled}" @click="onClickBtnHuyBo">
+                    <a href="javascript:void(0)">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy bỏ
+                    </a>
+                </li>
+                <li :class="{'disable-btn': !btnXoa.enabled}" @click="onClickBtnXoa">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-trash"></span>Xóa
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="popup-body">
+                <div class="grid-stack-box">
+                    <Split :gutterSize="2">
+                        <SplitArea :size="40">
+                            <div class="box-col box-form" id="boxLeft" style="height: 98%;">
+                                <div class="legend-title">Loại danh mục</div>
+                                <div class="value" ref="ref-select-loai-danhmuc">        
+                                    <SelectExt
+                                        :settings="{dropdownParent: $refs['ref-select-loai-danhmuc']}"
+                                        v-model="loaiDanhMucId" 
+                                        :dataSource="dsLoaiDanhMuc" 
+                                        dataValueField="id"
+                                        dataTextField="name" />
+                                </div> 
+                                <div class="legend-title mart20">Thông tin danh mục</div>
+                                <div class="table-content marb0">
+
+                                    <div v-show="!loaiDanhMucId || loaiDanhMucId == LOAI_DM.TUYEN_TRUYEN_DAN">
+                                        <table class="table-result table-gachle tree-grid-2">
+                                            <tbody>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Định danh
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Mã tuyến 
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" :value="tuyenTruyenDanModel.TUYENTD_ID" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Tên tuyến <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.tuyenTruyenDanModel.TUYEN_TD.$error">
+                                                            <input type="text" v-model.trim="tuyenTruyenDanModel.TUYEN_TD" :readonly="formTuyenTruyenDan.TUYEN_TD.readonly" maxlength="100" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Loại tuyến <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <div class="value" ref="ref-select-loai-ttd-01">
+                                                            <bss-error-marker :has-error="$v.tuyenTruyenDanModel.LOAITTD_ID.$error">
+                                                                <SelectExt
+                                                                    v-model="tuyenTruyenDanModel.LOAITTD_ID" 
+                                                                    :dataSource="comboLoaiTuyenTruyenDan01.dataSource" 
+                                                                    :disabled="formTuyenTruyenDan.LOAITTD_ID.disabled"
+                                                                    dataValueField="LOAITTD_ID"
+                                                                    dataTextField="LOAI_TUYEN" />
+                                                            </bss-error-marker>
+                                                        </div> 
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_TUYEN_TRUYEN_DAN">
+                                        <table class="table-result table-gachle tree-grid-2">
+                                            <tbody>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Định danh
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Mã loại tuyến 
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" :value="loaiTuyenTruyenDanModel.LOAITTD_ID" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Tên loại tuyến <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiTuyenTruyenDanModel.LOAI_TUYEN.$error">
+                                                            <input type="text" v-model.trim="loaiTuyenTruyenDanModel.LOAI_TUYEN" :readonly="formLoaiTuyenTruyenDan.LOAI_TUYEN.readonly" maxlength="100" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_CAP">
+                                        <table class="table-result table-gachle tree-grid-2">
+                                            <tbody>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Định danh
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Mã loại cáp 
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" :value="loaiCapModel.LOAICAP_ID" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Tên loại cáp <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiCapModel.LOAI_CAP.$error">
+                                                            <input type="text" v-model.trim="loaiCapModel.LOAI_CAP" :readonly="formLoaiCap.LOAI_CAP.readonly" maxlength="100" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_THIET_BI">
+                                        <table class="table-result table-gachle tree-grid-2">
+                                            <tbody>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Định danh
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Loại thiết bị ID
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" :value="loaiThietBiModel.LOAITBI_ID" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Mã loại thiết bị
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" v-model="loaiThietBiModel.MA_LOAITBI" :readonly="formLoaiThietBi.MA_LOAITBI.readonly" maxlength="20" class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Tên loại thiết bị <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiThietBiModel.LOAI_TBI.$error">
+                                                            <input type="text" v-model.trim="loaiThietBiModel.LOAI_TBI" :readonly="formLoaiThietBi.LOAI_TBI.readonly" maxlength="100" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Khác
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Ghi chú
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" v-model="loaiThietBiModel.GHICHU" :readonly="formLoaiThietBi.GHICHU.readonly" maxlength="300" class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_DOI_TUONG">
+                                        <table class="table-result table-gachle tree-grid-2">
+                                            <tbody>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Định danh
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                        
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Mã loại ĐT
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" :value="loaiDoiTuongModel.LOAIDT_ID" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Tên loại ĐT <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.TEN_LDT.$error">
+                                                            <input type="text" v-model.trim="loaiDoiTuongModel.TEN_LDT" :readonly="formLoaiDoiTuong.TEN_LDT.readonly" maxlength="100" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                    
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Loại tuyến
+                                                    </td>
+                                                    <td>
+                                                        <div class="value" ref="ref-select-loai-ttd-02">
+                                                            <SelectExt
+                                                                v-model="loaiDoiTuongModel.LOAITUYENTD_ID" 
+                                                                :dataSource="comboLoaiTuyenTruyenDan02.dataSource" 
+                                                                :disabled="formLoaiDoiTuong.LOAITUYENTD_ID.disabled"
+                                                                dataValueField="LOAITTD_ID"
+                                                                dataTextField="LOAI_TUYEN" />
+                                                        </div> 
+                                                    </td>
+                                                </tr>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Dữ liệu
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Lệnh select <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.LENH_SELECT.$error">
+                                                            <input type="text" maxlength="1000" v-model.trim="loaiDoiTuongModel.LENH_SELECT" :readonly="formLoaiDoiTuong.LENH_SELECT.readonly" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Trường khoá <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.TRUONG_KHOA.$error">
+                                                            <input type="text" maxlength="100" v-model.trim="loaiDoiTuongModel.TRUONG_KHOA" :readonly="formLoaiDoiTuong.TRUONG_KHOA.readonly" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Trường tên <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.TRUONG_TEN.$error">
+                                                            <input type="text" maxlength="100" v-model.trim="loaiDoiTuongModel.TRUONG_TEN" :readonly="formLoaiDoiTuong.TRUONG_TEN.readonly" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Loại thiết bị
+                                                    </td>
+                                                    <td>
+                                                        <input 
+                                                            type="number" 
+                                                            v-model="loaiDoiTuongModel.LOAITB_ID" 
+                                                            :readonly="formLoaiDoiTuong.LOAITB_ID.readonly" 
+                                                            class="form-control h24 bor0 bg-none fw6 text" 
+                                                            maxlength="2" 
+                                                            oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                    </td>
+                                                </tr>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Chủ đề (normal)
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Kích thước <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.KICHTHUOC.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.KICHTHUOC" 
+                                                                :readonly="formLoaiDoiTuong.KICHTHUOC.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="3" 
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Phông chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.PHONGCHU.$error">
+                                                            <input type="text" maxlength="100" v-model.trim="loaiDoiTuongModel.PHONGCHU" :readonly="formLoaiDoiTuong.PHONGCHU.readonly" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Cỡ chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.COCHU.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.COCHU" 
+                                                                :readonly="formLoaiDoiTuong.COCHU.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="4" 
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Kiểu chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.KIEUCHU.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.KIEUCHU" 
+                                                                :readonly="formLoaiDoiTuong.KIEUCHU.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="1" 
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                    
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Màu nền <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.MAUNEN.$error">
+                                                            <ejs-colorpicker :value="loaiDoiTuongModel.MAUNEN" :disabled="formLoaiDoiTuong.MAUNEN.disabled" :change="onChangeMauNen" mode="Palette" :showButtons="false"></ejs-colorpicker>
+                                                            <b>{{loaiDoiTuongModel.MAUNEN}}</b>
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                    
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Màu chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.MAUCHU.$error">
+                                                            <ejs-colorpicker :value="loaiDoiTuongModel.MAUCHU" :disabled="formLoaiDoiTuong.MAUCHU.disabled" :change="onChangeMauChu" mode="Palette" :showButtons="false"></ejs-colorpicker>
+                                                            <b>{{loaiDoiTuongModel.MAUCHU}}</b>
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                    
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Màu viền <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.MAUVIEN.$error">
+                                                            <ejs-colorpicker :value="loaiDoiTuongModel.MAUVIEN" :disabled="formLoaiDoiTuong.MAUVIEN.disabled" :change="onChangeMauVien" mode="Palette" :showButtons="false"></ejs-colorpicker>
+                                                            <b>{{loaiDoiTuongModel.MAUVIEN}}</b>
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                    
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Cỡ viền <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.COVIEN.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.COVIEN" 
+                                                                :readonly="formLoaiDoiTuong.COVIEN.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="1"
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                    
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Hình nền
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-icon-right">
+                                                            <input type="text" :placeholder="placeholderHinhNen" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                            <span class="icon -ap icon-more_horiz btn-border" @click="onClickBtnChonHinhNen"></span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr class="highlight tree-open">
+                                                    <td class="w16">
+                                                        <div class="tree-arrow"></div>
+                                                    </td>
+                                                    <td class="fw6" colspan="2">
+                                                        Chủ đề (selected)
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Phông chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.PHONGCHU_CHON.$error">
+                                                            <input type="text" maxlength="100" v-model.trim="loaiDoiTuongModel.PHONGCHU_CHON" :readonly="formLoaiDoiTuong.PHONGCHU_CHON.readonly" class="form-control h24 bor0 bg-none fw6 text">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Cỡ chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.COCHU_CHON.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.COCHU_CHON" 
+                                                                :readonly="formLoaiDoiTuong.COCHU_CHON.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="4" 
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Kiểu chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.KIEUCHU_CHON.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.KIEUCHU_CHON" 
+                                                                :readonly="formLoaiDoiTuong.KIEUCHU_CHON.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="1" 
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Màu nền <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.MAUNEN_CHON.$error">
+                                                            <ejs-colorpicker :value="loaiDoiTuongModel.MAUNEN_CHON" :disabled="formLoaiDoiTuong.MAUNEN_CHON.disabled" :change="onChangeMauNenChon" mode="Palette" :showButtons="false"></ejs-colorpicker>
+                                                            <b>{{loaiDoiTuongModel.MAUNEN_CHON}}</b>
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Màu chữ <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.MAUCHU_CHON.$error">
+                                                            <ejs-colorpicker :value="loaiDoiTuongModel.MAUCHU_CHON" :disabled="formLoaiDoiTuong.MAUCHU_CHON.disabled" :change="onChangeMauChuChon" mode="Palette" :showButtons="false"></ejs-colorpicker>
+                                                            <b>{{loaiDoiTuongModel.MAUCHU_CHON}}</b>
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Màu viền <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.MAUVIEN_CHON.$error">
+                                                            <ejs-colorpicker :value="loaiDoiTuongModel.MAUVIEN_CHON" :disabled="formLoaiDoiTuong.MAUVIEN_CHON.disabled" :change="onChangeMauVienChon" mode="Palette" :showButtons="false"></ejs-colorpicker>
+                                                            <b>{{loaiDoiTuongModel.MAUVIEN_CHON}}</b>
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;" class="bold">
+                                                        Cỡ viền <bss-required-marker />
+                                                    </td>
+                                                    <td>
+                                                        <bss-error-marker :has-error="$v.loaiDoiTuongModel.COVIEN_CHON.$error">
+                                                            <input 
+                                                                type="number" 
+                                                                v-model="loaiDoiTuongModel.COVIEN_CHON" 
+                                                                :readonly="formLoaiDoiTuong.COVIEN_CHON.readonly" 
+                                                                class="form-control h24 bor0 bg-none fw6 text" 
+                                                                maxlength="1" 
+                                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                                        </bss-error-marker>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w16 highlight">
+                                                
+                                                    </td>
+                                                    <td style="width: 40%;">
+                                                        Hình nền
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-icon-right">
+                                                            <input type="text" :placeholder="placeholderHinhNenChon" readonly class="form-control h24 bor0 bg-none fw6 text">
+                                                            <span class="icon -ap icon-more_horiz btn-border" @click="onClickBtnChonHinhNenChon"></span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </SplitArea>
+                        <SplitArea :size="60" style="padding-right: 0 !important;">
+                            <div class="box-col box-form" id="boxRight" style="height: 98%;">
+                                <div class="legend-title">Danh sách danh mục</div>
+                                <div class="table-content" style="height: 1060px;">
+
+                                    <div v-show="!loaiDanhMucId || loaiDanhMucId == LOAI_DM.TUYEN_TRUYEN_DAN">
+                                        <DataGrid 
+                                            ref="grid-tuyen-truyen-dan"
+                                            v-bind:columns="[
+                                                {fieldName: 'TUYENTD_ID', headerText: 'Mã tuyến', isPrimaryKey: true, allowFiltering: true, width: 100},
+                                                {fieldName: 'TUYEN_TD', headerText: 'Tên tuyến', allowFiltering: true, width: 100},
+                                                {fieldName: 'LOAITTD_ID', headerText: 'Loại tuyến', allowFiltering: true, width: 100},
+                                            ]"
+                                            v-bind:dataSource="dsTuyenTruyenDan" 
+                                            :showFilter="true"
+                                            :allowPaging="false"
+                                            :enablePagingServer="false"
+                                            @selectedRowChanged="onSelectRowTuyenTruyenDan">
+                                        </DataGrid>
+                                    </div>
+                          
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_TUYEN_TRUYEN_DAN">
+                                        <DataGrid 
+                                            ref="grid-loai-tuyen-truyen-dan"
+                                            v-bind:columns="[
+                                                {fieldName: 'LOAITTD_ID', headerText: 'Mã loại tuyến', isPrimaryKey: true, allowFiltering: true, width: 100},
+                                                {fieldName: 'LOAI_TUYEN', headerText: 'Tên loại tuyến', allowFiltering: true, width: 100},
+                                            ]"
+                                            v-bind:dataSource="dsLoaiTuyenTruyenDan" 
+                                            :showFilter="true"
+                                            :allowPaging="false"
+                                            :enablePagingServer="false"
+                                            @selectedRowChanged="onSelectRowLoaiTuyenTruyenDan">
+                                        </DataGrid>
+                                    </div>
+
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_CAP">
+                                        <DataGrid 
+                                            ref="grid-loai-cap"
+                                            v-bind:columns="[
+                                                {fieldName: 'LOAICAP_ID', headerText: 'Mã loại cáp', isPrimaryKey: true, allowFiltering: true, width: 100},
+                                                {fieldName: 'LOAI_CAP', headerText: 'Tên loại cáp', allowFiltering: true, width: 100},
+                                            ]"
+                                            v-bind:dataSource="dsLoaiCap" 
+                                            :showFilter="true"
+                                            :allowPaging="false"
+                                            :enablePagingServer="false"
+                                            @selectedRowChanged="onSelectRowLoaiCap">
+                                        </DataGrid>
+                                    </div>
+                          
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_THIET_BI">
+                                        <DataGrid 
+                                            ref="grid-loai-thiet-bi"
+                                            v-bind:columns="[
+                                                {fieldName: 'LOAITBI_ID', headerText: 'Loại thiết bị ID', isPrimaryKey: true, allowFiltering: true, width: 100},
+                                                {fieldName: 'MA_LOAITBI', headerText: 'Mã loại thiết bị', allowFiltering: true, width: 100},
+                                                {fieldName: 'LOAI_TBI', headerText: 'Tên loại thiết bị', allowFiltering: true, width: 100},
+                                            ]"
+                                            v-bind:dataSource="dsLoaiThietBi" 
+                                            :showFilter="true"
+                                            :allowPaging="false"
+                                            :enablePagingServer="false"
+                                            @selectedRowChanged="onSelectRowLoaiThietBi">
+                                        </DataGrid>
+                                    </div>
+                          
+                                    <div v-show="loaiDanhMucId == LOAI_DM.LOAI_DOI_TUONG">
+                                        <DataGrid 
+                                            ref="grid-loai-doi-tuong"
+                                            v-bind:columns="[
+                                                {fieldName: 'LOAIDT_ID', headerText: 'Mã loại ĐT', isPrimaryKey: true, allowFiltering: true, width: 100},
+                                                {fieldName: 'TEN_LDT', headerText: 'Tên loại ĐT', allowFiltering: true, width: 100},
+                                                {fieldName: 'LOAITUYENTD_ID', headerText: 'Loại tuyến', allowFiltering: true, width: 100},
+                                            ]"
+                                            v-bind:dataSource="dsLoaiDoiTuong" 
+                                            :showFilter="true"
+                                            :allowPaging="false"
+                                            :enablePagingServer="false"
+                                            @selectedRowChanged="onSelectRowLoaiDoiTuong">
+                                        </DataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </SplitArea>
+                    </Split>
+                </div>
+            </div>
+        </div>
+    </div>
+    <TrinhBienTapHinhAnh ref="ref-chon-hinh-nen" @select="onSelectHinhNen"></TrinhBienTapHinhAnh>
+    <TrinhBienTapHinhAnh ref="ref-chon-hinh-nen-chon" @select="onSelectHinhNenChon"></TrinhBienTapHinhAnh>
+    <b-modal ref="ref-modal-xacnhan-xoa" centered title="Thông báo" size="sm">        
+        <span>Bạn có thực sự muốn xóa {{title}} đang chọn không ?</span>
+        <template #modal-footer="{ cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="okXoaDanhMuc">Đồng ý</b-button>
+        </template>
+   </b-modal>
+</b-modal>

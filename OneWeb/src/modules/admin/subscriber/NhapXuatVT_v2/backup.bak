@@ -1,0 +1,418 @@
+
+async XacNhan_frmNhapText() {
+      let frm = this.$refs.frmNhapText;
+      if (frm.DialogResult == DialogResultObj.OK && frm.functionName == 'tsbtnXoa_Click') {
+        if (frm.vkieu_luachon == '1') {
+          if (!(await this.KIEMTRA_THAYDOI(this.vchungtu_id, ''))) {
+            return;
+          }
+          if (this.kiemtra_quyen) {
+            let kt = (await api.kiem_tra_xoa_chung_tu(this.axios, { chungtu_id: this.vchungtu_id, ma_nd: await this.$root.token.getUserName() })).data.data;
+            console.log('kiem_tra_xoa_chung_tu - 3050');
+            console.log(kt);
+            if (kt != '1') {
+              this.$toast.error(kt);
+              return;
+            }
+            if (!(await this.KIEMTRA_QUYEN_XN(5, this.t_kho_id))) {
+              return;
+            }
+          }
+          let mucdich_id = this.gridChungTu.value != null ? this.gridChungTu.value.MUCDICH_ID : 0;
+          let loaict_id = this.gridChungTu.value != null ? this.gridChungTu.value.LOAICT_ID : 0;
+          let md = (await api.kiem_tra_ct_xuat_nhap_hoan_tra(this.axios, { so_phieu_gop: this.gridChungTu.value != null ? this.gridChungTu.value.SOPHIEUGOP : '' })).data.data;
+          console.log('kiem_tra_ct_xuat_nhap_hoan_tra - 3063');
+          console.log(md);
+          let dt_null = (await api.kiem_tra_ct_xuat_hoan_tra_theo_ct_cha(this.axios, { chungtucha_id: this.vchungtu_id })).data.data;
+          console.log('kiem_tra_ct_xuat_hoan_tra_theo_ct_cha - 3066');
+          console.log(dt_null);
+          if ((mucdich_id == '234' || mucdich_id == '278') && (loaict_id == '2' || loaict_id == '3')) {
+            if (md.length) {
+              this.$toast.warning('Chứng từ xuất hoàn trả đã cặp với chứng từ nhập hoàn trả! Hãy xóa phiếu nhập trước!');
+              return;
+            }
+            if (dt_null.length) {
+              this.$toast.warning('Chứng từ xuất hoàn trả đã có chứng từ con! Không thể chỉnh sửa/xóa !');
+              return;
+            }
+          }
+          let result = await this.xoa_phieu_hoan_tra();
+          if (result == '0') {
+            return;
+          }
+          let s = '';
+          if (this.ttph_id == 4) {
+            s = (await api.kiem_tra_xoa_phieu_hoan_thanh(this.axios, { chungtu_id: this.vchungtu_id }));
+            console.log('kiem_tra_xoa_phieu_hoan_thanh - 3085');
+            console.log(s);
+            if (s != '1') {
+              this.$toast.error(s);
+              return;
+            }
+          }
+          // Xóa Đồng bộ
+          this.loading(true);
+          let db_kt = (await api.kiem_tra_xoa_dong_bo(this.axios, {
+            chungTuId: this.vchungtu_id,
+            nguoiCn: await this.$root.token.getUserName(),
+            mayCn: await this.$root.token.getMachine(),
+            ipCn: await this.$root.token.getIP()
+          })).data.data;
+          this.loading(false);
+          console.log('kiem_tra_xoa_dong_bo - 3099');
+          console.log(db_kt);
+          //Nếu tồn tại chứng từ tập đoàn thì phải xóa đồng bộ thành công
+          if (db_kt != 'xoa') {
+            if (db_kt == 'ok') {
+              this.$toast.success('Xóa chứng từ kế toán tập đoàn thành công!');
+            } else {
+              this.$toast.error('Xóa chứng từ kế toán tập đoàn có lỗi:' + db_kt + '!');
+              if (this.vchungtu_id != 0) {
+                // FocusGridViewRow(gridVatTu, "CHUNGTU_ID", this.vchungtu_id)
+              }
+              await this.Load_ds_chungtu();
+              //go to filnal
+              return;
+            }
+          }
+
+          // Xóa IMS
+          let area = this.area_chuanhoa();
+          let kt_xoa_ims = (await api.kiem_tra_xoa_ims(this.axios, { chungtu_id: this.vchungtu_id })).data.data;
+          console.log('kiem_tra_xoa_ims - 3119');
+          console.log(kt_xoa_ims);
+          if (kt_xoa_ims != '1') {
+            let xoa_ims = (await api.kiem_tra_trang_thai_ims(this.axios, {
+              soPhieu: this.soph + '|' + area,
+              iMode: '1'
+            })).data.data;
+            if (xoa_ims == '2') {
+              this.$toast.error('Chứng từ đã xác nhận, không xóa được trên IMS !  Liên hệ admin IMS để xử lý !');
+              return;
+            }
+          }
+          // Xóa QLTS
+          // let kt_xoa_qlts = ChungTu.GET_VALUE_FUNC("{?DB12}.KIEMTRA_DONGBO_CCDC_QLTS", "vchungtu_id", vchungtu_id, "vkieu", "2", "vnguoi_cn", ttnd.ma_nd, "vmay_cn", ttnd.may_cn, "vip_cn", ttnd.ip);
+          // if (kt_xoa_qlts == "OK" || kt_xoa_qlts == "BOQUA")
+          // {
+          //     if (kt_xoa_qlts == "OK")
+          //     {
+          //         DataInput_Xoa tz = new DataInput_Xoa();
+          //         tz.access_token = "";
+          //         tz.chungtu_id = vchungtu_id;
+          //         tz.ip_cn = ttnd.ip;
+          //         tz.ma_dvi = ttnd.tentat;
+          //         tz.ma_phieu = txtSoPhieu.Text;
+          //         tz.may_cn = ttnd.may_cn;
+          //         tz.nguoi_cn = ttnd.ma_nd;
+          //         tz.qlts_sync_id = Convert.ToInt64(gridviewChungTu.GetFocusedRowCellValue("CCDC_QLTS_ID"));
+          //         let email = ChungTu.GET_DATA_SQL(@"select b.email from {?DB1}.nguoidung a, {?DB1}.nhanvien b
+          //                     where a.nhanvien_id=b.nhanvien_id
+          //                     and a.nguoidung_id=:vnguoidung_id
+          //                      ", "vnguoidung_id", ttnd.nguoidung_id);
+          //         if (email.Rows.Count > 0)
+          //         {
+          //             if (email.Rows[0][0] != null && email.Rows[0][0] != DBNull.Value && email.Rows[0][0] != "")
+          //                 tz.nguoi_cap_nhat = email.Rows[0][0];
+          //         }
+          //         string xoa_qlts = DanhMuc.XOA_CCDC_QLTS(tz);
+          //         if (xoa_qlts != "OK") // = 0 = 1 bỏ qua ko cần show thÙng b·o
+          //         {
+          //             this.$toast.error("Xo· thÙng tin phiếu QLTS cÛ lỗi : " + xoa_qlts);
+          //             return;
+          //         }
+          //     }
+          // }
+          // else
+          // {
+          //     this.$toast.error("Xo· thÙng tin phiếu QLTS cÛ lỗi : " + kt_xoa_qlts);
+          //     return;
+          // }
+          // #endregion
+
+          if (this.ckbSendSMS && this.ttph_id == 4) {
+            try {
+              await api.send_sms_chung_tu(this.axios, {
+                tuDong: 2,
+                chungTuId: this.vchungtu_id
+              });
+            } catch (error) {
+              this.$toast.error('Có lỗi khi send smsm tự động');
+            }
+          }
+          if (this.grcFileCV.length > 0) {
+            for (const e of this.grcFileCV) {
+              let deleteFile = await api.deleteFile({ fileSource: e.linkFile });
+            }
+          }
+          s = (await api.xoa_chung_tu_bao_hanh(this.axios, {
+            kieu: 1,
+            chungTuId: this.vchungtu_id,
+            chungTuCtId: 0,
+            thietBiId: 0
+          }));
+          console.log('xoa_chung_tu_bao_hanh - 3191');
+          console.log(s);
+          if (s != '1') {
+            this.$toast.error(s);
+            return;
+          }
+          s = (await api.xoa_phieu_da_hoan_thanh(this.axios, {
+            chungTuId: this.vchungtu_id,
+            nguoiCn: await this.$root.token.getUserName(), //ttnd.ma_nd
+            mayCn: 'quy-test', //ttnd.may_cn
+            ipCn: '10.59.90.123' //ttnd.ip
+          })).data.data;
+          console.log('xoa_phieu_da_hoan_thanh - 3203');
+          console.log(s);
+          if (s != '1') {
+            this.$toast.error('Có lỗi trong quá trình xóa phiếu!' + s + '');
+            return;
+          }
+          await api.xoa_tat_ca_chi_tiet_chung_tu(this.axios, { chungtu_id: this.vchungtu_id });
+          console.log('xoa_tat_ca_chi_tiet_chung_tu - 3210');
+          console.log(result);
+          let t = (await api.xoa_thong_tin_ct(this.axios, { chungtu_id: this.vchungtu_id })).data.data;
+          console.log('xoa_thong_tin_ct - 3213');
+          console.log(t);
+          if (result != '0' && result != '1' && result != '') {
+            if (!(await this.xoa_con_hoan_tra(result))) {
+              return;
+            }
+          }
+          this.$toast.success('Xóa thành công!');
+          //FINAL
+          if (this.vchungtu_id != 0) {
+            // FocusGridViewRow(gridVatTu, "CHUNGTU_ID", vchungtu_id)
+          }
+          await this.Load_ds_chungtu();
+        }
+        // Xóa Đồng bộ
+        // Chỉ xóa tập đoàn
+        if (frm.vkieu_luachon == '2') {
+          let s = '';
+          if (this.ttph_id == 4) {
+            s = (await api.kiem_tra_xoa_phieu_hoan_thanh(this.axios, { chungtu_id: this.vchungtu_id })).data.data;
+            console.log('kiem_tra_xoa_phieu_hoan_thanh - 3233');
+            console.log(s);
+            if (s != '1') {
+              this.$toast.warning(s);
+              return;
+            }
+          }
+          let db_kt = (await api.kiem_tra_xoa_dong_bo(this.axios, {
+            chungTuId: this.vchungtu_id,
+            nguoiCn: await this.$root.token.getUserName(),
+            mayCn: await this.$root.token.getMachine(),
+            ipCn: await this.$root.token.getIP()
+          })).data.data;
+          console.log('kiem_tra_xoa_dong_bo - 3240');
+          console.log(db_kt);
+          //Nếu tồn tại chứng từ tập đoàn thì phải xóa đồng bộ thành công
+          if (db_kt != 'xoa') {
+            if (db_kt == 'ok') {
+              this.$toast.success('Xóa chứng từ kế toán tập đoàn thành công!');
+            } else {
+              this.$toast.error('Xóa chứng từ kế toán tập đoàn có lỗi:' + db_kt + '!');
+              if (this.vchungtu_id != 0) {
+                // FocusGridViewRow(gridVatTu, "CHUNGTU_ID", this.vchungtu_id)
+              }
+              await this.Load_ds_chungtu();
+            }
+          }
+        }
+        // Xóa trên IMS - Chỉ xóa tập đoàn
+        if (frm.vkieu_luachon == '3') {
+          let s = '';
+          if (this.ttph_id == 4) {
+            s = (await api.kiem_tra_xoa_phieu_hoan_thanh(this.axios, { chungtu_id: this.vchungtu_id })).data.data;
+            console.log('kiem_tra_xoa_phieu_hoan_thanh - 3266');
+            console.log(s);
+            if (s != '1') {
+              this.$toast.warning(s);
+              return;
+            }
+          }
+          let area = this.area_chuanhoa();
+          let xoa_ims = (await api.kiem_tra_trang_thai_ims(this.axios, {
+            soPhieu: this.soph + '|' + area,
+            iMode: '1'
+          })).data.data;
+          console.log('kiem_tra_trang_thai_ims - 3274');
+          console.log(xoa_ims);
+          if (xoa_ims == '1') {
+            let up_trangthai = (await api.cap_nhat_bbbg_ims(this.axios, {
+              chungTuId: this.vchungtu_id,
+              kieu: 1
+            })).data.data;
+            console.log('cap_nhat_bbbg_ims - 3281');
+            console.log(up_trangthai);
+            this.$toast.success('Xóa chứng từ thành công trên IMS !');
+          } else if (xoa_ims == '2') {
+            this.$toast.error('Chứng từ đã xác nhận, không xóa được trên IMS !  Liên hệ admin IMS để xử lý !');
+          } else {
+            this.$toast.error('Chứng từ không tồn tại trên IMS !');
+          }
+
+          await this.Load_ds_chungtu();
+        }
+      }
+    },
+
+// cần debugger thêm
+    async btnXoaVT_ButtonClick(item) {
+      if (this.copyct == false) {
+        if (this.tsbtnNhapMoi.enabled) {
+          if (!(await this.KiemTraNguoiCN())) {
+            this.$toast.error('Bạn không được sửa chứng từ của người khác!');
+            this.$refs.cboLoaiChungTu.list.focusIn();
+            return;
+          }
+          if (this.xTabTongHop.visible && this.chonvattu_lohang) {
+            this.$toast.error('Với chứng từ chọn số lượng bạn không được phép xoá');
+            return;
+          }
+
+          // if (this.nghiepvu_id_chungtu != '' && ((this.nghiepvu_id_chungtu == '280' && this.ma_pda_chungtu != '') || .288', '286', '282.includes(this.nghiepvu_id_chungtu))) {
+          //   this.$toast.error('Chứng từ tạo từ dự án IMS/QLTS không được sửa')
+          //   return
+          // }
+          if (this.soph.startsWith('QT')) {
+            this.$toast.error('Chứng từ quyết toán không thể sửa!');
+            return;
+          }
+          if ((await this.KiemTraSuaThuHoi({ chungTuId: this.vchungtu_id })).includes('ko')) {
+            this.$toast.error('Chứng từ thu hồi nhập kho tổ trưởng không thể sửa');
+            return;
+          }
+          let z = await this.KiemTraCapNhatChungTu({ chungTuId: this.vchungtu_id });
+          if (z.length && z[0] != '1') {
+            this.$toast.error(z);
+            return;
+          }
+        }
+
+        await this.$bvModal
+          .msgBoxConfirm('Bạn có chắc chán muốn xóa vật tư của chứng từ này!', {
+            okletiant: 'success',
+            okTitle: 'Đồng ý',
+            cancelTitle: 'Hủy',
+            centered: true
+          })
+          .then(async (value) => {
+            if (value) {
+              if (!this.tsbtnNhapMoi.enabled) {
+                // this.$refs.gridVatTu.deleteRecord(item)
+                //Xóa item ở grid
+                let NewDSVatTu = this.gridVatTu.filter(function (el) {
+                  return el.VATTU_ID != item.VATTU_ID;
+                });
+                this.gridVatTu.list = NewDSVatTu;
+
+                if (!this.$refs.gridVatTu.getDataRows().length && this.ReadOnly.cboTuKho) {
+                  this.ReadOnly.cboTuKho = false;
+                }
+                return;
+              }
+              if (!this.dsQuyen.includes(DS_QUYEN_VT.CAPNHAT_CHUNGTU) && !this.dsQuyen.includes(DS_QUYEN_VT.THUKHO_TAISANBANGIAO)) {
+                this.$toast.error('Bạn không có quyền thực hiện chức năng này!');
+                return;
+              }
+              if (this.kiemtra_quyen) {
+                if (this.$root.token.getMaTinh() == 'NET') {
+                  let ds_dt = await this.getThongTinNgayNhanCT({ chungTuId: this.vchungtu_id });
+                  if (ds_dt.length) {
+                    this.$toast.error('Không có dữ liệu ngày nhận không thể xóa');
+                    return;
+                  } else {
+                    if (ds_dt[0] != null && ds_dt[0] != '') {
+                      this.$toast.error('Đã có dữ liệu ngày nhận kho bạn không thể xóa thiết bị');
+                      return;
+                    }
+                  }
+                }
+                if (!(await this.kiemtra_thaydoi_ctct())) {
+                  return;
+                }
+                if (!(await this.KIEMTRA_QUYEN_XN(5, this.t_kho_id))) {
+                  return;
+                }
+              }
+              if (!(await this.KiemTraHanChotCT())) {
+                return;
+              }
+              if (!(await this.KIEMTRA_THAYDOI(this.vchungtu_id, 'GHILAI'))) {
+                return;
+              }
+              if (!(await this.KiemTra_XuatHoanTra(false))) {
+                return;
+              }
+              if (!(await this.KiemTra_NhapLeDieuChinh(false))) {
+                return;
+              }
+              if (this.ttph_id == 4) {
+                let s = await this.KiemTraXoaPhieuDaHoanThanh({ chungTuId: this.vchungtu_id });
+                if (s != '1') {
+                  this.$toast.error(s);
+                  return;
+                }
+                s = await this.XoaPhieuDaHoanThanh({
+                  chungTuId: this.vchungtu_id,
+                  nguoiCn: await this.$root.token.getUserName(), //ttnd.ma_nd
+                  mayCn: 'quyPc', //ttnd.may_cn
+                  ipCn: '10.59.90.123' //ttnd.ip
+                });
+                if (s != '1') {
+                  this.$toast.error('Có lỗi trong quá trình xóa phiếu! ' + s);
+                  return;
+                }
+              }
+
+              let id = item.CTCT_ID;
+              let k = await this.XoaChungTuBaoHanh({
+                kieu: 2,
+                chungTuId: this.vchungtu_id,
+                chungTuCtId: id,
+                thietBiId: 0
+              });
+              if (k != '1') {
+                this.$toast.error(k);
+                return;
+              }
+              // this.$refs.gridVatTu.deleteRecord(item)
+              //Xóa item ở grid
+              let NewDSVatTu = this.gridVatTu.filter(function (el) {
+                return el.VATTU_ID != item.VATTU_ID;
+              });
+              this.gridVatTu.list = NewDSVatTu;
+
+              if (id > 0) {
+                await this.XoaChiTietChungTu({ ctctId: id });
+                await this.Load_ds_vattu();
+                await this.Load_ds_thietbi();
+              }
+              // view.FocusedColumn = view.Columns[0]
+              if (this.tsbtnNhapMoi.enabled) {
+                let ctemp_id = this.vchungtu_id;
+                await this.Load_ds_chungtu();
+                // FocusGridViewRow(gridVatTu, "CHUNGTU_ID", ctemp_id)
+              }
+            } else {
+              return;
+            }
+          })
+          .catch((err) => {
+            // An error occurred
+          });
+      } else {
+        if (!(await this.KiemTra_XuatHoanTra(false))) {
+          return;
+        }
+        // this.$refs.gridVatTu.deleteRecord(item)
+        //Xóa item ở grid
+        let NewDSVatTu = this.gridVatTu.filter(function (el) {
+          return el.VATTU_ID != item.VATTU_ID;
+        });
+        this.gridVatTu.list = NewDSVatTu;
+      }
+    },

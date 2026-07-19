@@ -1,0 +1,517 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">{{labelFunctionTitle}}</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="#">Xử lý khiếu nại</a></li>
+            <li class="breadcrumb-item active">{{labelFunctionTitleMenu}} </li>
+        </ul>
+    </div>
+    <!-- <breadcrumb :header="header" /> -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" v-on:click.prevent="tsbtnGhiLai_Click" v-bind:class="{ disabled: !UiButton.showGhiLai }">
+                    <span class="icon one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="tsbtnGiaoXL_Click" v-bind:class="{ disabled: !UiButton.showGiaoXuLy }">
+                    <span class="icon one-flag"></span> Giao xử lý
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="tsbtnHuyGiao_Click" v-bind:class="{ disabled: !UiButton.showHuyGiao }">
+                    <span class="icon one-cancel"></span> Huỷ giao
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="tsbtnHSKN_Click" v-bind:class="{ disabled: !UiButton.showHoSo }">
+                    <span class="icon nc-icon-glyph files_single-content-02"></span> Hồ sơ
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="tsbtnKhoaPhieu_Click"
+                    v-bind:class="{ disabled: !UiButton.showKhoaPhieu }">
+                    <span class="icon one-file-lock"></span> Khoá phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="tsbtnTon_Click" v-bind:class="{ disabled: !UiButton.showBaoTon }">
+                    <span class="icon one-file-chart"></span> Báo tồn
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="tsbtnXuatExcel_Click"
+                    v-bind:class="{ disabled: !UiButton.showXuatFile }">
+                    <span class="icon one-download"></span>Xuất File
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent='tsbtnXem_Click' v-bind:class="{ disabled: !UiButton.showDanhSach }">
+                    <span class="icon text_list-bullet nc-icon-glyph"></span>Danh sách
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="tsbtnInPhieu_Click" v-bind:class="{ disabled: !UiButton.showInPhieu }">
+                    <span class="icon one-print"></span>In phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="tsbtnInPhieuTest_Click" v-show="false" >
+                    <span class="icon one-print"></span>In phiếu Test
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="grid-stack-box">
+            <div class="box-col box-form" id="box-left" style="min-width:420px;margin-right: 3px;min-height: 800;">
+                <div class="info-row">                    
+                    <div class="key w60">Quy trình</div>
+                    <div class="value">
+                        <div class="input-more-button">                           
+                            <Select2 v-model="QuyTrinhKnId" :options="DmQuyTrinhKN" @change="QuyTrinhKnChanged" />    
+                            <button class="btn btn-sm" @click="QuyTrinhKnChanged(QuyTrinhKnId)" title="Tải lại lưới">
+                                <span class="-ap one-refresh"></span>
+                            </button>
+                        </div>
+                    </div>                                      
+                </div>
+                <div class="table-content" style="min-height: 650px;">
+                    <DataGrid v-bind:columns="DanhSachChuDe.headers" v-bind:dataSource="DanhSachChuDe.data"
+                        :showColumnCheckbox="false" :enable-paging-server="false" :allowPaging="false" ref="gridChuDe"
+                        :showFilter="true" @rowClicked="ChonChuDe" :enabledSelectFirstRow="true" @rowDataBound="gridChuDe_RowDataBound"
+                        :panelDataHeight="'650'" @dataBound="gridChuDe_DataBound">
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="box-col" id="box-right" style="overflow: scroll;">
+                <div class="box-form">
+                    <div class="legend-title">Danh sách khiếu nại</div>
+                    <div class="nav tabs tab-over">
+                        <a href="#tab1" data-toggle="tab" @click.prevent="changeTab(0)" :class="{active: tabIndex==0}">Chưa xử lý</a>
+                        <a href="#tab2" data-toggle="tab" @click.prevent="changeTab(1)" :class="{active: tabIndex==1}">Chờ xử lý</a>
+                        <a href="#tab3" data-toggle="tab" @click.prevent="changeTab(2)" :class="{active: tabIndex==2}">Khóa phiếu</a>
+                        <a href="#tab4" data-toggle="tab" @click.prevent="changeTab(3)" :class="{active: tabIndex==3}">Báo tồn</a>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane" :class="{active: tabIndex==0}" id="tab1" >
+                            <div class="row">
+                                <div class="col-sm-12 col-12">
+                                    <div class="tright">
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="tsbtnGiaoXLAll_Click" :disabled="!UiButton.showGiaoXuLy">
+                                            <span class="icon one-flag f20 lh14 inline vcenter"></span> Giao xử lý tất cả
+                                        </button>
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="btn_ExportExcel_Click('gridChuaXuLy')">
+                                            <span class="one-xlsx-import f20 lh14 inline vcenter"></span> Xuất tất cả
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <KDataGrid v-bind:columns="DanhSachPhieus.headers2"
+                                v-bind:dataSource="DanhSachPhieus.datalist" :showColumnCheckbox="true"
+                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                @selectedItemsChanged="selectedItemsChanged_ChuaXuLy" @rowClicked="ChangeItemChuaXuLy"
+                                :selectionSettings="selectionOptions"
+                                ref="gridChuaXuLy"
+                                :contextMenuItems="getContextMenuItems"
+                                @contextMenuClick="contextMenu_Click"
+                                @rowSelected="gridChuaXuLy_RowSelected"
+                                @actionComplete="actionCompleteChuaXuLy"
+                                @dataBound="dataBoundChuaXuLy"
+                                panelDataHeight="300px"
+                                @checkBoxChange="checkBoxChuaXuLyChange" 
+                                @rowDeselected="dsChuaXLRowDeselected"
+                                :enabledSelectFirstRow="true">
+                            </KDataGrid>
+                        </div>
+                        <!-- @actionComplete="gridChoXuLy_ActionComplete" -->
+                        <div class="tab-pane" :class="{active: tabIndex==1}" id="tab2">
+                            <div class="row">
+                                <div class="col-sm-12 col-12">
+                                    <div class="tright">
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="tsbtnGhiLaiAll_Click" :disabled="!UiButton.showGhiLai" >
+                                            <span class="icon one-save f20 lh14 inline vcenter"></span> Ghi lại tất cả
+                                        </button>
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="tsbtnKhoaPhieuAll_Click" :disabled="!UiButton.showKhoaPhieu" >
+                                            <span class="icon one-file-lock f20 lh14 inline vcenter"></span> Khoá phiếu tất cả
+                                        </button>
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="btn_ExportExcel_Click('gridChoXuLy')">
+                                            <span class="one-xlsx-import f20 lh14 inline vcenter"></span> Xuất tất cả
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <KDataGrid v-bind:columns="DsPhieuChoXuLy.headers" 
+                                v-bind:dataSource="DsPhieuChoXuLy.datalist" :showColumnCheckbox="true"
+                                 @selectedItemsChanged="selectedItemsChanged_ChoXuLy"
+                                :enable-paging-server="false" :allowPaging="true" :showFilter="true" ref="gridChoXuLy"
+                                @rowSelected="gridChoXuLy_RowSelected"
+                                :selectionSettings="selectionOptions"
+                                panelDataHeight="300px"
+                                @cellSelected="gridChoXuLy_CellSelected"
+                                @pageChanged="gridChoXuLy_PageChanged"
+                                @actionComplete="actionCompleteChoXuLy"
+                                @rowDeselected="dsChoXLRowDeselected"
+                                @checkBoxChange="checkBoxChoXuLyChange" 
+                                @dataBound="dataBoundChoXuLy"
+                                :enabledSelectFirstRow="true"
+                                :contextMenuItems="getContextMenuItems_choxl"
+                                @contextMenuClick="contextMenuChoXL_Click">
+                            </KDataGrid>
+                        </div>
+                        <div class="tab-pane" :class="{active: tabIndex==2}" id="tab3">
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Từ tháng</div>
+                                        <div class="value">
+                                            <date-picker :format="dateFormatMonth" :value-type="dateFormatMonth"
+                                                :time-title-format="dateFormatMonth" v-model="DsPhieuKhoa.From"
+                                                :type="typeFormatMonth">
+                                                <template #icon-calendar>
+                                                    <span class="icon one-calendar"></span>
+                                                </template>
+                                            </date-picker>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Đến tháng</div>
+                                        <div class="value">
+                                            <div class="input-more-button -right">
+                                                <button class="btn" @click="btnChon_Click">
+                                                    <span class="nc-icon-outline ui-1_check-small f24"></span>
+                                                </button>
+                                                <div class="input-icon-right">
+                                                    <date-picker :format="dateFormatMonth" :value-type="dateFormatMonth"
+                                                        :time-title-format="dateFormatMonth" v-model="DsPhieuKhoa.To"
+                                                        :type="typeFormatMonth">
+                                                        <template #icon-calendar>
+                                                            <span class="icon one-calendar"></span>
+                                                        </template>
+                                                    </date-picker>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="tright">
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="tsbtnGhiLaiAll_Click" :disabled="!UiButton.showGhiLai">
+                                            <span class="icon one-save f20 lh14 inline vcenter"></span> Ghi lại tất cả
+                                        </button>                                        
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="btn_ExportExcel_Click('gridKhoaPhieu')">
+                                            <span class="one-xlsx-import f20 lh14 inline vcenter"></span> Xuất tất cả
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <DataGrid v-bind:columns="DsPhieuKhoa.headers" v-bind:dataSource="DsPhieuKhoa.datalist"
+                                @selectedItemsChanged="selectedItemsChanged_KhoaPhieu" :showColumnCheckbox="false"
+                                :selectionSettings="selectionOptions"
+                                :enable-paging-server="false" :allowPaging="true"
+                                ref="gridKhoaPhieu"
+                                @rowSelected="gridKhoaPhieu_RowSelected"
+                                @actionComplete="gridKhoaPhieu_ActionComplete"
+                                @pageChanged="gridKhoaPhieu_PageChanged"
+                                :showFilter="true" :enabledSelectFirstRow="true">
+                            </DataGrid>
+                        </div>
+                        <div class="tab-pane" :class="{active: tabIndex==3}" id="tab4">
+                            <div class="row">
+                                <div class="col-sm-12 col-12">
+                                    <div class="tright">
+                                        <button class="btn btn-main btn-second padt4 padb4" @click="btn_ExportExcel_Click('gridBaoTon')">
+                                            <span class="one-xlsx-import f20 lh14 inline vcenter"></span> Xuất tất cả
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <DataGrid v-bind:columns="DsPhieuBaoTon.headers" v-bind:dataSource="DsPhieuBaoTon.datalist"
+                                @selectedItemsChanged="selectedItemsChanged_BaoTon" :showColumnCheckbox="false"
+                                @rowClicked="ChangeItemBaoTon" :enable-paging-server="false" :allowPaging="true"
+                                ref="gridBaoTon"
+                                @rowSelected="gridBaoTon_RowSelected"
+                                :showFilter="true" :enabledSelectFirstRow="true">
+                            </DataGrid>
+                        </div>
+                    </div>
+                    <!-- <b-tabs v-model="tabIndex" >
+                        <b-tab title="Chưa xử lý" active>
+                            <DataGrid v-bind:columns="DanhSachPhieus.headers2"
+                                v-bind:dataSource="DanhSachPhieus.datalist" :showColumnCheckbox="true"
+                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                @selectedItemsChanged="selectedItemsChanged_ChuaXuLy" @rowClicked="ChangeItemChuaXuLy"
+                                :selectionSettings="selectionOptions"
+                                ref="gridChuaXuLy"
+                                @rowSelected="gridChuaXuLy_RowSelected"
+                                :enabledSelectFirstRow="true">
+                            </DataGrid>
+                        </b-tab>
+                        <b-tab title="Chờ xử lý">
+                            <DataGrid v-bind:columns="DsPhieuChoXuLy.headers" 
+                                v-bind:dataSource="DsPhieuChoXuLy.datalist" :showColumnCheckbox="true"
+                                 @selectedItemsChanged="selectedItemsChanged_ChoXuLy"
+                                :enable-paging-server="false" :allowPaging="true" :showFilter="true" ref="gridChoXuLy"
+                                @rowDeselected="gridChoXuLy_RowDeselected"  
+                                @rowSelected="gridChoXuLy_RowSelected"
+                                :selectionSettings="selectionOptions"
+                                @actionComplete="gridChoXuLy_ActionComplete"
+                                @cellSelected="gridChoXuLy_CellSelected"
+                                @pageChanged="gridChoXuLy_PageChanged"
+                                @paginationCommandClick="gridChoXuLy_PaginationCommandClick"
+                                :enabledSelectFirstRow="true">
+                            </DataGrid>
+                        </b-tab>
+                        <b-tab title="Khoá phiếu">
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Từ tháng</div>
+                                        <div class="value">
+                                            <date-picker :format="dateFormatMonth" :value-type="dateFormatMonth"
+                                                :time-title-format="dateFormatMonth" v-model="DsPhieuKhoa.From"
+                                                :type="typeFormatMonth">
+                                                <template #icon-calendar>
+                                                    <span class="icon one-calendar"></span>
+                                                </template>
+                                            </date-picker>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Đến tháng</div>
+                                        <div class="value">
+                                            <div class="input-more-button -right">
+                                                <button class="btn" @click="btnChon_Click">
+                                                    <span class="nc-icon-outline ui-1_check-small f24"></span>
+                                                </button>
+                                                <div class="input-icon-right">
+                                                    <date-picker :format="dateFormatMonth" :value-type="dateFormatMonth"
+                                                        :time-title-format="dateFormatMonth" v-model="DsPhieuKhoa.To"
+                                                        :type="typeFormatMonth">
+                                                        <template #icon-calendar>
+                                                            <span class="icon one-calendar"></span>
+                                                        </template>
+                                                    </date-picker>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="tright">
+                                        <button class="btn btn-main padt4 padb4" @click="btn_ExportExcel_Click">
+                                            <span class="one-xlsx-import f20 lh14 inline vcenter"></span> Xuất
+                                            báo cáo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <DataGrid v-bind:columns="DsPhieuKhoa.headers" v-bind:dataSource="DsPhieuKhoa.datalist"
+                                @selectedItemsChanged="selectedItemsChanged_KhoaPhieu" :showColumnCheckbox="false"
+                                :selectionSettings="selectionOptions"
+                                :enable-paging-server="false" :allowPaging="true"
+                                ref="gridKhoaPhieu"
+                                @rowSelected="gridKhoaPhieu_RowSelected"
+                                @actionComplete="gridKhoaPhieu_ActionComplete"
+                                @pageChanged="gridKhoaPhieu_PageChanged"
+                                :showFilter="true" :enabledSelectFirstRow="true">
+                            </DataGrid>
+                        </b-tab>
+                        <b-tab title="Báo tồn">
+                            <DataGrid v-bind:columns="DsPhieuBaoTon.headers" v-bind:dataSource="DsPhieuBaoTon.datalist"
+                                @selectedItemsChanged="selectedItemsChanged_BaoTon" :showColumnCheckbox="false"
+                                @rowClicked="ChangeItemBaoTon" :enable-paging-server="false" :allowPaging="true"
+                                ref="gridBaoTon"
+                                @rowSelected="gridBaoTon_RowSelected"
+                                :showFilter="true" :enabledSelectFirstRow="true">
+                            </DataGrid>
+                        </b-tab>
+                    </b-tabs> -->
+
+
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">Thông tin khiếu nại</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Đơn vị giao</div>
+                                <div class="value">
+                                    <input type="text" :readonly="true" v-model="txtDonViGiao" class="form-control">
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">ND giao</div>
+                                <div class="value">
+                                    <textarea class="form-control" v-model="txtNoiDungGiao" :readonly="true"
+                                        style="height: 100px;resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Kỳ TT</div>
+                                <div class="value">
+                                    <input type="text" v-model="txtKyTT" class="form-control" :readonly="true">
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Hẹn trả</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <date-picker v-bind:class="{'disabled':!dtpNgayHen_Enabled}"
+                                            :disabled="dtpNgayHen_Enabled" :format="dateFormatFull"
+                                            :value-type="dateFormatFull" :readonly="true"
+                                            :time-title-format="dateFormatFull" v-model="dtpNgayHen"
+                                            :type="typeFormatDateTime">
+                                            <template #icon-calendar>
+                                                <span class="icon one-calendar"></span>
+                                            </template>
+                                        </date-picker>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">ND khiếu nại</div>
+                                <div class="value">
+                                    <textarea class="form-control" v-model="txtNoiDungKN" :readonly="true"
+                                        style="height: 135px;resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Tiền trả </div>
+                                <div class="value">
+                                    <!-- <input type="text" v-model="txtTienTra" class="form-control"> -->
+                                    <vue-numeric class="form-control highlight tright" separator=","
+                                        v-model="txtTienTra" :readonly="true" id="txtTienTra" placeholder="0"
+                                        output-type="Number">
+                                    </vue-numeric>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Gói cước</div>
+                                <div class="value">
+                                    <input type="text" v-model="txtGoiCuoc" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend-title">Kết quả xử lý</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Kết quả XL</div>
+                                <div class="value">
+                                    <SelectExt v-model="cboKetQua_XL" :dataSource="DmKetQuaXuLy"
+                                        :placeholder='"Chọn kết quả xử lý"' dataTextField="ketqua"
+                                        dataValueField="kq_id" @change="cboKetQuaXL_Change">
+                                    </SelectExt>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Ngày XL</div>
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <date-picker v-bind:class="{'disabled':!dtpNgayXL_Enabled}"
+                                            :disabled="dtpNgayXL_Enabled" :format="dateFormatFull"
+                                            :value-type="dateFormatFull" :time-title-format="dateFormatFull"
+                                            v-model="dtpNgayXL" :type="typeFormatDateTime">
+                                            <template #icon-calendar>
+                                                <span class="icon one-calendar"></span>
+                                            </template>
+                                        </date-picker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Nguyên nhân</div>
+                                <div class="value">
+                                    <textarea class="form-control highlight" v-model="txtNguyenNhan" ref="reftxtNguyenNhan"
+                                        style="height: 100px;resize: vertical;"  maxlength="1000"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">KQ lỗi</div>
+                                        <div class="value">
+                                            <SelectExt v-model="cboLoi" :dataSource="DmKetQuaLoi"
+                                                dataTextField="noidung" dataValueField="ketquakn_id">
+                                            </SelectExt>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Người XL</div>
+                                        <div class="value">
+                                            <SelectExt v-model="cboNvTH" :dataSource="DmNhanVienXuLy"
+                                                dataTextField="ten_nv" dataValueField="nhanvien_id">
+                                            </SelectExt>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Tiền GC</div>
+                                        <div class="value">
+                                            <!-- <input type="text" v-model="txtTienGC"
+                                                class="form-control tright red" value="0"> -->
+                                            <vue-numeric class="form-control highlight tright red" separator=","
+                                                v-model="txtTienGC" id="txtTienGC" placeholder="0" output-type="Number" v-bind:max="999999999999" maxlength="12">
+                                            </vue-numeric>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90"><span v-html="lblNDXuLy"></span></div>
+                                <div class="value">
+                                    <textarea v-show="cboKetQua_XL==1" class="form-control highlight" v-model.trim="txtNoiDungXL"
+                                        ref="reftxtNoiDungXL" style="height: 100px;resize: vertical;" maxlength="1000"></textarea>
+                                    <textarea v-show="cboKetQua_XL!=1" class="form-control highlight" v-model.trim="txtNoiDungXL_Ton"
+                                        ref="reftxtNoiDungXL_Ton" style="height: 100px;resize: vertical;" maxlength="300"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <XemBaoCao ref="refXemBaoCao" :ma_bc="ma_bc" :dsGiaTri="dsGiaTri"></XemBaoCao>
+    <ExportDataModal ref="exportDataModal" :data="exportData"></ExportDataModal>
+    <frmHoSoKhieuNai ref="frmHoSoKhieuNai" />
+    <ejs-dialog :enableResize='true' :visible="false" ref="refChiTietPhieuKN" :position="position"
+        :animationSettings="animationSettings" :header='"Chi tiết phiếu khiếu nại"' showCloseIcon="true"
+        target="#app .main-wrapper" width='80%'>
+        <div class="popupKN">
+            <DataGrid v-bind:columns="dgvChiTiet.headers" v-bind:dataSource="dgvChiTiet.datalist"
+                :showColumnCheckbox="true" :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                :enabledSelectFirstRow="false">
+            </DataGrid>
+        </div>
+    </ejs-dialog>
+    <frmTraPhieuKN_SLL ref="frmTraPhieuKN_SLL" @success="onSuccess_frmTraPhieuKN_SLL"/>
+
+</div>

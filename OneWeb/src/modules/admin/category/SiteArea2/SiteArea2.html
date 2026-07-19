@@ -1,0 +1,414 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">{{ title || "khu vực địa danh" }}</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="#">Lập hợp đồng</a></li>
+            <li class="breadcrumb-item active">Lắp đặt mới</li>
+        </ul>
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li v-if="tsbtnNhapMoi.Visible">
+                <a @click="tsbtnNhapMoi_Click" :class="tsbtnNhapMoi.Enabled ? '' : 'disabled'">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnGhiLai_Click" :class="tsbtnGhiLai.Enabled ? '' : 'disabled'">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+
+            <li>
+                <a @click="tsbtnHuyBo_Click" :class="tsbtnHuyBo.Enabled ? '' : 'disabled'">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnXoa_Click" :class="tsbtnNhapMoi.Enabled ? '' : 'disabled'">
+                    <span class="icon one-trash"></span>Xoá
+                </a>
+            </li> 
+            <li>
+                <a @click.prevent="tsbtnNapDL_Click">
+                    <span class="icon one-vt"></span>Nạp DL
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnXoaDL_Nap_Click">
+                    <span class="icon one-trash"></span>Xoá nạp
+                </a>
+            </li>
+            <li>
+                <a @click="tsbGanDvi_Click">
+                    <span class="icon one-gan"></span>Gán đơn vị
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnTraCuu_Click">
+                    <span class="icon one-file-search"></span>Tra cứu
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnBanDo_Click">
+                    <span class="icon one-map-location"></span>Bản đồ
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-2 col-12 d-flex fd-col">
+                <div class="box-form">
+                    <div class="legend-title">Khu vực</div>
+                    <div class="info-row">
+                        <div class="key w80">Mã khu vực <span class="required-field">*</span></div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtMa_KhuVuc.Text"/>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w75">KV cha<span class="required-field">*</span></div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <vue-select v-model="cboKhuVucCha.EditValue"
+                                    :required="false" :labelWidth="'0'" :disable="false"
+                                    :options="cboKhuVucCha.Items" :valueField="'khuvuc_id'"
+                                    :labelField="'ten_kv'" :checkbox="false"></vue-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w80">Khu vực<span class="required-field">*</span></div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtTen_KhuVuc.Text"/>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w80">Ghi chú</div>
+                        <div class="value">
+                            <textarea name="" class="form-control" style="height: 120px;resize: none;"
+                                v-model="txtGhiChu.Text"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form fg-1">
+                    <div class="legend-title">Danh sách khu vực</div>
+                    <input type="text" class="form-control" v-model="txtKV.Text" @keypress="txtKV_KeyPress"/>
+                    <div class="tree-plus tree-icon ovauto" style="height: 750px;">
+                        <tree-view :options="lay_ds_khuvuc_theo_diemchia" labelField="name" valueField="id"
+                        @changeSelectedItem="tvwKhuVuc_AfterFocusNode" @isOpenChange="true" :selectedValue="tvwKhuVuc.Selection">
+                    </tree-view>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5 col-12 flex-box fd-col">
+                <div class="box-move-select-table">
+                    <div class="box-col box-form">
+                        <div class="legend-title">Loại KV đã gán</div>
+                        <div class="table-content" style="height: 190px;">
+                            <ejs-grid ref="gridAssigned" :dataSource="dgvLoai_KV_DaGan.DataSource" :allowSorting='true'
+                                :allowPaging='true' :pageSettings='pageSettings' :allowFiltering='true'
+                                :selectionSettings='dgvLoai_KV_DaGan.selectionOptions' locale="vi-VN">
+                                <e-columns>
+                                    <e-column type='checkbox' width='50'></e-column>
+                                    <e-column type='text' :filter="{ operator: 'contains' }" field='LOAI_KV' headerText='Loại khu vực'></e-column>
+                                </e-columns>
+                            </ejs-grid>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn" @click="transferToUnassignArea(false)">
+                            <span class="fa fa-angle-right"></span>
+                        </button>
+                        <button class="btn" @click="transferToUnassignArea(true)">
+                            <span class="fa fa-angle-double-right"></span>
+                        </button>
+                        <button class="btn" @click="transferToAssignArea(false)">
+                            <span class="fa fa-angle-left"></span>
+                        </button>
+                        <button class="btn" @click="transferToAssignArea(true)">
+                            <span class="fa fa-angle-double-left"></span>
+                        </button>
+                    </div>
+                    <div class="box-col box-form">
+                        <div class="legend-title">Loại KV chưa gán</div>
+                        <div class="table-content" style="height: 190px;">
+                            <ejs-grid ref="gridUnassigned" :dataSource="dgvLoai_KV_ChuaGan.DataSource"
+                                :allowGrouping="true" :allowSorting='true' :allowPaging='true'
+                                :pageSettings='pageSettings' :allowFiltering='true'
+                                :selectionSettings='dgvLoai_KV_ChuaGan.selectionOptions'
+                                locale="vi-VN">
+                                <e-columns>
+                                    <e-column type='checkbox' width='50'></e-column>
+                                    <e-column type='text' field='LOAI_KV' :filter="{ operator: 'contains' }" headerText='Loại khu vực'></e-column>
+                                </e-columns>
+                            </ejs-grid>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form fg-1">
+                    <div class="legend-title">Dữ liệu nạp</div>
+                    <div class="table-content" style="height: 100%;">
+                        <!-- <ejs-grid ref="loadDataGrid" :dataSource="dgvDuLieuNap.DataSource" :allowSorting='true'
+                            :allowPaging='true' :pageSettings='pageSettings' :allowFiltering='true'
+                            :selectionSettings='dgvDuLieuNap.selectionOptions' locale="vi-VN">
+                            <e-columns>
+                                <e-column type='checkbox' width='50'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_quan' headerText='Quận' width='150'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_phuong' headerText='Phường' width='150'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_pho' headerText='Phố' width='150'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='dacdiem' headerText='Đặc điểm' width='250'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_ap' headerText='Ấp' width='150'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_khu' headerText='Khu' width='150'></e-column>
+                            </e-columns>
+                        </ejs-grid> -->
+                        <DataGrid ref="loadDataGrid" 
+                            :columns="dgvDuLieuNap.cols"
+                            :showColumnCheckbox="true" 
+                            :dataSource="dgvDuLieuNap.DataSource" 
+                            :showFilter="true" 
+                            :selectionSettings='dgvDuLieuNap.selectionOptions'
+                            :allowPaging="true" :enablePagingServer="false" 
+                            :totalRecords="dgvDuLieuNap.DataSource.length"> 
+                       </DataGrid>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5 col-12 flex-box fd-col">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Tỉnh<span class="required-field">*</span></div>
+                                <div class="value">
+                                    <div class="select-custom" ref="ds_tinh">
+                                        <select2 :settings="{ dropdownParent: $refs['ds_tinh'] }"
+                                            v-model="cboTinh.EditValue" class="select2"
+                                            :options="cboTinh.Items.map(e=> ({id: e.TINH_ID, text: e.TENTINH}))"
+                                            @change="cboTinh_EditValueChanged"
+                                            >
+                                        </select2>
+                                    </div>
+                                    <!-- <div class="select-custom">
+                                        <vue-select :required="false"
+                                            :labelWidth="'0'" :disable="false" :options="cboTinh.Items"
+                                            :valueField="'TINH_ID'" :labelField="'TENTINH'" :checkbox="false"
+                                            v-model="cboTinh.EditValue" @input="cboTinh_EditValueChanged"></vue-select>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Quận<span class="required-field">*</span></div>
+                                <div class="value">
+                                    <div class="select-custom" ref="ds_quan">
+                                        <select2 :settings="{ dropdownParent: $refs['ds_quan'] }"
+                                            v-model="cboQuan.EditValue" class="select2"
+                                            :options="cboQuan.Items.map(e=> ({id: e.QUAN_ID, text: e.TEN_QUAN}))"
+                                            @change="cboQuan_EditValueChanged"
+                                            >
+                                        </select2>
+                                    </div>
+                                    <!-- <div class="select-custom">
+                                        <vue-select :required="false"
+                                            :labelWidth="'0'" :disable="false" :options="cboQuan.Items"
+                                            :valueField="'QUAN_ID'" :labelField="'TEN_QUAN'" :checkbox="false"
+                                            v-model="cboQuan.EditValue" @input="cboQuan_EditValueChanged"></vue-select>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Phường<span class="required-field">*</span></div>
+                                <div class="value">
+                                    <div class="select-custom" ref="ds_phuong">
+                                        <select2 :settings="{ dropdownParent: $refs['ds_phuong'] }"
+                                            v-model="cboPhuong.EditValue" class="select2"
+                                            :options="cboPhuong.Items.map(e=> ({id: e.PHUONG_ID, text: e.TEN_PHUONG}))"
+                                            @change="cboPhuong_EditValueChanged"
+                                            >
+                                        </select2>
+                                    </div>
+                                    <!-- <div class="select-custom">
+                                        <vue-select :required="false"
+                                            :labelWidth="'0'" :disable="false" :options="cboPhuong.Items"
+                                            :valueField="'PHUONG_ID'" :labelField="'TEN_PHUONG'" :checkbox="false"
+                                            v-model="cboPhuong.EditValue" @input="cboPhuong_EditValueChanged"></vue-select>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="h-1-divide-3">
+                    <div class="box-move-select-table h-100">
+                        <div class="box-col box-form flex-box fd-col">
+                            
+                            <div class="legend-title mart10">Phố đã gán</div>
+                            <div class="table-content fg-1">
+                                    <DataGrid ref="assignedTownGrid" 
+                                    :columns="dgvPho_DaGan.cols"
+                                    :showColumnCheckbox="true" 
+                                    :dataSource="dgvPho_DaGan.DataSource" 
+                                    :showFilter="true" 
+                                    @selectedItemsChanged="handleOnchangeTownAssignSelect" 
+                                    :allowPaging="true" 
+                                    :enablePagingServer="false" :totalRecords="dgvPho_DaGan.DataSource.length"> 
+
+                                </DataGrid>
+                                <!-- <ejs-grid ref="assignedTownGrid" :dataSource="dgvPho_DaGan.DataSource" :allowSorting='true' 
+                                    :allowPaging='true' :pageSettings='pageSettings' :allowFiltering='true'
+                                    :selectionSettings='dgvPho_DaGan.selectionOptions' locale="vi-VN"  >
+                                    <e-columns>
+                                        <e-column type='checkbox' width='50'  ></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='ten_phuong' headerText='Phường' width='150'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='ten_pho' headerText='Phố' width='150'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='nhom_pho' headerText='Loại'width='100'></e-column>
+                                    </e-columns>
+                                </ejs-grid> -->
+                            </div>
+    
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="transferToUnassignTown(false)">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+                            <!-- <button class="btn" @click="transferToUnassignTown(true)">
+                                <span class="fa fa-angle-double-right"></span>
+                            </button> -->
+                            <button class="btn" @click="transferToAssignTown(false)">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+                            <!-- <button class="btn" @click="transferToAssignTown(true)">
+                                <span class="fa fa-angle-double-left"></span>
+                            </button> -->
+                        </div>
+                        <div class="box-col box-form flex-box fd-col">
+                            
+                            <div class="legend-title mart10">Phố chưa gán</div>
+                            <div class="table-content fg-1">
+
+                                <DataGrid ref="unassignedTownGrid" 
+                                 :columns="dgvPho_ChuaGan.cols"
+                                 :showColumnCheckbox="true" 
+                                 :dataSource="dgvPho_ChuaGan.DataSource" 
+                                 :showFilter="true" 
+                                 :allowPaging="true" 
+                                 @selectedItemsChanged="handleOnchangeTownUnassignSelect" 
+                                 :enablePagingServer="false" :totalRecords="dgvPho_ChuaGan.DataSource.length"> 
+
+                                </DataGrid>
+                                <!-- <ejs-grid ref="unassignedTownGrid" :dataSource="dgvPho_ChuaGan.DataSource"
+                                    :allowSorting='true' :allowPaging='true' :pageSettings='pageSettings'
+                                    :allowFiltering='true' :selectionSettings='dgvPho_ChuaGan.selectionOptions'
+                                    locale="vi-VN">
+                         
+                                    <e-columns>
+                                        <e-column type='checkbox' width='50' @change="handleOnchangePhoSelect($event)"></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='ten_phuong' headerText='Phường' width='150'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='ten_pho' headerText='Phố' width='150'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='nhom_pho' headerText='Loại'width='100'></e-column>
+                                    </e-columns>
+                                </ejs-grid> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+      
+
+
+                 <div class="h-1-divide-3">
+                    <div class="box-move-select-table h-100">
+                        <div class="box-col box-form flex-box fd-col">
+                            <div class="legend-title">Đặc điểm đã gán</div>
+                            <div class="table-content fg-1">
+                                <ejs-grid ref="assignedPropertiesGrid" :dataSource="dgvDacDiem_DaGan.DataSource"
+                                    :allowSorting='true' :allowPaging='true' :pageSettings='pageSettings'
+                                    :allowFiltering='true' :selectionSettings='dgvDacDiem_DaGan.selectionOptions'
+                                    locale="vi-VN">
+                                    <e-columns>
+                                        <e-column type='checkbox' width='50'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='ten_pho' headerText='Phố/Ấp/Khu' width='150'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='dacdiem' headerText='Đặc điểm' width='300'></e-column>
+                                    </e-columns>
+                                </ejs-grid>
+    
+                            </div>
+    
+                        </div>
+                        <div class="actions">
+                            <button class="btn" @click="transferToUnAssignProperties(false)">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+                            <!-- <button class="btn" @click="transferToUnassignProperties(true)">
+                                <span class="fa fa-angle-double-right"></span>
+                            </button> -->
+                            <button class="btn" @click="transferToAssignProperties(false)">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+                            <!-- <button class="btn" @click="transferToAssignProperties(true)">
+                                <span class="fa fa-angle-double-left"></span>
+                            </button> -->
+                        </div>
+                        <div class="box-col box-form flex-box fd-col">
+                            <div class="legend-title">Đặc điểm chưa gán</div>
+                            <div class="table-content fg-1">
+                                <ejs-grid ref="unassignedPropertiesGrid" :dataSource="dgvDacDiem_ChuaGan.DataSource"
+                                    :allowSorting='true' :allowPaging='true' :pageSettings='pageSettings'
+                                    :allowFiltering='true' :selectionSettings='dgvDacDiem_ChuaGan.selectionOptions'
+                                    locale="vi-VN">
+                                    <e-columns>
+                                        <e-column type='checkbox' width='50'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='ten_pho' headerText='Phố/Ấp/Khu' width='150'></e-column>
+                                        <e-column type='text' :filter="{ operator: 'contains' }" field='dacdiem' headerText='Đặc điểm' width='300'></e-column>
+                                    </e-columns>
+                                </ejs-grid>
+                            </div>
+    
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dữ liệu chưa nạp -->
+                <div class="h-1-divide-3">
+                    <div class="legend-title">Dữ liệu chờ nạp</div>
+                    <div class="table-content" style="height: 100%;">
+                        <DataGrid ref="" 
+                        :columns="dgvDuLieuChoNap.cols"
+                        :showColumnCheckbox="true" 
+                        :dataSource="dgvDuLieuChoNap.DataSource" 
+                        :showFilter="true" 
+                        :allowPaging="true" :enablePagingServer="false" :totalRecords="dgvDuLieuChoNap.DataSource.length"> 
+
+                       </DataGrid>
+                        <!-- <ejs-grid ref="loadDataGrid" :dataSource="dgvDuLieuChoNap.DataSource" :allowSorting='true'
+                            :allowPaging='true' :pageSettings='pageSettings' :allowFiltering='true'
+                            :selectionSettings='dgvDuLieuChoNap.selectionOptions' locale="vi-VN">
+                            <e-columns>
+                                <e-column type='checkbox' width='50'></e-column>
+                           
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_phuong' headerText='Phường'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='ten_pho' headerText='Phố/Ấp'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='dacdiem' headerText='Đặc điểm'></e-column>
+                                <e-column type='text' :filter="{ operator: 'contains' }" field='loai' headerText='Loại'></e-column>
+                            </e-columns>
+                        </ejs-grid> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+    <DialogManagementUnit ref="dlgMngUnit"/>
+    <DialogLookUpArea ref='dlgLookUpArea'@onAccept="onDialogLookupAccept"/>
+    <DialogMap ref="dlgMap"/>
+    <DrawAreaModal ref="drawAreaModal"  :khuvuc_id="khuvuc_id" :ten_kv="txtTen_KhuVuc.Text"/>
+</div>

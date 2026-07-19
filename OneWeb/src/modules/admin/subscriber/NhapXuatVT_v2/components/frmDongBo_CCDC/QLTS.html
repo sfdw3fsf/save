@@ -1,0 +1,188 @@
+
+<ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupQLTS"
+    :animationSettings='animationSettings'
+    showCloseIcon=false 
+    width='90%'
+    :target='target'
+    :header='"Quản lý tài sản"'
+    :close="closeQLTS"
+    >   
+<!-- Form -->
+    <div class="">
+        <div class="list-actions-top">
+    
+            <ul class="list">
+            
+                <li   v-if="Visible.tsbtnXacNhan" @click="tsbtnXacNhan_Click">
+                    <a >
+                        <span class="icon one-file-arrow-right1"></span> Xác nhận
+                    </a>
+                </li>
+                <li  v-if="Visible.tsbtnTaoTbi" @click="tsbtnTaoTbi_Click" >
+                    <a >
+                        <span class="icon  one-save"></span> {{tsbtnTaoTbi.Text}}
+                    </a>
+                </li>
+                <li  v-if="Visible.tsbtnInTem" @click="tsbtnInTem_Click" >
+                    <a >
+                        <span class="icon one-print"></span> In tem 
+                    </a>
+                </li>
+                <li  @click="tsbtnExcel_Click" :class="{'disabledInput': !Enabled.tsbtnExcel}">
+                    <a >
+                        <span class="icon one-xlsx-import"></span> Nhập từ excel 
+                    </a>
+                   
+                </li> 
+                
+                <label style="display:none;" for="upload1" class="btn">
+                    <span class="-ap icon-more_horiz">Nhập từ excel TEST</span>
+                    <input
+                      ref="fileInput1"
+                      type="file"
+                      id="upload1"
+                      style="display: none"
+                      @change="onChangeFile"
+                      accept=".xls, .xlsx"
+                      @click="$refs.fileInput1.value = null"
+                    />
+                  </label>                
+                <li  v-if="Visible.tsbtnXuatQRCode" @click="tsbtnXuatQRCode_Click" >
+                    <a >
+                        <span class="icon one-xlsx-import"></span> Xuất QR code
+                    </a>
+                </li> 
+            </ul>
+                
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin chi tiết</div>
+                <div class="row col-sm-6 col-12">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                Option
+                            </div>
+                            <div class="value">
+                                <select name="" id="" class="form-control" @change="cboOption_EditValueChanged"
+                                    v-model="params.cboOption">
+                                    <option v-for="option in DSOption" v-bind:value="option.kieu_id">
+                                        {{option.kieu}}</option>
+                                </select>  
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                Serial
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.txtSerial" @keyup.enter="txtSerial_KeyPress" :disabled="ReadOnly.txtSerial">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="legend-title">Thông tin serial</div>
+                        <DataGrid v-bind:columns="[    
+                            {fieldName: '', headerText: '',textAlign: 'Center', allowFiltering: false, allowSorting: false, freeze: 'Left', width: '80', template: colXoaSeri},                                                            
+                            { allowEditing: false  , fieldName: 'ma_vt_hh_dv', headerText: 'Mã VT',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'TEN_VT', headerText: 'Tên VT',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'DVTINH_ID', headerText: 'ĐVT',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'seri', headerText: 'Serial',  allowFiltering: true},
+                            { allowEditing: false , fieldName: 'so_luong', headerText: 'Số lượng',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'DONGIA', headerText: 'Đơn giá',  allowFiltering: true},           
+                            { allowEditing: false  , fieldName: 'TIEN', headerText: 'Thành tiền',  allowFiltering: true},    
+                            { allowEditing: false  , fieldName: 'qr_code', headerText: 'QR Code',  allowFiltering: true},   
+                            {fieldName: '', headerText: '',textAlign: 'Center', allowFiltering: false, allowSorting: false, freeze: 'Right', width: '80', template: colHuyGan},                                                              
+                            ]"
+                            v-bind:dataSource="DSSerial"
+                            ref="gridSerial"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :enablePagingServer='false'    
+                            @rowSelected='gridSerial_selectedRow'                               
+                            >
+                        </DataGrid>    
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="legend-title">Gán serial - thiết bị</div>
+                        <DataGrid v-bind:columns="[         
+                            {fieldName: '', headerText: '',textAlign: 'Center', allowFiltering: false, allowSorting: false, freeze: 'Left', width: '80', template: colThemMaVT},                                                      
+                            { allowEditing: false  , fieldName: 'loHang', headerText: 'Lô hàng',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'maVt', headerText: 'Mã VT',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'tenVt', headerText: 'Tên VT',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'soLuong', headerText: 'SL',  allowFiltering: true , format: 'N0' ,type: 'number'},
+                            { allowEditing: false  , fieldName: 'soLuongChuaGan', headerText: 'SL còn',  allowFiltering: true},
+                            { allowEditing: false  , fieldName: 'donGia', headerText: 'Đơn giá',  allowFiltering: true , format: 'N0' ,type: 'number'},           
+                            { allowEditing: false  , fieldName: 'tien', headerText: 'Thành tiền',  allowFiltering: true , format: 'N0' , type: 'number'},    
+                            { allowEditing: false  , fieldName: 'qr_code', headerText: 'QR Code',  allowFiltering: true},                                                     
+                            ]"
+                            v-bind:dataSource="DSTbiChuaGan"
+                            ref="gridDS_TbiChuaGan"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :enablePagingServer='false' 
+                            @selectedRowChanged="gridDS_TbiChuaGan_selectedRow"    
+                            @rowSelected='rowSelected'                            
+                            >
+                        </DataGrid>     
+                    </div>
+                </div>
+               
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Loại vật tư</div>
+                <DataGrid v-bind:columns="[                                                               
+                    { allowEditing: false  , fieldName: 'serial', headerText: 'Serial',  allowFiltering: true},
+                    { allowEditing: false  , fieldName: 'stt', headerText: 'STT',  allowFiltering: true},
+                    { allowEditing: false  , fieldName: 'so_the', headerText: 'Số thẻ',  allowFiltering: true},
+                    { allowEditing: false  , fieldName: 'maVt', headerText: 'Mã VT',  allowFiltering: true},
+                    { allowEditing: false  , fieldName: 'ten_the', headerText: 'Tên thẻ',  allowFiltering: true},
+                    { allowEditing: false  , fieldName: 'gia_tri', headerText: 'SL',  allowFiltering: true},           
+                    { allowEditing: false  , fieldName: 'model', headerText: 'Model',  allowFiltering: true},    
+                    { allowEditing: false  , fieldName: 'loai_ts', headerText: 'Loại TS',  allowFiltering: true},    
+                    { allowEditing: false  , fieldName: 'ma_csht', headerText: 'Mã CSHT',  allowFiltering: true},         
+                    { allowEditing: false  , fieldName: 'ma_du_an', headerText: 'Mã dự án',  allowFiltering: true},  
+                    { allowEditing: false  , fieldName: 'ma_dvi_sd', headerText: 'Mã DV SD',  allowFiltering: true},  
+                    { allowEditing: false  , fieldName: 'ten_dvi_sd', headerText: 'Tên DV SD',  allowFiltering: true},      
+                    { allowEditing: false  , fieldName: 'ma_ns', headerText: 'Mã NS',  allowFiltering: true},   
+                    { allowEditing: false  , fieldName: 'ten_ns', headerText: 'Tên NS',  allowFiltering: true},      
+                    { allowEditing: false  , fieldName: 'ma_phong', headerText: 'Mã phòng',  allowFiltering: true},       
+                    { allowEditing: false  , fieldName: 'ten_phong', headerText: 'Tên phòng',  allowFiltering: true},      
+                    { allowEditing: false  , fieldName: 'ma_tinh_trang_sd', headerText: 'Mã TTSD',  allowFiltering: true},   
+                    { allowEditing: false  , fieldName: 'ma_so', headerText: 'Mã số',  allowFiltering: true},         
+                    { allowEditing: false  , fieldName: 'ten', headerText: 'Tên',  allowFiltering: true},       
+                    { allowEditing: false  , fieldName: 'nam_su_dung', headerText: 'Năm SD',  allowFiltering: true},  
+                    { allowEditing: false  , fieldName: 'nam_sx', headerText: 'Năm SX',  allowFiltering: true},           
+                    { allowEditing: false  , fieldName: 'ghichu', headerText: 'Ghi chú',  allowFiltering: true},    
+                    { allowEditing: false  , fieldName: 'diadiem', headerText: 'Địa điểm',  allowFiltering: true},
+                    { allowEditing: false  , fieldName: 'HETHONG', headerText: 'Hệ thống',  allowFiltering: true },
+                    { allowEditing: false  , fieldName: 'qrCode', headerText: 'QR code',  allowFiltering: true },
+                    { allowEditing: false  , fieldName: 'barcode', headerText: 'Bar code',  allowFiltering: true } 
+                    ]"
+                    v-bind:dataSource="DSTTTS"
+                    ref="gridTTTS"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer='false'  
+                    :showColumnCheckbox="true"   
+                    @selectedItemsChanged="DSTTTSCheckox"                           
+                    >
+                </DataGrid>     
+            </div>
+        </div>
+        
+    </div>
+    
+</ejs-dialog>
+

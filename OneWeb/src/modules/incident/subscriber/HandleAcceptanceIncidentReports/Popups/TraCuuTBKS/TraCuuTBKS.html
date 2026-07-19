@@ -1,0 +1,163 @@
+<ejs-dialog :enableResize='true' :visible="false" ref="dlg_tracuutbks" :header='"Tra cứu khảo sát độ hài lòng khách hàng"'
+                showCloseIcon=false target=".main-wrapper" width='80%' height="800">
+    <div class="modal-content popup-box">
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a>
+                        <span class="icon one-reload1"></span> Tìm kiếm
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <span class="icon one-notepad"></span> Chi tiết KS
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <span class="icon one-excel"></span> Xuất excel
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <span class="icon one-download"></span> Xuất file
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Chọn đơn vị</div>
+                        <div class="tree-plus tree-icon ovauto" style="height: 225px;">
+                            <ejs-treeview  id='treeview' ref="treeObj" @nodeSelected="selectDonViFocusedNodeChange" 
+                                            :fields='this.fields' :showCheckBox='false'></ejs-treeview>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                    <div class="box-form" style="height: 96% !important">
+                        <div class="legend-title">Thời gian khảo sát</div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">Từ ngày</div>
+                                    <div class="value">
+                                        <div class="input-icon-right">
+                                            <vue-date format="DD/MM/YYYY" type="datetime" v-model="dtpTuNgay" id="dtpTuNgay"></vue-date>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">Đến ngày</div>
+                                    <div class="value">
+                                        <div class="input-icon-right">
+                                            <vue-date format="DD/MM/YYYY" type="datetime" v-model="dtpDenNgay" id="dtpDenNgay"></vue-date>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="legend-title">Thông tin thuê bao</div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">Ngày khảo sát</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txtNgayKS" id="txtNgayKS">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">Ngày yêu cầu</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txtNgayYC" id="txtNgayYC">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">Số máy/Acc</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txtMaTB" id="txtMaTB" @keyup="txtMaTB_KeyPress">
+                                    </div>
+                                    <div class="value w30 nowrap">
+                                        <button class="btn btn-second" @click="txtMaTB_ButtonClick">...</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key">Ngày HT</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txtNgayTH" id="txtNgayTH">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <div class="info-row">
+                                    <div class="key">Ghi chú</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control" v-model="txtGhiChu" id="txtGhiChu">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="box-form" style="height: 96% !important">
+                        <div class="check-action">
+                            <input type="checkbox" class="check" id="chkAllCH" @change="chkAllCH_CheckedChanged">
+                            <div class="legend-title">Câu hỏi/Trả lời</div>
+                        </div>
+                        <div class="tree-plus tree-icon ovauto" style="height: 225px;">
+                            <ejs-treeview  id='treeviewTL' ref="treeObjTL" @nodeSelected="selectTLFocusedNodeChange" 
+                                            :fields='this.fieldsTL' :showCheckBox='true'></ejs-treeview>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách thuê bao được khảo sát --------</div>{{lbTong}}
+                <div class="table-content mart10">
+                    <DataGridCustom
+                        ref="ds_thuebao"
+                        v-bind:columns="columnsDSTB"
+                        v-bind:dataSource="ds_thuebao"
+                        :showColumnCheckbox="false"
+                        :showFilter="true"
+                        :enabledSelectFirstRow="true"
+                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                        panelDataHeight="270"
+                        :allowPaging="true" :enablePagingServer="false"
+                    ></DataGridCustom>
+                </div>           
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Chi tiết</div>
+                <div class="table-content mart10">
+                    <DataGridCustom
+                        ref="ds_chitiet"
+                        v-bind:columns="columnsDSCT"
+                        v-bind:dataSource="ds_chitiet"
+                        :showColumnCheckbox="false"
+                        :showFilter="true"
+                        :enabledSelectFirstRow="true"
+                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                        panelDataHeight="270"
+                        :allowPaging="true" :enablePagingServer="false"
+                    ></DataGridCustom>
+                </div>           
+            </div>
+        </div>
+    </div>
+</ejs-dialog>

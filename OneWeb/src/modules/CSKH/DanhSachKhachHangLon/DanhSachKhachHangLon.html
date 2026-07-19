@@ -1,0 +1,327 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    v-on:click="layDS()"
+                    data-toggle="tooltip"
+                    title="Lấy danh sách KHL đã tạo"
+                >
+                    <span class="icon one-file-attach1"></span>Lấy DS
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    v-on:click="taoDS()"
+                    data-toggle="tooltip"
+                    title="Tạo danh sách"
+                >
+                    <span class="icon one-file-plus-1"></span>Tạo DS
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    v-on:click="showModalXoa()"
+                    data-toggle="tooltip"
+                    title="Xóa toàn bộ danh sách KHL đã tạo"
+                >
+                    <span class="icon one-trash"></span>Xoá DS
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    v-on:click="showModalTao()"
+                    data-toggle="tooltip"
+                    title="Ghi lại"
+                >
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    data-toggle="tooltip"
+                    title="Thêm khách hàng lớn lẻ"
+                    v-on:click="openPopupThemKHL"
+                >
+                    <span
+                        class="icon nc-icon-glyph location_position-user"
+                    ></span
+                    >KH lẻ
+                </a>
+                <appThemKhachHangLonLe
+                    ref="popupThemKHL"
+                    :loaiKH="dsLoaiKH"
+                    :loaiKHL="dsLoaiKHL"
+                    :chuKyNo="dsChuKyNo"
+                    :kyHoaDon="kyCuoc"
+                ></appThemKhachHangLonLe>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    data-toggle="tooltip"
+                    title="File gồm 1 cột MA_KH"
+                >
+                    <label for="upload">
+                        <span class="icon one-book"></span>Đọc file
+                        <input
+                            ref="fileInput"
+                            type="file"
+                            id="upload"
+                            style="display: none"
+                            @change="importExcel"
+                            accept=".xls, .xlsx"
+                            v-on:click="$refs.fileInput.value=null"
+                        />
+                    </label>
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    data-toggle="tooltip"
+                    title="Xuất file"
+                    v-on:click="xuatFile"
+                >
+                    <!-- <downloadexcel :data="dataExcel"> -->
+                    <span class="icon one-download"></span>Xuất file
+                    <!-- </downloadexcel> -->
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript: void(0)"
+                    v-on:click="xuatFileMau()"
+                    data-toggle="tooltip"
+                    title="Tải file mẫu"
+                >
+                    <span class="icon one-excel"></span>Tải file mẫu
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb6">
+            <div class="pull-right">
+                <div class="inline">
+                    <app-ky-cuoc
+                        @handleChangeKyCuoc="handleKyHoaDon"
+                        :isTextBold="true"
+                    ></app-ky-cuoc>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Điều kiện lọc thông tin</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w70">Từ KHĐ<BssRequiredMarker class="ml-1"/></div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select class="form-control" v-model="tuKHD">
+                                    <option
+                                        v-for="(chuKyNo, index) in dsChuKyNo"
+                                        :key="index"
+                                        :value="chuKyNo.CHUKYNO"
+                                        >{{ chuKyNo.CHUKY }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w70">Đến KHĐ<BssRequiredMarker class="ml-1"/></div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select class="form-control" v-model="denKHD">
+                                    <option
+                                        v-for="(chuKyNo, index) in dsChuKyNo"
+                                        :key="index"
+                                        :value="chuKyNo.CHUKYNO"
+                                        >{{ chuKyNo.CHUKY }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w70">Loại KH<BssRequiredMarker class="ml-1"/></div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select class="form-control" v-model="dataSelect.dsLoaiKhId">
+                                    <option v-for="(loaiKH, index) in dsLoaiKH" :key="index" :value="loaiKH.LOAIKH_ID">{{ loaiKH.TEN_LOAIKH }}</option>
+                                </select> -->
+                                <ejs-multiselect
+                                    selectAllText="Chọn tất cả"
+                                    unSelectAllText="Bỏ chọn tất cả"
+                                    mode="CheckBox"
+                                    :showSelectAll="true"
+                                    v-model="loaiKhId"
+                                    :dataSource="dsLoaiKH"
+                                    :showDropDownIcon="true"
+                                    :allowFiltering="false"
+                                    :fields="{value:'LOAIKH_ID', text: 'TEN_LOAIKH'}"
+                                >
+                                </ejs-multiselect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w70">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    class="check"
+                                    v-model="isDisableQuan"
+                                />
+                                <span class="name">Quận</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select class="form-control" :disabled="!isDisableQuan" v-model="dataSelect.dsQuanId">
+                                    <option v-for="(quan, index) in dsQuan" :key="index" :value="quan.QUAN_ID">{{ quan.TEN_QUAN }}</option>
+                                </select> -->
+                                <ejs-multiselect
+                                    selectAllText="Chọn tất cả"
+                                    unSelectAllText="Bỏ chọn tất cả"
+                                    mode="CheckBox"
+                                    :showSelectAll="true"
+                                    v-model="quanId"
+                                    :dataSource="dsQuan"
+                                    :showDropDownIcon="true"
+                                    :allowFiltering="false"
+                                    :fields="selectFields"
+                                    :enabled="isDisableQuan"
+                                >
+                                </ejs-multiselect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w70">Loại KHL<BssRequiredMarker class="ml-1"/></div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select class="form-control" v-model="dataSelect.dsKhlId">
+                                    <option v-for="(loaiKHL, index) in dsLoaiKHL" :key="index" :value="loaiKHL.KHLON_ID">{{ loaiKHL.TEN_LKHL }}</option>
+                                </select> -->
+                                <ejs-multiselect
+                                    selectAllText="Chọn tất cả"
+                                    unSelectAllText="Bỏ chọn tất cả"
+                                    mode="CheckBox"
+                                    :showSelectAll="true"
+                                    v-model="khlId"
+                                    :dataSource="dsLoaiKHL"
+                                    :showDropDownIcon="true"
+                                    :allowFiltering="false"
+                                    :fields="{value:'KHLON_ID', text: 'TEN_LKHL'}"
+                                >
+                                </ejs-multiselect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-8 col-12">
+                    <div class="box-form mart10">
+                        <div class="legend-title">Danh sách khách hàng</div>
+                        <DataGrid
+                            ref="gridDSKhachHang"
+                            v-bind:columns="fieldsDSKhachHang"
+                            v-bind:dataSource="getdsKhachHangGetter"
+                            :showFilter="true"
+                            dataKeyField="MA_KH"
+                            :enablePagingServer="true"
+                            :allowPaging="true"
+                            :totalRecords="totalElements"
+                            :showColumnCheckbox="true"
+                            :defaultColumnCheckboxChecked="true"
+                            @queryCellInfo="gridViewControll_QueryCellInfo"
+                            @excelQueryCellInfo='gridViewControll_ExcelQueryCellInfo'
+                            @pageChanged="DSKhachHang_gridChanged"
+                        >
+                        </DataGrid>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="box-form mart10">
+                        <div class="legend-title">Danh sách lần tạo</div>
+                        <DataGrid
+                            v-bind:columns="fieldsDSLanTao"
+                            v-bind:dataSource="dsLanTao"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            ref="gridDSLanTao"
+                            @rowClicked="rowClick"
+                            @rowDoubleClicked="doubleClicked"
+                            :commands="[{name: 'Xoa', cssClass: 'btn btn-second button-not-bg pad3 lh14 icon one-trash', width: 20}]"
+                            :commandColumn="{headerText: 'Xoá', width: 100, cellCssClass: 'css1', firstColumn: false, show: true}"
+                            @commandClicked="showModalXoaLanTao"
+                        ></DataGrid>
+                        <appChiTiet :dsLanTao="dsChiTietKhachHang"></appChiTiet>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal xoá danh sách lần tạo-->
+    <b-modal
+        v-model="isShowModalXoaLanTao"
+        cancelTitle="Hủy"
+        okTitle="Đồng ý"
+        title="Thông báo"
+        size="md"
+        @ok="xoaDanhSachLanTao()"
+    >
+        <span>Bạn thực sự muốn xoá danh sách khách hàng lớn này không?</span>
+    </b-modal>
+    <!-- Modal xoá danh sách KHL-->
+    <b-modal
+        v-model="isShowModalXoa"
+        cancelTitle="Hủy"
+        okTitle="Đồng ý"
+        title="Thông báo"
+        size="md"
+        @ok="xoaDS()"
+    >
+        <span>Bạn thực sự muốn xoá danh sách khách hàng lớn này không?</span>
+    </b-modal>
+    <!-- Modal ghi lại danh sách đã tạo -->
+    <b-modal
+        v-model="isShowModalTao"
+        cancelTitle="Hủy"
+        okTitle="Đồng ý"
+        title="Thông báo"
+        size="md"
+        @ok="ghiDS()"
+    >
+        <span>Bạn thực sự muốn tạo danh sách khách hàng lớn này không?</span>
+    </b-modal>
+    <!-- Xuất file -->
+    <ModalXuatDuLieu
+        id="modal-xuat-dulieu"
+        :thuocTinh="dsThuocTinh"
+        :data="dataExcel"
+    >
+    </ModalXuatDuLieu>
+    <!-- Danh sách mã khách hàng lỗi -->
+    <appDSMaKH :dsMaKHLoi="dsMaKHLoi"></appDSMaKH>
+</div>

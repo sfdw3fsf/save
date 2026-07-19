@@ -1,0 +1,725 @@
+<div class="">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li :class="{disabled : isAddNew}">
+                <a class="pointer" @click.prevent="onClickNhapMoi">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li :class="{disabled : isHuy}">
+                <a class="pointer" @click.prevent="onClickGhiLai">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li :class="{disabled : !isAddNew}">
+                <a class="pointer" @click.prevent="onClickHuy">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+            <li :class="{disabled : isAddNew}">
+                <a class="pointer" @click.prevent="onClickXoa">
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+            </li>
+            <!-- <li>
+                <a class="pointer">
+                    <span class="icon one-print"></span>In phiếu
+                </a>
+            </li> -->
+            <li :class="{disabled : isAddNew || nvThauShowing}">
+                <a class="pointer" @click.prevent="onClickNVThau">
+                    <span class="icon one-user-focus"></span>NV Thầu
+                </a>
+            </li>
+            <li :class="{disabled : isAddNew}">
+                <a class="pointer" @click.prevent="onClickDSVT">
+                    <span class="icon one-coin"></span>DS Vật tư
+                </a>
+            </li>
+            <li :class="{disabled : isAddNew}">
+                <a class="pointer" @click.prevent="onClickNGhepHd">
+                    <span class="icon -ap icon-collections_bookmark"></span>Ghép HĐ
+                </a>
+            </li>
+            <li :class="{disabled : !isDone}">
+                <a class="pointer" @click.prevent="onClickHoanThien">
+                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Hoàn thiện
+                </a>
+            </li>
+            <li v-click-outside="hideMenuPrint">
+                <a class="pointer" @click.prevent="toggleMenuPrint">
+                    <span class="icon one-print"></span>In phiếu <span class="fa fa-angle-down text-desc"></span>
+                </a>
+                <div class="print-menu p-2" v-show="showPrintMenu">
+                    <a class="pointer" @click.prevent="onClickInPhieu">Phiếu giá thanh toán</a>
+                </div>
+            </li>
+            <li>
+                <a class="pointer" @click.prevent="onClickNhapExcel">
+                    <span class="icon one-xlsx"></span>Đọc file excel
+                </a>
+                <input type="file" @change="onChangeFileExcel" ref="fileExcel" accept=".xlsx, .xls"
+                    style="display: none" />
+            </li>
+            <li @click.prevent="tsbtnThanhLy_Click">
+                <a>
+                    <span class="icon one-xlsx"></span>Thanh lý HĐ
+                </a>
+            </li>
+            <li @click.prevent="tsbtnHuyTL_Click">
+                <a>
+                    <span class="icon one-xlsx"></span>Hủy TL HĐ
+                </a>
+            </li>
+        </ul>
+        <div class="more">
+            <a class="pointer" data-toggle="dropdown">
+                <span class="-ap icon-more_vert"></span>
+            </a>
+            <div class="dropdown-menu">
+                <a class="pointer" @click.prevent="downFileMau">
+                    <span class="dropdown-icon one-excel"></span> File Excel Mẫu
+                </a>
+                <a class="pointer" @click.prevent="">
+                    <span class="dropdown-icon one-circle-question"></span> Trợ giúp
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="page-content" id="checkTTDKNCVT">
+        <div class="grid-stack-box">
+            <Split :gutterSize="20">
+                <SplitArea :size="57" :minSize="100">
+                    <div class="box-col box-form" id="boxLeft">
+                        <div class="legend-title">Thông tin hợp đồng</div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Mã HĐ</div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button class="btn" @click="onClickTraCuu">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <input type="text" style="color: #0176FF; font-size: 13px"
+                                                class="form-control" v-model.trim="tthd.maHd">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày ký</div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 text" :format="'dd/MM/yyyy'"
+                                            :showClearButton="true" v-model="tthd.ngayKy">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày YC<span class="required"> *</span></div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 text"
+                                            :format="'dd/MM/yyyy HH:mm:ss'" :showClearButton="false"
+                                            v-model="tthd.ngayYc" :enabled="false">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Nhà thầu<span class="required"> *</span></div>
+                                    <!-- <vt-custom-dropdown :column="[
+                                    {fieldName: 'TEN_KHO', headerText: '', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MA_KHO', headerText: '', allowFiltering: true, allowSorting: false}]"
+                                    :dataSource="nhaThauLst" :textField="['TEN_KHO']"
+                                    v-on:onSelectValue="rowSelectNhaThau"
+                                    >
+                                    </vt-custom-dropdown> -->
+                                    <div class="value" v-click-outside="hideNhaThau">
+                                        <!-- old -->
+                                        <!-- <div class="vattu_box">
+                                            <div class="input-group">
+                                                <div class="li input-text">
+                                                    <div class="select-custom">
+                                                        <input ref="nhaThau" readonly v-model="tthd.nhaThau.text"
+                                                            class="form-control bg-none" @click="toggleNhaThau">
+                                                        </input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="vattu_table" v-show="tthd.nhaThau.show">
+                                                <DataGrid2
+                                                    v-bind:columns="[
+                                                    {fieldName: 'TEN_KHO', headerText: '', allowFiltering: true, allowSorting: false},
+                                                    {fieldName: 'MA_KHO', headerText: '', allowFiltering: true, allowSorting: false}]"
+                                                    v-bind:dataSource="nhaThauLst"
+                                                    :showFilter="true"
+                                                    :showColumnCheckbox="false"
+                                                    dataKeyField="KHO_ID"
+                                                    :defaultColumnCheckboxChecked="false"
+                                                    @selectedRowChanged="rowSelectNhaThau"
+                                                    :pageSize="10000"
+                                                    :selectedRow="-1"
+                                                    ref="nhaThauRef">
+                                                </DataGrid2>
+                                            </div>
+                                        </div> -->
+                                        <!-- end old -->
+                                        <ComboboxGrid ref="nhaThauDtCbbRef"
+                                            :columns="[
+                                             {fieldName: 'TEN_KHO', headerText: '', allowFiltering: true, allowSorting: false},
+                                             {fieldName: 'MA_KHO', headerText: '', allowFiltering: true, allowSorting: false}]"
+                                            @selectedChanged="rowSelectNhaThau" :dataSource="nhaThauLst"
+                                            :allowPaging="false" :enablePagingServer="false" textField="TEN_KHO"
+                                            valueField="KHO_ID">
+
+                                        </ComboboxGrid>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Hình thức HĐ</div>
+                                    <div class="value" v-click-outside="hideHTHopDong">
+                                        <div class="vattu_box">
+                                            <div class="input-group">
+                                                <div class="li input-text">
+                                                    <div class="select-custom">
+                                                        <input ref="htHD" readonly v-model="tthd.htHD.text"
+                                                            class="form-control bg-none" @click="toggleHTHopDong">
+                                                        </input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="vattu_table" v-show="tthd.htHD.show">
+                                                <DataGrid2
+                                                    v-bind:columns="[
+                                                    {fieldName: 'mucDich', headerText: '', allowFiltering: true, allowSorting: false}]"
+                                                    v-bind:dataSource="htHopDongLst" :showFilter="true"
+                                                    :showColumnCheckbox="false" dataKeyField="mucDichId"
+                                                    :defaultColumnCheckboxChecked="false"
+                                                    @selectedRowChanged="rowSelectHTHopDong" :pageSize="10000"
+                                                    :selectedRow="-1" ref="htHdRef">
+                                                </DataGrid2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Trạng thái<span class="required"> *</span></div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select disabled v-model="tthd.trangThaiHd" class="form-control">
+                                                <option v-for="dv in trangThaiHDLst" v-bind:value="dv.TTHD_ID">
+                                                    {{dv.TRANGTHAI_HD}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Loại HĐ<span class="required"> *</span></div>
+                                    <div class="value" v-click-outside="hideLoaiHopDong">
+                                        <div class="vattu_box">
+                                            <div class="input-group">
+                                                <div class="li input-text">
+                                                    <div class="select-custom">
+                                                        <input ref="loaiHd" readonly v-model="tthd.loaiHD.text"
+                                                            class="form-control bg-none" @click="toggleLoaiHopDong">
+                                                        </input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="vattu_table" v-show="tthd.loaiHD.show">
+                                                <DataGrid2
+                                                    v-bind:columns="[
+                                                    {fieldName: 'MA_MD', headerText: '', allowFiltering: true, allowSorting: false},
+                                                    {fieldName: 'MUCDICH', headerText: '', allowFiltering: true, allowSorting: false}]"
+                                                    v-bind:dataSource="loaiHopDongLst" :showFilter="true"
+                                                    :showColumnCheckbox="false" dataKeyField="MUCDICH_ID"
+                                                    :defaultColumnCheckboxChecked="false"
+                                                    @selectedRowChanged="rowSelectLoaiHopDong" :pageSize="10000"
+                                                    :selectedRow="-1" ref="loaiHDRef">
+                                                </DataGrid2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Kiểu HĐ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select v-model="tthd.kieuHD" class="form-control">
+                                                <option v-for="dv in kieuHopDongLst" v-bind:value="dv.KIEUHD_ID">
+                                                    {{dv.KIEU_HD}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày kế hoạch<span class="required"> *</span></div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 text" :format="'dd/MM/yyyy'"
+                                            :showClearButton="false" v-model="tthd.ngayKh">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày hiệu lực<span class="required"> *</span></div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 text" :format="'dd/MM/yyyy'"
+                                            :showClearButton="false" v-model="tthd.ngayHl">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày hết hạn<span class="required"> *</span></div>
+                                    <div class="value">
+                                        <ejs-datepicker class="form-control bg-none bor0 text" :format="'dd/MM/yyyy'"
+                                            :showClearButton="false" v-model="tthd.ngayDh" :change="changeNgayHetHan">
+                                        </ejs-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Số ngày TH<span class="required"> *</span></div>
+                                    <div class="value" v-click-outside="hideSoNgay">
+                                        <div class="vattu_box">
+                                            <div class="input-group">
+                                                <div class="li input-text">
+                                                    <div class="select-custom">
+                                                        <input readonly v-model="tthd.soNgayTh.dispValue"
+                                                            class="form-control bg-none" @click="toggleSoNgay">
+                                                        </input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="select-table w-100 p-2" v-show="tthd.soNgayTh.show">
+                                                <div class="text-center">
+                                                    <label>Số ngày thực hiện</label>
+                                                </div>
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn btn-second" @click="changeKieuTinh(true)">Theo
+                                                        ngày</button>
+                                                    <button class="btn btn-main" @click="changeKieuTinh(false)">Theo
+                                                        tháng</button>
+                                                </div>
+                                                <div class="info-row mart10">
+                                                    <div v-if="tthd.soNgayTh.theoNgay" class="key w60">Số ngày</div>
+                                                    <div v-else class="key w60">Số tháng</div>
+                                                    <div class="value">
+                                                        <div class="input-number-custom">
+                                                            <input type="number" class="form-control tright"
+                                                                style="text-align: center !important;"
+                                                                v-model="tthd.soNgayTh.inpValue" v-on:keyup="tinhGiaTri"
+                                                                @change="tinhGiaTri">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="count f36 red center">{{tthd.soNgayTh.text}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w110">Nội dung<span class="required"> *</span></div>
+                            <div class="value">
+                                <textarea class="form-control" v-model.trim="tthd.noiDung"
+                                    style="height: 80px;resize: vertical;"></textarea>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w110">Ghi chú</div>
+                            <div class="value">
+                                <textarea class="form-control" v-model="tthd.ghiChu"
+                                    style="height: 80px;resize: vertical;"></textarea>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w110">File CV</div>
+                            <div class="value">
+                                <div class="input-more-button">
+                                    <label for="upload" class="btn" :class="{disabled : isAddNew}">
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </label>
+                                    <input type="file" ref="fileInput" @change="onChangeFile" id="upload"
+                                        style="display: none" multiple />
+                                    <div id="textarea" class="form-control" style="height: 80px;resize: vertical;">
+                                        <div class="text-area-content mb-2" v-for="item in tthd.fileNames">
+                                            <div>
+                                                <b>{{item.split('/')[item.split('/').length -1]}}</b>
+                                            </div>
+                                            <div>
+                                                <a href="#" @click.prevent="onClickDownFile(item)"
+                                                    class="btn btn-success btn-sm">
+                                                    <span class="-ap icon-download"></span>
+                                                </a>
+                                                <a href="#" @click.prevent="onClickDeleteFile(item)"
+                                                    class="btn btn-danger btn-sm">
+                                                    <span class="-ap icon-trash"></span>
+                                                </a>
+                                                <a href="#" @click.prevent="onClickViewFile(item)"
+                                                    class="btn btn-primary btn-sm">
+                                                    <span class="-ap icon-search"></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Tiền HĐ</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control tright text-main" disabled
+                                            v-model="tthd.tienHd">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Giá trị HĐ</div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button class="btn" @click="onClickSaveGtHd">
+                                                <span class="one-save"></span>
+                                            </button>
+                                            <input type="text" class="form-control tright" v-model.trim="tthd.giaTri">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Ngày còn lại<span class="required"> *</span></div>
+                                    <div class="value">
+                                        <input type="text" class="form-control tright" v-model="tthd.ngayCl" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">VAT</div>
+                                    <div class="value">
+                                        <input type="text" disabled class="form-control tright text-main"
+                                            v-model="tthd.vat">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Tỷ lệ VAT</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select v-model="tyle_VAT" class="form-control">
+                                                <option v-for="dv in listTyLeVAT" v-bind:value="dv.TYLE_VAT">
+                                                    {{dv.TYLE_VAT}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12" v-show="tthd.dsPhuLuc.vVisible">
+                                <div class="info-row">
+                                    <div class="key w110">Phụ Lục</div>
+                                    <div class="value" v-click-outside="hidePhuLuc">
+                                        <div class="input-more-button">
+                                            <div class="li input-text">
+                                                <div class="select-custom">
+                                                    <input ref="dsPhuLuc" readonly v-model="tthd.dsPhuLuc.text"
+                                                        class="form-control bg-none" @click="toggleDsPhuLuc">
+                                                    </input>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="vattu_table" v-show="tthd.dsPhuLuc.show">
+                                                    <DataGrid2
+                                                        v-bind:columns="[
+                                                                {fieldName: 'PHULUC', headerText: '', allowFiltering: true, allowSorting: false}]"
+                                                        v-bind:dataSource="tthd.listPhuLuc" :showFilter="true"
+                                                        :showColumnCheckbox="false" dataKeyField="PHULUC_ID"
+                                                        :defaultColumnCheckboxChecked="false"
+                                                        @selectedRowChanged="rowSelectDsPhuLuc" :pageSize="10000"
+                                                        :selectedRow="-1" ref="dsPhuLucRef">
+                                                    </DataGrid2>
+                                                </div>
+                                            </div>
+
+                                            <button class="btn" @click="cboTTPhuLuc_ButtonClick">
+                                                <span class="-ap icon-check"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Thành tiền</div>
+                                    <div class="value">
+                                        <input type="text" class="form-control tright red" disabled
+                                            v-model="tthd.thanhTien">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">Số tiền bằng chữ</div>
+                                    <div class="value">
+                                        <textarea class="form-control" v-model="tthd.tienBangChu" disabled
+                                            style="height: 32px; resize: vertical;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </SplitArea>
+                <SplitArea :size="43" :minSize="100">
+                    <div class="box-col box-form" id="boxRight">
+                        <div class="nav tabs tab-over">
+                            <a href="#tab1" class="minw0 active" data-toggle="tab">Danh sách hợp đồng</a>
+                            <a href="#tab2" class="minw0" data-toggle="tab">Đăng ký nhu cầu</a>
+                            <a href="#tab3" class="minw0" data-toggle="tab">Nhân viên tổ thầu</a>
+                        </div>
+                        <div class="tab-content" style="height: calc(100% - 45px);">
+                            <div class="tab-pane active" id="tab1">
+                                <DataGrid ref="dsHDRef" v-bind:columns="[
+                                    {fieldName: 'MA_HD', headerText: 'Mã HĐ', allowFiltering: true, allowSorting:true,},
+                                    {fieldName: 'NHA_THAU', headerText: 'Nhà thầu', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'LOAI_HD', headerText: 'Loại HĐ', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'TRANG_THAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting:true,width: 130},
+                                    {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'NGAY_KY', headerText: 'Ngày ký', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'NGAY_HH', headerText: 'Ngày hết hạn', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'CONLAI', headerText: 'Ngày còn lại', allowFiltering: true, allowSorting:true,width: 130},
+                                    {fieldName: 'NGAY_NT', headerText: 'Ngày nghiệm thu', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'SLDH', headerText: 'Số lượng đơn hàng', allowFiltering: true, allowSorting:true,width: 130},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'KIEU_HD', headerText: 'Kiểu HĐ', allowFiltering: true, allowSorting:true},
+                                    {fieldName: 'NGUOI_CN', headerText: 'Người lập', allowFiltering: true, allowSorting:true,freeze: 'right',width: 130}
+                                    ]" v-bind:dataSource="hopDongLst.data" :showFilter="true"
+                                    :showColumnCheckbox="false" :allowPaging="true"
+                                    :totalRecords="hopDongLst.totalItems" :enablePagingServer="false"
+                                    @selectedRowChanged="rowSelectHopDong">
+                                </DataGrid>
+                            </div>
+                            <div class="tab-pane" id="tab2">
+                                <DataGrid3 ref="grid" class="table-result table-gachle" v-bind:columns="[
+                                    {fieldName: 'DOT', headerText: 'Đợt tổng hợp', allowFiltering: true, allowSorting: false },
+                                    {fieldName: 'NGAYDUYET', headerText: 'Ngày duyệt', allowFiltering: true, allowSorting: true} ,
+                                    {fieldName: 'THANG_VIEW', headerText: 'Tháng TH', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true}
+                                    ]" v-bind:dataSource="dkncCha.data" :showFilter="true" dataKeyField="DOT"
+                                    :allowPaging="true" :enablePagingServer="false" :childGrid='childGrid'
+                                    @detailDataBound='onDetailDataBound'>
+                                </DataGrid3>
+                            </div>
+                            <div class="tab-pane" id="tab3">
+                                <div class="legend-title">
+                                    <div class="pull-left">Danh sách nhân viên tham gia tổ thầu</div>
+                                    <div class="pull-right">
+                                        <button class="btn btn-main pad3 lh14" @click="v_btn_Save_MouseClick()">
+                                            <span class="nc-icon-outline tech-2_sim-card"></span>
+                                        </button>
+                                        <button class="btn btn-main pad3 lh14" @click="getDsNVTG()">
+                                            <span class="nc-icon-outline arrows-1_refresh-69"></span>
+                                        </button>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <DataGrid v-bind:columns="[
+                                    {fieldName: '', headerText: 'X', allowFiltering: false, width: 120, template: deleteTemplateNVT, cssClass: 'text-center'},
+                                    {
+                                        fieldName: 'tenDv',
+                                        headerText: '',
+                                        allowFiltering: false,
+                                        allowSorting: false,
+                                        isGroupedColumn: true,
+                                    },
+                                    {
+                                        fieldName: 'maNv',
+                                        headerText: 'Mã NV',
+                                        allowFiltering: true,
+                                        allowSorting: false,
+                                    },
+                                    {
+                                        fieldName: 'tenNv',
+                                        headerText: 'Tên NV',
+                                        allowFiltering: true,
+                                        allowSorting: false,
+                                    },
+                                    {
+                                        fieldName: 'vaiTroText',
+                                        headerText: 'Vai trò',
+                                        allowFiltering: false,
+                                    },
+                                ]" v-bind:dataSource="nVTGLst.data" :showFilter="true" dataKeyField="nhanVienId"
+                                    :showColumnCheckbox=false :allowPaging="true" :totalRecords="nVTGLst.totalItems"
+                                    :enablePagingServer="false" :selectionSettings="{enableToggle: false}">
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </SplitArea>
+            </Split>
+        </div>
+        <div class="grid-stack-box">
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách vật tư của hợp đồng</div>
+                    <div class="pull-right">
+                        <button class="btn btn-main pad3 lh14" @click="onSaveDSVT">
+                            <span class="nc-icon-outline tech-2_sim-card"></span>
+                        </button>
+                        <button class="btn btn-main pad3 lh14" @click="getDsVTHD">
+                            <span class="nc-icon-outline arrows-1_refresh-69"></span>
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="info-row">
+                    <div class="pull-left"></div>
+                    <div class="pull-right">                        
+                        <div class="pull-right">
+                            <button class="btn btn-second padt3 padb3" @click="btnXoaHetVT_Click">
+                                <span class="nc-icon-glyph ui-1_simple-remove"></span> Xóa hết
+                            </button>
+                        </div>   
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                             
+                <DataGrid v-bind:columns="[
+                    {fieldName: 'MA_VATU', headerText: 'Mã vật tư', allowFiltering: true,},
+                    {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true},
+                    {fieldName: 'SL_KD', headerText: 'SL Khả dụng', allowFiltering: true},
+                    {fieldName: 'SOLUONG', headerText: 'SL Đặt', allowFiltering: true ,type:'number', format:'N3',},
+                    {fieldName: 'DVITINH_VALUE', headerText: 'ĐVT', allowFiltering: true},
+                    {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true,cssClass: 'c-red',allowEditing:true , type:'number', format:'N3', width:100},
+                    {fieldName: 'TIEN', headerText: 'Thành tiền', allowFiltering: true, type:'number', format:'N3'},
+                    {fieldName: 'VAT', headerText: 'VAT', allowFiltering: true, type:'number',format:'N3'},
+                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true,  allowEditing:true},
+                    {fieldName: '', headerText: 'Xóa', allowFiltering: false, width: 120, template: deleteTemplate, cssClass: 'text-center'},
+                    ]" v-bind:dataSource="vatTuHDLSt.data" :showFilter="true" dataKeyField="HDVT_ID" :allowPaging="true"
+                    :totalRecords="vatTuHDLSt.totalItems" :enablePagingServer="false" :editSettings='editSettings'
+                    :selectionSettings="{enableToggle: false}" @cellSaved="editGridVTHD" :aggregates="PTAggregatesColumns"
+                    ref="tableVTHD" @rowDataBound="rowDataBound">
+                </DataGrid>               
+            </div>
+        </div>            
+    </div>
+
+   
+    <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="popupDSVatTu"
+        :animationSettings="{ effect: 'Zoom' }" showCloseIcon=true width='80%' :target="'.main-wrapper'"
+        style="top:30px; bottom:30px" header='<div class="main-title">Danh sách vật tư</div>'>
+        <ds-vattu :data="hopDongChon" v-on:addSuccess="themVTThanhCong"></ds-vattu>
+    </ejs-dialog>
+    <b-modal id="modal-nvt" ref="nvThauRef" hide-footer modal-class="modal-dsvt" @hide="onCloseModalNVThau"
+        title="Danh sách nhân viên" no-close-on-backdrop size="xl">
+        <nv-thau :data="hopDongChon" v-on:addSuccess=""></nv-thau>
+    </b-modal>
+    <b-modal id="modal-ghd" ref="ghepHdRef" hide-footer modal-class="modal-dsvt"
+        title="Ghép hợp đồng ảo vào hợp đồng thật" no-close-on-backdrop size="xl">
+        <ghep-hop-dong :data="hopDongChon" v-on:addSuccess=""></ghep-hop-dong>
+    </b-modal>
+    <!-- <b-modal id="modal-tracuu" ref="traCuuRef" hide-footer modal-class="modal-dsvt" title="Tra cứu hợp đồng - đơn hàng"
+        no-close-on-backdrop size="xl">
+        <div class="modal-wrapper" style="width: 100%; max-width: 1220px;">
+            <tra-cuu-hd ref="traCuuHDRef" :isPopup="true" @onXacNhan="traCuuHDConfirm"></tra-cuu-hd>
+        </div>
+    </b-modal> -->
+    <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="traCuuRef"
+        :animationSettings="{ effect: 'Zoom' }" showCloseIcon=true width='80%' :target="'.main-wrapper'"
+        style="top:30px; bottom:30px" header='<div class="main-title">Tra cứu hợp đồng - đơn hàng</div>'
+        :close="traCuuHDConfirm">
+        <div class="modal-wrapper" style="width: 100%; max-width: 1220px;">
+            <tra-cuu-hd ref="traCuuHDRef" :isPopup="true" @onXacNhan="traCuuHDConfirm"></tra-cuu-hd>
+        </div>
+    </ejs-dialog>
+    <template>
+        <div id="duyFixed">
+            <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="false" :preview-modal="true"
+                :paginate-elements-by-height="1600" filename="hee hee" :pdf-quality="2" :manual-pagination="true"
+                pdf-format="a4" pdf-orientation="portrait" ref="html2Pdf2" @progress="onProgress($event)">
+                <section slot="pdf-content">
+                    <div class="p-4" style="width: 100%;">
+                        <phieu-in :data="printDataLst"></phieu-in>
+                    </div>
+                </section>
+            </vue-html2pdf>
+        </div>
+    </template>
+
+    <b-modal no-close-on-backdrop hide-footer hide-header hide-header-close class="modal" id="popupThanhLy">
+
+        <div class="modal-content popup-box">
+            <div class="popup-header">
+                <div class="title">Thanh lý hợp đồng</div>
+                <div class="close -ap icon-close" @click="$bvModal.hide('popupThanhLy')" data-dismiss="modal">
+                </div>
+            </div>
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li>
+                        <a @click="XacNhanThanhLy()">
+                            <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="popup-body">
+                <div class="info-row">
+                    <div class="key w90">
+                        Ngày thanh lý
+                    </div>
+                    <div class="value">
+                        <ejs-datepicker class="form-control" :format="'dd/MM/yyyy'" v-model="tthd.ngayThanhLy">
+                        </ejs-datepicker>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">
+                        Nhập nội dung
+                    </div>
+                    <div class="value">
+                        <textarea class="form-control" v-model="tthd.ndThanhLy" value="tthd.ndThanhLy"
+                            style="height: 100px;resize: vertical;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </b-modal>
+</div>

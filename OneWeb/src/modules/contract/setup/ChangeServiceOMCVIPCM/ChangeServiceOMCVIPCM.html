@@ -1,0 +1,436 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header"/>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-for="item in actions" :key="item.id" @click="onActionClick(item)"
+          :class="{disabled: !item.active}" v-show="item.visible">
+        <a style="cursor: pointer;" :class="{disabled_color: !item.active}">
+          <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+        </a>
+      </li>
+    </ul>
+    <div class="more dropdown">
+      <a href="#" data-toggle="dropdown">
+        <span class="icon -ap  icon-dots-three-vertical"></span>
+      </a>
+      <div class="dropdown-menu ovauto">
+        <a style="cursor: pointer" v-for="item in actionsDropdown" :key="item.id" @click="onActionClick(item)"
+           :class="{disabled: !item.active}" v-show="item.visible">
+          <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="box-form">
+          <div class="legend-title">Thông tin phiếu yêu cầu</div>
+          <div class="row">
+            <div class="col-md-8 col-sm-6 col-xs-6 col-12">
+              <div class="info-row">
+                <div class="key">Dịch vụ</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="dichvuVTId" :disabled='false' v-model="cboDichVuVT.value"
+                             :options="cboDichVuVT.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-6 col-12">
+              <div class="info-row">
+                <div class="key">Mã GD</div>
+                <div class="value">
+                  <input type="text" ref="txtMaGD" v-model="frmThongTinPhieuYc.txtMaGD" v-on:keyup.enter="OnMaGDEnter"
+                         class="form-control highlight bold">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8 col-sm-6 col-xs-6 col-12">
+              <div class="info-row">
+                <div class="key">Quy trình</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="quytrinhId" :disabled='false' v-model="cboQuyTrinh.value"
+                             :options="cboQuyTrinh.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-6 col-12">
+              <div class="info-row">
+                <div class="key">Số máy/Acc</div>
+                <div class="value">
+                  <input type="text" ref="txtMaTB" v-model="frmThongTinPhieuYc.txtMaTB" v-on:keyup.enter="OnMaTBEnter"
+                         class="form-control highlight bold">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8 col-sm-6 col-xs-6 col-12">
+              <div class="info-row">
+                <div class="key">Tên thuê bao</div>
+                <div class="value">
+                  <input type="text" ref="txtTenTB" v-model="frmThongTinPhieuYc.txtTenTB" class="form-control bold">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action">
+                    <input type="checkbox" ref="chkNgayBG" v-model="chkNgayBG.checked"
+                           @change="chkNgayBG_CheckedChanged" class="check" :disabled="chkNgayBG.disable">
+                    <span class="name">Ngày HT</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker ref="dtpNgayBG" format="DD/MM/YYYY HH:mm:ss" type="datetime"
+                                   v-model="frmThongTinPhieuYc.dtpNgayBG" :disabled="!chkNgayBG.checked"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Địa chỉ TB</div>
+            <div class="value">
+              <input type="text" readonly ref="txtDiaChiTB" v-model="frmThongTinPhieuYc.txtDiaChiTB" class="form-control text-view bold">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Địa chỉ LĐ</div>
+            <div class="value">
+              <input type="text" readonly ref="txtDiaChiLD" v-model="frmThongTinPhieuYc.txtDiaChiLD" class="form-control text-view bold">
+            </div>
+          </div>
+          <div class="row">
+            <div :class="visibleListCtl.boxNeCu === true ? 'col-sm-8 col-12' : 'col-sm-12 col-12'">
+              <div class="info-row">
+                <div class="key">Host LĐ</div>
+                <div class="value">
+                  <input type="text" readonly ref="txtHostLD" v-model="frmThongTinPhieuYc.txtHostLD" class="form-control text-view">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12" v-show="visibleListCtl.boxNeCu">
+              <div class="info-row">
+                <div class="key">Số NE cũ</div>
+                <div class="value">
+                  <input type="text" ref="txtSoNeCu" v-model="frmThongTinPhieuYc.txtNeCu" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div :class="visibleListCtl.boxNeMoi === true ? 'col-sm-8 col-12' : 'col-sm-12 col-12'">
+              <div class="info-row">
+                <div class="key">Ghi chú</div>
+                <div class="value">
+                  <input type="text" ref="txtGhiChu" :disabled="true" v-model="frmThongTinPhieuYc.txtGhiChu" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12" v-show="visibleListCtl.boxNeMoi">
+              <div class="info-row">
+                <div class="key">Số NE mới</div>
+                <div class="value">
+                  <input type="text" ref="txtSoNeMoi" v-model="frmThongTinPhieuYc.txtNeMoi" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="legend-title mart20">
+            <div class="pull-left">Giao việc</div>
+            <div class="pull-right">
+              <div class="normal red">
+                <span class="name">{{ frmThongTinPhieuYc.lienhe }}</span>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8 col-12">
+              <div class="info-row">
+                <div class="key">Người giao việc</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="nguoigiaoviecid" :disabled='false' v-model="cboNguoiGV.value"
+                             :options="cboNguoiGV.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action">
+                    <input type="checkbox" ref="chkNgayGV" @change="chkNgayGV_CheckedChanged"
+                           v-model="chkNgayGV.checked" class="check" :disabled="chkNgayGV.disable">
+                    <span class="name">Ngày GV</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker v-model="frmThongTinPhieuYc.dtpNgayGV" format="DD/MM/YYYY HH:mm:ss" type="datetime"
+                                   ref="dtpNgayGV" :disabled="!chkNgayGV.checked"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DataGrid ref="dgvNhanVien" class="table-result table-gachle" v-bind:columns="dgvNhanVien.headers"
+                    v-bind:dataSource="dgvNhanVien.data" :showColumnCheckbox="false"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    :enabled-select-first-row="true"></DataGrid>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="box-form">
+          <div class="row mart20">
+            <div class="col-sm-12 col-12">
+              <div class="row">
+                <div class="col-sm-12 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Nội dung giao</div>
+                    <div class="value">
+                      <input type="text" readonly v-model="frmThongTinChung.txtNDGiao" ref="txtNDGiao" class="form-control text-view">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Nội dung trả</div>
+                    <div class="value">
+                      <input type="text" readonly v-model="frmThongTinChung.txtThongTinTra" ref="txtThongTinTra"
+                             class="form-control text-view">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Nội dung TH</div>
+                    <div class="input-more-button -left">
+                      <button class="btn" @click="btnNDTH_Click">
+                        <span class="nc-icon-glyph ui-1_edit-76 f16"></span>
+                      </button>
+                      <input type="text" class="form-control text-danger" v-model="frmThongTinChung.txtNoiDungTH"
+                             ref="txtNoiDungTH" :class="{'is-invalid': validationStatus($v.frmThongTinChung.txtNoiDungTH)}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Nhóm KQ</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <Select2 ref="nhomKQID" :disabled='false' v-model="cboNhomKQ.value"
+                                 :options="cboNhomKQ.list" :settings="settingSelect2"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-8 col-12">
+                  <div class="info-row">
+                    <div class="key w90">Kết quả</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <ComboboxGrid :valueField="DmKetQuaXL.valueField" :textField="DmKetQuaXL.textField"
+                                      v-model="DmKetQuaXL.selectKQXL" :value="DmKetQuaXL.selectKQXL"
+                                      :columns="DmKetQuaXL.headers"
+                                      :panelDataHeight="DmKetQuaXL.panelDataHeight" :enabledSelectFirstRow="true"
+                                      :dataSource="DmKetQuaXL.data">
+                        </ComboboxGrid>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="legend-title">Dịch vụ đăng ký</div>
+          <div class="table-content">
+            <DataGrid ref="grvDVGT" class="table-result table-gachle" v-bind:columns="grvDVGT.headers"
+                      v-bind:dataSource="grvDVGT.data" :showColumnCheckbox="true"
+                      :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                      :enabled-select-first-row="true"></DataGrid>
+          </div>
+          <div class="legend-title mart20">
+            <div class="box-title box-lydohuy">
+              <div class="title-label">
+                Lý do hủy
+              </div>
+              <div class="actions">
+                <button class="btn btn-primary btn-sm btn-lydo" v-show="visibleListCtl.btnLyDoHuy"
+                        @click="btnLyDoHuy_Click">
+                  Lý do
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="table-content">
+            <DataGrid ref="gridVLyDoHuyHDTB" class="table-result table-gachle" v-bind:columns="gridVLyDoHuyHDTB.headers"
+                      v-bind:dataSource="gridVLyDoHuyHDTB.data" :showColumnCheckbox="false"
+                      :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                      :enabled-select-first-row="true"></DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">
+        <div class="row">
+          <div class="col-md-4">Danh sách thuê bao thay đổi dịch vụ</div>
+          <div class="col-md-2">
+            <div class="list-checks red normal pt-1">
+              <div class="item red">
+                <div class="check-action">
+                  <input type="radio" class="check" name="LoaiPhieu" @change="onChange($event)"
+                         v-model="frmDanhSachTBTDDV.loaiPhieu"
+                         value="rdoPhieuMoi">
+                  <span class="name" style="font-weight: 600 !important;">Phiếu mới</span>
+                </div>
+              </div>
+              <div class="item red">
+                <div class="check-action">
+                  <input type="radio" class="check" name="LoaiPhieu" @change="onChange($event)"
+                         v-model="frmDanhSachTBTDDV.loaiPhieu"
+                         value="rdoPhieuTra">
+                  <span class="name" style="font-weight: 600 !important;">Phiếu trả lại</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="info-row">
+              <div class="key nowrap">
+                <div class="check-action">
+                  <input type="checkbox" class="check" v-model="chkTimKiem.checked" @change="chkTimKiem_CheckedChanged">
+                  <span class="name">Tìm kiếm</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <Select2 ref="LoaiDVTKID" :disabled='cboLoaiDVTK.disable' v-model="cboLoaiDVTK.value"
+                           :options="cboLoaiDVTK.list" :settings="settingSelect2"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="info-row">
+              <div class="key nowrap">
+                Đơn vị
+              </div>
+              <div class="value" v-bind:class="{ disabled: cboDViTimKiem.disable}">
+                <ComboboxGridExt :valueField="cboDViTimKiem.valueField" :textField="cboDViTimKiem.textField"
+                                 v-model="cboDViTimKiem.selectDViTimKiem" :value="cboDViTimKiem.selectDViTimKiem"
+                                 :columns="cboDViTimKiem.headers"
+                                 :panelDataHeight="cboDViTimKiem.panelDataHeight" :enabledSelectFirstRow="false"
+                                 :dataSource="cboDViTimKiem.data">
+                </ComboboxGridExt>
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+      <div class="table-content">
+        <DataGrid ref="gview_DanhSach" class="table-result table-gachle" v-bind:columns="gview_DanhSach.headers"
+                  v-bind:dataSource="gview_DanhSach.data" :showColumnCheckbox="true"
+                  :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                  :selectionSettings="gview_DanhSach.selectionOptions"
+                  @selectedItemsChanged="gview_DanhSach_SelectedItemsChanged"
+                  :enabled-select-first-row="false"
+                  @rowClicked="gview_DanhSach_SelectRow"
+                  @queryCellInfo="customiseCell"
+                  @actionComplete="selectRowsChon"
+                  @selectedRowChanged="gview_DanhSach_selectedRowChanged"></DataGrid>
+      </div>
+    </div>
+  </div>
+  <ThongTinHenKhachHangModal ref="ThongTinHenKhachHangModal" :hdkh_id="this.hdkh_id"
+                             :quyenduoc_hen="this.quyen_duoc_hen"/>
+  <ChuyenTo ref="popupChuyenTo" @closeChuyenTo="closePopupChuyenTo"></ChuyenTo>
+  <ExportDataModal ref="exportDataModal" :data="this.gview_DanhSach.data"></ExportDataModal>
+  <b-modal
+    v-model="showModalTraphieu"
+    modal-class="traphieu"
+    header-class="popup-header"
+    content-class="traphieu-content"
+    body-class="none-padding traphieu-body"
+    size="xl"
+    title="Trả phiếu"
+    hide-footer
+  >
+    <traphieu :ngaytra="modelTraPhieu.ngaytra" :ngaygiao="modelTraPhieu.ngaygiao"
+              :ma_gd="modelTraPhieu.matb" :nhanvien_id="modelTraPhieu.nhanvienId"
+              :ma_tb="modelTraPhieu.matb" :kieu="modelTraPhieu.kieugoiId"
+              :loaihd_id="modelTraPhieu.loaihdId" :dichvuvt_id="modelTraPhieu.dichvuvtId" />
+  </b-modal>
+
+  <tonPhieu ref="popupTonPhieu" @close="closePopupTonPhieu" :trangthaiId="this.tthd_id" :phieuId="this.phieu_id"/>
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="giaoPhieuNhanVien"
+              :header='"Giao phiếu nhân viên"' showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <giaophieunhanvien @giaoviec_success="giaoviec_success()" ref="formgiaphieu" :ngaygiao="modelGiaoViec.ngaygiao"
+                       :nguoigv_id="this.modelGiaoViec.nguoigv_id" :phieu_id="modelGiaoViec.phieu_id"
+                       :hdtb_id="modelGiaoViec.hdtb_id" :ma_tb="modelGiaoViec.ma_tb" :huonggiao_id="null"/>
+  </ejs-dialog>
+
+  <DoiNeHNI ref="popupDoiNeHNI" :ma_tb="frmThongTinPhieuYc.txtMaTB.trim()" :hdtb_id="this.hdtb_id"
+            :sone_cu="this.frmThongTinPhieuYc.txtNeCu.trim()" @popupDoiNeClosed="popupDoiNeClosed"></DoiNeHNI>
+  <VatTuThueBao ref="popupVatTuThueBao" :input-data="modelVatTu"/>
+  <DuAnHDTB ref="popupDuAnHDTB" :vhdtb_id="this.hdtb_id"/>
+  <ThayDoiLyDoHuy ref="popupThayDoiLyDoHuy" :input-data="modelThayDoiLyDoHuy" @success="CapNhatLyDoHuyThanhCong"/>
+  <KetQuaDoKiem ref="popupKetQuaDoKiem" :vhdtb_id="this.hdtb_id"/>
+  <TCThongTinNo ref="popupTCThongTinNo"/>
+  <TraCuuThongSoKTModal ref="traCuuThongSoKTModal" :hdtb_id="this.hdtb_id" :dichvuvt_id="Number.parseInt(this.dichvuvt_id)"
+                        :ma_tb="this.frmThongTinPhieuYc.txtMaTB.trim()" :kieu="1" :thuebao_id="this.thuebao_id"/>
+
+  <b-modal
+    body-class="none-padding"
+    size="hosodientu-size"
+    ref="hosodientu"
+    title="Upload hồ sơ"
+    hide-footer
+  >
+    <component :is="popupComponent" ref="generalPopup" :isCA="true" :txtMaGD="frmThongTinPhieuYc.txtMaGD" :ma_thue_bao="frmThongTinPhieuYc.txtMaTB" tag="1"
+               isPopup="true"></component>
+  </b-modal>
+
+  <CapVatTuTB ref="popupVatTuTB" :input-data="modelVatTu2"/>
+
+  <InBienBan ref="popupInBB" :params="modelIn"/>
+
+  <ejs-dialog
+    :isModal="true"
+    :enableResize="true"
+    :resizeHandles="['All']"
+    :visible="false"
+    ref="GiaoPhieuView"
+    :header='"Giao phiếu điều hành thi công"'
+    showCloseIcon="true"
+    target=".main-wrapper"
+    width="90%"
+    allowDragging="true"
+    :animationSettings="animationSettings"
+    @close="GiaoPhieuView_OnClose"
+  >
+    <div>
+      <GiaoPhieuView v-if="giaoPhieuViewDialog.isVisiable" type="modal"  v-bind="giaoPhieuViewDialog.input" />
+    </div>
+  </ejs-dialog>
+  <CreateIssue ref="dialogCreateIssue"/>
+</div>

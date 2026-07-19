@@ -1,0 +1,344 @@
+<div class="box-form">
+        <div class="legend-title">THÔNG TIN KẾT NỐI</div>
+        
+        <div class="title-bg-main">
+            <span class="title">Thiết bị nguồn</span>
+        </div>
+        <div class="row">
+            <div class="col-sm-10 col-12">
+                <div class="info-row">
+                    <div class="key w100">Tên thiết bị</div>
+                    <div class="value">
+                        <input type="text" v-model="form.ten_tbi_nguon" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w100">Vị trí port</div>
+                    <div class="value">
+                        <input type="text" v-model="'#'+form.port_DsLam.vitri" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2 col-12" >
+                <div class="title fw6 marb5">Trạng thái cổng kết nối</div>
+                <div class="list-checks-ver" :class="{'disable-btn': form.edit}">
+            
+                   <div class="item marb5">
+                        <div class="check-action">
+                            <input type="radio" name="rd1" class="check"                             
+                              value='1' v-model="form.connect">
+                            <span class="name">Uplink</span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="check-action">
+                            <input type="radio" name="rd1" class="check" 
+                              value='2'
+                              v-model="form.connect">
+                            <span class="name">Downlink</span>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <div class="title-bg-main mart10">
+            <span class="title">Thiết bị đích</span>
+        </div>
+        <div class="info-row">
+            <div class="key w100">Hướng kết nối</div>
+            <div class="value">
+                <div class="select-custom">
+                    <SelectExt v-model="huong_kn"
+                     :disabled="form.edit"
+                     :dataSource="dsHuongKetNoi" 
+                    dataTextField="LOAI_TBI"
+                    dataValueField="LOAITBI_ID" @change="onChangeHuongKN()"/>
+                </div>
+            </div>
+        </div>
+        <div id='divDslam' v-show="huong_kn==1">
+        <div class="info-row">
+            <div class="key w100">Tên thiết bị</div>
+            <div class="value">               
+                <div class="select-custom" :class="{'disable-btn': form.edit}" id="ccbTbi" @click="convertData">
+                    <ComboboxGrid ref="thiet-bi-dslam" 
+                    v-bind:columns="[
+                    {fieldName: 'TENDSLAM', headerText: 'Tên thiết bị', allowFiltering: true},
+                    {fieldName: 'TRAMTBI', headerText: 'Trạm thiết bị', allowFiltering: true},
+                    {fieldName: 'TO_KT', headerText: 'Tổ kỹ thuật', allowFiltering: true},
+                    ]" v-bind:dataSource="dsThietBiDsLam"
+                     textField="TENDSLAM"
+                     valueField="DSLAM_ID"                    
+                     @selectedChanged="thietBiDsLam_selectedChanged"
+                     ></ComboboxGrid>
+                </div>      
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w100">Card điều khiển</div>
+            <div class="value">
+                <div class="select-custom">
+                    <SelectExt v-model="dslam.cardDsl_id" 
+                    :dataSource="dslam.dsCardDsl"
+                     dataTextField="TEN_CARD"
+                    dataValueField="CARDDSL_ID" 
+                    :disabled="form.edit"
+                    @change="onChangeCardDsl()"/>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w100">
+                <div class="check-action">                  
+                    <input type="radio" class="check" value="1" v-model="dslam.card_dslam">
+                    <span class="name">Port</span>
+                </div>
+            </div>
+            <div class="value">
+                <div class="select-custom">
+                    <SelectExt v-model="dslam.port_id"
+                    :disabled="dslam.card_dslam!=1 ||form.edit"
+                    :dataSource="dslam.dsPort" dataTextField="VITRI"
+                    dataValueField="PORTVL_ID"/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-7 col-12">
+                <div class="info-row">
+                    <div class="key w100">
+                        <div class="check-action">
+                            <input type="radio" class="check" value="2" 
+                            v-model="dslam.card_dslam">
+                            <span class="name">Module</span>
+                        </div>
+                    </div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <SelectExt v-model="dslam.module_id" 
+                            :disabled="dslam.card_dslam!=2 || form.edit"
+                    :dataSource="dslam.dsModule" dataTextField="LOAI_MODULE"
+                    dataValueField="MODULEDSL_ID" @change="onChangeModuleDsl()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5 col-12">
+                <div class="info-row">
+                    <div class="key w50">
+                        Port
+                    </div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <SelectExt v-model="dslam.port_module"
+                            :disabled="dslam.card_dslam!=2 || form.edit"
+                             :dataSource="dslam.dsPort_Module"
+                              dataTextField="VITRI"
+                             dataValueField="PORTVL_ID"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w100">
+                Mã kết nối
+            </div>
+            <div class="value">
+                <input type="text" class="form-control" v-model="dslam.ma_ketnoi">
+            </div>
+        </div>
+        </div>
+
+        <div id='divSwitch' v-show="huong_kn==2">
+            <div class="info-row">
+                <div class="key w100">Tên thiết bị</div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model="switch_.thietbi_d_id" 
+                        :dataSource="dsThietBiSwitch"
+                         dataTextField="TENDSLAM"
+                        dataValueField="DSLAM_ID"
+                        :disabled="form.edit"
+                         @change="onChangeThietBiSwich()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">
+    
+                        <span class="name">Port</span>
+               
+                </div>
+                <div class="value">
+                    <div class="select-custom">
+                 <SelectExt v-model.trim="switch_.port_id" 
+                    :dataSource="switch_.dsPort"
+                    :disabled="form.edit" 
+                    dataTextField="VITRI"
+                    dataValueField="PORTVL_ID"/>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">
+                    Mã kết nối
+                </div>
+                <div class="value">
+                    <input type="text" v-model="switch_.ma_ketnoi" class="form-control">
+                </div>
+            </div>
+           
+        </div>
+
+        <div id='divGpon' v-show="huong_kn==3">
+            <div class="info-row">
+                <div class="key w100">Tên thiết bị</div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model="gpon.thietbi_d_id" 
+                        :disabled="form.edit"
+                        :dataSource="dsThietBiGpon" dataTextField="TENDSLAM"
+                        dataValueField="DSLAM_ID" @change="onChangeThietBiGpon()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">Card điều khiển</div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model.trim="gpon.cardGpon_id" 
+                        :disabled="form.edit"
+                        :dataSource="gpon.dsCardGpon" dataTextField="TEN_CARD"
+                        dataValueField="CARDGP_ID" @change="onChangeCardGpon()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">
+                        <span class="name">Port</span>
+                </div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model.trim="gpon.port_id" 
+                    :dataSource="gpon.dsPort"
+                    :disabled="form.edit" 
+                    dataTextField="VITRI"
+                    dataValueField="PORTVL_ID"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="key w100">
+                    Mã kết nối
+                </div>
+                <div class="value">
+                    <input type="text" v-model="gpon.ma_ketnoi" class="form-control">
+                </div>
+            </div>
+           
+        </div>
+
+        <div id='divMane' v-show="huong_kn==17">
+            <div class="info-row">
+                <div class="key w100">Tên thiết bị</div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model="mane.thietbi_d_id" 
+                        :dataSource="dsThietBiMane"
+                         dataTextField="TENDSLAM"
+                         dataValueField="DSLAM_ID"
+                        :disabled="form.edit"
+                         @change="onChangeThietBiMane()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">Card điều khiển</div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model="mane.cardMane_id" 
+                        :dataSource="mane.dsCardMane"
+                         dataTextField="TEN_CARD"
+                         dataValueField="CARDMANE_ID"
+                         :disabled="form.edit"
+                         @change="onChangeCardMane()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">
+                    <div class="check-action">                  
+                        <input type="radio" class="check" value="1" v-model="mane.card_mane">
+                        <span class="name">Port</span>
+                    </div>
+                </div>
+                <div class="value">
+                    <div class="select-custom">
+                        <SelectExt v-model="mane.port_id" 
+                        :disabled="mane.card_mane!=1 || form.edit"
+                        :dataSource="mane.dsPort" dataTextField="VITRI"
+                        dataValueField="PORTVL_ID"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="radio" class="check" value="2" v-model="mane.card_mane">
+                                <span class="name">Module</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="mane.module_id"
+                                :disabled="mane.card_mane!=2 || form.edit"
+                                 :dataSource="mane.dsModule" 
+                                 dataTextField="LOAI_MODULE"
+                                  dataValueField="MODULEMANE_ID"
+                                   @change="onChangeModuleMane()"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                        <div class="key w50">
+                            Port
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="mane.port_module"
+                                 :disabled="mane.card_mane!=2 || form.edit"
+                                 :dataSource="mane.dsPort_Module"
+                                  dataTextField="VITRI"
+                                 dataValueField="PORTVL_ID"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w100">
+                    Mã kết nối
+                </div>
+                <div class="value">
+                    <input type="text" v-model="mane.ma_ketnoi" class="form-control">
+                </div>
+            </div>
+           
+        </div>
+
+        <div class="group-button -bottom">
+            <button class="btn btn-second" @click="ketNoi()" 
+                    :disabled="form.view==0||form.edit">
+                <span class="f20 lh20 inline vcenter one-save"></span> Kết nối
+            </button>
+            <button class="btn btn-second" @click="goKetNoi()" :disabled="form.view==0||!form.edit">
+                <span class="f20 lh20 inline vcenter ui-1_simple-remove"></span> Gỡ kết nối
+            </button>
+        </div>
+    </div>

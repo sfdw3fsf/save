@@ -1,0 +1,399 @@
+<div class="main-wrapper">
+    <!-- <breadcrumb :header="header" /> -->
+    <div class="main-title">OB NHÂN CÔNG</div>
+    <div class="list-actions-top" style="position: relative;">
+        <ul class="list">
+            <li title="Lấy thông tin" :class="{'disabled': !btnStatus.btnLayttEnabled}">
+                <a href="#" @click="listData()"><span class="icon one-reload1"></span>Lấy TT</a>
+            </li>
+            <li title="Ghi lại thông tin" :class="{'disabled': !btnStatus.btnCapnhatObEnabled}">
+                <a href="#" @click="saveData()"><span class="icon one-save"></span>Ghi lại</a>
+            </li>
+            <!-- <li title="Thực hiện Outbound" :class="{'disabled': !btnStatus.btnOutboundEnabled}">
+                <a href="#" @click="outBound()"><span class="icon one-phone"></span>Outbound
+                    Call</a>
+            </li> -->
+            <!-- media-2_headphones-mic nc-icon-glyph --- icon headphone-->
+            <li title="Agent" class="combo-right custom-li" style="float: right;">
+                <ejs-combobox id="Reading" ref="Reading" v-model="selectedReading" :dataSource="ReadingData"
+                    :fields="ReadingFields" :placeholder="ReadingWaterMark" style="width: 150px;"
+                    :enabled="btnStatus.isCboReadingEnabled" @change="onCboReadingChange"></ejs-combobox>
+            </li>
+            <li v-if="isConnected" class="combo-right custom-li" style="float: right;margin-right: 20px;">
+                <!-- <span style="color: green;">Đã kết nối</span> -->
+                <span
+                    style="color: rgb(255, 255, 255); background-color: rgb(60, 9, 243); padding: 5px 10px; border-radius: 20px; font-weight: bold;">Đã
+                    kết nối</span>
+            </li>
+            <li v-else class="combo-right custom-li" style="float: right; margin-right: 20px;">
+                <span
+                    style="color: rgb(255, 255, 255); background-color: rgb(243, 9, 60); padding: 5px 10px; border-radius: 20px; font-weight: bold;">
+                    Chưa sẵn sàng kết nối
+                </span>
+            </li>
+            <li title="AgentIpcc" class="combo-right custom-li" style="float: right;margin-right: 20px;">
+                <!-- Combobox -->
+                <ejs-combobox id="UserIPCC" ref="UserIPCC" v-model="selectedUser" :dataSource="UserCallData"
+                    :fields="UserCallFields" :placeholder="UserCallWaterMark" style="width: 150px;"
+                    @focus="openPopup()"></ejs-combobox>
+
+            </li>
+            <!-- :v-model="selectedUser" -->
+            <!-- Dialog -->
+            <el-dialog :visible.sync="dialogVisible" :modal="false" style="width: 50%; margin: 0 auto;"
+                title="Chọn agent Outbound">
+                <!-- Grid có 3 cột -->
+                <el-table :data="userData" style="width: 100%">
+                    <el-table-column prop="user_ipcc" label="User IPCC" width="100">
+                    </el-table-column>
+                    <el-table-column prop="line" label="Line" width="100">
+                    </el-table-column>
+                    <!-- Cột với Switch button -->
+                    <el-table-column label="Login/Logout" width="150">
+                        <!-- Sử dụng scope slot để thêm nút switch vào cuối mỗi dòng -->
+                        <template v-slot="scope">
+                            <el-switch v-model="switchStates[scope.$index]"
+                                @change="chonUserOB(scope.row, switchStates[scope.$index])"></el-switch></el-switch>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-dialog>
+        </ul>
+    </div>
+
+    <div class="page-content">
+        <div class="nav tabs tab-over">
+            <a href="#tab1" data-toggle="tab" @click.prevent="changeTab(1)" :class="{active: currentTab==1}">OB nhân
+                công (F2)</a>
+            <a href="#tab2" data-toggle="tab" @click.prevent="changeTab(2)" :class="{active: currentTab==2}">Tra cứu
+                (F3)</a>
+        </div>
+        <div class="tab-content bor0  pad0" style="box-shadow: none;">
+            <div class="tab-pane" :class="{active: currentTab==1}">
+                <div class="box-form padt8 padb8">
+                    <div class="legend-title">Thông tin Outbount</div>
+                    <div class="row">
+                        <div id="boxLeft" class="box-col col-sm-12 col-12">
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Tập Outbound nhân công</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="cboTapOb.value"
+                                                    :dataSource="cboTapOb.dataSource" :allowFiltering="true"
+                                                    :fields="{ value: 'tapob_id', text: 'ten_tapob'}"
+                                                    @change="onDropdownChangeTenTapOb">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Từ ngày</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker id="datepicker" v-model="txttungay"
+                                                    :value="tungay.value" style="background: white; color: #495057"
+                                                    :format="tungay.format">
+                                                </ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Đến ngày</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker id="datepicker" v-model="txtdenngay"
+                                                    :value="denngay.value" style="background: white; color: #495057"
+                                                    :format="denngay.format"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--  -->
+                            <div class="main-title"></div> <!--  xuống 1 hàng -->
+
+                            <div class="row">
+                                <div class="box-col col-sm-6 col-12">
+                                    <div class="box-form">
+                                        <div class="row">
+                                            <div class="legend-title">Thông tin OB</div>
+                                            <!-- Gọi component con và lắng nghe sự kiện từ nó -->
+
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">SĐT TT</div>
+                                                    <div class="value">
+                                                        <!-- <select2 v-model="listbox.dichvu_vt.value" class="select-custom" :options="listbox.dichvu_vt.list.map(dv=>({id:dv.dichvuvt_id*1,text:dv.ten_dvvt}))"></select2> -->
+                                                        <input type="text" class="form-control text fw6"
+                                                            :value=txtSdttt>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">Các SĐT KH</div>
+                                                    <div class="value">
+                                                        <input type="text" class="form-control text fw6"
+                                                            v-model="txtSdtkh">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">Các SĐT TB</div>
+                                                    <div class="value">
+                                                        <input type="text" class="form-control text fw6"
+                                                            :value=txtSdttb>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">D/S thanh toán</div>
+                                                    <div class="value">
+                                                        <textarea class="form-control text fw6" :value=txtDstt
+                                                            rows="5"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">D/S khách hàng</div>
+                                                    <div class="value">
+                                                        <textarea class="form-control text fw6" :value=txtDskh
+                                                            rows="5"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-col col-sm-6 col-12">
+                                    <div class="box-form">
+                                        <div class="row">
+                                            <div class="legend-title">Cập nhật kết quả OB</div>
+                                            <div class="col-sm-5 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">SĐT OB</div>
+                                                    <div class="value">
+                                                        <!-- <div class="input-more-button">
+                                                            <button class="btn">
+                                                                <span class="icon one-phone"
+                                                                    :disabled="!btnStatus.btnOutboundEnabled || !isValidPhone"
+                                                                    :class="{'disabled': !btnStatus.btnCallEnabled || !isValidPhone}"
+                                                                    @click="makeCall" title="Call"></span>
+                                                            </button>
+                                                            <input type="text" class="form-control text fw6"
+                                                                v-model="phoneNumberOb"
+                                                                @input="validatePhoneNumber"
+                                                                style="width: 100px;">
+                                                        </div> -->
+                                                        <div class="input-more-button">
+                                                            <button class="btn"
+                                                                :disabled="!btnStatus.btnOutboundEnabled || !btnStatus.btnCallEnabled"
+                                                                :class="{'disabled': !btnStatus.btnCallEnabled}">
+                                                                <span class="icon one-phone" @click="makeCall"
+                                                                    title="Call"></span>
+                                                            </button>
+                                                            <input type="text" class="form-control text fw6"
+                                                                v-model="phoneNumberOb" @input="validatePhoneNumber"
+                                                                style="width: 100px;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-7 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w120">Đầu số gọi OB</div>
+                                                    <div class="value">
+                                                        <ejs-combobox Id='Dauso' :dataSource='DausoData'
+                                                            v-model="Dauso_Id" :fields='DausoFields'
+                                                            :placeholder='DausoWaterMark'></ejs-combobox>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w100">TT kết nối</div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <ejs-dropdownlist locale="vi-VN"
+                                                                v-model="cboThongtinKetnoi.value"
+                                                                :dataSource="cboThongtinKetnoi.dataSource"
+                                                                :allowFiltering="true" @change="getDsKetquaOB"
+                                                                :fields="{ value: 'ttkn_id', text: 'trangthai_kn'}">
+                                                            </ejs-dropdownlist>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w100">Kết quả OB</div>
+                                                    <div class="value">
+                                                        <ejs-combobox Id='KetquaOb' :dataSource='KetquaObData'
+                                                            v-model="KetquaOb_Id" :fields='KetquaObFields'
+                                                            :placeholder='KetquaObWaterMark'
+                                                            @change="onComboBoxChangeKqOb">
+                                                        </ejs-combobox>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w100">Ghi chú</div>
+                                                    <div class="value">
+                                                        <textarea class="form-control text fw6" v-model="txtGhichu"
+                                                            placeholder='Nhập thông tin ghi chú' rows="2"
+                                                            style="font-style: italic;"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KHai báo grid -->
+
+                    <ThongTinKHOBNC ref="refListOBNC" @sdt_thanhtoan="receiveDataKH" />
+
+
+                </div>
+            </div> <!--đóng tab1  -->
+
+            <div class="tab-pane" :class="{active: currentTab==2}">
+                <div class="box-form padt8 padb8">
+                    <div class="legend-title">Thông tin phân giao</div>
+                    <div class="row">
+                        <div id="boxLeft" class="box-col col-sm-12 col-12">
+                            <div class="row">
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Tra cứu theo</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist locale="vi-VN" v-model="cboTracuuOb.value"
+                                                    :dataSource="cboTracuuOb.dataSource" :allowFiltering="true"
+                                                    :fields="{ value: 'doituong_id', text: 'ten_doituong'}"
+                                                    @change="onDropdownChangeTracuuOb">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="value">
+                                            <div class="input-more-button">
+                                                <button class="btn" @click="SearchDanhBa">
+                                                    <span class="-ap icon-more_horiz"></span>
+                                                </button>
+
+                                                <input type="text" class="form-control highlight text fw6"
+                                                    v-model="thongtinTracuu" ref="thongtinTracuu"
+                                                    v-on:keyup.enter="onEnter" />
+                                                <!-- <PopupTracuuTb :isPopup="true" v-if="showPopup"
+                                                    @close="showPopup = false" /> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <ejs-dialog :enableResize="true" :visible="false" :position="position"
+                                    ref="searchAccountDialog"
+                                    target="#app" width="80%" height="800" top="100" class="searchAccount-popup-dlg">
+                                    <div class="searchAccount-popup popupBody">
+                                        <searchAccount :isPopup="true" @form-close="searchAccountDialogClose" />
+                                    </div>
+                                    <!-- :header="'Tra cứu danh bạ'" showCloseIcon="true" -->
+                                </ejs-dialog>
+
+                                <ejs-dialog :enableResize="true" :visible="false" :position="position"
+                                    ref="ChangeServiceDialog" :header="'Thay đổi thông tin'" showCloseIcon="true"
+                                    target="#app" width="80%" height="800" top="100" class="searchAccount-popup-dlg">
+                                    <div class="searchAccount-popup popupBody">
+                                        <ChangeService :isPopup="true" @form-close="ChangeServiceDialogClose" />
+                                    </div>
+                                </ejs-dialog>
+                                <!-- :ma_tb="ma_tb" :loaitb_id="loaitb_id"
+                                :ob_id="ob_id" :loai_ob="loai_ob" :matb_kt="matb_kt" -->
+                                <div class="col-sm-2 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Từ ngày</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker id="datepicker" v-model="tungayTracuu"
+                                                    :value="tungay.value" style="background: white; color: #495057"
+                                                    :format="tungay.format"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 col-12">
+                                    <div class="info-row marb0">
+                                        <div class="key w10 nowrap fw6">Đến ngày</div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker id="datepicker" v-model="denngayTracuu"
+                                                    :value="denngay.value" style="background: white; color: #495057"
+                                                    :format="denngay.format"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KHai báo grid -->
+                    <THONGTINTRACUU ref="refListTTTC" />
+                    <!-- <div class="box-form">
+                        <div class="legend-title">Thông tin tra cứu</div>
+                        <DataGrid class="table-result table-gachle" panelDataHeight="400" :columns="grdLichsuOB.header"
+                            :dataSource="grdLichsuOB.list" :enable-paging-server="false" :allowPaging="true"
+                            :showFilter="true" :showColumnCheckbox="true" :enabledSelectFirstRow="false"
+                            :defaultColumnCheckboxChecked="false" ref="grdLichsuOB" :allowExcelExport='true'
+                            @selectedItemsChanged="dataCheckedsGan($event)" /> -->
+                    <!-- <ejs-grid id="grdTBkhoiphuc" :dataSource="grdTBkhoiphuc.dataSource" :allowPaging='true' :allowSorting='true' :pageSettings="{ pageSize: 5 }" height="500px"> -->
+                    <!-- <ejs-grid :dataSource="grdTBkhoiphuc" :detailInit="detailInit" :detailDataBound="detailDataBound" 
+                                  :allowPaging="true" 
+                                  :pageSettings="{ pageSize: 10 }" height="500px">
+                            <e-columns>
+                                <e-column field='ma_tb' headerText='Mã TB' textAlign='left' width=160 allowFiltering='true'></e-column>
+                                <e-column field='ten_tb' headerText='Tên TB' textAlign='left' width=140 allowFiltering='true'></e-column>
+                                <e-column field='loai_tb' headerText='Loại TB' textAlign='left' width=160></e-column>
+                                <e-column field='diachi_ld' headerText='Tên TT' textAlign='left' width=160></e-column>
+                                <e-column field='ma_nvcs' headerText='Mã NVCS' textAlign='left' width=160></e-column>
+                                <e-column field='ten_nvcs' headerText='Tên NVCS' textAlign='left' width=160></e-column>
+                                <e-column field='phong_nvcs' headerText='Phòng NVCS' textAlign='left' width=160></e-column>
+                                <e-column field='sdt_ob' headerText='SĐT OB' textAlign='left' width=160></e-column>
+                                <e-column field='tap_ob' headerText='Tập OB' textAlign='left' width=160></e-column>
+                                <e-column field='ketqua_ob' headerText='Kết quả OB' textAlign='left' width=160></e-column>
+                                <e-column field='ghichu' headerText='Ghi chú' textAlign='left' width=160></e-column>
+                                <e-column field='ngaygoi_ob' headerText='Ngày gọi OB' textAlign='left' width=160></e-column>
+                                <e-column field='ngayhen_lienlac' headerText='Ngày hẹn liên lạc' textAlign='left' width=160></e-column>
+                                <e-column field='ma_gd' headerText='Mã GD' textAlign='left' width=160></e-column>
+                                <e-column field='loai_hd' headerText='Loại HĐ' textAlign='left' width=160></e-column>
+                            </e-columns>
+                        </ejs-grid> -->
+
+                    <!-- </div> -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

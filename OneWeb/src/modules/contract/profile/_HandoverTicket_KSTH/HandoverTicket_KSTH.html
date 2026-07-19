@@ -1,0 +1,318 @@
+<div v-bind:class="[isPopup != true ? 'main-wrapper' : '', '']">
+    <breadcrumb :header="header" v-if="isPopup != true"/>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="TimTTHS">
+                    <span class="icon one-file-attach1"></span>Lấy TT
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon one-file-back"></span>Trả phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Xác nhận
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="ThemFile" :class="{'disabled':(isThemFile || !(gridbox.bohoso.value && gridbox.bohoso.value.trangthai_hs && gridbox.bohoso.value.trangthai_hs.toLower().indexOf('mới')>=0))}">
+                    <span class="icon nc-icon-glyph ui-1_circle-add"></span>Thêm file
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="XoaFile" :class="{'disabled':isThemFile || cant_delete }">
+                    <span class="icon nc-icon-glyph ui-1_circle-add"></span>Xoá file
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon one-book1"></span>Hướng dẫn
+                </a>
+            </li>
+            
+            
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="grid-stack-box">
+            <div class="box-col" id="boxLeft">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="box-form">
+                            <div class="legend-title">Các thông tin về bộ hồ sơ</div>
+                            <div class="title-bg-main">Thông tin tìm kiếm</div>
+                            <div class="info-row">
+                                <div class="key">
+                                    Kiểu giao
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" v-model="listbox.kieugiao_hs.value" class="form-control">
+                                            <option :value="kg.ID" v-for="kg in listbox.kieugiao_hs.list">{{kg.NAME}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key">
+                                            Số lô HS
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select v-if="listbox.lo_hs.list && listbox.lo_hs.list.count>0" class="form-control" v-model="listbox.lo_hs.value">
+                                                    <option :value="hs.ID" v-for="hs in listbox.lo_hs.list">{{ hs.NAME }}</option>
+                                                </select>
+                                                <input v-if="!(listbox.lo_hs.list && listbox.lo_hs.list.count>0)" type="text" class="form-control" v-model="listbox.lo_hs.value" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key  w80">
+                                            Mã KH/GD
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control highlight">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key">
+                                            Đơn vị giao
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select name="" id="" v-model="listbox.donvigiao.value" class="form-control">
+                                                    <option :value="dv.ID" v-for="dv in listbox.donvigiao.list">{{dv.NAME}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">
+                                            Trạng thái
+                                        </div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <select name="" id="" class="form-control" v-model="listbox.trangthai_ph.value">
+                                                    <option :value="ph.ID" v-for="ph in listbox.trangthai_ph.list">{{ ph.NAME }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key">
+                                            <div class="check-action">
+                                                <input type="checkbox" class="check" v-model="searchDate.isEnabled">
+                                                <span class="name">Giao từ ngày</span>
+                                            </div>
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <flat-pickr class="form-control" :config="searchDate.dateconfig" v-model="searchDate.fromDate" :disabled="!searchDate.isEnabled" />
+                                                <span class="icon one-calendar"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key  w80">
+                                            Đến ngày
+                                        </div>
+                                        <div class="value">
+                                            <div class="input-icon-right">
+                                                <flat-pickr class="form-control" :config="searchDate.dateconfig" v-model="searchDate.toDate" :disabled="!searchDate.isEnabled" />
+                                                <span class="icon one-calendar"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="title-bg-main">
+                                <span class="title">Thông tin bộ hồ sơ</span>
+                                <div class="check-action marl10">
+                                    <input type="checkbox" class="check">
+                                    <span class="name">Tự động chọn cùng lô</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key">
+                                            Số lô HS
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="gridbox.bohoso.value.malo_hs">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key  w80">
+                                            Mã KH
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="gridbox.bohoso.value.ma_kh">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key">
+                                            Trạng thái
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="gridbox.bohoso.value.trangthai_hs">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key  w80">
+                                            Tên KH
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="gridbox.bohoso.value.ten_kh">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key">
+                                            Đơn vị giao
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="gridbox.bohoso.value.dv_giao">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key  w80">
+                                            Mã GD
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="gridbox.bohoso.value.ma_gd">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key">
+                                    Nội dung trả
+                                </div>
+                                <div class="value">
+                                    <textarea name="" class="form-control" style="height:62px;resize:none" id="" cols="30" rows="10" v-model="gridbox.bohoso.value.nd_tra_con"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="box-form" style="height: 490px;">
+                            <div class="legend-title">Chi tiết bộ hồ sơ</div>
+                            <gridview id="table2" :datalist="gridbox.filehoso.list" :headers="gridbox.filehoso.header" v-bind:flcol="false" @recordChange="grdFileHSChanged" v-bind:checkheader="true" lastcoltemplate="1"></gridview>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">Danh sách bộ hồ sơ</div>
+                    <gridview id="table1" :datalist="gridbox.bohoso.list" :headers="gridbox.bohoso.header" v-bind:flcol="false" @recordChange="grdBoHSChanged" v-bind:checkheader="true" :lastcoltemplate="0"></gridview>
+                </div>
+            </div>
+            <div class="box-col box-form padt5" id="boxRight">
+                <div class="legend-title padb2">
+                    <div class="pull-left">
+                        <span class="title inline vcenter">Thông tin file</span>
+                        <button class="btn btn-second" @click.prevent="RefreshFileHS">
+                            <span class="one-reload"></span> Làm mới
+                        </button>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#" class="red btn f20 lh20" @click.prevent="CAPNHAT_FILE" :class="{'disabled':!isThemFile}">
+                            <span class="-ap icon-arrow-right3"></span>
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Nhóm file</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select name="" id="" class="form-control" v-model="listbox.nhomfile.value">
+                                <option :value="nf.ID" v-for="nf in listbox.nhomfile.list">{{ nf.NAME }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Loại File</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select name="" id="" class="form-control" v-model="listbox.loaifile.value">
+                                <option :value="lf.loaifile_id" v-for="lf in listbox.loaifile.list.filter(x=>x.nhomfile_id==listbox.nhomfile.value || !listbox.nhomfile.value)">{{ lf.loai_file }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Đường dẫn</div>
+                    <div class="value">
+                        <div class="input-more-button -right">
+                            <label class="btn" for="upload-file">
+                                <span class="-ap icon-more_horiz"></span>
+                                <input type="file" ref="files" class="hidden" id="upload-file" @change="UploadFileHoSo">
+                            </label>
+                            <input type="text" class="form-control highlight" v-model="fileHoSoURL">
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Ghi chú</div>
+                    <div class="value">
+                        <input type="text" class="form-control" v-model="ghiChu">
+                    </div>
+                </div>
+                <div class="title-bg-main">
+                    <div class="pull-left">
+                        <span class="title mart5">Danh sách thuê bao</span>
+                        <a href="#" class="btn btn-second pad2 lh20 button-not-bg marl10">
+                            <span class="nc-icon-outline arrows-1_refresh-69 f20"></span>
+                        </a>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#" class="btn btn-second pad2 lh20 button-not-bg marl10">
+                            <span class="nc-icon-outline ui-2_filter f20"></span>
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <gridview id="table3" :datalist="gridbox.hdthuebao.list" :headers="gridbox.hdthuebao.header" v-bind:flcol="false" @recordChange="grdHDTBChanged" v-bind:checkheader="true" lastcoltemplate="0"></gridview>
+            </div>
+        </div>
+    </div>
+</div>

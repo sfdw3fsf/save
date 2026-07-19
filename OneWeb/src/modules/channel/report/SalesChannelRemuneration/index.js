@@ -1,0 +1,2 @@
+import SalesChannelRemuneration from './SalesChannelRemuneration.vue'
+export default SalesChannelRemuneration

@@ -1,0 +1,185 @@
+<ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="popupNhapDieuChinh"
+    :animationSettings='animationSettings' showCloseIcon=true width='90%' :target='target' :header='"Nhập điều chỉnh"'>
+    <div class="">
+        <div class="list-actions-top" style="position: unset;">
+            <ul class="list" style="position: unset;">
+                <li @click="onClickTimKiem">
+                    <a>
+                        <span class="icon one-search"></span>Tìm kiếm
+                    </a>
+                </li>
+                <li @click="onClickLamMoi">
+                    <a>
+                        <span class="icon one-reload1"></span>Làm mới
+                    </a>
+                </li>
+
+                <li @click="onClickXacNhan">
+                    <a>
+                        <span class="icon one-save"></span>Xác nhận
+                    </a>
+                </li>
+                <li v-if="visibleGoChungTu" @click="onClickGoChungTu">
+                    <a>
+                        <span class="icon fa fa-close"></span>Gỡ chứng từ
+                    </a>
+                </li>
+
+                <label v-if="visibleNhapExcel" for="upload" class="btn">
+                    <span class="icon one-xlsx-import"></span>File Excel mẫu
+                    <input ref="fileInput" type="file" id="upload" style="display: none" @change="onChangeFile"
+                        accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                </label>
+
+                <li v-if="visibleFileMau" @click="tsbtnFileMau">
+                    <a>
+                        <span class="icon one-xlsx-import"></span>File Excel mẫu
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="box-form">
+            <div class="legend-title">
+                Tìm kiếm chứng từ
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">Số chứng từ</div>
+                        <div class="value">
+                            <input v-model="txtSoChungTu" type="text" class="form-control"
+                                @keyup.enter="soChungTuEnter">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w100">Mã lô hàng</div>
+                        <div class="value">
+                            <input v-model="txtMaLoHang" type="text" class="form-control" :readonly="true"
+                                @keyup.enter="maLoHangEnter">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w1000">Nội dung chứng từ</div>
+                        <div class="value">
+                            <input v-model="txtNoiDungChungTu" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w100">Đến kho</div>
+                        <div class="value">
+                            <SelectExt v-model.trim="txtDenKho" :dataSource="cboDenKho" dataTextField="TEN_KHO"
+                          dataValueField="KHO_ID" placeholder="Chọn kho"></SelectExt>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" @click="onClickCBTuNgayNgay">
+                                <span class="name">Từ ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :format="dateFormat"
+                                    v-model="txtTuNgay"></ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" @click="onClickCBDenNgay">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :format="dateFormat"
+                                    v-model="txtDenNgay"></ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="box-form">
+            <div class="legend-title">Kết quả tìm kiếm<map name=""></map></div>
+            <div class="table-content">
+                <DataGrid :columns="[{fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true},
+                  {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true},
+                  {fieldName: 'LOAI_CT', headerText: 'Loại chứng từ', allowFiltering: true},
+                  {fieldName: 'NGAY_CT', headerText: 'Ngày yêu cầu', allowFiltering: true},
+                  {fieldName: 'TIEN', headerText: 'Tiền', allowFiltering: true},
+                  {fieldName: 'KHO_GIAO', headerText: 'Từ kho', allowFiltering: true},
+                  {fieldName: 'KHO_NHAN', headerText: 'Đến kho', allowFiltering: true},
+                  {fieldName: 'ND_GIAO', headerText: 'Nội dung', allowFiltering: true}]" :showFilter="true"
+                    :showColumnCheckbox="false" dataKeyField="CHUNGTU_ID" :dataSource="grdChungTu"
+                    :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer="false"
+                    @selectedRowChanged="onChangeSelectedChungTu">
+                </DataGrid>
+            </div>
+        </div>
+
+        <div class="tabs nav tab-over">
+            <a href="#tab-1" style="min-width: 195px;" :class="{active:isTab1}" @click="changeTab(1)"
+                data-toggle="tab">Danh sách vật tư chứng từ đã chọn</a>
+            <a href="#tab-2" style="min-width: 195px;" :class="{active:isTab2}" @click="changeTab(2)"
+                data-toggle="tab">Danh sách vật tư thay đổi</a>
+            <a href="#tab-3" style="min-width: 195px;" :class="{active:isTab3}" @click="changeTab(3)"
+                data-toggle="tab">Danh sách vật tư đã chọn</a>
+        </div>
+        <div class="tab-content">
+            <div id="tab-1" class="tab-pane active" v-if="visibleTab1">
+                <div class="table-content">
+                    <DataGrid ref="grvChiTietVT" v-bind:columns="columnTab1" :showFilter="true"
+                        :showColumnCheckbox="false" @selectedRowChanged="onChangeSelectedChiTietVT"
+                        :dataSource="grdChiTietVT" :enabledSelectFirstRow="false" :allowPaging="true"
+                        :enablePagingServer="false" :editSettings='editSettings' dataKeyField="CTCT_ID"
+                        @cellSaved="editGridChiTietVT">
+                    </DataGrid>
+                </div>
+            </div>
+            <div id="tab-2" class="tab-pane" v-if="visibleTab2">
+                <div class="table-content">
+                    <DataGrid ref="grvChiTietDieuChinh" dataKeyField="CTCT_ID" v-bind:columns="columnTab2"
+                        :showFilter="true" :showColumnCheckbox="true" :dataSource="grdChiTietDieuChinh"
+                        :enabledSelectFirstRow="false" :allowPaging="true" :enablePagingServer="false"
+                        :editSettings='editSettings' @cellSaved="editGridChiTietDieuChinh"
+                        @commandClick="onGridDeleteClicked">
+                    </DataGrid>
+                </div>
+            </div>
+            <div id="tab-3" class="tab-pane" v-if="visibleTab3">
+                <div class="table-content">
+                    <DataGrid :columns="[
+                            {fieldName: 'LOHANG', headerText: 'Mã lô hàng', allowFiltering: true},
+                            {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true},
+                            {fieldName: 'MA_VT', headerText: 'Mã vật tư', allowFiltering: true, allowEditing: true},
+                            {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true},
+                            {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowEditing: true, type: 'number'},
+                            {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true},
+                            {fieldName: 'TIEN', headerText: 'Thành tiền', allowFiltering: true, allowEditing: true ,type: 'number'},
+                            {fieldName: 'LOAI_TBI', headerText: 'Loại thiết bị', allowFiltering: true},
+                            {fieldName: 'VATTU_ID', headerText:'', visible:false, isPrimaryKey:true}
+                        ]" ref="grvChiTietVT_v2" :showFilter="true" dataKeyField="VATTU_ID" :showColumnCheckbox="true"
+                        :dataSource="grdChiTietVT_2" :enabledSelectFirstRow="false" :allowPaging="true"
+                        :enablePagingServer="false" :editSettings='editSettings' @cellSaved="editGridChiTietVT_v2">
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</ejs-dialog>

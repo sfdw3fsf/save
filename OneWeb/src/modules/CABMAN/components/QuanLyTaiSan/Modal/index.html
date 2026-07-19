@@ -1,0 +1,189 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">Quản lý tài sản</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="javascript:void(0)" @click="onClickButtonNhapMoi">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="onClickButtonGhiLai">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin tài sản</div>
+                <div class="info-row">
+                    <div class="key w80">Dự án</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select v-model="duAnId" class="form-control" @change="onChangeComboDuAn">
+                                <option v-for="duAn in dsDuAn" :value="duAn.DUAN_ID">{{duAn.MA_CT}}: {{duAn.SOHIEU_CT}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="value w30 nowrap">
+                        <button class="btn btn-second" @click="onClickButtonChuyenDuAn">
+                            <span class="one-file-back-1 inline vcenter f16 normal"></span> Chuyển dự án
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Mã tài sản</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="maTaiSan" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Nguyên giá</div>
+                            <div class="value">
+                                <vue-numeric class="form-control" v-model="nguyenGia" :min="0" :minus="false" :separator="'.'"></vue-numeric>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Tên tài sản</div>
+                    <div class="value">
+                        <input type="text" class="form-control" v-model="tenTaiSan" />
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">TTVT</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select v-model="ttvtId" class="form-control">
+                                <option v-for="ttvt in dsTtvt" :value="ttvt.DONVI_ID">{{ttvt.TEN_DV}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend-title mart10">
+                    Tìm tài sản theo mã
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Tìm kiếm</div>
+                    <div class="value">
+                        <div class="input-more-button">
+                            <button class="btn" @click="onClickButtonTimTaiSan">
+                                <span class="one-search"></span>
+                            </button>
+                            <input type="text" class="form-control highlight" v-model="maTimKiem" v-on:keyup.enter="onEnterInputTimKiem">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách tài sản</div>
+                <table class="table-result table-gachle" id="table">
+                    <thead class="center">
+                        <tr>
+                            <th class="w20"></th>
+                            <th>Mã tài sản</th>
+                            <th>Tên tài sản</th>
+                            <th>Nguyên giá</th>
+                            <th>TTVT</th>
+                            <th class="w80"></th>
+                        </tr>
+                        <tr>
+                            <th class="w20"></th>
+                            <th>
+                                <div class="input-icon-right">
+                                    <input type="text" class="form-control">
+                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="input-icon-right">
+                                    <input type="text" class="form-control">
+                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="input-icon-right">
+                                    <input type="text" class="form-control">
+                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="input-icon-right">
+                                    <input type="text" class="form-control">
+                                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                </div>
+                            </th>
+                            <th class="w80"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="taiSan in tableDsTaiSan.data" 
+                            :class="{highlight: taiSan.TAISAN_ID == tableDsTaiSan.selected}" 
+                            @click="onClickRowDsTaiSan(taiSan.TAISAN_ID)">
+                            <td class="w20">
+                                <span v-if="taiSan.TAISAN_ID == tableDsTaiSan.selected" class="fa fa-play text-main"></span>
+                            </td>
+                            <td :class="{selected: taiSan.TAISAN_ID == tableDsTaiSan.selected}">{{taiSan.MA_TS}}</td>
+                            <td>{{taiSan.TEN_TS}}</td>
+                            <td>{{taiSan.GIA}}</td>
+                            <td>{{taiSan.TEN_DV}}</td>
+                            <td class="w80 center">
+                                <a href="javascript:void(0)" class="padt1 padb1 padl4 padr3 lh20 btn btn-main" @click="onClickButtonXoaTaiSan(taiSan.TAISAN_ID)">
+                                    <span class="-ap icon-close"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <bss-local-pagination :datasource="dsTaiSan" @change="onPageChangeDsTaiSan" />
+            </div>
+        </div>
+    </div>
+    <b-modal v-model="showModalXacNhanXoa" title="Thông báo" size="sm" @ok="okXoaTaiSan">        
+        <span>Bạn thật sự muốn xóa tài sản?</span>
+    </b-modal>
+    <b-modal id="modal-chuyen-duan" title="Chuyển dự án" ok-only @ok="okChuyenDuAn">
+        <div v-if="dsDuAn && dsDuAn.length > 0" class="select-custom">
+            <select v-model="duAnChuyenId" class="form-control">
+                <option v-for="duAn in dsDuAn" :value="duAn.DUAN_ID">{{duAn.MA_CT}}: {{duAn.SOHIEU_CT}}</option>
+            </select>
+        </div>
+        <div v-if="!dsDuAn || dsDuAn.length == 0">Chưa có danh mục dự án.</div>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="primary" style="color: white" @click="ok()">Xác nhận</b-button>
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy bỏ</b-button>
+        </template>
+    </b-modal>
+    <b-modal id="modal-chon-taisan" title="Chọn 1 tài sản để xem" ok-only @ok="okChonTaiSanTimKiem">
+        <div>Tìm thấy {{dsTaiSanTimKiem.length}} tài sản.</div>
+        <div v-for="taiSan in dsTaiSanTimKiem" style="padding-left: 20px">
+            <input type="radio" :id="taiSan.TAISAN_ID" :value="taiSan.TAISAN_ID" v-model="taiSanTimKiemSelected">
+            <label :for="taiSan.TAISAN_ID">[{{taiSan.SOHIEU_CT}}] {{taiSan.MA_TS}}</label>
+        </div>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="primary" style="color: white" @click="ok()">Xác nhận</b-button>
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy bỏ</b-button>
+        </template>
+    </b-modal>
+</b-modal>

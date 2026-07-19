@@ -1,0 +1,509 @@
+<div class="">
+    <div class="list-actions-top">
+        <div class="pull-left">
+            <ul class="list" style="overflow: visible !important; z-index: 99999;">
+                <li @click="TimKiem()">
+                    <a>
+                        <span class="icon one-search"></span>Lấy TT
+                    </a>
+                </li>
+                <li @click="TimKiemLichSu()">
+                    <a>
+                        <span class="icon one-search"></span>Tìm kiếm
+                    </a>
+                </li>
+                <li @click="NhapMoi()" :class="{'disabled': !Enabled.NhapMoi}" v-if="Visible.NhapMoi">
+                    <a data-toggle="tooltip" title="Nhập mới">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li @click="GhiLai()"  v-if="Visible.GhiLai">
+                    <a data-toggle="tooltip" title="Ghi lại">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li @click="Huy()" v-if="Visible.Huy">
+                    <a data-toggle="tooltip" title="Hủy">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                    </a>
+                </li>
+                <li @click="XoaPhieu()" v-if="Visible.XoaPhieu">
+                    <a data-toggle="tooltip" title="Xóa phiếu">
+                        <span class="icon one-trash"></span>Xóa phiếu
+                    </a>
+                </li>
+                <li @click="GiaoPhieu" v-if="Visible.GiaoPhieu">
+                    <a data-toggle="tooltip" title="Giao phiếu">
+                        <span class="icon one-file-arrow-right11"></span>Giao phiếu
+                    </a>
+                </li>
+                <li @click="ShowGiaoPhieuPhoiHop" v-if="Visible.GiaoPhoiHop">
+                    <a data-toggle="tooltip" title="Giao phối hợp">
+                        <span class="icon one-file-arrow-right11"></span>Giao phối hợp
+                    </a>
+                </li>
+                <li @click="KhoaPhieu">
+                    <a data-toggle="tooltip" title="Khóa phiếu">
+                        <span class="icon one-file-lock"></span>Khóa phiếu
+                    </a>
+                </li>
+                <li @click="ShowPopupFile" v-if="Visible.FileDinhKem">
+                    <a data-toggle="tooltip" title="File đính kèm">
+                        <span class="icon one-xlsx-import"></span>File đính kèm
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" @click="isShowMenu = !isShowMenu">
+                        <span class="icon one-file-arrow-right11"></span>
+                        <span class="arrow fa fa-angle-down"></span>
+                    </a>
+    
+                    <ul :class="['dropdown-menu', isShowMenu ? 'show' : '']" style="color: #0176FF;">
+                        <li @click="redirectLink(1)">
+                            <a>
+                                <span class="icon one-file-arrow-right11"></span> Lập hợp đồng
+                            </a>
+                        </li>
+                        <li
+                            @click="redirectLink(2)">
+                            <a>
+                                <span class="icon one-file-arrow-right11"></span> Báo Hỏng
+                            </a>
+                        </li>
+                        <li
+                            @click="redirectLink(3)">
+                            <a>
+                                <span class="icon one-file-arrow-right11"></span> Khiếu nại
+                            </a>
+                        </li>
+                        <li
+                            @click="redirectLink(4)">
+                            <a>
+                                <span class="icon one-file-arrow-right11"></span> Tiếp nhận đơn hàng
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="pull-right mart4">
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="box-form" ref='boxTTPhieu'>
+                    <div class="legend-title">Thông tin phiếu hỗ trợ</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã thuê bao</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" data-toggle="tooltip" title="Tìm mã khách hàng"
+                                            @click.prevent="ShowSearchAccount">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control " v-model="MaThueBao" ref="txtMaTb"
+                                            @keyup.enter="MaThueBao_KeyPress(MaThueBao,2)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã hỗ trợ</div>
+                                <div class="value">
+                                    <input type="text" class="form-control " v-model="MaHoTro" ref="txtMaHT">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Dịch vụ</div>
+                                <div class="value">
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="DichVu.ID" :dataSource='DichVu.DataSouce'
+                                        :fields="{value:'DICHVUVT_ID', text: 'TEN_DVVT'}" :allowFiltering="true"
+                                        @change="DichVuChanged">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Loại hình</div>
+                                <div class="value">
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="LoaiHinh.ID" :dataSource='LoaiHinh.DataSouce'
+                                        :fields="{value:'LOAITB_ID', text: 'LOAIHINH_TB'}" :allowFiltering="true">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="key w120">Tên thuê bao</div>
+                        <div class="value">
+                            <input type="text" class="form-control " v-model="TenThueBao" ref="txtTenTb">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Địa chỉ LĐ</div>
+                        <div class="value">
+                            <div class="input-more-button -right">
+                                <button class="btn" @click='ChonDiaChiLD'>
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" class="form-control " v-model="DiaChiLD" ref="txtDiaChiLD">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Kênh tiếp nhận (<span class="required">*</span>)</div>
+                                <div class="value">
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="KenhTiepNhan.ID" :dataSource='KenhTiepNhan.DataSouce'
+                                        :fields="{value:'HTKN_ID', text: 'HINHTHUC_KN'}" :allowFiltering="true">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Ngày tiếp nhận (<span class="required">*</span>)</div>
+                                <div class="value">
+                                    <ejs-datetimepicker v-model="NgayTiepNhan" :format="'dd/MM/y HH:mm:ss'" :allowEdit=false
+                                        :showClearButton=false ref='dtpNgayTiepNhan'
+                                        class="form-control bg-none bor0 fw6">
+                                    </ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Nhóm hỗ trợ (<span class="required">*</span>)</div>
+                        <div class="value">
+                            <ejs-dropdownlist 
+                                class="form-control" 
+                                ref="cboDieuChinh" 
+                                locale='vi' 
+                                v-model="LoaiHoTro.ID"
+                                :dataSource='LoaiHoTro.DataSouce' 
+                                :fields="{value:'NHOMHT_ID', text: 'NHOM_HT'}"
+                                :allowFiltering="true"
+                                @change="NhomHoTroChanged">
+                            </ejs-dropdownlist>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Chủ đề (<span class="required">*</span>)</div>
+                        <div class="value">
+                            <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi' v-model="ChuDe.ID"
+                                :dataSource='ChuDe.DataSouce' :fields="{value:'CHUDEHT_ID', text: 'CHUDE_HT'}"
+                                :allowFiltering="true" @change="ChuDeChanged">
+                            </ejs-dropdownlist>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">Yêu cầu HT (<span class="required">*</span>)</div>
+                        <div class="value">
+                            <textarea name="" class="form-control" id="" cols="30" rows="10"
+                                style="height: 120px;resize: vertical;" v-model="YeuCauHT" ref="TxtYcHt"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="box-form" ref='boxTTKH'>
+                    <div class="legend-title">Thông tin khách hàng</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã KH </div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" data-toggle="tooltip" title="Tìm mã khách hàng"
+                                            @click.prevent="ShowSearchAccountModal">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control " v-model="MaKH" ref="txtMaKH"
+                                            @keyup.enter="MaKH_KeyPress(MaKH)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Phân loại KH</div>
+                                <div class="value">
+                                    <!-- <input type="text" class="form-control " v-model="PhanLoaiKH" ref="txtMaKH">       -->
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="PhanLoaiKH.ID" :dataSource='PhanLoaiKH.DataSouce'
+                                        :fields="{value:'LOAIKH_ID', text: 'TEN_LOAIKH'}" :allowFiltering="true">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120 ">Tên KH(<span class="required">*</span>)</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="TenKH">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120 ">Địa chỉ(<span class="required">*</span>)</div>
+                        <div class="value">
+                            <div class="input-more-button -right">
+                                <button class="btn" @click='ChonDiaChiKH'>
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" class="form-control" v-model="DiaChi">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Mã số thuế</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="MaSoThue">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Người yêu cầu(<span class="required">*</span>)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="NguoiYeuCau">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Số điện thoại(<span class="required">*</span>)</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="SoDT">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Email</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model="Email">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend-title">Kết quả hỗ trợ</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Ngày hỗ trợ(<span class="required">*</span>)</div>
+                                <div class="value">
+                                    <ejs-datepicker v-model="NgayHoTro" :format="'dd/MM/y'" :allowEdit=false
+                                        :showClearButton=false ref='dtpNgayHoTro' class="form-control bg-none bor0 fw6">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Hình thức</div>
+                                <div class="value">
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="HinhThuc.ID" :dataSource='HinhThuc.DataSouce'
+                                        :fields="{value:'HTKN_ID', text: 'HINHTHUC_KN'}" :allowFiltering="true">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Kết quả</div>
+                                <div class="value">
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="KetQua.ID" :dataSource='KetQua.DataSouce'
+                                        :fields="{value:'KETQUA_ID', text: 'TEN_KETQUA'}" :allowFiltering="true">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w120">MĐ hài lòng</div>
+                                <div class="value">
+                                    <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi'
+                                        v-model="MucDoHaiLong.ID" :dataSource='MucDoHaiLong.DataSouce'
+                                        :fields="{value:'ID', text: 'TEN'}" :allowFiltering="true">
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120 ">Nội dung</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="NoiDung">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120 ">Đơn vị XL</div>
+                        <div class="value">
+                            <ejs-dropdownlist class="form-control" ref="cboDieuChinh" locale='vi' v-model="DonViXL.ID"
+                                :dataSource='DonViXL.DataSouce' :fields="{value:'DONVI_ID', text: 'TEN_DV'}"
+                                :allowFiltering="true">
+                            </ejs-dropdownlist>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=''>
+                <div class='nav tabs tab-over'>
+                    <a href='#tabTB' data-toggle='tab' @click.prevent='currentTab = 1;'
+                        :class='{active: currentTab===1}'>DS thuê bao</a>
+                    <a href='#tabHT' data-toggle='tab' @click.prevent='currentTab = 2;'
+                        :class='{active: currentTab===2}'>Lịch sử hỗ trợ</a>
+                    <a href='#tabBH' data-toggle='tab' @click.prevent='currentTab = 3;'
+                        :class='{active: currentTab===3}'>Lịch sử báo hỏng</a>
+                    <a href='#tabKN' data-toggle='tab' @click.prevent='currentTab = 4;'
+                        :class='{active: currentTab===4}'>Lịch sử khiếu nại</a>
+                    <a href='#tabCSKH' data-toggle='tab' @click.prevent='currentTab = 5;'
+                        :class='{active: currentTab===5}'>Lịch sử CSKH</a>
+                    <a href='#tabDH' data-toggle='tab' @click.prevent='currentTab = 6;'
+                        :class='{active: currentTab===6}'>Lịch sử đơn hàng</a>
+                </div>
+
+                <div class='tab-content'>
+                    <div class='tab-pane' id="tabTB" :class='{active: currentTab===1}'>
+                        <div class="row">
+                            <div class="box-form">
+                                <DataGrid :columns="columnsDSThueBao" :dataSource="DSThueBao"
+                                    :showColumnCheckbox="false" :showFilter="true" dataKeyField="MA_KH"
+                                    ref="gridPhanAnh" :allowPaging="true" :enablePagingServer="false"
+                                    @selectedRowChanged="">
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='tab-pane' id="tabHT" :class='{active: currentTab===2}'>
+                        <div class="box-form">
+                            <div class="row">
+                                <DataGrid :columns="columnsDSLichSuHoTro" :dataSource="DSLichSuHoTro"
+                                    :showColumnCheckbox="false" :showFilter="true" dataKeyField="ma_hotro"
+                                    ref="gridHoTro" :allowPaging="true" :enablePagingServer="false"
+                                    @selectedRowChanged=""></DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='tab-pane' id="tabBH" :class='{active: currentTab===3}'>
+                        <div class="box-form">
+                            <div class="row">
+                                <DataGrid :columns="columnsDSLichSuBaoHong" :dataSource="DSLichSuBaoHong"
+                                    :showColumnCheckbox="false" :showFilter="true" dataKeyField="ma_thuebao"
+                                    ref="gridBaoHong" :allowPaging="true" :enablePagingServer="false"
+                                    @selectedRowChanged=""></DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='tab-pane' id='tabKN' :class='{active: currentTab===4}'>
+                        <div class="box-form">
+                            <div class="row">
+                                <DataGrid :columns="columnsDSKhieuNai" :dataSource="DSKhieuNai"
+                                    :showColumnCheckbox="false" :showFilter="true" dataKeyField="ma_khieunai"
+                                    ref="gridKhieuNai" :allowPaging="true" :enablePagingServer="false"
+                                    @selectedRowChanged=""></DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='tab-pane' id="tabCSKH" :class='{active: currentTab===5}'>
+                        <div class="box-form">
+                            <div class="row">
+                                <DataGrid :columns="columnsDSLichSuCSKH" :dataSource="DSLichSuCSKH"
+                                    :showColumnCheckbox="false" :showFilter="true" dataKeyField="ma_cs"
+                                    ref="gridPhanAnh" :allowPaging="true" :enablePagingServer="false"
+                                    @selectedRowChanged="">
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='tab-pane' id="tabDH" :class='{active: currentTab===6}'>
+                        <div class="box-form">
+                            <div class="row">
+                                <DataGrid :columns="columnsDSLichSuDonHang" :dataSource="DSLichSuDonHang"
+                                    :showColumnCheckbox="false" :showFilter="true" dataKeyField="ma_kh"
+                                    ref="gridLsDonHang" :allowPaging="true" :enablePagingServer="false"
+                                    @selectedRowChanged=""></DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">            
+
+            <div class="box-col box-form">
+                <div class="legend-title">Danh sách phiếu hỗ trợ</div>                
+              
+                <div class="nav tabs tab-over">
+                    <a href="#tab-tao-moi" data-toggle="tab" class="active"  @click="changeTab(true)">Phiếu mới</a>
+                    <a href="#tab-da-gui" data-toggle="tab" @click="changeTab(false)">Phiếu phối hợp</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-tao-moi">
+                        <DataGrid 
+                            :columns="columnsPhieuHoTro" 
+                            :dataSource="DSPhieuHoTro" 
+                            :showColumnCheckbox="false"
+                            :showFilter="true" 
+                            dataKeyField="MA_KH" 
+                            ref="gridPhanAnh" 
+                            :allowPaging="true"
+                            :enablePagingServer="false" 
+                            @selectedRowChanged="SelectedPhieuHoTro">
+                        </DataGrid>
+                    </div>
+                    <div class="tab-pane" id="tab-da-gui">
+                        <DataGrid 
+                            :columns="columnsPhieuHoTro" 
+                            :dataSource="DSPhieuGiaoPhoiHop" 
+                            :showColumnCheckbox="false"
+                            :showFilter="true" 
+                            dataKeyField="MA_KH" 
+                            ref="gridPhanAnh" 
+                            :allowPaging="true"
+                            :enablePagingServer="false" 
+                            @selectedRowChanged="SelectedPhieuHoTro"
+                            >
+                        </DataGrid>                   
+                    </div>                                   
+                </div>
+            </div> 
+        </div>
+    </div>
+    <b-modal id="popupComponents" size="xl" hide-footer hide-header hide-header-close body-class="modal-body p-0"
+        scrollable>
+        <component :is="popupComponent" @form-close="ClosePopup" :isPopup="true"></component>
+    </b-modal>
+    <GiaoPhieuHoTro ref='frmGiaoPhieuHoTro' :pQuyTrinhID="quytrinh_id" :pTTHTID="ttht_id" :pTTPHID="temp_pTTPHID" :pMa_TB="MaThueBao" @closePopup="closeGiaoPhieu"/>
+  
+    <DiaChiKhachHangModal ref="diaChiKhachHangModal" :data="dataDiaChiKH" @accept="acceptDiaChiKH" />
+
+    <PopupUploadFile ref="popupUploadFile"></PopupUploadFile>
+  
+    <formGiaoPhieuPhoiHop ref="formGiaoPhieuPhoiHop" :pQuyTrinhID="quytrinh_id" :pMaHT="MaHoTro"/>
+</div>

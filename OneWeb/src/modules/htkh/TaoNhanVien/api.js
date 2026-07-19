@@ -1,0 +1,17 @@
+export default {
+  lay_tt_userwarp: (axios, data) => axios.post('/web-tracuu/tracuu/lay_tt_userwarp', data),
+  sp_cbx_timkiem_tt_doitac_dai: (axios, data) => axios.get('/web-tracuu/tracuu/sp_cbx_timkiem_tt_doitac_dai', data),
+  ins_userwarp: (axios, data) => axios.post('/web-tracuu/tracuu/ins_userwarp', data),
+  xacThucNhanVien: (axios, data) => axios.get(`/tichhop/hrm/xacThucNhanVien?maNhanVien=${data.maNhanVien}`, data),
+  xacThucThongTin: (axios, data) => axios.get(`/tichhop/hrm/xacThucThongTin?email=${data.email}`, data),
+  lay_ds_dv_dai: (axios, data) => axios.get('/web-tracuu/tracuu/lay_ds_dv_dai', data),
+  sp_lay_user_ipcc_theo_nguoidung_id: (axios, data) => axios.get(`/web-tracuu/tracuu/sp_lay_user_ipcc_theo_nguoidung_id?nguoidung_id=${data.nguoidung_id}`, data),
+  update_dv_userwarp: (axios, data) => axios.post('/web-tracuu/tracuu/update_dv_userwarp', data),
+  gan_useripcc: (axios, data) => axios.post('/web-tracuu/tracuu/gan_useripcc', data),
+  lay_ds_agent: (axios, data) => axios.get(`/web-tracuu/tracuu/lay_ds_agent?p_ma_nv=${data.p_ma_nv}`, data),
+  xoa_agent: (axios, data) => axios.get(`/web-tracuu/tracuu/xoa_agent?p_user_ipcc=${data.p_user_ipcc}`, data),
+  lay_nv_theo_ndid: async (axios, data) => axios.post('/web-tracuu/tracuu/lay_nv_theo_ndid', data),
+  sp_lay_hinhthuc_hd_nv: async (axios, data) => axios.post('/web-tracuu/tracuu/sp_lay_hinhthuc_hd_nv', data),
+  update_hthd_nhanvien: async (axios, data) => axios.post('/web-tracuu/tracuu/update_hthd_nhanvien', data),
+  update_trangthai_nhanvien_dai: async (axios, data) => axios.post('/web-tracuu/tracuu/update_trangthai_nhanvien_dai', data),
+}

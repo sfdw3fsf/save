@@ -1,0 +1,2 @@
+import AssignCommitNumberManual from './AssignCommitNumberManual'
+export default AssignCommitNumberManual

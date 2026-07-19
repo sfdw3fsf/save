@@ -1,0 +1,245 @@
+<div >
+  
+  <div class="list-actions-top">
+    <ul class="list">
+        <li>
+            <a href="#" v-on:click.prevent="onClickDS">
+                <span class="icon one-file-attach1"></span>Lấy DS
+            </a>
+        </li>
+        <li :class="{disabled : isAddNew || dsKhatNo.length == 0}">
+            <a href="#"  v-on:click.prevent="onAddNew">
+                <span class="icon one-file-plus"></span>Nhập mới
+            </a>
+        </li>
+        <li :class="{prevent : isSaving}">
+            <a href="#" v-on:click.prevent="onSave">
+                <span class="icon one-save"></span>Ghi lại
+            </a>
+        </li>
+        <li>
+            <a href="#" v-on:click.prevent="onShowModalImport">
+                <span class="icon one-book"></span>Đọc file
+            </a>
+        </li>
+        <li :class="{disabled : dsKhatNo.length == 0}">
+            <a href="#" v-on:click.prevent="onShowModalExport">
+                <span class="icon one-download"></span>Xuất file
+            </a>
+        </li>
+        <li>
+            <a href="#" v-on:click.prevent="onCancel">
+                <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ
+            </a>
+        </li>
+        <li :class="{disabled : isAddNew && dsKhatNo.length > 0}">
+            <a href="#" v-on:click.prevent="onRemove">
+                <span class="icon one-trash"></span>Xoá
+            </a>
+        </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form padt8 padb5">
+        <!-- <div class="pull-right">
+            <div class="inline">
+                <div class="info-row marb0">
+                    <div class="key fw6 w80">Kỳ hóa đơn</div>
+                    <div class="value">
+                        <div class="input-icon-right">
+                            <input type="text" class="form-control red" v-model="kyHd">
+                            <span class="icon one-calendar"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="inline marl10">
+                <div class="info-row marb0">
+                    <div class="key fw6 w50">Chu kỳ</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select name="" id="" v-model="chuKy" class="form-control red">
+                                <option value="01">01</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- <KyCuoc :isTextBold="true"/> -->
+        <div class="pull-right custom-kycuoc">
+          <app-ky-cuoc :disabled="true" @handleChangeKyCuoc="handleKyHoaDon"></app-ky-cuoc>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="box-form">
+        <div class="legend-title">Thông tin treo nợ</div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-12">
+                <div class="info-row">
+                    <div class="key w100">Số máy/Acc <BssRequiredMarker class="ml-1"/></div>
+                    <div class="value">
+                        <input type="text" v-model="form.maTb" v-on:keyup.enter="doSearch" ref="maTb"
+                         class="form-control highlight" :class="{ 'is-invalid': $v.form.maTb.$error && form.submit}"
+                         :disabled="dataSelected != null && !isAddNew">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-12">
+                <div class="info-row">
+                    <div class="key w100">Dịch vụ</div>
+                    <div class="value">
+                        <div class="select-custom">
+                          <select name="" id=""  class="form-control" v-model="form.idDichVu" disabled>
+                            <option v-for="dv in dsDichVu" v-bind:value="dv.DICHVUVT_ID">{{dv.TEN_DVVT}}</option>
+                         </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-12">
+                <div class="info-row">
+                    <div class="key w100">Tiền khất <BssRequiredMarker class="ml-1"/></div>
+                    <div class="value">
+                        <input type="text"
+                        :value="form.tienNo | currency"
+                        @input="$event => form.tienNo = $event.target.value"
+
+                        class="form-control tright fw6" :class="{ 'is-invalid': $v.form.tienNo.$error && form.submit}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-12">
+                <div class="info-row">
+                    <div class="key w100">Ngày hẹn trả</div>
+                    <div class="value"  :class="{ 'is-invalid': $v.form.ngayHenTra.$error && form.submit}">
+                        <ejs-datepicker
+                          class="form-control bg-none bor0 fw6 text h24"
+                          :placeholder="waterMark"
+                          :format="dateFormat"
+                          :showClearButton="false"
+                          v-model="form.ngayHenTra"
+                          >
+                      </ejs-datepicker>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="info-row">
+                    <div class="key w100">Tên thuê bao</div>
+                    <div class="value">
+                        <input type="text" v-model="form.tenTb" tabindex="-1"  readonly class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-12">
+                <div class="info-row">
+                    <div class="key w100">Địa chỉ TB</div>
+                    <div class="value">
+                        <input type="text" v-model="form.diaChiTb" tabindex="-1"  readonly class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+              <div class="info-row">
+                <div class="key w100">Lý do <BssRequiredMarker class="ml-1"/></div>
+                <div class="value">
+                    <input type="text" v-model="form.lyDo" class="form-control" ref="lyDo"
+                    :class="{ 'is-invalid': $v.form.lyDo.$error && form.submit}">
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-form">
+        <div class="legend-title">Danh sách treo nợ</div>
+        <div class="col-last-r col-5-r">
+          <DataGrid3 v-bind:columns="[
+            {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting:true},
+            {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', allowFiltering: true, allowSorting:true},
+            {fieldName: 'TIENNO', headerText: 'Tiền khất nợ', allowFiltering: true, allowSorting:true},
+            {fieldName: 'KYHOADON', headerText: 'Kỳ hoá đơn', allowFiltering: true, allowSorting:true},
+            {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting:true},
+            {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ LĐ', allowFiltering: true, allowSorting:true},
+            {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái TB', allowFiltering: true, allowSorting:true},
+            {fieldName: 'LYDO', headerText: 'Lý do', allowFiltering: true, allowSorting:true},
+            {fieldName: 'NGAYHENTRA', headerText: 'Ngày hẹn trả', allowFiltering: true, allowSorting:true}
+            ]"
+            v-bind:dataSource="dsKhatNo" :showFilter="true" dataKeyField="THUEBAO_ID"
+            :showColumnCheckbox=true
+            @selectedItemsChanged="grid1_selectedItemChanged"
+            @selectedRowChanged="dsKhatNo_selectedRowChanged"
+            :selectedRow="indexFocus"
+            :allowPaging="true"
+            :totalRecords="dsKhatNo.length"
+            :enablePagingServer="false"
+            ref="table"
+            >
+          </DataGrid3>
+        </div>
+    </div>
+  </div>
+  <b-modal id="bv-modal-example" hide-footer hide-header no-close-on-backdrop size="lg">
+    <div>
+      <h4>Danh sách thuê bao</h4>
+      <div>
+        <b-button variant="outline-primary" @click="confirmChose">Chấp nhận</b-button>
+        <b-button  @click="$bvModal.hide('bv-modal-example')">Thoát</b-button>
+      </div>
+    </div>
+    <hr>
+    <div class="d-block mt-2">
+      <DataGrid2 :columns="[
+        {fieldName: 'MA_TB', headerText: 'Số máy/ACC', allowFiltering: true, allowSorting:false},
+        {fieldName: 'DICHVU_VT', headerText: 'Dịch vụ', allowFiltering: true, allowSorting:false},
+        {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, allowSorting:false},
+        {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting:false},
+        {fieldName: 'MA_TB_SUB', headerText: 'Mã TB sub', allowFiltering: true, allowSorting:false},
+        {fieldName: 'TRANGTHAI_TB', headerText: 'Mã TB sub', allowFiltering: true, allowSorting:false},
+        {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting:false},
+        {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting:false},
+        {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ LĐ', allowFiltering: true, allowSorting:false},
+        ]"
+        v-bind:dataSource="dsDBModal" :showFilter="false" dataKeyField="THUEBAO_ID"
+        :selectedRow="indexFocus"
+        @selectedItemsChanged="grid1_selectedRowChanged"
+        @selectedRowChanged="grid1_selectedRowChanged">
+      </DataGrid2>
+    </div>
+  </b-modal>
+
+  <b-modal id="modal-export" hide-footer modal-class="modal-export"  title="Xuất dữ liệu" no-close-on-backdrop size="lg">
+    <div>
+      <div>
+        <ModalExport :data="dsKhatNo"></ModalExport>
+      </div>
+    </div>
+  </b-modal>
+
+  <b-modal id="modal-import" hide-footer modal-class="modal-export"  title="Đọc file danh sách các thuê bao khất nợ" no-close-on-backdrop size="lg">
+    <div>
+    <ModalImport :dsDichVu="dsDichVu" :kyCuoc="kyCuoc" :ngayHenTra="form.ngayHenTra" v-on:importSucess="importSucess"></ModalImport>
+    </div>
+  </b-modal>
+  <b-modal size="sm" id="notice-notfound"  hide-header hide-footer>
+    <p class="p-3" style="word-wrap: break-word;">
+       {{noticeMsg}}
+    </p>
+    <div class="text-center">
+        <button id="ok-md" @click="closeNoticeNotFound" class="btn btn-primary">OK</button>
+    </div>
+  </b-modal>
+  <b-modal size="sm" id="notice-exist"  hide-header hide-footer>
+    <p class="p-3" style="word-wrap: break-word;">
+       {{noticeMsg}}
+    </p>
+    <div class="text-center">
+        <button id="ok-exit" @click="closeNoticeExist" class="btn btn-primary">OK</button>
+    </div>
+  </b-modal>
+</div>

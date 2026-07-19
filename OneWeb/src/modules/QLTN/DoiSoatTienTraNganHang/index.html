@@ -1,0 +1,445 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="LayTT" title="Lấy thông tin">
+                    <span class="icon one-file-attach"></span> Lấy TT
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="DoiSoat" title="Đối soát">
+                    <span class="icon one-file-find"></span> Đối soát
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="Nap_DL" title="Nạp dữ liệu địa danh">
+                    <span class="icon one-coin"></span> Nạp DL
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="Xoa_DL" title="Xóa nạp">
+                    <span class="icon nc-icon-glyph ui-1_circle-delete"></span> Xóa nạp
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="CapNhat" title="Cập nhật">
+                    <span class="icon one-reload1"></span> Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="TaiFileMau" title="File Excel mẫu">
+                    <span class="icon one-excel"></span>File Excel mẫu
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="onChonTT" :class="{disabled : isShowTT}" title="Chọn mã thanh toán">
+                    <span class="icon one-user-info"></span> Chọn TT
+                </a>
+            </li>
+            <!-- <li>
+        <a href="#" @click.prevent="$toast.error('Pendding')">
+          <span class="icon one-circle-question"></span> Hướng dẫn
+        </a>
+      </li> -->
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb8">
+            <div class="pull-right">
+                <div class="inline">
+                    <div class="info-row marb0">
+                        <div class="key fw6 w80">Kỳ hóa đơn</div>
+                        <div class="value">
+                            <ejs-datepicker class="form-control bg-none bor0 fw6 text-red" placeholder="Chọn kỳ hóa đơn"
+                                :format="'MM/y'" :max="max_kyhoadon" :start="'Year'" :depth="'Year'"
+                                :showClearButton="false" v-model="kyHoaDon" :allowEdit="false"
+                                :change="onKyHoaDonChange" :readonly="true" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="grid-stack-box">
+            <Split>
+                <SplitArea :size="30" :minSize="100">
+                    <div class="box-col box-form" id="boxLeft" style="height: 830px;">
+                        <div class="legend-title">Danh sách số tài khoản</div>
+                        <div class="info-row">
+                            <div class="key w90">
+                                Tên File
+                            </div>
+                            <div class="value">
+                                <div class="input-more-button">
+                                    <input v-model="duongDan" type="text" class="form-control highlight" />
+
+                                    <label for="upload" class="btn">
+                                        <span class="-ap icon-more_horiz"></span>
+                                        <input ref="fileInput" type="file" id="upload" style="display: none"
+                                            @change="onChangeFile" accept=".xls, .xlsx"
+                                            @click="$refs.fileInput.value = null" />
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <DataGrid :columns="[
+            {fieldName: 'SO_TK', headerText: 'Số tài khoản', allowFiltering: true},
+            {fieldName: 'TIEN', headerText: 'Tiền trả', allowFiltering: true, type:'number',format:'N0'},
+            {fieldName: 'LOI', headerText: 'Thông tin lỗi', allowFiltering: true},
+            {fieldName: 'STATUS', headerText: 'Trạng thái', allowFiltering: true}
+            ]" :dataSource="dsSoTaiKhoan" :showFilter="true" :showColumnCheckbox="true" dataKeyField="SO_TK"
+                            ref="stk_grid" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"/>
+                    </div>
+                </SplitArea>
+                <SplitArea :size="69.5" :minSize="100">
+                    <div class="box-col" id="boxRight">
+                        <div class="nav tabs tab-over">
+                            <a href="#tab1" data-toggle="tab" class="active">Kết quả đối soát</a>
+                            <a href="#tab2" data-toggle="tab">DS STK chưa có mã TT</a>
+                        </div>
+                        <div class="tab-content" style="height: 800px;">
+                            <div class="tab-pane active" id="tab1">
+                                <div class="legend-title mart10">
+                                    <div class="pull-left">Thông tin chi tiết kết quả đối soát</div>
+                                    <div class="pull-right">
+                                        <button class="btn btn-second padt2 padb1" @click="XuatExcelDoiSoat">
+                                            <span class="one-excel-outline normal f20"
+                                                style="line-height: unset;"></span>
+                                        </button>
+                                        <button class="btn btn-second padt2 padb1">
+                                            <span class="nc-icon-outline files_single-paragraph normal f20"></span>
+                                        </button>
+                                    </div>
+                                    <div class="clearfix">
+                                    </div>
+                                </div>
+                                <DataGrid :columns="[
+            {fieldName: 'SO_TK', headerText: 'Số tài khoản', allowFiltering: true},
+            {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true},
+            {fieldName: 'TIEN', headerText: 'Tiền trả', allowFiltering: true, type:'number',format:'N0'},
+            {fieldName: 'NO_HT', headerText: 'Nợ hiện tại', allowFiltering: true, type:'number',format:'N0'},
+            {fieldName: 'KT_LECH', headerText: 'KT lệch', allowFiltering: true, allowSorting: false, cssClass: 'text-center', template: statusTemplate},
+            ]" :dataSource="dsKetQua" :showFilter="true" :showColumnCheckbox="true" dataKeyField="MA_TT"
+                                    ref="ketqua_grid" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"/>
+                            </div>
+                            <div class="tab-pane" id="tab2">
+                                <div class="grid-stack-box">
+                                    <Split style="height:300px;">
+                                        <SplitArea :size="40" :minSize="100">
+                                            <div class="box-col" id="boxLeft1">
+                                                <DataGrid :columns="[
+                                                    {fieldName: 'SO_TK', headerText: 'Số tài khoản', allowFiltering: true},
+                                                    ]" :dataSource="dsMapMaTT" :showFilter="true"
+                                                    @selectedRowChanged="dsMapMaTT_selectedRowChanged"
+                                                    ref="mapmaTT_grid" :allowPaging="true" :enablePagingServer="false"/>
+                                            </div>
+                                        </SplitArea>
+                                        <SplitArea :size="59.5" :minSize="100">
+                                            <div class="box-col" id="boxRight1">
+                                                <DataGrid :columns="[
+                                                    {fieldName: 'SO_TK', headerText: 'Số tài khoản', allowFiltering: true},
+                                                    {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true},
+                                                    {fieldName: 'MA_KH', headerText: 'Mã KH', allowFiltering: true},
+                                                    ]" :dataSource="dsNapDL" :showFilter="true"
+                                                    :showColumnCheckbox="true" dataKeyField="MA_TT"
+                                                    ref="napDL_grid" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"/>
+                                            </div>
+                                        </SplitArea>
+                                    </Split>
+                                </div>
+                                <div v-if="isShowTT">
+                                    <div class="legend-title mart10">
+                                        <span class="icon -ap icon-arrow-right3" @click="isShowTT = false"></span> Tìm kiếm mã thanh toán
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            Tiêu chí
+                                        </div>
+                                        <div class="value">
+                                            <!-- <b-dropdown id="dropdown-form" block variant="primary" ref="dropdownFilter"
+                                                menu-class="w-100" :text="txtTieuChi || 'Chọn tiêu chí tìm kiếm'" split
+                                                split-variant="outline-primary"
+                                                @click="$refs.dropdownFilter.show(true)">
+                                                <b-dropdown-form @submit.stop.prevent> -->
+                                            <div class="dropdown">
+                                                <div class="select-custom" data-toggle="dropdown">
+                                                    <button class="btn form-control">{{txtTieuChi || 'Chọn tiêu chí tìm kiếm'}}</button>
+                                                </div>
+                                                <div class="dropdown-menu fullw pad10" style="max-width: 100%">
+                                                    <div class="title-bg-main">
+                                                        <span class="title">Điều kiện lọc </span>
+                                                    </div>
+                                                    <div class="grid-stack-box">
+                                                        <Split>
+                                                            <SplitArea :size="50" :minSize="100">
+                                                                <div class="box-col box-form" id="boxLeft2">
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheck1"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Tra cứu theo</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <div class="select-custom">
+                                                                                        <select
+                                                                                            v-model="filterThanhToan.idDk1"
+                                                                                            name="" id=""
+                                                                                            class="form-control"
+                                                                                            :disabled="!filterThanhToan.isCheck1">
+                                                                                            <option
+                                                                                                v-for="(item, index) in filterThanhToan.dsDieuKien"
+                                                                                                :key="index"
+                                                                                                :value="item.KIEUTK_ID">
+                                                                                                {{item.KIEU_TK}}
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <input
+                                                                                        v-model="filterThanhToan.valueDk1"
+                                                                                        type="text" class="form-control"
+                                                                                        :disabled="!filterThanhToan.isCheck1">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheck2"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Tra cứu theo</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <div class="select-custom">
+                                                                                        <select
+                                                                                            v-model="filterThanhToan.idDk2"
+                                                                                            name="" id=""
+                                                                                            class="form-control"
+                                                                                            :disabled="!filterThanhToan.isCheck2">
+                                                                                            <option
+                                                                                                v-for="(item, index) in filterThanhToan.dsDieuKien"
+                                                                                                :key="index"
+                                                                                                :value="item.KIEUTK_ID">
+                                                                                                {{item.KIEU_TK}}
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <input
+                                                                                        v-model="filterThanhToan.valueDk2"
+                                                                                        type="text" class="form-control"
+                                                                                        :disabled="!filterThanhToan.isCheck2">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheck3"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Tra cứu theo</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <div class="select-custom">
+                                                                                        <select
+                                                                                            v-model="filterThanhToan.idDk3"
+                                                                                            name="" id=""
+                                                                                            class="form-control"
+                                                                                            :disabled="!filterThanhToan.isCheck3">
+                                                                                            <option
+                                                                                                v-for="(item, index) in filterThanhToan.dsDieuKien"
+                                                                                                :key="index"
+                                                                                                :value="item.KIEUTK_ID">
+                                                                                                {{item.KIEU_TK}}
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <input
+                                                                                        v-model="filterThanhToan.valueDk3"
+                                                                                        type="text" class="form-control"
+                                                                                        :disabled="!filterThanhToan.isCheck3">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheck4"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Tra cứu theo</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <div class="select-custom">
+                                                                                        <select
+                                                                                            v-model="filterThanhToan.idDk4"
+                                                                                            name="" id=""
+                                                                                            class="form-control"
+                                                                                            :disabled="!filterThanhToan.isCheck4">
+                                                                                            <option
+                                                                                                v-for="(item, index) in filterThanhToan.dsDieuKien"
+                                                                                                :key="index"
+                                                                                                :value="item.KIEUTK_ID">
+                                                                                                {{item.KIEU_TK}}
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6 col-12">
+                                                                                    <input
+                                                                                        v-model="filterThanhToan.valueDk4"
+                                                                                        type="text" class="form-control"
+                                                                                        :disabled="!filterThanhToan.isCheck4">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                            </SplitArea>
+                                                            <SplitArea :size="49.5" :minSize="100">
+                                                                <div class="box-col box-form" id="boxRight2">
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheckDichVuVT"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Dịch vụ VT</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="select-custom">
+                                                                                <select
+                                                                                    v-model="filterThanhToan.idDichVuVT"
+                                                                                    name="" id="" class="form-control"
+                                                                                    :disabled="!filterThanhToan.isCheckDichVuVT">
+                                                                                    <option
+                                                                                        v-for="(item, index) in filterThanhToan.dsDichVu"
+                                                                                        :key="index"
+                                                                                        :value="item.DICHVUVT_ID">
+                                                                                        {{item.TEN_DVVT}}</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheckDonVi"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Đơn vị</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="select-custom">
+                                                                                <select
+                                                                                    v-model="filterThanhToan.idDonVi"
+                                                                                    name="" id="" class="form-control"
+                                                                                    :disabled="!filterThanhToan.isCheckDonVi">
+                                                                                    <option
+                                                                                        v-for="(item, index) in filterThanhToan.dsDonVi"
+                                                                                        :key="index"
+                                                                                        :value="item.DONVI_ID">
+                                                                                        {{item.TEN_DV}}</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="info-row">
+                                                                        <div class="key w110">
+                                                                            <div class="check-action">
+                                                                                <input
+                                                                                    v-model="filterThanhToan.isCheckTuyenThu"
+                                                                                    type="checkbox" class="check">
+                                                                                <span class="name">Tuyến thu</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="value">
+                                                                            <div class="select-custom">
+                                                                                <select
+                                                                                    v-model="filterThanhToan.idTuyenThu"
+                                                                                    name="" id="" class="form-control"
+                                                                                    :disabled="!filterThanhToan.isCheckTuyenThu">
+                                                                                    <option
+                                                                                        v-for="(item, index) in filterThanhToan.dsTuyenThu"
+                                                                                        :key="index"
+                                                                                        :value="item.TUYENTHU_ID">
+                                                                                        {{item.TEN_TT}}</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="group-buttons -bottom tright">
+                                                                        <button class="btn btn-second"
+                                                                            @click="onClickTimKiem">
+                                                                            <span
+                                                                                class="one-search f20 inline vcenter normal"></span>
+                                                                            Tìm
+                                                                            kiếm
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </SplitArea>
+                                                        </Split>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- </b-dropdown-form>
+                                            </b-dropdown> -->
+                                        </div>
+
+                                    </div>
+                                    <div class="table-content mart10" style="height: 300px;">
+                                        <DataGrid :columns="[
+                                    {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true},
+                                    {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true},
+                                    {fieldName: 'MA_KH', headerText: 'Mã khách hàng', allowFiltering: true},
+                                    {fieldName: 'MATT_CU', headerText: 'Mã TT cũ', allowFiltering: true},
+                                    {fieldName: 'MST', headerText: 'MST', allowFiltering: true},
+                                    {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true},
+                                    {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true},
+                                    ]" :dataSource="dsDanhBaThanhToan" :showFilter="true" :showColumnCheckbox="true"
+                                            dataKeyField="THANHTOAN_ID"
+                                            ref="danhba_grid" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </SplitArea>
+            </Split>
+        </div>
+    </div>
+</div>

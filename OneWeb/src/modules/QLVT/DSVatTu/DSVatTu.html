@@ -1,0 +1,176 @@
+<ejs-dialog
+  :enableResize='true'
+  :allowDragging='true'
+  :visible='false'
+  ref="popup_frmDSVatTu"
+  :animationSettings='animationSettings'
+  showCloseIcon=false
+  width='80%'
+  :target='target'
+  style="top:30px; bottom:30px"
+  :open='OpenDialog'>
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title font-weight-bold"><span class="icon one-appstore"></span> Danh sách vật tư</div>
+            <!-- <div class="close -ap icon-close" data-dismiss="modal" @click="Close"> -->
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="tsbtnHoanThanh_Click" >
+                    <a >
+                        <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận
+                    </a>
+                </li>
+                <li @click="tsbtnDocFile_Click">
+                    <a>
+                      <span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Đọc file excel
+                    </a>
+                    <b-form-file id="fileUploadDSVT" v-model="arrayImportFile.filexcel" ref="fileUploadDSVT" @change="this.onChangeDSVT" accept=".xls, .xlsx" class="-ap icon-more_horiz hidden" plain></b-form-file>
+                </li>
+                <li @click="tsbtnFileMau_Click">
+                    <a>
+                      <span class="icon one-xlsx1 f20 inline vcenter"></span> File Excel Mẫu
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="row">
+                    <div class="legend-title"><span class="icon fa fa-angle-up"></span>Danh sách vật tư</div>
+                    <div class="col-12" :class="visible.layoutControlItem3 ? 'col-sm-6' : 'col-sm-12'">
+                        <div class="table-content" style="overflow-x:hidden;">
+                            <DataGrid
+                                v-bind:columns="[
+                                {fieldName: 'ISCHECK', headerText: '',type: 'checkbox', textAlign: 'Left', allowFiltering: true, width: '60', freeze: 'Left'},
+                                {fieldName: 'MA_VT', headerText: 'Mã vật tư' , textAlign: 'Left', allowFiltering: true,},
+                                {fieldName: 'TEN_VT' , headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true,},
+                                {fieldName: 'DVI_TINH', headerText: 'ĐVT', textAlign: 'Left', allowFiltering: true,},
+                                {fieldName: 'PART_NUMBER', headerText: 'Part_number', textAlign: 'Left', allowFiltering: true,},
+                                {fieldName: 'LOAI_TBI', headerText: 'Loại TB', textAlign: 'Left', allowFiltering: true,},
+                                
+                                ]"
+                                v-bind:dataSource="gridControl1"
+                                ref="TableGridControl1"
+                                :showColumnCheckbox='false'
+                                :defaultColumnCheckboxChecked='false'
+                                :enabledSelectFirstRow='false'
+                                :showFilter="true"
+                                :allowPaging="true"
+                                :enablePagingServer='false'
+                                @rowSelected='gridView1_MouseDown'
+                                :selectionSettings="{ checkboxOnly: true }"
+                                >
+                            </DataGrid>
+                           
+                        </div>
+                    </div>
+                    <div v-if="visible.layoutControlItem3" class="col-sm-6 col-12">
+                        <div class="table-content" style="overflow-x:hidden;">
+                            <ejs-grid ref="TableGridDS"
+                                class="table-result table-gachle"
+                                locale="vi"
+                                :dataSource="gridDS"
+                                :allowPaging='true'
+                                :allowSorting='true'
+                                :allowFiltering='true'
+                                :filterSettings='filterOptions'
+                                :allowResizing='true'
+                                :allowSelection='true'
+                                :gridLines="'Both'"
+                                rowHeight=32
+                                :enableHover='true'
+                                :pageSettings='pageSettings'
+                                >
+                                <e-columns>
+                                    <e-column field='STT' headerText='' width=20 textAlign='Center' :template='cRowSelected' :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column type='checkbox' :allowFiltering='false' textAlign='Center' :allowSorting='false' width='60'></e-column>
+                                    <e-column field='MA_VT' headerTextAlign='Center' headerText='Mã vật tư' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='TEN_VT' headerTextAlign='Center' headerText='Tên vật tư' textAlign='Left'  :filterBarTemplate='templateOptions'></e-column>
+                                    <e-column field='DVI_TINH' headerTextAlign='Center' headerText='ĐVT' textAlign='Left' :filterBarTemplate='templateOptions'></e-column>
+                                </e-columns>
+                            </ejs-grid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title padb5">
+                    <div class="pull-left"><span class="icon fa fa-angle-up"></span>Danh sách vật tư đã chọn</div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="table-content" >
+                            <DataGrid
+                                v-bind:columns="[
+                                { allowEditing: false, fieldName: 'MA_VT', headerText: 'Mã vật tư' , textAlign: 'Left', allowFiltering: true, headerTemplate: MA_VT_Header},
+                                { allowEditing: false, headerText: 'Lô hàng', textAlign: 'Left', allowFiltering: true, template: LoHangTemplate , visible : visible.LOHANG},
+                                { allowEditing: false, fieldName: 'TEN_VT' , headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true,},
+                                { allowEditing: false, fieldName: 'DVI_TINH', headerText: 'ĐVT', textAlign: 'Left', allowFiltering: true,},
+                                { allowEditing: true, fieldName: 'SOLUONG', headerText: 'Số lượng', textAlign: 'Right', allowFiltering: true, type:'number', editType:'numericedit', format: 'n3'},
+                                { allowEditing: true, fieldName: 'DONGIA', headerText: 'Đơn giá', textAlign: 'Right', allowFiltering: true, type:'number', editType:'numericedit', format: 'n3'},
+                                { allowEditing: false, fieldName: 'TIEN', headerText: 'Thành tiền', textAlign: 'Right', allowFiltering: true, type:'number', editType:'numericedit', format: 'n3'},
+                                { allowEditing: true, fieldName: 'HAN_BH', headerText: 'Hạn BH', textAlign: 'Right', allowFiltering: true, editType: 'datepickeredit'},
+                                { allowEditing: false, fieldName: 'btnThemVT', headerText: 'Thêm VT', textAlign: 'Left', allowFiltering: true, template: btnThemVTTemplate, width: 70},                                
+                                { fieldName: 'KEYROW', isPrimaryKey:true , visible: false},
+                                ]"
+                                v-bind:dataSource="gridVatTu"
+                                dataKeyField="KEYROW"
+                                ref="TableGridVatTu"
+                                :showColumnCheckbox='false'
+                                :defaultColumnCheckboxChecked='false'
+                                :enabledSelectFirstRow='false'
+                                :showFilter="true"
+                                :allowPaging="true"
+                                :enablePagingServer='false'
+                                :editSettings="{ allowEditing: true,mode:'Batch'}"
+                                @cellSaved='gridViewVatTu_ValidateRow'                                
+                                >
+                            </DataGrid>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <b-modal 
+        no-close-on-backdrop
+        hide-footer 
+        hide-header 
+        hide-header-close 
+        class="modal" 
+        size="xl"
+        id="popupLoHang">
+        
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">Chọn lô hàng</div>
+                    <div class="close -ap icon-close"  @click="$bvModal.hide('popupLoHang')" data-dismiss="modal">
+                    </div>
+                </div>                
+                <div class="popup-body">
+                    <DataGrid
+                        v-bind:columns="[
+                        { fieldName: 'loHang', headerText: 'LOHANG' },
+                        { fieldName: 'prefix', headerText: 'PREFIX'},
+                        { fieldName: 'donGia' , headerText: 'DONGIA'},                     
+                        ]"
+                        v-bind:dataSource="cboLoHang"
+                        ref="gridLoHang"
+                        :showColumnCheckbox='false'                       
+                        :enabledSelectFirstRow='false'
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer='false'     
+                        @selectedRowChanged="gridLoHang_FocusedRowChanged_sender"                   
+                        >
+                    </DataGrid>
+                </div>
+            </div>
+        
+    </b-modal>
+</ejs-dialog>

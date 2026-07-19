@@ -1,0 +1,782 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a style="cursor: pointer;" href="javascript:;" @click="onClickNhapMoi" :class="{ 'disabled': !newBtn }">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </a>
+      </li>
+      <li>
+        <a style="cursor: pointer;" href="javascript:;" @click="onClickGhiLai" :class="{ 'disabled': !saveBtn }">
+          <span class="icon one-save"></span> Ghi lại
+        </a>
+      </li>
+      <li>
+        <a style="cursor: pointer;" href="javascript:;" @click="onClickSua" :class="{ 'disabled': !editBtn }">
+          <span class="icon one-edit"></span>Sửa
+        </a>
+      </li>
+      <li>
+        <a class="pointer" @click="onClickHuy" :class="{ 'disabled': !cancelBtn }">
+          <span class="icon one-trash"></span> Hủy bỏ
+        </a>
+      </li>
+      <li>
+        <a style="cursor: pointer;" href="javascript:;" @click="onClickXoa" :class="{ 'disabled': !deleteBtn }">
+          <span class="icon one-trash"></span>Xóa
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <!-- Search Form -->
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Tìm kiếm</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="col-sm-4 key">Model thiết bị</div>
+                <div class="col-sm-8 value">
+                  <input type="text" class="form-control" v-model="searchParams.modelThietBi" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="col-sm-4 key">Hãng sản xuất</div>
+                <div class="col-sm-8 value">
+                  <SelectExt
+                    v-model="searchParams.hangSxId"
+                    :dataSource="listHangSanXuat"
+                    dataTextField="text"
+                    dataValueField="id"
+                    :placeholder="'Chọn hãng sản xuất'"
+                  >
+                  </SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="col-sm-8 value">
+                  <a style="cursor: pointer;" href="javascript:;" @click="onClickTimKiem" class="btn btn-primary">
+                    <span class="icon one-search"></span> Tìm kiếm
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin chủng loại server</div>
+          </div>
+          <div class="nav tab-over tabs">
+            <a
+              href="#thongTinChung"
+              v-on:click="onChangeTab(1)"
+              data-toggle="tab"
+              class="tab"
+              :class="{active: tab_index == 1}"
+              >Thông tin chung</a
+            >
+            <a
+              href="#cauHinhPhanCung"
+              v-on:click="onChangeTab(2)"
+              data-toggle="tab"
+              class="tab"
+              :class="{active: tab_index == 2}"
+              >Cấu hình phần cứng</a
+            >
+
+            <a
+              href="#congKetNoi"
+              v-on:click="onChangeTab(3)"
+              data-toggle="tab"
+              class="tab"
+              :class="{active: tab_index == 3}"
+              >Cổng kết nối và giao diện</a
+            >
+          </div>
+          <div class="tab-content">
+            <div class="tab-pane" id="thongTinChung" :class="{active: tab_index == 1}">
+              <div class="row">
+                <!-- 1. Thông tin chung -->
+                <div class="col-8">
+                  <div class="row">
+                    <div class="legend-subtitle">Thông tin chung</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="col-12">
+                        <div class="info-row">
+                          <div class="col-sm-4 key">Mã chủng loại</div>
+                          <div class="col-sm-8 value">
+                            <input
+                              type="number"
+                              class="form-control"
+                              disabled="true"
+                              v-model="currentItem.chungLoaiSvrId"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="info-row">
+                          <div class="col-sm-4 key">Mã Vật tư</div>
+                          <div class="col-sm-8 value">
+                            <input type="text" class="form-control" disabled="true" v-model="currentItem.maVatTu" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="info-row">
+                          <div class="col-sm-4 key">Model thiết bị</div>
+                          <div class="col-sm-8 value">
+                            <input
+                              type="text"
+                              class="form-control"
+                              :class="controls.modelThietBi.invalid ? 'is-invalid' : ''"
+                              :disabled="!controls.modelThietBi.enabled"
+                              v-model="currentItem.modelThietBi"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="col-12">
+                        <div class="info-row">
+                          <div class="col-sm-4 key">Hiệu lực</div>
+                          <div class="col-sm-8 value padt4">
+                            <div class="check-action">
+                              <input
+                                type="checkbox"
+                                class="check"
+                                :disabled="!controls.hieuLuc.enabled"
+                                v-model="currentItem.hieuLuc"
+                                :true-value="1"
+                                :false-value="0"
+                              /><span class="name"></span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="info-row">
+                          <div class="col-sm-4 key">Ghi chú</div>
+                          <div class="col-sm-8 value">
+                            <input
+                              type="text"
+                              class="form-control"
+                              :class="controls.ghiChu.invalid ? 'is-invalid' : ''"
+                              :disabled="!controls.ghiChu.enabled"
+                              v-model="currentItem.ghiChu"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Đặc tính thiết bị -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">Đặc tính thiết bị</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Full depth</div>
+                        <div class="col-sm-8 value padt4">
+                          <div class="check-action">
+                            <input
+                              type="checkbox"
+                              class="check"
+                              :disabled="!controls.fullDepth.enabled"
+                              v-model="currentItem.fullDepth"
+                              :true-value="1"
+                              :false-value="0"
+                            /><span class="name"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Hãng sản xuất <span class="red">*</span></div>
+                        <div class="col-sm-8 value">
+                          <SelectExt
+                            v-model="currentItem.hangSxId"
+                            :disabled="!controls.hangSxId.enabled"
+                            :class="controls.hangSxId.invalid ? 'invalidBox' : ''"
+                            :dataSource="listHangSanXuat"
+                            dataTextField="text"
+                            dataValueField="id"
+                            :placeholder="'Chọn hãng sản xuất'"
+                          >
+                          </SelectExt>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Công suất định danh <span class="red">*</span></div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.congSuat.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.congSuat.enabled"
+                            v-model="currentItem.congSuat"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="cauHinhPhanCung" :class="{active: tab_index == 2}">
+              <div class="row">
+                <!--CPU -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">CPU</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số khe cắm <span class="red">*</span></div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.cpuSoKhe.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.cpuSoKhe.enabled"
+                            v-model="currentItem.cpuSoKhe"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số Socket CPU</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.cpuSoSocket.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.cpuSoSocket.enabled"
+                            v-model="currentItem.cpuSoSocket"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Model CPU</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.cpuModel.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.cpuModel.enabled"
+                            v-model="currentItem.cpuModel"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Ổ cứng -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">Ổ cứng</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số khe cắm SSD</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.soKheSsd.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.soKheSsd.enabled"
+                            v-model="currentItem.soKheSsd"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số khe cắm HDD</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.soKheHdd.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.soKheHdd.enabled"
+                            v-model="currentItem.soKheHdd"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số khe cắm NvMe</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.soKheNvme.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.soKheNvme.enabled"
+                            v-model="currentItem.soKheNvme"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- GPU -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">GPU</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Model</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.gpuModel.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.gpuModel.enabled"
+                            v-model="currentItem.gpuModel"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số lượng GPU</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.gpuSoLuong.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.gpuSoLuong.enabled"
+                            v-model="currentItem.gpuSoLuong"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <!-- RAM -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">RAM</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số khe cắm <span class="red">*</span></div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.soKheRam.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.soKheRam.enabled"
+                            v-model="currentItem.soKheRam"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FAN -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">FAN</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số slot</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.soSlotFan.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.soSlotFan.enabled"
+                            v-model="currentItem.soSlotFan"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Module PCI -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">Module PCI</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số lượng slot PCI</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.soSlotPci.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.soSlotPci.enabled"
+                            v-model="currentItem.soSlotPci"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="congKetNoi" :class="{active: tab_index == 3}">
+              <div class="row">
+                <!-- 4. Cổng dữ liệu -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">Cổng dữ liệu</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số lượng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.dpSoCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.dpSoCong.enabled"
+                            v-model="currentItem.dpSoCong"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Tên cổng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.dpTenCong && controls.dpTenCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!(controls.dpTenCong && controls.dpTenCong.enabled)"
+                            v-model="currentItem.dpTenCong"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Loại cổng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.dpLoaiCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.dpLoaiCong.enabled"
+                            v-model="currentItem.dpLoaiCong"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Mục đích sử dụng</div>
+                        <div class="col-sm-8 value">
+                          <SelectExt
+                            v-model="currentItem.dpMucDichSdId"
+                            :disabled="!controls.dpMucDichSdId.enabled"
+                            :class="controls.dpMucDichSdId.invalid ? 'invalidBox' : ''"
+                            :dataSource="listMucDichSuDung"
+                            dataTextField="text"
+                            dataValueField="id"
+                            :placeholder="'Chọn mục đích sử dụng'"
+                          >
+                          </SelectExt>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Module</div>
+                        <div class="col-sm-8 value">
+                          <SelectExt
+                            v-model="currentItem.dpTtModuleId"
+                            :disabled="!controls.dpTtModuleId.enabled"
+                            :class="controls.dpTtModuleId.invalid ? 'invalidBox' : ''"
+                            :dataSource="listThongTinModule"
+                            dataTextField="text"
+                            dataValueField="id"
+                            :placeholder="'Chọn module'"
+                          >
+                          </SelectExt>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Băng thông</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.dpBangThong.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.dpBangThong.enabled"
+                            v-model="currentItem.dpBangThong"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. Cổng nguồn -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">Cổng nguồn</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số lượng<span class="red">*</span></div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.ppSoCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.ppSoCong.enabled"
+                            v-model="currentItem.ppSoCong"
+                            min="1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Tên cổng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.ppTenCong && controls.ppTenCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!(controls.ppTenCong && controls.ppTenCong.enabled)"
+                            v-model="currentItem.ppTenCong"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Loại nguồn điện</div>
+                        <div class="col-sm-8 value">
+                          <SelectExt
+                            v-model="currentItem.ppLoaiNd"
+                            :disabled="!controls.ppLoaiNd.enabled"
+                            :class="controls.ppLoaiNd.invalid ? 'invalidBox' : ''"
+                            :dataSource="ppLoaiNdOptions"
+                            dataTextField="text"
+                            dataValueField="id"
+                            :placeholder="'Chọn loại nguồn điện'"
+                          >
+                          </SelectExt>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Chuẩn đầu nối</div>
+                        <div class="col-sm-8 value">
+                          <SelectExt
+                            v-model="currentItem.ppChuanDnId"
+                            :disabled="!controls.ppChuanDnId.enabled"
+                            :class="controls.ppChuanDnId.invalid ? 'invalidBox' : ''"
+                            :dataSource="listChuanDauNoi"
+                            dataTextField="text"
+                            dataValueField="id"
+                            :placeholder="'Chọn chuẩn đầu nối'"
+                          >
+                          </SelectExt>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Dòng định danh</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.ppDongDien.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.ppDongDien.enabled"
+                            v-model="currentItem.ppDongDien"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Điện áp định danh</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.ppDienAp.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.ppDienAp.enabled"
+                            v-model="currentItem.ppDienAp"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 6. Cổng điều khiển -->
+                <div class="col-4">
+                  <div class="row">
+                    <div class="legend-subtitle">Cổng điều khiển</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Số lượng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="number"
+                            class="form-control"
+                            :class="controls.cpSl.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.cpSl.enabled"
+                            v-model="currentItem.cpSl"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Tên cổng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.cpTenCong && controls.cpTenCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!(controls.cpTenCong && controls.cpTenCong.enabled)"
+                            v-model="currentItem.cpTenCong"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Loại cổng</div>
+                        <div class="col-sm-8 value">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :class="controls.cpLoaiCong.invalid ? 'is-invalid' : ''"
+                            :disabled="!controls.cpLoaiCong.enabled"
+                            v-model="currentItem.cpLoaiCong"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="info-row">
+                        <div class="col-sm-4 key">Mục đích sử dụng</div>
+                        <div class="col-sm-8 value">
+                          <SelectExt
+                            v-model="currentItem.cpMucDichSdId"
+                            :disabled="!controls.cpMucDichSdId.enabled"
+                            :class="controls.cpMucDichSdId.invalid ? 'invalidBox' : ''"
+                            :dataSource="listMucDichSuDung"
+                            dataTextField="text"
+                            dataValueField="id"
+                            :placeholder="'Chọn mục đích sử dụng'"
+                          >
+                          </SelectExt>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách chủng loại server</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <DataGrid
+                ref="gridItems"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :showColumnCheckbox="true"
+                :allowExcelExport="false"
+                :columns="columns"
+                :dataSource="dataItems"
+                @rowSelected="onRowSelected"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

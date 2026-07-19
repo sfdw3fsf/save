@@ -1,0 +1,281 @@
+<div>
+    <breadcrumb />
+    <vue-nav>
+        <ul ref="menu" class="list">
+            <li ref="tsbtnNhapMoi" @click="nhapmoi" :class="button.nhapmoi ? 'active' : 'non-active'">
+                <a> <span class="icon one-file-plus"></span>Nhập mới </a>
+            </li>
+            <li ref="tsbtnGhiLai" @click="ghilai()" :class="button.ghilai ? 'active' : 'non-active'">
+                <a> <span class="icon one-save"></span>Ghi lại </a>
+            </li>
+            <li ref="tsbtnHuyBo" @click="huy" :class="button.huy ? 'active' : 'non-active'">
+                <a>
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+            <li ref="tsbtnXoa" @click="xoa" :class="button.xoa ? 'active' : 'non-active'">
+                <a> <span class="icon one-trash"></span>Xóa </a>
+            </li>
+            <li ref="tsbtnNapDL" @click="napDl_click" :class="button.napdl ? 'active' : 'non-active'">
+                <a> <span class="icon one-vt"></span>Nạp DL </a>
+            </li>
+            <li @click="xoanap()" :class="button.xoanap ? 'active' : 'non-active'">
+                <a ref="tsbtnXoaDL_Nap"> <span class="icon one-trash"></span>Xóa nạp </a>
+            </li>
+        </ul>
+    </vue-nav>
+    <div class="page-content">
+        <b-row>
+            <b-col md="7">
+                <vue-card label="Thông tin tuyến thu">
+                    <b-row>
+                        <b-col md="7">
+                            <div class="info-row  mb-2">
+                                <div class="key w100 nowrap">Đơn vị quản lý</div>
+                                <div class="value">
+                                    <SelectExt labelWidth="100" :value="donviql_id" label="Đơn vị quản lý"
+                                        dataTextField="ten_dv" @change="cboDonVi_QL_SelectedValueChanged" dataValueField="donvi_id" :dataSource="options.donviQL" />
+                                </div>
+                            </div>
+                            <div class="info-row  mb-2">
+                                <div class="key w100 nowrap">Nhân viên</div>
+                                <div class="value">
+                                    <SelectExt labelWidth="100" label="Nhân viên" :value="model.nhanvien_tc"
+                                        dataTextField="ten_hienthi" @change="cboNhanVienTC_EditValueChanged_1" dataValueField="nhanvien_id" :dataSource="options.nhanvien_TC" />
+                                </div>
+                            </div>
+                            <div class="info-row  mb-2">
+                                <div class="key w100 nowrap">Mã tuyến</div>
+                                <div class="value">
+                                    <input class="form-control" ref="txtMatuyen" v-model="tuyenthu.ma_tuyen" label="Mã tuyến" />
+                                </div>
+                            </div>
+                            <vue-input labelWidth="100" v-model="tuyenthu.tentuyen" label="Tên tuyến" />
+                            <vue-input v-model="tuyenthu.ghichu" labelWidth="100" label="Ghi chú" />
+                        </b-col>
+                        <b-col md="5">
+                            <div class="info-row  mb-2">
+                                <div class="key w80 nowrap">Loại tuyến</div>
+                                <div class="value">
+                                    <SelectExt label="Loại tuyến" v-model="tuyenthu.kieutuyenthu" dataTextField="tenkieu"
+                                        dataValueField="kieu" :dataSource="options.kieuTuyenthu" />
+                                </div>
+                            </div>
+                            <div class="info-row  mb-2">
+                                <div class="key w80 nowrap">Mã NV</div>
+                                <div class="value">
+                                    <input class="form-control" v-model="tuyenthu.ma_nvtc" disabled label="Mã NV" />
+                                </div>
+                            </div>
+                            <vue-input v-model="tuyenthu.tuyenthu_id" label="Tuyến ID" />
+                            <div class="info-row  mb-2">
+                                <div class="key w80 nowrap">Kiểu thu</div>
+                                <div class="value">
+                                    <SelectExt label="Kiểu thu" v-model="tuyenthu.kieuthu_id" dataTextField="KIEUTHU"
+                                        dataValueField="KIEUTHU_ID" :dataSource="options.kieuThu" />
+                                </div>
+                            </div>
+                            <div class="info-row  mb-2">
+                                <div class="key w80 nowrap">HTTT</div>
+                                <div class="value">
+                                    <SelectExt v-model="tuyenthu.httt_id" label="hinhthuc_tt" dataTextField="hinhthuc_tt"
+                                        dataValueField="httt_id" :dataSource="options.httt" />
+                                </div>
+                            </div>
+                        </b-col>
+                    </b-row>
+                </vue-card>
+                <div class="box-form">
+                    <div class="leged-title">
+                        Tìm kiếm theo mã tuyến
+                    </div>
+                    <input @keyup.enter="txtTimKiem_KeyPress" v-model="txtTimKiem" type="text" class="form-control highlight">
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Danh sách tuyển thu
+                        </div>
+                        <div class="pull-right">
+                            <div class="check-action normal">
+                                <input v-model="ckbTuyenThu" type="checkbox" true-value="1" false-value="0" class="check">
+                                <span class="name">Tuyến thu sử dụng</span>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="table-content" style="height: 335px;">
+                        <DataGrid v-bind:columns="col_tuyenthu" v-bind:dataSource="dsTuyenthu" :showColumnCheckbox="false"
+                        :showFilter="false" :allowPaging="true"
+                        :enabledSelectFirstRow="false"
+                        :enablePagingServer="false" panelDataHeight="100" @rowSelected="focusTuyenthu"
+                        ref="danh_sach_tuyen_thu"></DataGrid>
+                    </div>
+                </div>
+                <vue-card label="Dữ liệu nạp">
+                    <DataGrid v-bind:columns="col_dsnap" v-bind:dataSource="options.dsNap" :showColumnCheckbox="true"
+                        ref="danh_sach_nap" :showFilter="false" :allowPaging="true" :enablePagingServer="false"
+                        panelDataHeight="600"></DataGrid>
+                </vue-card>
+            </b-col>
+            <b-col md="5">
+                <vue-card label="Thông tin địa danh">
+                    <b-row>
+                        <b-col md="4">
+                            <div class="info-row  mb-2">
+                                <div class="key w60 nowrap">Tỉnh</div>
+                                <div class="value">
+                                    <SelectExt labelWidth="40" label="Tỉnh	" v-model="timkiem.tinh" dataTextField="TENTINH"
+                                        dataValueField="TINH_ID" :dataSource="options.tinh" />
+                                </div>
+                            </div>
+                        </b-col>
+                        <b-col md="4">
+                            <div class="info-row  mb-2">
+                                <div class="key w60 nowrap">Huyện</div>
+                                <div class="value">
+                                    <SelectExt labelWidth="40" label="Quận	" v-model="timkiem.quan" dataTextField="TEN_QUAN"
+                                        dataValueField="QUAN_ID" :dataSource="huyenByTinh" />
+                                </div>
+                            </div>
+                        </b-col>
+                        <b-col md="4">
+                            <div class="info-row  mb-2">
+                                <div class="key w60 nowrap">Xã</div>
+                                <div class="value">
+                                    <SelectExt labelWidth="40" label="Xã" v-model="timkiem.phuong" dataTextField="TEN_PHUONG"
+                                        dataValueField="PHUONG_ID" :dataSource="options.phuong" />
+                                </div>
+                            </div>
+                        </b-col>
+                    </b-row>
+                </vue-card>
+                <!-- combo 1 -->
+                <div class="box-move-select-table">
+                    <vue-card label="Phố đã gán">
+                        <DataGrid v-bind:columns="col_pho_left" v-bind:dataSource="options.pho_da_gan"
+                            :showColumnCheckbox="true" :showFilter="false"
+                            :enabledSelectFirstRow="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :allowPaging="true"
+                            :enablePagingServer="false" ref="pho_da_gan" panelDataHeight="150"></DataGrid>
+                    </vue-card>
+                    <div class="actions">
+                        <button @click="pho_to_right" class="btn">
+                            <span class="fa fa-angle-right"></span>
+                        </button>
+                        <button @click="pho_to_right_all" class="btn">
+                            <span class="fa fa-angle-double-right"></span>
+                        </button>
+                        <button @click="pho_to_left" class="btn">
+                            <span class="fa fa-angle-left"></span>
+                        </button>
+                        <button @click="pho_to_left_all" class="btn">
+                            <span class="fa fa-angle-double-left"></span>
+                        </button>
+                    </div>
+                    <vue-card label="Phố chưa gán">
+                        <DataGrid v-bind:columns="col_pho" v-bind:dataSource="options.pho_chua_gan"
+                            :showColumnCheckbox="true" :showFilter="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :allowPaging="true"
+                            :enabledSelectFirstRow="false"
+                            ref="pho_chua_gan" :enablePagingServer="false" panelDataHeight="150"
+                            @rowSelected="getDaciemchuagan"></DataGrid>
+                    </vue-card>
+                </div>
+                <!-- combo 2 -->
+                <div class="box-move-select-table">
+                    <vue-card label="Ấp đã gán">
+                        <DataGrid v-bind:columns="col_ap_left" v-bind:dataSource="options.ap_da_gan"
+                            :showColumnCheckbox="true" :showFilter="false" :allowPaging="true" ref="ap_da_gan"
+                            :enabledSelectFirstRow="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :enablePagingServer="false"
+                            panelDataHeight="150"></DataGrid>
+                    </vue-card>
+                    <div class="actions">
+                        <button @click="ap_to_right" class="btn">
+                            <span class="fa fa-angle-right"></span>
+                        </button>
+                        <button @click="ap_to_right_all" class="btn">
+                            <span class="fa fa-angle-double-right"></span>
+                        </button>
+                        <button @click="ap_to_left" class="btn">
+                            <span class="fa fa-angle-left"></span>
+                        </button>
+                        <button @click="ap_to_left_all" class="btn">
+                            <span class="fa fa-angle-double-left"></span>
+                        </button>
+                    </div>
+                    <vue-card label="Ấp chưa gán">
+                        <DataGrid v-bind:columns="col_ap" v-bind:dataSource="options.ap_chua_gan"
+                            :showColumnCheckbox="true" ref="ap_chua_gan" :showFilter="false" :allowPaging="true"
+                            :enabledSelectFirstRow="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :enablePagingServer="false"
+                            panelDataHeight="150"></DataGrid>
+                    </vue-card>
+                </div>
+                <!-- combo 3 -->
+                <div class="box-move-select-table">
+                    <vue-card label="Khu đã gán">
+                        <DataGrid v-bind:columns="col_khu_left" v-bind:dataSource="options.khu_da_gan"
+                            :showColumnCheckbox="true" :showFilter="false" :allowPaging="true"
+                            :enabledSelectFirstRow="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :enablePagingServer="false"
+                            panelDataHeight="150" ref="khu_da_gan"></DataGrid>
+                    </vue-card>
+                    <div class="actions">
+                        <button @click="khu_to_right" class="btn">
+                            <span class="fa fa-angle-right"></span>
+                        </button>
+                        <button @click="khu_to_right_all" class="btn">
+                            <span class="fa fa-angle-double-right"></span>
+                        </button>
+                        <button @click="khu_to_left" class="btn">
+                            <span class="fa fa-angle-left"></span>
+                        </button>
+                        <button @click="khu_to_left_all" class="btn">
+                            <span class="fa fa-angle-double-left"></span>
+                        </button>
+                    </div>
+                    <vue-card label="Khu chưa gán">
+                        <DataGrid v-bind:columns="col_khu" v-bind:dataSource="options.khu_chua_gan"
+                            :showColumnCheckbox="true" ref="khu_chua_gan" :showFilter="false" :allowPaging="true"
+                            :enabledSelectFirstRow="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :enablePagingServer="false"
+                            panelDataHeight="150"></DataGrid>
+                    </vue-card>
+                </div>
+                <!-- combo 4 -->
+                <div class="box-move-select-table">
+                    <vue-card label="Đặc điểm đã gán">
+                        <DataGrid v-bind:columns="col_dacdiem" v-bind:dataSource="options.dacdiem_da_gan"
+                            :showColumnCheckbox="true" :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                            :enabledSelectFirstRow="false"
+                            :showFilter="false" :allowPaging="true" :enablePagingServer="false" panelDataHeight="150"
+                            ref="dacdiem_da_gan"></DataGrid>
+                    </vue-card>
+                    <div class="actions">
+                        <button @click="dacdiem_to_right" class="btn">
+                            <span class="fa fa-angle-right"></span>
+                        </button>
+                        <button @click="dacdiem_to_right_all" class="btn">
+                            <span class="fa fa-angle-double-right"></span>
+                        </button>
+                        <button @click="dacdiem_to_left" class="btn">
+                            <span class="fa fa-angle-left"></span>
+                        </button>
+                        <button @click="dacdiem_to_left_all" class="btn"> 
+                            <span class="fa fa-angle-double-left"></span>
+                        </button>
+                    </div>
+                    <vue-card label="Đặc điểm chưa gán">
+                        <DataGrid v-bind:columns="col_dacdiem" ref="dacdiem_chua_gan"
+                            v-bind:dataSource="options.dacdiem_chua_gan" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :showFilter="false"
+                            :allowPaging="true" :enablePagingServer="false" panelDataHeight="150"></DataGrid>
+                    </vue-card>
+                </div>
+            </b-col>
+        </b-row>
+    </div>
+</div>

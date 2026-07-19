@@ -1,0 +1,224 @@
+<div>
+  <b-modal
+    ref="popupVatTuTB"
+    size="vattutb-size"
+    hide-header
+    hide-header-close
+    hide-footer
+    body-class="p-0"
+    no-close-on-backdrop
+    @show="frmCapVatTuTB_Load"
+    @hide="handleHideModal"
+  >
+    <div class="modal-content popup-box">
+      <div class="popup-header">
+        <div class="title">
+          <span class="icon one-notepad"></span> Cấp/Thu hồi vật tư
+        </div>
+        <div class="close -ap icon-close" @click="hideModal"></div>
+      </div>
+      <div class="list-actions-top custom-list">
+        <ul class="list" style="overflow: inherit !important;">
+          <li v-for="item in actions" :key="item.id" @click="onActionClick(item)"
+              :class="{disabled: !item.active}" v-show="item.visible">
+            <a style="cursor: pointer;" :class="{disabled_color: !item.active}" :ref="item.id">
+              <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+            </a>
+          </li>
+          <li class="dropdown" @click="xuatPhieuShow = !xuatPhieuShow" style="position: static;">
+            <a href="#"> <span class="icon one-print"></span>In biên bản
+              <svg width="16" height="16" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </a>
+            <ul v-show="xuatPhieuShow" class="ui-xuat-phieu">
+              <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"
+                  v-show="tsbtnInBienBanVisible.tsbtnInBienBanNTWifi">
+                <a @click="tsbtnInBienBanNTWifi_Click">
+                  <span class="icon one-print"></span> In BB nghiệm thu wifi
+                </a>
+              </li>
+              <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"
+                  v-show="tsbtnInBienBanVisible.tsbtnInBienBanBG">
+                <a @click="tsbtnInBienBanBG_Click"
+                   style="color: #007bff; text-decoration: none">
+                  <span class="icon one-print"></span>In BB bàn giao
+                </a>
+              </li>
+              <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"
+                  v-show="tsbtnInBienBanVisible.tsbtnInBienBanTH">
+                <a @click="tsbtnInBienBanTH_Click" style="color: #007bff;text-decoration: none">
+                  <span class="icon one-print"></span>In BB thu hồi</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="popup-body">
+        <div class="box-form">
+          <div class="legend-title">Thông tin thiết bị</div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w100">Ngày thực hiện</div>
+                    <div class="value">
+                      <div class="input-icon-right">
+                        <k-date-picker type="datetime" format="DD/MM/YYYY HH:mm A"
+                                       v-model="formThongTinThietBi.dtpNgayCap" :disabled="disableBox.dtpNgayCap"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w80">Kiểu thiết bị</div>
+                    <div class="value">
+                      <Select2 ref="cboKieuTbi" :disabled='cboKieuTbi.disabled' v-model="cboKieuTbi.value"
+                               :options="cboKieuTbi.list" :settings="settingSelect2"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Mục đích cấp</div>
+                <div class="value">
+                  <div v-bind:class="{ disabled: DmMucDichCap.disabled}">
+                    <ComboboxGrid :valueField="DmMucDichCap.valueField" :textField="DmMucDichCap.textField"
+                                  v-model="DmMucDichCap.selectMucDichCap" :value="DmMucDichCap.selectMucDichCap"
+                                  :columns="DmMucDichCap.headers"
+                                  :panelDataHeight="DmMucDichCap.panelDataHeight" :enabledSelectFirstRow="true"
+                                  :dataSource="DmMucDichCap.data">
+                    </ComboboxGrid>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Lý do cấp</div>
+                <div class="value">
+                  <div class="select-custom" v-bind:class="{ disabled: DmLyDoCap.disabled}">
+                    <ComboboxGrid :valueField="DmLyDoCap.valueField" :textField="DmLyDoCap.textField"
+                                  v-model="DmLyDoCap.selectLyDoCap" :value="DmLyDoCap.selectLyDoCap"
+                                  :columns="DmLyDoCap.headers"
+                                  :panelDataHeight="DmLyDoCap.panelDataHeight" :enabledSelectFirstRow="true"
+                                  :dataSource="DmLyDoCap.data" disabled="true">
+                    </ComboboxGrid>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Trang bị</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="cboKieuTrangBi" :disabled='cboKieuTrangBi.disabled' v-model="cboKieuTrangBi.value"
+                             :options="cboKieuTrangBi.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Tình trạng</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="cboTinhTrang" :disabled='cboTinhTrang.disabled' v-model="cboTinhTrang.value"
+                             :options="cboTinhTrang.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w70">Nhân viên</div>
+                    <div class="value">
+                      <div class="select-custom">
+                        <Select2 ref="cboNhanVien" :disabled='cboNhanVien.disabled' v-model="cboNhanVien.value"
+                                 :options="cboNhanVien.list" :settings="settingSelect2"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w40">Kho</div>
+                    <div class="value">
+                      <Select2 ref="cboKho" :disabled='cboKho.disabled' v-model="cboKho.value"
+                               :options="cboKho.list" :settings="settingSelect2"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w70">Serial</div>
+                <div class="value">
+                  <div class="select-custom dropdown">
+                    <ComboboxGridEdit ref="cboSerial" class="table-result table-gachle"
+                                      v-model="DmVTGiao.selectVTGiao"
+                                      :columns="DmVTGiao.headers"
+                                      :panelDataHeight="DmVTGiao.panelDataHeight"
+                                      :enabledSelectFirstRow="true"
+                                      :editSettings="DmVTGiao.editSettings"
+                                      :dataSource="DmVTGiao.data"
+                                      @InsertSerial="receiverInsertSerialData"
+                    >
+                    </ComboboxGridEdit>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w70">Vật tư</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="cboVatTu" :disabled='cboVatTu.disabled' v-model="cboVatTu.value"
+                             :options="cboVatTu.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w70">Số lượng</div>
+                <div class="value">
+                  <input type="number" ref="txtSoLuong" class="form-control tright"
+                         v-model="formThongTinThietBi.soluong"
+                         :disabled="disableBox.txtSoLuong">
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w70">Ghi chú</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="formThongTinThietBi.txtGhiChu">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="box-form">
+          <div class="legend-title">Danh sách cấp/thu hồi vật tư</div>
+          <DataGrid ref="gridDanhSachVatTu" v-bind:columns="gridviewVatTu.headers"
+                    v-bind:dataSource="gridviewVatTu.list" :showColumnCheckbox="false"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    :enabled-select-first-row="false"
+                    @selectedRowChanged="gridviewVatTu_FocusedRowChanged"
+                    @actionComplete="gridviewVatTuActionComplete"
+                    @rowClicked="gridviewVatTuRowClick">
+          </DataGrid>
+        </div>
+        <div class="box-form">
+          <div class="legend-title">Danh sách vật tư thuê bao đang sử dụng</div>
+          <DataGrid ref="gridDanhSachVatTuDangSD" v-bind:columns="grvDS_VT_Giao.headers"
+                    v-bind:dataSource="grvDS_VT_Giao.list"
+                    :showColumnCheckbox="grvDS_VT_Giao.showColumnCheckbox"
+                    :enable-paging-server="false" :allowPaging="true"
+                    :showFilter="true"
+                    @selectedItemsChanged="grvDS_VT_Giao_SelectedItemsChanged"
+                    :selectionSettings="grvDS_VT_Giao.selectionOptions"
+                    :enabled-select-first-row="false">
+          </DataGrid>
+        </div>
+      </div>
+    </div>
+    <XemBaoCao ref="popupXemBaoCao" v-bind:ds-gia-tri="xembaocao.dsGiaTri" v-bind:ma_bc="xembaocao.ma_bc"/>
+    <VatTuImage ref="popupVatTuImage" :phieuvt_id="phieuvt_id"/>
+  </b-modal>
+</div>

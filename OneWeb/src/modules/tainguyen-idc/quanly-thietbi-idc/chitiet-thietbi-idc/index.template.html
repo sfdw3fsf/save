@@ -1,0 +1,156 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChiTietThietBi"
+  :isModal="true"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        {{ currentMode == 'VIEW' ? ' Chi tiết thiết bị: ' + (item && item.TEN ? item.TEN : 'Chưa có tên') : currentMode
+        == 'EDIT' ? ' Chỉnh sửa thiết bị: ' + (item && item.TEN ? item.TEN : 'Chưa có tên') : ' Thêm mới thiết bị' }}
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal" :disabled="currentMode == 'VIEW'">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2 ">
+      <!-- TAB NAVIGATION -->
+      <div class="">
+        <div class="nav tab-over tabs" style="margin-top: 20px;">
+          <a
+            href="#tabCauHinhThietBi"
+            v-on:click="onChangeTab(1)"
+            data-toggle="tab"
+            class="tab"
+            :class="{active: tab_index == 1}"
+            >Cấu hình thiết bị</a
+          >
+          <a
+            href="#tabPort"
+            v-on:click="onChangeTab(2)"
+            data-toggle="tab"
+            class="tab"
+            :class="{active: tab_index == 2}"
+            >Thông tin Port</a
+          >
+          <a
+            href="#tabLapDat"
+            v-on:click="onChangeTab(3)"
+            data-toggle="tab"
+            class="tab"
+            :class="{active: tab_index == 3}"
+            >Lắp đặt</a
+          >
+          <a
+            href="#tabLichSuThayDoi"
+            v-on:click="onChangeTab(4)"
+            data-toggle="tab"
+            v-if="currentMode != 'ADD'"
+            class="tab"
+            :class="{active: tab_index == 4}"
+            >Lịch sử thay đổi</a
+          >
+        </div>
+      </div>
+      <div class="tab-content" style="margin-bottom: 20px;">
+        <div class="tab-pane" id="tabCauHinhThietBi" :class="{active: tab_index == 1}">
+          <!-- THÔNG TIN THIẾT BỊ -->
+          <ThongTinThietBi
+            ref="ThongTinThietBi"
+            :currentItem="currentItem"
+            :currentMode="currentMode"
+            :controls="controls"
+            :loaiThietBiList="loaiThietBiList"
+            :mangThietBiList="mangThietBiList"
+            :hangSanXuatList="hangSanXuatList"
+            :trangThaiTaiSanList="trangThaiTaiSanList"
+            :trangThaiVanHanhList="trangThaiVanHanhList"
+            :thietBiChaList="thietBiChaList"
+            :thanhPhanThietBiList="thanhPhanThietBiList"
+            :nhaCungCapList="nhaCungCapList"
+            :uploadingIcon="uploadingIcon"
+            :pendingIconFile="pendingIconFile"
+            :loadingImageUrl="loadingImageUrl"
+            :pendingIconPreviewUrl="pendingIconPreviewUrl"
+            :displayIconUrl="displayIconUrl"
+            @change-loai-thiet-bi="onChangeLoaiThietBi"
+            @change-mang-thiet-bi="onChangeMangThietBi"
+            @change-hang-san-xuat="onChangeHangSanXuat"
+            @change-trang-thai-tai-san="onChangeTrangThaiTaiSan"
+            @change-trang-thai-van-hanh="onChangeTrangThaiVanHanh"
+            @change-thiet-bi-cha="onChangeThietBiCha"
+            @change-thanh-phan-thiet-bi="onChangeThanhPhanThietBi"
+            @change-noi-san-xuat="onChangeNoiSanXuat"
+            @click-upload-icon="onClickUploadIcon"
+            @remove-icon="onRemoveIcon"
+            @change-icon-file="onChangeIconFile"
+          />
+          <!-- THÔNG TIN QUẢN LÝ -->
+          <ThongTinQuanLy
+            :currentItem="currentItem"
+            :currentMode="currentMode"
+            :controls="controls"
+            :donViQuanLyList="donViQuanLyList"
+            :nhanVienList="nhanVienList"
+            :heThongList="heThongList"
+            :danhMucIdcList="danhMucData.danhMucIdcList"
+            @change-don-vi-quan-ly="onChangeDonViQuanLy"
+            @change-nhan-vien-quan-ly="onChangeNhanVienQuanLy"
+            @change-he-thong="onChangeHeThong"
+            @change-pham-vi-idc="onChangePhamViIdc"
+          />
+        </div>
+        <div class="tab-pane" id="tabPort" :class="{active: tab_index == 2}">
+          <!-- THÔNG TIN PORT -->
+          <ThongTinPort
+            ref="ThongTinPort"
+            :currentItem="currentItem"
+            :currentMode="currentMode"
+            :loaiCongList="loaiCongList"
+            @show-modal-port-thiet-bi="showModalPortThietBi"
+            @delete-port="deletePort"
+            @edit-port="editPort"
+            @port-changed="onPortChanged"
+          />
+        </div>
+        <div class="tab-pane" id="tabLapDat" :class="{active: tab_index == 3}">
+          <!-- THÔNG TIN LẮP ĐẶT -->
+          <ThongTinLapDat
+            :currentItem="currentItem"
+            :currentMode="currentMode"
+            :danhMucData="danhMucData"
+          />
+        </div>
+        <div class="tab-pane" id="tabLichSuThayDoi" :class="{active: tab_index == 4}">
+          <!-- LỊCH SỬ TÁC ĐỘNG -->
+          <div class="box-form" v-if="currentMode != 'ADD'">
+            <div class="legend-title">Lịch sử tác động</div>
+            <TabHistory :tenBang="'THIETBI'" :tenCot="''" :khoaDuLieu="currentItem.id" ref="tabHistory"></TabHistory>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ModalPortThietBi ref="ModalPortThietBi" :loaiCongList="loaiCongList" @portSaved="onPortSaved"></ModalPortThietBi>
+</ejs-dialog>

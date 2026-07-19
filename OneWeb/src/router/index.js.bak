@@ -1,0 +1,142 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+import menu from '../utils/menu'
+// layouts
+import MainLayout from '@/layouts/MainLayout'
+import BlankLayout from '@/layouts/BlankLayout'
+// public page
+import Home from '@/modules/Home'
+import Login from '@/modules/AUTH/Login'
+// // module routes
+import QLTN from '@/modules/QLTN/router.js'
+// // module OB routes
+import CSKH from '@/modules/CSKH/router.js'
+// // module QLVT routes
+import QLVT from '@/modules/QLVT/router.js'
+// module account
+import account from '@/modules/account/router.js'
+// module admin
+import admin from '@/modules/admin/router.js'
+// module install
+import install from '@/modules/install/router.js'
+// module contract
+import contract from '@/modules/contract/router.js'
+// module quantri
+import quantri from '@/modules/quantri/router.js'
+// module search
+import search from '@/modules/search/router.js'
+
+//module common
+import common from '@/modules/common/router.js'
+import complaint from '@/modules/complaint/router.js'
+import prepaid from '@/modules/prepaid/router.js'
+// module ECMS routes
+import ECMS from '@/modules/ECMS/router.js'
+// module CABMAN routes
+import CABMAN from '@/modules/CABMAN/router.js'
+// module QLSC routes
+import QLSC from '@/modules/QLSC/router.js'
+//
+import incident from '@/modules/incident/router.js'
+import report from '@/modules/report/router.js'
+// module HOPDONG routes
+import HOPDONG from '@/modules/EXTS/HOPDONG/router.js'
+// module KHIEUNAI routes
+import KHIEUNAI from '@/modules/EXTS/KHIEUNAI/router.js'
+// module QUANTRI routes
+import QUANTRI from '@/modules/EXTS/QUANTRI/router.js'
+// module TOANHA routes
+import TOANHA from '@/modules/EXTS/TOANHA/router.js'
+// module Payment routes
+import Payment from '@/modules/Payment/router.js'
+import print from '@/modules/print/router.js'
+
+Vue.use(Router)
+const router = new Router({
+  routes: [
+    {
+      path: '',
+      component: MainLayout,
+      children: [
+        {
+          path: '',
+          name: 'Home',
+          component: ()=>import('@/modules/index')//Home
+        },
+        {
+          path: 'home1',
+          name: 'Home1',
+          component: ()=>import('@/modules/index1')//Home
+        }
+      ]
+    },
+    {
+      path: '/auth',
+      name: 'auth',
+      component: BlankLayout,
+      meta: {
+        requiresAuth: false
+      },
+      children: [
+        {
+          path: 'login',
+          name: 'Login',
+          component: Login,
+          meta: {
+            requiresAuth: false
+          }
+        }
+      ]
+    },
+    ...CSKH,
+    ...QLTN,
+    ...QLVT,
+    ...ECMS,
+    ...CABMAN,
+    ...QLSC,
+    ...account,
+    ...admin,
+    ...search,
+    ...install,
+    ...contract,
+    ...admin,
+    ...quantri,
+    ...incident,
+    ...common,
+    ...complaint,
+    ...prepaid,
+    ...report,
+    ...HOPDONG,
+    ...KHIEUNAI,
+    ...QUANTRI,
+    ...TOANHA,
+    ...Payment,
+    ...print,
+
+    /*
+    {
+      path: '/qltn',
+      name: 'qltn',
+      component: LayoutMain
+    },
+    */
+  ]
+})
+// Vue Router navigation guards
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth == undefined || to.meta.requiresAuth == null || to.meta.requiresAuth == true) {
+    if (Vue.auth.isAuthenticated()) {
+      menu.setCurrentMenuItemFromRouter(to.path);
+      next();
+	}
+    else {
+      menu.setCurrentMenuItem(0);
+      next({ name: 'Login' });
+	}
+  }
+  else {
+	  menu.setCurrentMenuItemFromRouter(to.path);
+    next();
+  }
+})
+export default router

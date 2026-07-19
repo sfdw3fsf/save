@@ -1,0 +1,241 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    :odf_id="odf_id"
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    @shown="focusMyElement"
+    @hidden="hiddenModal"
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span> Ghi chú cổng ODF
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+                    <div class="list-actions-top">
+                        <ul class="list">
+                            <li>
+                                <a
+                                  href="javascript:void(0)"
+                                  @click="clearForm()"
+                                  :class="{'disable-btn': isDisableBtnNhapMoi}">
+                                  <span class="icon one-file-plus"></span> Nhập mới
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  href="javascript:void(0)"
+                                  @click="ghiLai()"
+                                  :class="{'disable-btn': isDisableBtnGhiLai}">
+                                  <span class="icon one-save"></span> Ghi lại (F9)
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  href="javascript:void(0)"
+                                  @click="huyBo()"
+                                  :class="{'disable-btn': isDisableBtnHuy}">
+                                  <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  href="javascript:void(0)"
+                                  @click="xoa()"
+                                  :class="{'disable-btn': isDisableBtnXoa}">
+                                  <span class="icon one-trash"></span> Xóa
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  href="javascript:void(0)"
+                                  @click="$root.toastSuccess('Hướng dẫn sử dụng')">
+                                  <span class="icon one-book1"></span>Hướng dẫn
+                                </a>
+                              </li>                   
+                        </ul>                    
+                    </div>
+                    <div class="popup-body">
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="box-form">
+                                    <div class="legend-title">Thông tin ghi chú</div>
+                                    <div class="table-content">
+                                        <table class="table-result tree-grid-2">
+                                            <tr class="highlight fw6">
+                                                <td colspan="3">
+                                                    <div class="tree-arrow"></div>Vị trí
+                                                </td>
+                                            </tr>
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">Từ (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white"> <input
+                                                    type="number"
+                                                    :class="{ 'is-invalid': $v.ghichu.tu_vitri.$error}"
+                                                    v-model="ghichu.tu_vitri"
+                                                    class="form-control"/> 
+                                                  </td></td>
+                                            </tr>
+                                            
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">Đến (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white"> <input
+                                                    type="number"     
+                                                    :class="{ 'is-invalid': $v.ghichu.den_vitri.$error}"                                              
+                                                    v-model="ghichu.den_vitri"
+                                                    class="form-control"/> 
+                                                  </td></td>
+                                            </tr>
+                                            
+                                            <tr class="highlight fw6">
+                                                <td colspan="3">
+                                                    <div class="tree-arrow"></div> Hướng đến trạm
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">TTVT (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white">
+                                                    <bss-error-marker :has-error="$v.ghichu.ttvt_id.$error">
+                                                    <div class="select-custom">
+                                                        <SelectExt
+                            v-model="ghichu.ttvt_id"
+                            :dataSource="dsTTVT"
+                            @change="onChangeTTVT"
+                            dataTextField="TEN_DV"
+                            dataValueField="DONVI_ID"/>
+                                                    </div>
+                                                </bss-error-marker>
+                                                </td>
+                                            </tr>
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">Tổ kỹ thuật (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white">
+                                                    <bss-error-marker :has-error="$v.ghichu.to_kt.$error">
+                                                    <div class="select-custom">
+                                                        <SelectExt
+                            v-model="ghichu.to_kt"
+                            :dataSource="dsToQL"
+                            @change="onChangeToQL"
+                            dataTextField="TEN_DV"
+                            dataValueField="DONVI_ID"/>
+                                                    </div>
+                                                </bss-error-marker>
+                                                </td>
+                                            
+                                            </tr>
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">Trạm thiết bị (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white">
+                                                    <bss-error-marker :has-error="$v.ghichu.donvi_id.$error">
+                                                    <div class="select-custom">
+                                                        <SelectExt
+                            v-model="ghichu.donvi_id"
+                            :dataSource="dsTramTbi"
+                            dataTextField="TEN_DV"
+                            dataValueField="DONVI_ID"/>
+                                                    </div>
+                                                </bss-error-marker>
+                                                </td>
+                                            </tr>
+                                            <tr class="highlight fw6">
+                                                <td colspan="3">
+                                                    <div class="tree-arrow"></div>Thông tin bố sung
+                                                </td>
+                                            </tr>
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">Thứ tự sắp xếp (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white"> <input
+                                                    type="number"
+                                                    :class="{ 'is-invalid': $v.ghichu.thutu.$error}"
+                                                    v-model="ghichu.thutu"
+                                                    class="form-control"/> 
+                                                  </td></td>
+                                            </tr>
+                                            <tr class="text-desc">
+                                                <td class="w20 highlight">
+                            
+                                                </td>
+                                                <td class="highlight5">Cự ly (m) (<span style="color: red;">*</span>)</td>
+                                                <td class="bg-white"> <input
+                                                    type="number"
+                                                    :class="{ 'is-invalid': $v.ghichu.culy.$error}"
+                                                    v-model="ghichu.culy"
+                                                    class="form-control"/> 
+                                                  </td></td>
+                                            </tr>    
+                            
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="box-form">
+                                    <div class="legend-title">Danh sách ghi chú</div>
+                                    <div class="table-content" style="height: 360px;">
+                                        <DataGrid ref='grid' v-bind:columns="[
+                                        {fieldName: 'THUTU', headerText: 'STT', allowFiltering: true},
+                                        {fieldName: 'TU_VITRI', headerText: 'Từ vị trí', allowFiltering: true}, 
+                                        {fieldName: 'DEN_VITRI', headerText: 'Đến vị trí', allowFiltering: true},
+                                        {fieldName: 'HUONGDEN', headerText: 'Hướng đến', allowFiltering: true},  
+                                        {fieldName: 'CULY', headerText: 'Cự ly (m)', allowFiltering: true},                   
+                                        ]"
+                                            v-bind:dataSource="dsGhiChu" :showFilter="true"
+                                             @selectedRowChanged="ghichu_selectedRowChanged"></DataGrid>  
+                                                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        
+                    </div>
+           
+    </div>
+     <!-- Modal -->
+  <b-modal
+  ref="modalXoa"
+  v-model="modalXoa"
+  title="Thông báo"
+  size="sm"
+  @ok="xacNhanXoa"
+>
+  <div class="d-block text-center">
+    <span>Bạn có thực sự muốn xóa ODF này không?</span>
+  </div>
+  <template #modal-footer="{ ok, cancel }">
+    <b-button
+      variant="secondary"
+      style="color: white"
+      @click="$refs['modalXoa'].hide()">Không đồng ý</b-button>
+    <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+  </template>
+</b-modal>
+</b-modal>
+           

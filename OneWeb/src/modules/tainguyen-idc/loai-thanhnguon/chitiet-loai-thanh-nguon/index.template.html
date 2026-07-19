@@ -1,0 +1,334 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChiTietLoaiThanhNguon"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        {{ currentMode == 'VIEW' ? ' Chi tiết loại thanh nguồn: ' + (currentItem && currentItem.ten ? currentItem.ten :
+        'Chưa có tên') : currentMode == 'EDIT' ? ' Chỉnh sửa loại thanh nguồn: ' + (currentItem && currentItem.ten ?
+        currentItem.ten : 'Chưa có tên') : ' Thêm mới loại thanh nguồn' }}
+      </div>
+      <div class="close -ap icon-close" style="cursor: pointer;" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal" :disabled="currentMode == 'VIEW'">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Huỷ bỏ
+          </b-link>
+        </li>
+      </ul>
+    </div>
+
+    <div class="modal-content p-2">
+      <!-- THÔNG TIN LOẠI THANH NGUỒN -->
+      <div class="box-form">
+        <div class="legend-title">Thông tin loại thanh nguồn</div>
+
+        <div class="row">
+          <!-- Cột trái -->
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">ID Loại thanh nguồn <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :value="currentItem.id ? currentItem.id : ''"
+                  :placeholder="!currentItem.id ? 'Tự sinh' : ''"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Tên loại thanh nguồn <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtTenLoaiThanhNguon.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.ten"
+                  placeholder="Nhập tên loại thanh nguồn"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Loại dòng điện <span class="red">*</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.loaiDongDien"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectLoaiDongDien.invalid ? 'is-invalid' : ''"
+                  :dataSource="[...loaiDongDienOptions]"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="Chọn loại dòng điện"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Thông số dòng điện <span class="red">*</span></div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.txtThongSoDongDien.invalid ? 'is-invalid' : ''"
+                    :disabled="currentMode == 'VIEW'"
+                    v-model="currentItem.thongSoDongDien"
+                    min="0"
+                    step="1"
+                  />
+                  <input type="text" class="form-control" value="A" disabled style="max-width:60px; margin-left:5px;" />
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Thông số điện áp <span class="red">*</span></div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.txtDienApDongDien.invalid ? 'is-invalid' : ''"
+                    :disabled="currentMode == 'VIEW'"
+                    v-model="currentItem.dienApDongDien"
+                    min="0"
+                    step="1"
+                  />
+                  <input type="text" class="form-control" value="V" disabled style="max-width:60px; margin-left:5px;" />
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Công suất thiết kế <span class="red">*</span></div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.txtCongSuatThietKe.invalid ? 'is-invalid' : ''"
+                    :disabled="currentMode == 'VIEW'"
+                    v-model="currentItem.csThietKe"
+                    min="0"
+                    step="1"
+                  />
+                  <input
+                    type="text"
+                    class="form-control"
+                    value="kW"
+                    disabled
+                    style="max-width:60px; margin-left:5px;"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Kích thước chiều dài <span class="red">*</span></div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.txtKichThuocChieuDai.invalid ? 'is-invalid' : ''"
+                    :disabled="currentMode == 'VIEW'"
+                    v-model="currentItem.dai"
+                    min="0"
+                    step="1"
+                  />
+                  <input
+                    type="text"
+                    class="form-control"
+                    value="cm"
+                    disabled
+                    style="max-width:60px; margin-left:5px;"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Kích thước chiều rộng <span class="red">*</span></div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.txtKichThuocChieuRong.invalid ? 'is-invalid' : ''"
+                    :disabled="currentMode == 'VIEW'"
+                    v-model="currentItem.rong"
+                    min="0"
+                    step="1"
+                  />
+                  <input
+                    type="text"
+                    class="form-control"
+                    value="cm"
+                    disabled
+                    style="max-width:60px; margin-left:5px;"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Kích thước chiều cao <span class="red">*</span></div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.txtKichThuocChieuCao.invalid ? 'is-invalid' : ''"
+                    :disabled="currentMode == 'VIEW'"
+                    v-model="currentItem.cao"
+                    min="0"
+                    step="1"
+                  />
+                  <input
+                    type="text"
+                    class="form-control"
+                    value="cm"
+                    disabled
+                    style="max-width:60px; margin-left:5px;"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cột phải -->
+          <div class="col-sm-6 col-12">
+            <!-- Hiệu lực lên đầu -->
+            <div class="info-row">
+              <div class="key w150">Hiệu lực</div>
+              <div class="value padt4">
+                <div class="check-action">
+                  <input
+                    type="checkbox"
+                    class="check"
+                    v-model="currentItem.suDung"
+                    :true-value="1"
+                    :false-value="0"
+                    :disabled="currentMode == 'VIEW'"
+                    style="cursor: pointer;"
+                  />
+                  <span class="name"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Hãng sản xuất <span class="red">*</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.hangSxId"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectHangSanXuat.invalid ? 'is-invalid' : ''"
+                  :dataSource="hangSanXuatSelectionList"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="Chọn hãng sản xuất"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Hình thức lắp đặt <span class="red">*</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.lapDat"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectLapDat.invalid ? 'is-invalid' : ''"
+                  :dataSource="[...lapDatOptions]"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="Chọn hình thức lắp đặt"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Số lượng ổ IEC C13 <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtSoLuongIECC13.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.slIecC13"
+                  min="0"
+                  step="1"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Số lượng ổ IEC C19 <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtSoLuongIECC19.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.slIecC19"
+                  min="0"
+                  step="1"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Số lượng ổ khác <span class="red">*</span></div>
+              <div class="value">
+                <input
+                  type="number"
+                  class="form-control"
+                  :class="controls.txtSoLuongKhac.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.slKhac"
+                  min="0"
+                  step="1"
+                />
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="key w150">Ghi chú</div>
+              <div class="value">
+                <textarea
+                  class="form-control"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.ghiChu"
+                  style="height: 100px; resize: none;"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

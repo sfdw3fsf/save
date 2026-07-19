@@ -1,0 +1,2 @@
+import UpdateMobileSubsInformation from './UpdateMobileSubsInformation'
+export default UpdateMobileSubsInformation

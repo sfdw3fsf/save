@@ -1,0 +1,402 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">{{ header.title }}</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="javascript: void(0)" class="router-link-active">Xử lý thuê bao</a></li>
+            <li class="breadcrumb-item"><a href="javascript: void(0)" class="router-link-active">Hoàn thiện khóa mở nợ cước</a></li>
+        </ul>
+    </div>
+    <template>
+        <div>
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li>
+                        <a href="#" @click.prevent="getDsThueBao()" title="Lấy thông tin mới">
+                            <span class="icon one-file-attach"></span> Lấy TT
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="onClickCapNhat" title="Cập nhật">
+                            <span class="icon  one-reload1"></span> Cập nhật
+                        </a>
+                    </li>
+                    <li :class="{disabled : !itemSelect || itemSelect.STATUS != 0}" title="Kích hoạt">
+                        <a href="#" @click.prevent="onClickKichHoat">
+                            <span class="icon one-file-arrow-up"></span> Kích hoạt
+                        </a>
+                    </li>
+                    
+                    <li :class="{disabled : !itemSelect || itemSelect.STATUS == 0}" title="Hoàn công hoàn thiện hồ sơ">
+                        <a href="#" @click.prevent="onClickHoanCong">
+                            <span class="icon   one-hoancong"></span> Hoàn công
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="onClickTraPhieu" title="Trả phiếu về hướng giao trước">
+                            <span class="icon  one-reload1"></span> Trả phiếu
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="onClickExPort" title="Xuất file">
+                            <span class="icon  one-download"></span> Xuất file
+                        </a>
+                    </li>
+                </ul>
+                <!-- <div class="more dropdown">
+                    <a href="#" data-toggle="dropdown">
+                        <span class="icon -ap  icon-dots-three-vertical"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon nc-icon-glyph arrows-1_simple-up"></span> Test Port
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon one-clipart-arrow-right"></span> Show Port
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon nc-icon-glyph arrows-1_simple-right"></span> Chuyển VNPT - Media
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon nc-icon-glyph arrows-1_simple-right text-warning"></span> Chuyển VNPT
+                                - NET
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon nc-icon-glyph arrows-1_simple-right text-warning"></span> Chuyển OMC
+                                - Data
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon one-circle-question"></span> Trợ giúp
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon nc-icon-glyph ui-1_database"></span>Vật tư
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon one-file-trash"></span>Xóa phiếu
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon one-reload-mobile"></span>TB cùng cáp
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon nc-icon-glyph media-2_headphones-mic"></span>Hỗ trợ KT
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon business_contacts nc-icon-glyph"></span>Liên hệ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon one-folder-arrow"></span>Chuyển IT360
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="dropdown-icon one-file-arrow"></span>Chuyển VIP
+                            </a>
+                        </li>
+                    </ul>
+                </div> -->
+            </div>
+            <div class="page-content" style="top: 80px !important; padding-bottom: 56px;">
+                <div class="grid-stack-box">
+                    <Split style="height: 600px;" :gutterSize="20">
+                        <SplitArea :size="33" :minSize="100">
+                            <div class="box-col box-form" id="boxLeft1">
+                                <div class="legend-title">
+                                    <div class="title">Thông tin phiếu yêu cầu</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">Dịch vụ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                          <!-- <select @change="getDsQuyTrinh"  class="form-control" v-model="ttPhieu.dichVuId">
+                            <option v-for="dv in dsDichVu" v-bind:value="dv.DICHVUVT_ID">{{dv.TEN_DVVT}}</option>
+                         </select> -->
+                         <SelectExt v-model="ttPhieu.dichVuId" :dataSource="dsDichVu" dataTextField="TEN_DVVT"
+                          dataValueField="DICHVUVT_ID" @change="getDsQuyTrinh"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">Quy trình </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                          <select  class="form-control" v-model="ttPhieu.quyTrinhId" @change="getHuongGiao">
+                            <option v-for="dv in dsQuyTrinh" v-bind:value="dv.QUYTRINH_ID">{{dv.QUYTRINH}}</option>
+                         </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">
+                                        <div class="check-action">
+                                            <input type="checkbox" v-model="ttPhieu.loaiHinhCkb" class="check">
+                                            <span class="name">Loại hình</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select :disabled="!ttPhieu.loaiHinhCkb" v-model="ttPhieu.loaiHinhId" class="form-control">
+                                                <option v-for="dv in dsLoaiHinh" v-bind:value="dv.LOAITB_ID">{{dv.LOAIHINH_TB}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">
+                                        Số máy/Acc
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" ref="maTb" v-model.trim="ttPhieu.maTb"  v-on:keyup.enter="doSearch"
+                        class="form-control highlight" :class="dsThueBao.length == 0 ? 'is-invalid' : ''">
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">
+                                        Kiểu YC
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                          <select  class="form-control" v-model="ttPhieu.kieuYcId">
+                            <option v-for="dv in dsKieuYc" v-bind:value="dv.KIEU_ID">{{dv.TENKIEU}}</option>
+                         </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">
+                                        Thu hồi Tbị
+                                    </div>
+                                    <div class="value">
+                                        <div class="list-checks mart7">
+                                            <div class="item">
+                                                <div class="check-action">
+                                                    <input type="radio" v-model="ttPhieu.rdGiao" v-bind:value="1" class="check">
+                                                    <span class="name">Giao theo QĐ ({{soNgayThuHoi}} ngày)</span>
+                                                </div>
+                                            </div>
+                                            <div class="item">
+                                                <div class="check-action">
+                                                    <input type="radio"  v-model="ttPhieu.rdGiao" v-bind:value="0" class="check">
+                                                    <span class="name">Giao ngay</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w90">
+                                        Nội dung TH
+                                    </div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button class="btn" @click="onClickUpdateNDTH">
+                                                <span class="one-reload1 normal f16"></span>
+                                            </button>
+                                            <input type="text" v-model.trim="ttPhieu.noiDungTH" class="form-control ">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="check-list red mart10">
+                                    <div class="item marb10">
+                                        <div class="check-action">
+                                            <input type="checkbox" v-model="ttPhieu.bqKichHoat" class="check">
+                                            <span class="name">Bỏ qua lỗi khi kích hoạt để kích hoạt thuê bao tiếp theo</span>
+                                        </div>
+                                    </div>
+                                    <div class="item marb10">
+                                        <div class="check-action">
+                                            <input type="checkbox" v-model="ttPhieu.bqHoanCong" class="check">
+                                            <span class="name">Bỏ qua lỗi khi hoàn công để hoàn công thuê bao kế tiếp</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </SplitArea>
+                        <SplitArea :size="67" :minSize="100">
+                            <div class="box-col" id="boxRight1">
+                                <div class="box-form">
+                                    <div class="legend-title">Thông tin giao việc</div>
+                                    <div class="row">
+                                        <div class="col-sm-4 col-12">
+                                            <div class="info-row">
+                                                <div class="key w80">
+                                                    Người GV
+                                                </div>
+                                                <div class="value">
+                                                    <div class="select-custom">
+                                <select  class="form-control" v-model="ttPhieu.idNguoiGv">
+                                  <option v-for="dv in dsNguoiGv" v-bind:value="dv.NHANVIEN_ID">{{dv.TEN_NV}}</option>
+                               </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 col-12">
+                                            <div class="info-row">
+                                                <div class="key w80">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" v-model="ttPhieu.cbkNgayGv" class="check">
+                                                        <span class="name">Ngày GV</span>
+                                                    </div>
+                                                </div>
+                                                <div class="value">
+                              <div class="input-icon-right">
+                                  <ejs-datetimepicker
+                                  class="form-control bg-none bor0 fw6 text h24"
+                                  :style="{'padding-top': '7px'}"
+                                  :placeholder="'Chọn ngày'"
+                                  v-model="ttPhieu.ngayGV"
+                                  format="dd/MM/yyyy HH:mm"
+                                  :showClearButton="false"
+                                  :enabled="ttPhieu.cbkNgayGv">
+                                  </ejs-datetimepicker>
+                              </div>
+                            </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 col-12">
+                                            <div class="info-row">
+                                                <div class="key w80">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" v-model="ttPhieu.cbkNgayHt" class="check">
+                                                        <span class="name">Ngày HT</span>
+                                                    </div>
+                                                </div>
+                            <div class="value">
+                              <div class="input-icon-right">
+                                  <ejs-datetimepicker
+                                  class="form-control bg-none bor0 fw6 text h24"
+                                  :style="{'padding-top': '7px'}"
+                                  :placeholder="'Chọn ngày'"
+                                  v-model="ttPhieu.ngayHT"
+                                  format="dd/MM/yyyy HH:mm"
+                                  :showClearButton="false"
+                                  :enabled="ttPhieu.cbkNgayHt">
+                                  </ejs-datetimepicker>
+                              </div>
+                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-content">
+                        <DataGrid v-bind:columns="[
+                          {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, allowSorting:true},
+                          {fieldName: 'SO_DT', headerText: 'Điện thoại', allowFiltering: true, allowSorting:true},
+                          {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ', allowFiltering: true, allowSorting:true},
+                          {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting:true},
+                          ]"
+                        v-bind:dataSource="dsNhanVien" :showFilter="true" dataKeyField="TEN_NV"
+                        :showColumnCheckbox=false :allowPaging="true" :enablePagingServer="false"
+                        ref="table">
+                        </DataGrid>
+                                    </div>
+                                </div>
+                                <div class="box-form">
+                                    <div class="legend-title">
+                                        <span class="title">Lý do huỷ</span>
+                                    </div>
+                                    <div class="table-lydo">
+                        <DataGrid v-bind:columns="[
+                        {fieldName: 'LYDOHUY', headerText: 'Lý do hủy', allowFiltering: true, allowSorting:true},
+                        {fieldName: 'KIEU_HUY', headerText: 'Kiểu', allowFiltering: true, allowSorting:true},
+                        {fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true, allowSorting:true},
+                        {fieldName: 'DELETE', headerText: '', allowFiltering: true, allowSorting:false, allowHtml: true, cssClass: 'text-center'},
+                        ]"
+                        v-bind:dataSource="dsLyDo" :showFilter="true"
+                        :showColumnCheckbox=false
+                        @selectedRowChanged="selectRowNv"
+                        :allowPaging="true" :enablePagingServer="false"
+                        ref="tableNv">
+                        </DataGrid>
+                      </div>
+                                </div>
+                            </div>
+                        </SplitArea>
+                    </Split>
+                </div>
+                <!-- <script type="text/javascript">
+                    Split(['#boxLeft1', '#boxRight1'], {
+                        sizes: [33.3333, 67.66667],
+                    })
+                </script> -->
+                <div class="box-form tab-content">
+                    <div class="legend-title">
+                        <div class="pull-left">
+                            Danh sách thuê bao khóa mở máy do nợ cước
+                        </div>
+                        <div class="pull-right red">
+                            <div class="list-checks normal">
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" v-model="rdLoaiPhieu" v-bind:value="0" @change="getDsThueBao()" class="check">
+                                        <span class="name">Phiếu mới</span>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" v-model="rdLoaiPhieu" v-bind:value="1" @change="getDsThueBao()" class="check">
+                                        <span class="name">Phiếu trả lại</span>
+                                    </div>
+                                </div>
+                                <div class="item fw6">
+                                    {{thongbao}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="table-content">
+                <DataGrid v-bind:columns="columns"
+                  v-bind:dataSource="dsThueBao" :showFilter="true" dataKeyField="PHIEU_ID"
+                  :showColumnCheckbox=true
+                  :defaultColumnCheckboxChecked="true"
+                  ref="tableThueBao"
+                  :enabledSelectFirstRow="false"
+                  @selectedItemsChanged="checkRow"
+                  @selectedRowChanged="selectRow"
+                  @rowClicked="clickRowThueBao"
+                  :allowPaging="true" :enablePagingServer="false"
+                  :selectionSettings="{type: 'Multiple', checkboxOnly: true }"
+                  >
+                </DataGrid>
+              </div>
+                </div>
+            </div>
+            <b-modal size="sm" id="notice-kichhoat" hide-header hide-footer>
+                <p class="p-3" style="word-wrap: break-word;">
+                    {{msgKichHoat}}
+                </p>
+                <div class="text-center">
+                    <button id="ok-exit" @click="closeKHModal(true)" class="btn btn-primary">OK</button>
+                    <button class="btn btn-secondary ml-2" @click="closeKHModal(false)">Hủy</button>
+                </div>
+            </b-modal>
+            <b-modal id="modal-export" hide-footer modal-class="modal-export"  title="Xuất dữ liệu" no-close-on-backdrop size="lg">
+            <ModalExport :data="dsThueBao" :columnsIn="columns"></ModalExport>
+            </b-modal>
+        </div>
+    </template>
+</div>

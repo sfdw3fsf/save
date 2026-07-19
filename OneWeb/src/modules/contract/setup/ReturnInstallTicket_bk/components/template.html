@@ -1,0 +1,124 @@
+<div>
+    <vue-nav>
+        <ul class="list">
+            <li>
+                <a @click="getDsPhieugiao()">
+                    <span class="icon one-file-attach"></span>Lấy TT (F5)
+                </a>
+            </li>
+            <li>
+                <a @click="traphieu_click()">
+                    <span class="icon one-file-back"></span>Trả phiếu
+                </a>
+            </li>
+            <li>
+                <a href="#"> <span class="icon one-download"></span>Xuất file </a>
+            </li>
+        </ul>
+    </vue-nav>
+    <div class="page-content">
+        <vue-card>
+            <vue-card :noborder="true" label="Thông tin khách hàng">
+                <b-row>
+                    <vue-element label="Loại HĐ/PL" class="col-md-4">
+                        <ejs-dropdownlist :dataSource="options.loaihopdong"
+                            :fields="{ text: 'ten_loaihd', value: 'loaihd_id' }" v-model="model.loaihd_id"
+                            popupWidth="auto" />
+                    </vue-element>
+                    <vue-element label="Dịch vụ" class="col-md-3">
+                        <ejs-dropdownlist :dataSource="options.dichvu" v-model="model.dichvuvt_id"
+                            :fields="{ value: 'DICHVUVT_ID', text: 'TEN_DVVT' }" popupWidth="auto" />
+                    </vue-element>
+                    <vue-element label="Tên thuê bao" class="col-md-5">
+                        <ejs-textbox v-model="model.ten_tb"></ejs-textbox>
+                    </vue-element>
+                    <vue-element label="Mã giao dịch" class="col-md-4">
+                        <div class="input-more-button">
+                            <button ref="btnLayMaHD" @click="btnLayMaHD_Click" class="btn">
+                                <span class="-ap icon-more_horiz"></span>
+                            </button>
+                            <input class="form-control" @keyup.enter="txtMaGD_KeyUp" v-model="model.ma_gd"></input>
+                            <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" />
+                        </div>
+                    </vue-element>
+                    <vue-element label="Số máy/Acc" class="col-md-3">
+                        <input class="form-control" v-model="model.ma_tb"></input>
+                    </vue-element>
+                    <vue-element label="Địa chỉ LĐ" class="col-md-5">
+                        <ejs-textbox v-model="model.diachi_ld"></ejs-textbox>
+                    </vue-element>
+                </b-row>
+            </vue-card>
+            <vue-card :noborder="true" label="Thông tin phiếu giao">
+                <b-row>
+                    <div class="col-md-7">
+                        <div class="info-row">
+                            <div class="key w100">Ngày giao</div>
+                            <div class="value w20 padt7">
+                                <div class="check-action">
+                                    <input ref="chkNgayGiao" type="checkbox" class="check" />
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <vue-date v-model="ngaygiao_format" type="datetime"
+                                format="DD/MM/YYYY hh:mm:ss"></vue-date>
+                        </div>
+                    </div>
+                    <vue-element label="Đơn vị" class="col-md-5">
+                        <ejs-textbox v-model="model.donvi_giao"></ejs-textbox>
+                    </vue-element>
+                    <vue-element label="Số quyết định" class="col-md-7">
+                        <ejs-textbox v-model="model.sophieu"></ejs-textbox>
+                    </vue-element>
+                    <vue-element label="Nhân viên" class="col-md-5">
+                        <ejs-textbox v-model="model.nv_giao"></ejs-textbox>
+                    </vue-element>
+                    <vue-element label="Nội dung giao" class="col-md-12">
+                        <ejs-textbox v-model="model.nd_giao"></ejs-textbox>
+                    </vue-element>
+                </b-row>
+            </vue-card>
+            <vue-card :noborder="true" label="Thông tin phiếu trả">
+                <b-row>
+                    <b-col md="7">
+                        <b-row>
+                            <vue-element label="Lý do trả" class="col-md-7">
+                                <ejs-textbox></ejs-textbox>
+                            </vue-element>
+                            <div class="col-md-5">
+                                <div class="info-row">
+                                    <div class="key w100">Ngày giao</div>
+                                    <div class="value w20 padt7">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" />
+                                            <span class="name"></span>
+                                        </div>
+                                    </div>
+                                    <vue-date type="date" v-model="traphieu.ngay_giao" format="DD/MM/YYYY"></vue-date>
+                                </div>
+                            </div>
+                            <vue-element label="Đơn vị trả" class="col-md-7">
+                                <ejs-textbox></ejs-textbox>
+                            </vue-element>
+                            <vue-element label="Kiểu trả" class="col-md-5">
+                                <ejs-dropdownlist v-model="traphieu.kieutra" :dataSource="options.kieutra"
+                                    :fields="{ value: 'LOAIPT_ID', text: 'NOIDUNG' }" popupWidth="auto" />
+                            </vue-element>
+                            <vue-textarea v-model="traphieu.ghichu" class="ghichu-traphieu col-md-12" labelWidth="100"
+                                label="Ghi chú"></vue-textarea>
+                        </b-row>
+                    </b-col>
+                    <b-col md="5">
+                        <vue-textarea v-model="traphieu.nd_tra" class="noidung-traphieu" labelWidth="100"
+                            label="Nội dung trả"></vue-textarea>
+                    </b-col>
+                </b-row>
+            </vue-card>
+            <vue-card :noborder="true" label="Danh sách phiếu yêu cầu">
+                <DataGrid ref="dagan" v-bind:columns="collumns" v-bind:dataSource="options.danhsachphieu"
+                    :showColumnCheckbox="true" :showFilter="true" :allowPaging="true" :enablePagingServer="false"
+                    panelDataHeight="170" @rowSelected="focusItem"></DataGrid>
+            </vue-card>
+        </vue-card>
+    </div>
+</div>

@@ -1,0 +1,363 @@
+<b-modal
+    :id="modalId"
+    size="xl"
+    :data="data"
+    no-close-on-backdrop
+    hide-footer
+    hide-header
+    hide-header-close
+    @shown="showModal()"
+    body-class="modal-body p-0">
+  <div class="modal-content popup-box">
+    <ModalChonDiaChi modalId="popupDiaChiTB" :data="dataSend" @xacnhan="getDiaChiTB"/>
+    <ModalChonDiaChi modalId="popupDiaChiLD" :data="dataSend" @xacnhan="getDiaChiLD"/>
+    <b-modal id="popupDonViQL" size="xl"
+             hide-footer
+             hide-header
+             hide-header-close
+             body-class="modal-body p-0">
+      <popupDonViQL modalId="popupDonViQL" @form-close="xacNhanDonViQL" @acceptChangeDVQL="xacNhanDonViQL" isPopup="true"/>
+    </b-modal>
+    <b-modal id="popupChonKhuVuc" size="xl"
+             hide-footer
+             title="Gán khu vực quản lý thuê bao"
+             body-class="modal-body p-0">
+      <popupChonKhuVuc modalId="popupChonKhuVuc" :dulieu="dataSend" @form-close="xacNhanKhuVuc" @acceptChangeDVQL="xacNhanKhuVuc" isPopup="true"/>
+    </b-modal>
+    <div class="popup-header">
+      <div class="title"><span class="icon -ap icon-apps text-main"></span> Chuẩn hóa thông tin thuê bao</div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide(modalId)">
+      </div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+
+        <li>
+          <a href="javascript:void(0)" @click="chapNhanClick" title="Chấp nhận">
+            <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" @click="$bvModal.hide(modalId)" title="Thoát">
+            <span class="icon one-export"></span> Thoát
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">Thông tin cũ</div>
+            <div class="info-row">
+              <div class="key">Số máy/Acc</div>
+              <div class="value">
+                <input type="text" class="form-control fw6 text" v-model="ma_tb" @keydown.self.prevent>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w110">Tên thuê bao <span style="color: red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control fw6 text" v-model="ten_tb" @keydown.self.prevent>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w80">Ngày sinh <span style="color: red">*</span></div>
+                  <div class="value">
+                    <div class="input-icon-right disabled">
+                      <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :value="dateVal" :format="dateFormat" v-model="ngay_sn" disabled></ejs-datepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Địa chỉ TB <span style="color: red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control fw6 text" v-model="diachi_tb" @keydown.self.prevent>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Địa chỉ LĐ <span style="color: red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control fw6 text" v-model="diachi_ld" @keydown.self.prevent>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Khu vực</div>
+              <div class="value">
+                <input type="text" class="form-control fw6 text" @keydown.self.prevent>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Đơn vị</div>
+              <div class="value">
+                <div class="select-custom" ref="cboDonVi">
+                  <SelectExt
+                    v-model="donvi_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboDonVi']}"
+                    :dataSource="dsDonVi"
+                    dataTextField="ten_dv"
+                    dataValueField="donvi_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Đối tượng</div>
+              <div class="value">
+                <div class="select-custom" ref="cboDoiTuong">
+                  <SelectExt
+                    v-model="doituong_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboDoiTuong']}"
+                    :dataSource="dsDoiTuong"
+                    dataTextField="ten_dt"
+                    dataValueField="doituong_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Mức cước TB</div>
+              <div class="value">
+                <div class="select-custom" ref="cboMucCuocTB">
+                  <SelectExt
+                    v-model="mucuoctb_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboMucCuocTB']}"
+                    :dataSource="dsMucCuocTB"
+                    dataTextField="tenmuccuoc"
+                    dataValueField="mucuoctb_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Loại hình</div>
+              <div class="value">
+                <div class="select-custom" ref="cboLoaiHinhTB">
+                  <SelectExt
+                    v-model="loaitb_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboLoaiHinhTB']}"
+                    :dataSource="dsLoaiHinhTB"
+                    dataTextField="loaihinh_tb"
+                    dataValueField="loaitb_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Tốc độ</div>
+              <div class="value">
+                <div class="select-custom" ref="cboTocDo">
+                  <SelectExt
+                    v-model="tocdo_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboTocDo']}"
+                    :dataSource="dsTocDo"
+                    dataTextField="thuonghieu"
+                    dataValueField="tocdo_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Mức cước</div>
+              <div class="value">
+                <div class="select-custom" ref="cboMucCuoc">
+                  <SelectExt
+                    v-model="muccuoc_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboMucCuoc']}"
+                    :dataSource="dsMucCuoc"
+                    dataTextField="tenmuc"
+                    dataValueField="muccuoc_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Ghi chú</div>
+              <div class="value">
+                <div class="input-number-custom">
+                  <input type="text" class="form-control" v-model="ghichu" @keydown.self.prevent>
+                </div>
+              </div>
+            </div>
+            <div class="legend-title mart20">Dịch vụ khác</div>
+            <div class="info-row">
+              <div class="key"></div>
+              <div class="value">
+                <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model="dichvukhac" @keydown.self.prevent></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">Thông tin mới </div>
+            <div class="info-row">
+              <div class="key">Số máy/Acc</div>
+              <div class="value">
+                <input type="text" class="form-control highlight fw6 text" v-model="ma_tb" @keydown.self.prevent>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w110">Tên thuê bao <span style="color: red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control fw6 text" v-model="ten_tb_moi" :class="{ 'is-invalid': $v.ten_tb_moi.$error }">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w80">Ngày sinh <span style="color: red">*</span></div>
+                  <div class="value">
+                    <div class="input-icon-right">
+                      <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :value="dateVal" :format="dateFormat" v-model="ngay_sn_moi" :class="{ 'is-invalid': $v.ngay_sn_moi.$error }"></ejs-datepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Địa chỉ TB <span style="color: red">*</span></div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="diaChiTBClick">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" class="form-control fw6 text" v-model="diachi_tb_moi" @keydown.self.prevent :class="{ 'is-invalid': $v.diachi_tb_moi.$error }">
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Địa chỉ LĐ <span style="color: red">*</span></div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="diaChiLDClick">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" class="form-control fw6 text" v-model="diachi_ld_moi" @keydown.self.prevent  :class="{ 'is-invalid': $v.diachi_tb_moi.$error }">
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Khu vực</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="khuVucClick">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" class="form-control fw6 text" v-model="khuvuc_moi" @keydown.self.prevent>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Đơn vị</div>
+              <div class="value">
+                <div class="select-custom" ref="cboDonVi">
+                  <SelectExt
+                    v-model="donvi_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboDonVi']}"
+                    :dataSource="dsDonVi"
+                    dataTextField="ten_dv"
+                    dataValueField="donvi_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Đối tượng</div>
+              <div class="value">
+                <div class="select-custom" ref="cboDoiTuong">
+                  <SelectExt
+                    v-model="doituong_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboDoiTuong']}"
+                    :dataSource="dsDoiTuong"
+                    dataTextField="ten_dt"
+                    dataValueField="doituong_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Mức cước TB</div>
+              <div class="value">
+                <div class="select-custom" ref="cboMucCuocTBMoi">
+                  <SelectExt
+                    v-model="mucuoctb_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboMucCuocTBMoi']}"
+                    :dataSource="dsMucCuocTB"
+                    dataTextField="tenmuccuoc"
+                    dataValueField="mucuoctb_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Loại hình</div>
+              <div class="value">
+                <div class="select-custom" ref="cboLoaiHinhTB">
+                  <SelectExt
+                    v-model="loaitb_id"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboLoaiHinhTB']}"
+                    :dataSource="dsLoaiHinhTB"
+                    dataTextField="loaihinh_tb"
+                    dataValueField="loaitb_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Tốc độ</div>
+              <div class="value">
+                <div class="select-custom" ref="cboTocDoMoi">
+                  <SelectExt
+                    v-model="tocdo_id_moi"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboTocDoMoi']}"
+                    :dataSource="dsTocDo"
+                    dataTextField="thuonghieu"
+                    dataValueField="tocdo_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Mức cước</div>
+              <div class="value">
+                <div class="select-custom" ref="cboMucCuocMoi">
+                  <SelectExt
+                    v-model="muccuoc_id_moi"
+                    disabled
+                    :settings="{dropdownParent: $refs['cboMucCuocMoi']}"
+                    :dataSource="dsMucCuoc"
+                    dataTextField="tenmuc"
+                    dataValueField="muccuoc_id"/>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key">Ghi chú</div>
+              <div class="value">
+                <div class="input-number-custom">
+                  <input type="text" class="form-control" v-model="ghichu_moi" :class="{ 'is-invalid': $v.ghichu_moi.$error }">
+                </div>
+              </div>
+            </div>
+            <div class="legend-title mart20">Dịch vụ khác</div>
+            <div class="info-row">
+              <div class="key"></div>
+              <div class="value">
+                <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model="dichvukhac_moi" @keydown.self.prevent></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</b-modal>

@@ -1,0 +1,2 @@
+import MyaccountPasswordLookup from './MyaccountPasswordLookup'
+export default MyaccountPasswordLookup

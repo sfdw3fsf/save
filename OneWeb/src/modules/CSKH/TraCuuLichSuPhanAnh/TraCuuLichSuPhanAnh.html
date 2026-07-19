@@ -1,0 +1,139 @@
+<div>
+    <!-- <breadcrumb :header="header" /> -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="doSearch()" data-toggle="tooltip" title="Tìm kiếm">
+                    <span class="icon one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onClickBtnExcelDsPhanAnh" data-toggle="tooltip" title="Xuất Excel">
+                    <span class="icon one-excel"></span> Xuất Excel
+                    <!-- <downloadexcel :data="this.dataExcel">
+                        <span class="icon one-excel"></span> Xuất Excel
+                    </downloadexcel> -->
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tra cứu</div>
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chk_from_date">
+                                <span class="name">Ngày tiếp nhận</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker v-model="from_date" :value="today" :max="today" :format="'dd/MM/y'"
+                                :enabled="chk_from_date" :showClearButton=false>
+                            </ejs-datepicker>
+                            <!-- <div class="input-icon-right">
+                                <flat-pickr :disabled="!chk_from_date" v-model="from_date" class="form-control"
+                                    :config="dateConfig" placeholder="Chọn ngày tiếp nhận" />
+                                <span class="icon one-calendar"></span>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chk_to_date">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker v-model="to_date" :value="today" :max="today" :format="'dd/MM/y'"
+                                :enabled="chk_to_date" :showClearButton=false>
+                            </ejs-datepicker>
+                            <!-- <div class="input-icon-right">
+                                <flat-pickr :disabled="!chk_to_date" v-model="to_date" class="form-control"
+                                    :config="dateConfig" placeholder="Chọn đến ngày" />
+                                <span class="icon one-calendar"></span>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Mã KH
+                        </div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click.prevent="ShowSearchAccount">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" class="form-control highlight font-weight-bold" v-model="ma_kh" ref="maKH" @keydown="onMaKHSearch">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách phản ánh</div>
+            <CSKHGrid
+                :columns='[
+                { fieldName: "NOIDUNGPA", headerText: "Nội dung phản ánh: ${key}", isGroupedColumn: true},
+                { fieldName: "MA_KH", headerText: "Mã KH", allowFiltering: true, allowSorting: false, cssClass: "font-weight-bold"},
+                { fieldName: "NGAYTIEPNHAN", headerText: "Ngày tiếp nhận", allowFiltering: true, allowSorting: false, textAlign: "Right"},
+                { fieldName: "NGAY_GQ", headerText: "Ngày giải quyết", allowFiltering: true, allowSorting: false, textAlign: "Right"},
+                { fieldName: "GHICHU", headerText: "Ghi chú", allowFiltering: true, allowSorting: false, },
+                { fieldName: "TRANGTHAI_PA", headerText: "Trạng thái", allowFiltering: true, allowSorting: false, }
+            ]'
+                :dataSource="dsPhanAnh"
+                :showFilter="true"
+                ref="grid-dsphananh"
+                :allowPaging="false" :enablePagingServer="false"
+                :allowGrouping='true'
+                @dataBound="onDataBoundTienTrinh"
+            />
+            <!-- <ejs-grid
+                ref='grid-dsphananh'
+                ref-value='grid-dsphananh'
+                class="table-result tree-grid-2"
+                locale='vi-VN'
+                gridLines='Both'
+                :groupSettings="{showDropArea: false, captionTemplate: 'Nội dung phản ánh: ${key}'}"
+                :selectionSettings="{enableToggle: false}"
+                :dataSource="dsPhanAnh"
+                :allowSorting="true"
+                :allowFiltering='true'
+                :allowResizing='true'
+                :allowGrouping='true'
+                :rowSelected='onRowSelected'
+                :actionComplete="onActionCompleteTienTrinh"
+                :dataBound="onDataBoundTienTrinh">
+                <e-columns>
+                    <e-column headerText='' textAlign="Center" width="20" :allowResizing="false" :allowFiltering="false" :template='columnTemplate'></e-column>
+                    <e-column field='NOIDUNGPA' headerText='' headerTextAlign='Center' width="130" :visible="false" :filterBarTemplate='filterBarTemplate'></e-column>
+
+                    <e-column field='MA_KH' headerText='Mã KH' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate' :customAttributes= "{class: 'font-weight-bold'}"></e-column>
+                    <e-column field='NGAYTIEPNHAN' headerText='Ngày tiếp nhận' headerTextAlign='Center' textAlign='Right' width="200" :filterBarTemplate='filterBarTemplate'></e-column>
+                    <e-column field='NGAY_GQ' headerText='Ngày giải quyết' headerTextAlign='Center' textAlign='Right' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                    <e-column field='GHICHU' headerText='Ghi chú' headerTextAlign='Center' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                    <e-column field='TRANGTHAI_PA' headerText='Trạng thái' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+
+                </e-columns>
+            </ejs-grid> -->
+
+        </div>
+    </div>
+    <b-modal id="modal-1" title="Tra cứu danh bạ" size="xl">
+        <TraCuuDanhBa />
+    </b-modal>
+    <b-modal id="popupComponents" size="xl"
+        hide-footer
+        hide-header
+        hide-header-close
+        body-class="modal-body p-0"
+        scrollable>
+        <component :is="popupComponent" @form-close="searchAccountClosed" :isPopup="true"></component>
+    </b-modal>
+</div>

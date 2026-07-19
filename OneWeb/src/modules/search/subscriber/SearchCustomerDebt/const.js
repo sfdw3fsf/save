@@ -1,0 +1,55 @@
+export default {
+  cols: [
+    {
+      fieldName: "ROW_STT",
+      headerText: "STT",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+    },
+    {
+      fieldName: "MA_KH",
+      headerText: "Mã KH",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+    },
+    {
+      fieldName: "SDD",
+      headerText: "Số DD",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+    },
+    {
+      fieldName: "TEN_TB",
+      headerText: "Tên TT",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+    },
+    {
+      fieldName: "DIACHI",
+      headerText: "Địa chỉ TT",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+    },
+    {
+      fieldName: "TIENNO",
+      headerText: "Tiền nợ",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+      textAlign: 'right',
+    },
+    {
+      fieldName: "CHUKYNO",
+      headerText: "Chu kỳ nợ",
+      allowFiltering: true,
+      allowSorting: false,
+      width: 'auto',
+      textAlign: 'right',
+    },
+  ],
+}

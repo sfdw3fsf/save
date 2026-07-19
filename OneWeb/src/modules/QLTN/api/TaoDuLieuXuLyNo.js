@@ -1,0 +1,22 @@
+export default {
+  getDanhSachNamNo: (axios, data) => axios.get("/web-thuno/api/thu-no/common/danh-sach-nam-no", { params: data }),
+  getDanhSachBuocXLN: (axios, data) => axios.get("/web-thuno/api/thu-no/common/buoc-xu-ly-no/kieu-xu-ly-no/" + data),
+  getDanhSachLanTao: (axios, data) => axios.get("/web-thuno/api/thu-no/common/lan-tao-xu-ly-no", { params: data }),
+  kiemTraFileXLN: (axios, data) => axios.post("/web-thuno/api/thu-no/xu-ly-no/kiem-tra-xu-ly-no", data),
+  getDsDotLayDuLieu: (axios, data) => axios.get("/web-thuno/api/thu-no/xu-ly-no/ds-xu-ly-no/lan-tao/" + data),
+  getDsNhanVienQL: (axios, data) => axios.get("/web-thuno/api/thu-no/common/nhan-vien-quan-ly/don-vi/" + data),
+  getDsNguoiGiao: (axios, data) => axios.get("/web-thuno/api/thu-no/xu-ly-no/nguoi-giao-phieu-xln/buoc-xu-ly-no/" + data),
+  getDsNguoiNhan: (axios, data) => axios.get("/web-thuno/api/thu-no/xu-ly-no/nguoi-nhan-phieu-xln/buoc-xu-ly-no", { params: data }),
+  getDsKetQuaXL: (axios, data) => axios.get("/web-thuno/api/thu-no/common/trang-thai-xln", { params: data }),
+  getDsKhachHang: (axios, data) => axios.get("/web-thuno/api/thu-no/xu-ly-no/ma-xu-ly-no", { params: data }),
+  taoDuLieuXuLyNo: (axios, data) => axios.post("/web-thuno/api/thu-no/xu-ly-no/tao-xu-ly-no", data),
+  xoaLanTaoById: (axios, data) => axios.delete("/web-thuno/api/thu-no/xu-ly-no/" + data),
+  getDsLichSuNo: (axios, data) => axios.get("/web-thuno/api/thu-no/tra-cuu/lich-su-no/khach-hang-thanh-toan-thue-bao", { params: data }),
+  getChiTietNo: (axios, data) => axios.get("/web-thuno/api/thu-no/xu-ly-no/thong-tin-chi-tiet-no/ma-xu-ly-no", { params: data }),
+  getDsKhachHangByThanhToan: (axios, data) => axios.post("/web-thuno/api/thu-no/xu-ly-no/thanh-toan", data),
+  getDsKhachHangByKhachHang: (axios, data) => axios.post("/web-thuno/api/thu-no/xu-ly-no/khach-hang", data),
+  getDsKhachHangByThueBao: (axios, data) => axios.post("/web-thuno/api/thu-no/xu-ly-no/thue-bao", data),
+  getDSNhanVien: (axios, data) => axios.post("/web-thuno/api/thu-no/xu-ly-no/ds-nhan-vien-xln", data),
+  getDSDonViQuanLy: async (axios, data) => axios.get("web-thuno/api/thu-no/lay-danh-sach-don-vi-quan-ly", {params: data}),
+
+};

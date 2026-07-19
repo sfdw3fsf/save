@@ -1,0 +1,386 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <b-link href="javascript:void(0)" @click="onAddNew" :disabled="!buttons.btnAddNew.enabled">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onSave" :disabled="!buttons.btnSave.enabled">
+                    <span class="icon one-save"></span>Ghi lại
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onCancel" :disabled="!buttons.btnCancel.enabled">
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onEdit" :disabled="!buttons.btnEdit.enabled">
+                    <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+                </b-link>
+            </li>
+            <li>
+                <b-link href="javascript:void(0)" @click="onDelete" :disabled="!buttons.btnDelete.enabled">
+                    <span class="icon one-trash"></span>Xóa
+                </b-link>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-12">
+                <!-- Thông tin chung -->
+                <div class="box-form">
+                    <div class="row">
+                        <div class="legend-title">Thông tin chung
+                        </div>
+                    </div>
+                    <!-- Mã tài nguyên CĐS-ĐHIT (*) - Hiệu lực -->
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Mã tài nguyên CĐS-ĐHIT (*) </div>
+                                <div class="value">
+                                    <input type="text" class="form-control"
+                                        :class="controls.text.invalid ? 'is-invalid' : ''"
+                                        :disabled="!controls.text.enabled" v-model="current_item.ma" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Hiệu lực</div>
+                                <div class="value padt4">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" :disabled="!controls.checkbox.enabled"
+                                            v-model="current_item.hieu_luc" :true-value="1" :false-value="0" />
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tên tài nguyên (*) - IP backup (selection) -->
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Tên tài nguyên (*) </div>
+                                <div class="value">
+                                    <ejs-autocomplete class="form-control" :enabled="controls.text.enabled"
+                                        :dataSource="recommentDataList" v-model="current_item.ten"
+                                        :filtering="onFiltering"></ejs-autocomplete>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">IP backup </div>
+                                <div class="value">
+                                    <SelectExt v-model="current_item.ip_backup_id" dataTextField="TEN"
+                                        dataValueField="ID" :dataSource="select_ip_backup"
+                                        :disabled="!controls.selection.enabled"
+                                        :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Hạ tầng backup (*) (selection) - Đường dẫn backup  -->
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Hạ tầng backup (*) </div>
+                                <div class="value">
+                                    <SelectExt v-model="current_item.hatangbackup_id" dataTextField="MA"
+                                        dataValueField="ID" :dataSource="select_hatang_backup"
+                                        placeholder="Ảo hoá/Vật lý/SmartCloud"
+                                        :disabled="!controls.selection.enabled || current_item.has_caphat_backup == 1"
+                                        :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Đường dẫn backup </div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="!controls.text.enabled"
+                                        v-model="current_item.link_backup" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Loại backup (*) (selection) - Mã phiếu yêu cầu  -->
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Loại backup (*) </div>
+                                <div class="value">
+                                    <SelectExt v-model="current_item.backup_loai_id" dataTextField="TEN"
+                                        dataValueField="ID" :dataSource="select_loai_backup"
+                                        :disabled="!controls.selection.enabled"
+                                        :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Mã phiếu yêu cầu</div>
+                                <div class="value">
+                                    <SelectExt v-model="current_item.phieuyeucau_id" dataTextField="sophieu"
+                                        dataValueField="id" :dataSource="select_phieuyeucau"
+                                        :disabled="!controls.selection.enabled || current_item.has_caphat_backup == 1"
+                                        :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tần suất backup (selection)  -->
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Tần suất backup </div>
+                                <div class="value">
+                                    <SelectExt v-model="current_item.tansuat_id" dataTextField="TEN" dataValueField="ID"
+                                        :dataSource="select_tansuat_backup" :disabled="!controls.selection.enabled"
+                                        :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Ghi chú -->
+                    <div class="info-row">
+                        <div class="key w180">Ghi chú</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="!controls.text.enabled"
+                                v-model="current_item.ghi_chu" />
+                        </div>
+                    </div>
+                </div>
+                <!-- Thông tin năng lực -->
+                <div class="row" v-if="nguon_yeucau !== 1">
+                    <div class="col-12">
+                        <div class="box-form">
+                            <div class="row">
+                                <div class="legend-title">Thông tin năng lực
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w180">Loại hạ tầng lưu trữ</div>
+                                        <div class="value">
+                                            <SelectExt v-model="current_item.loaihatang_luutru" dataTextField="TEN"
+                                                dataValueField="ID" @change="loaiLuuTruOnChange"
+                                                :dataSource="select_loai_hatang_luutru" placeholder="Tủ đĩa, Tự dựng"
+                                                :disabled="!controls.selection.enabled"
+                                                :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w180">Loại lưu trữ </div>
+                                        <div class="value">
+                                            <SelectExt v-model="current_item.loailuutru" dataTextField="TEN"
+                                                dataValueField="ID" :dataSource="select_loai_luutru"
+                                                placeholder="SSD, HDD" :disabled="!controls.selection.enabled"
+                                                :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w180">Hạ tầng lưu trữ </div>
+                                        <div class="value">
+                                            <SelectExt v-model="current_item.hatang_luutru_id"
+                                                dataTextField="MAHATANG_INFRA" dataValueField="ID"
+                                                @change="haTangLuuTruOnChange" :dataSource="select_hatang_luutru"
+                                                :disabled="!controls.selection.enabled"
+                                                :class="controls.selection.invalid ? 'is-invalid' : ''" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w180">Dung lượng cấp </div>
+                                        <div class="value">
+                                            <input type="number" class="form-control"
+                                                :disabled="!controls.selection.enabled" @input="dungLuongValid"
+                                                v-model="current_item.dungluong" />
+                                        </div>
+                                        <div class="key w50" style="padding-left: 10px;font-weight: bold;">GB </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w180">Khả năng cấp phát</div>
+                                        <div class="value">
+                                            <input type="number" class="form-control" :disabled="!controls.text.enabled"
+                                                readonly v-model="current_item.nangluc" />
+                                        </div>
+                                        <div class="key w50" style="padding-left: 10px;font-weight: bold;">GB</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Thông tin quản lý -->
+                <div class="box-form" v-if="nguon_yeucau !== 1">
+                    <div class="row">
+                        <div class="legend-title">Thông tin quản lý
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Đơn vị quản lý</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :disabled="!controls.text.enabled"
+                                        v-model="current_item.donviqly_name" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Chủ quản dịch vụ</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" readonly
+                                        v-model="current_item.phongbanqly_name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w180">Cá nhân quản lý</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" readonly
+                                        v-model="current_item.nguoiqly_name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Thông tin biến động dung lượng tài nguyên backup -->
+                <div class="box-form" v-if="nguon_yeucau !== 1">
+                    <div class="row">
+                        <div class="legend-title">Thông tin biến động dung lượng tài nguyên backup
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <DataGrid ref="grdItems" :allowPaging="true" :enablePagingServer="false"
+                                :showColumnCheckbox="false" :enabledSelectFirstRow="false" v-bind:columns="[
+                                {fieldName: 'f_loaibiendong', headerText: 'Loại biến động', textAlign: 'Center'},
+                                {fieldName: 'sophieu', headerText: 'Mã phiếu', textAlign: 'Center'},
+                                {fieldName: 'dungluong', headerText: 'Dung lượng cấp', textAlign: 'Center'},
+                                {fieldName: 'f_thoigian_cap', headerText: 'Thời gian cấp', textAlign: 'Center'}
+                                ]" v-bind:dataSource="backup_biendong_items">>
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin liên quan -->
+        <div class="box-form" v-if="nguon_yeucau !== 1">
+            <div class="nav tab-over tabs">
+                <a href="#lienquan-tab1" v-on:click="tab_index = 1" data-toggle="tab" class="tab active">Máy ảo</a>
+                <a href="#lienquan-tab2" v-on:click="tab_index = 2" data-toggle="tab" class="tab">Lịch sử thay đổi</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="lienquan-tab1">
+                    <div class="row" style="padding-top: 0px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div class="title" style="font-weight: 600;"></div>
+                            <button class="btn btn-outline-primary" style="margin-left: 10px; margin-bottom: 2px;"
+                                @click="openDialogMayAo"
+                                :disabled="this.current_item.has_caphat_backup == 1 || !this.controls.text.enabled">
+                                <strong><span>+</span></strong>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <div class="grid-ext grid-ext-nodata">
+                            <DataGrid ref="grdItems_haTangMang" :allowPaging="true" :enablePagingServer="false"
+                                :showColumnCheckbox="true" v-bind:columns="[
+                                {fieldName: 'sothutu', headerText: 'STT', textAlign: 'Center'},
+                                {fieldName: 'tenvm', headerText: 'Tên VM', textAlign: 'Center'},
+                                {fieldName: 'spdv_name', headerText: 'SPDV', textAlign: 'Center'},
+                                {fieldName: 'mayao_ip', headerText: 'Địa chỉ IP', textAlign: 'Center'},
+                                {fieldName: 'ram', headerText: 'RAM', textAlign: 'Center'},
+                                {fieldName: 'cpu', headerText: 'CPU', textAlign: 'Center'},
+                                {fieldName: 'nguoiqly_name', headerText: 'Người quản trị', textAlign: 'Center'},
+                                {fieldName: 'donviqly_name', headerText: 'Đơn vị quản trị', textAlign: 'Center'},
+                                {fieldName: 'f_hieu_luc', headerText: 'Hiệu lực', textAlign: 'Center'},
+                                ]" v-bind:dataSource="may_ao_items" :enabledSelectFirstRow="true"
+                                :commands="[{name: 'XOA', cssClass: 'btn-primary fa fa-trash-o', width: 20 }]"
+                                @commandClicked="grid_onCommandClicked_thietbi"
+                                :commandColumn="{headerText: 'Thao tác', textAlign: 'Left', show: true, width: 50}">
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="lienquan-tab2">
+                    <div class="table-content">
+                        <div class="grid-ext grid-ext-nodata">
+                            <DataGrid ref="grd_items_history" :allowPaging="true" :enablePagingServer="false"
+                                :showColumnCheckbox="true" v-bind:columns="[
+                                {fieldName: 'sothutu', headerText: 'STT', textAlign: 'Center'},
+                                {fieldName: 'tacdong', headerText: 'Tên tác động', textAlign: 'Center'},
+                                {fieldName: 'field', headerText: 'Trường thông tin thay đổi', textAlign: 'Center'},
+                                {fieldName: 'old_value', headerText: 'Giá trị cũ', textAlign: 'Center'},
+                                {fieldName: 'new_value', headerText: 'Giá trị mới', textAlign: 'Center'},
+                                {fieldName: 'nguoi_cn', headerText: 'Người thực hiện', textAlign: 'Center'},
+                                {fieldName: 'f_ngay_cn', headerText: 'Thời điểm', textAlign: 'Center'},
+                                ]" v-bind:dataSource="lichsu_thaydoi_items">
+                                >
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách -->
+        <div class="row">
+            <div class="col-12">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="legend-title">Danh sách Tài nguyên Backup
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <DataGrid ref="grdItems" :allowPaging="true" :enablePagingServer="false"
+                                :showColumnCheckbox="true" v-bind:columns="[
+                                {fieldName: 'ten', headerText: 'Tên hạ tầng', textAlign: 'Center'},
+                                {fieldName: 'hatangbackup_ma', headerText: 'Mã hạ tầng backup', textAlign: 'Center'},
+                                {fieldName: 'ip_backup_name', headerText: 'IP backup', textAlign: 'Center'},
+                                {fieldName: 'link_backup', headerText: 'Đường dẫn backup', textAlign: 'Center'},
+                                {fieldName: 'backup_loai_name', headerText: 'Loại backup', textAlign: 'Center'},
+                                {fieldName: 'tansuat_name', headerText: 'Tần suất backup', textAlign: 'Center'},
+                                {fieldName: 'phieuyeucau_name', headerText: 'Mã phiếu yêu cầu', textAlign: 'Center'},
+                                {fieldName: 'f_hieu_luc', headerText: 'Hiệu lực', textAlign: 'Center'},
+                                ]" v-bind:dataSource="item_list" @rowSelected="grdItems_RowSelected"
+                                @rowDeselected="grdItems_RowDeselected">
+                                >
+                            </DataGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <DialogMayAo ref="grdItems_may_ao" @output-data="xacNhanThemMayAo" :backupId="current_item.id"
+        @reloadData="reloadData">
+    </DialogMayAo>
+</div>

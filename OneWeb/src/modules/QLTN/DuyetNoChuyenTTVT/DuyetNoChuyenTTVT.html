@@ -1,0 +1,219 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript: void(0)" @click="doLoadDS">
+          <span class="icon one-file-remove"></span> Danh sách
+        </a>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="doDuyetChuyen" :class="{ disabled: !configs.f_duyetchuyen_enable }" v-show="configs.f_duyetchuyen_visible">
+          <span class="icon one-excel"></span>Duyệt chuyển TTVT
+        </a>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="doReadExcel">
+          <span class="icon one-file-remove"></span> Nhập excel
+        </a>
+        <input id="chuyenduyet_upload_excel" ref="chuyenduyet_upload_excel" @change="uploadFileChuyenDuyet" type="file" hidden>
+        <app-popup-d-s-loi ref="refPopupDSLoi" :ds_loi="dsErrors"></app-popup-d-s-loi>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="doExportExcel">
+          <span class="icon one-file-remove"></span> Xuất excel
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="top-form-group block">
+      <div class="pull-right w120">
+        <app-ky-cuoc-2 :isDisabled=true @chukycuocChange="chukycuocChangeHandler"></app-ky-cuoc-2>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách phiếu</div>
+      <div class="table-content mart10">
+        <div class="nav tabs tab-over">
+          <a href="#tabPhieuChoPheDuyet" @click="params.p_current_tab = 0" data-toggle="tab" :class="{active: params.p_current_tab === 0}">Phiếu chờ phê duyệt</a>
+          <a href="#tabDaChuyenTTVT" @click="params.p_current_tab = 1" data-toggle="tab"  :class="{active: params.p_current_tab === 1}">Đã chuyển TTVT</a>
+        </div>
+        <div class="tab-content">
+          <div id="tabPhieuChoPheDuyet" class="tab-pane"  :class="{active: params.p_current_tab === 0}">
+            <DataGrid3
+              v-bind:columns="[
+                {fieldName: 'DONVI_CPS', headerText: 'GIAO CPS', allowFiltering: true, width: 100},
+                {fieldName: 'NHANVIEN_CPS', headerText: 'NV thực hiện CPS', allowFiltering: true, width: 150},
+                {fieldName: 'TT_CHUYEN', headerText: 'Chuyển TT', allowFiltering: true},
+                {fieldName: 'MA_TT_NEO', headerText: 'Mã TT Neo', allowFiltering: true},
+                {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true},
+                {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true},
+                {fieldName: 'QUAN_ID', headerText: 'Điểm TN', allowFiltering: true},
+                {fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true},
+                {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true},
+                {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái TB', allowFiltering: true},
+                {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'HINHTHUC_TT', headerText: 'HTTT', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SL', headerText: 'SL kết quả', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SODT_LH', headerText: 'ĐT LH', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SDTTT', headerText: 'SDT Thanh toán', textAlign: 'Right', allowFiltering: true},
+                {fieldName: 'LYDOTRA_ID', headerText: 'Lý do', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'GHICHU', headerText: 'ĐLTC', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'ND_THUCHIEN', headerText: 'NVQL ĐB xử lý', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'NVQLDB_OB', headerText: 'NVQL ĐB OB', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SMS', headerText: 'SMS', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'POPUP', headerText: 'popup', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'OUTBOUND', headerText: 'Outbound', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'KQ_GDV', headerText: 'KQ nhắc GDV', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'KQ_TTVT1', headerText: 'KQ nhắc TTVT 1', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'KQ_TTVT2', headerText: 'KQ nhắc TTVT 2', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'KQ_800126', headerText: 'KQ nhắc 800126', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SO_SERI', headerText: 'Số seri', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TIEN', headerText: 'Tiền nợ', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'NO_PS', headerText: 'Nợ PS', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'NO_PS_2', headerText: 'Nợ n-2', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'NO_PS_3', headerText: 'Nợ n-3', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'NO_PS_4', headerText: 'Nợ n-4', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'NO_DK', headerText: 'Nợ ĐK', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+                {fieldName: 'SO_THUNG', headerText: 'Số thùng', textAlign: 'Right', allowFiltering: true},
+                {fieldName: 'SERI', headerText: 'Seri', textAlign: 'Right', allowFiltering: true},
+                {fieldName: 'THUTU_IN', headerText: 'Thứ tự in', textAlign: 'Right', allowFiltering: true},
+                {fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', textAlign: 'Right', allowFiltering: true},
+                {fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', textAlign: 'Right', allowFiltering: true},
+                {fieldName: 'TUYENTHU_ID', headerText: 'Tuyến thu', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'THUNO', headerText: 'Thu nợ', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'LOAIPHIEU_ID', headerText: 'LOAIPHIEU_ID', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TEN_LKHL', headerText: 'Loại KHL', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TENHT_GIAO', headerText: 'HT giao', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'DONVI_BHKV', headerText: 'Phòng BHKV', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TO_KD', headerText: 'Tổ KD', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TEN_QLDB', headerText: 'Tên QLĐB', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SDT_QLDB', headerText: 'Số ĐT QLĐB', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TO_KT', headerText: 'Đơn vị NVVT', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'TEN_NVVT', headerText: 'Tên NVVT', textAlign: 'Left', allowFiltering: true},
+                {fieldName: 'SDT_CNVT', headerText: 'SDT_CNVT', textAlign: 'Left', allowFiltering: true},
+                ]"
+              v-bind:aggregates="
+                [
+                {field: 'TIEN', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                {field: 'TIEN_HD', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                {field: 'NO_PS', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                {field: 'NO_PS_2', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                {field: 'NO_PS_3', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                {field: 'NO_PS_4', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                {field: 'NO_DK', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggTienNo },
+                ]
+              "
+              v-bind:dataSource="dsPhieuChoPheDuyet"
+              :enablePagingServer="false"
+              :allowPaging="false"
+              :allowExcelExport="true"
+              :showColumnCheckbox="true"
+              :enabledSelectFirstRow="false"
+              :selectionSettings="configs.selectionSettings"
+              :showFilter="true"
+              @selectedRowChanged="onPhieuChoDuyetRowChanged"
+              ref="gridPhieuChoPheDuyet"
+              >
+            </DataGrid3>
+          </div>
+          <div id="tabDaChuyenTTVT" class="tab-pane"  :class="{active: params.p_current_tab === 1}">
+            <DataGrid
+              v-bind:columns="[
+              {fieldName: 'DONVI_CPS', headerText: 'GIAO CPS', allowFiltering: true, width: 100},
+              {fieldName: 'NHANVIEN_CPS', headerText: 'NV thực hiện CPS', allowFiltering: true, width: 150},
+              {fieldName: 'DS_CHUYEN', headerText: 'DS chuyển', allowFiltering: true, width: 150},
+              {fieldName: 'TT_CHUYEN', headerText: 'Chuyển TT', allowFiltering: true},
+              {fieldName: 'MA_TT_NEO', headerText: 'Mã TT Neo', allowFiltering: true},
+              {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true},
+              {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true},
+              {fieldName: 'QUAN_ID', headerText: 'Điểm TN', allowFiltering: true},
+              {fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true},
+              {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true},
+              {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái TB', allowFiltering: true},
+              {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SL', headerText: 'SL kết quả', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SODT_LH', headerText: 'ĐT LH', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SDTTT', headerText: 'SDT Thanh toán', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'LYDOTRA_ID', headerText: 'Lý do', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'GHICHU', headerText: 'ĐLTC', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'ND_THUCHIEN', headerText: 'NVQL ĐB xử lý', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'NVQLDB_OB', headerText: 'NVQL ĐB OB', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SMS', headerText: 'SMS', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'POPUP', headerText: 'popup', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'OUTBOUND', headerText: 'Outbound', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'KQ_GDV', headerText: 'KQ nhắc GDV', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'KQ_TTVT1', headerText: 'KQ nhắc TTVT 1', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'KQ_TTVT2', headerText: 'KQ nhắc TTVT 2', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'KH_YC_GIAHAN', headerText: 'KH yc gia hạn', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'KQ_800126', headerText: 'KQ nhắc 800126', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SO_SERI', headerText: 'Số seri', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TIEN', headerText: 'Tiền nợ', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'NO_PS', headerText: 'Nợ PS', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'NO_PS_2', headerText: 'Nợ n-2', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'NO_PS_3', headerText: 'Nợ n-3', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'NO_PS_4', headerText: 'Nợ n-4', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'NO_DK', headerText: 'Nợ ĐK', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', textAlign: 'Right', allowFiltering: true, format: 'N0', type: 'number'},
+              {fieldName: 'SO_THUNG', visible: false, headerText: 'Số thùng', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'SERI', visible: false, headerText: 'Seri', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'THUTU_IN', visible: false, headerText: 'Thứ tự in', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'TUYENTHU_ID', visible: false, headerText: 'Tuyến thu', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'MAIN_GHEP', visible: false, headerText: 'Mã in ghép', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'THUNO', headerText: 'Thu nợ', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'LOAIPHIEU_ID', visible: false, headerText: 'LOAIPHIEU_ID', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'HOADON_ID', visible: false, headerText: 'HOADON_ID', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TEN_LKHL', headerText: 'Loại KHL', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TENHT_GIAO', headerText: 'HT giao', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'DONVI_BHKV', headerText: 'Phòng BHKV', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TO_KD', headerText: 'Tổ KD', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TEN_QLDB', headerText: 'Tên QLĐB', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SDT_QLDB', headerText: 'Số ĐT QLĐB', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TO_KT', headerText: 'Đơn vị NVVT', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TEN_NVVT', headerText: 'Tên NVVT', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'SDT_CNVT', headerText: 'SDT_CNVT', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'MA_TB_CHEM', headerText: 'Mã TB chêm', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'NGAY_CHEM', headerText: 'Ngày chêm/mở', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'NGAY_GIAHAN_1', headerText: 'Ngày KH gia hạn 1', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'NGAY_GIAHAN_2', headerText: 'Ngày KH gia hạn 2', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'NGAY_THUHOI', headerText: 'Ngày thu hồi TBĐC', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'TEN_TBI', headerText: 'Tên TBị', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'USER_THUHOI', headerText: 'User thu hồi', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'TEN_NVVT_THUHOI', headerText: 'Tên NVVT thu hồi', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'USER_GACHNO', headerText: 'User gạch nợ', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'NGAY_GACHNO', headerText: 'Ngày gạch nợ', textAlign: 'Right', allowFiltering: true},
+              {fieldName: 'HTTT_GN', headerText: 'HTTT GN', textAlign: 'Left', allowFiltering: true},
+              {fieldName: 'HINHTHUC_TT', headerText: 'HTTT', textAlign: 'Left', allowFiltering: true},
+                ]"
+              v-bind:dataSource="dsDaChuyenTTVT"
+              :enablePagingServer="false"
+              :allowPaging="false"
+              :allowExcelExport="true"
+              :showColumnCheckbox="true"
+              :enabledSelectFirstRow="false"
+              :selectionSettings="configs.selectionSettings"
+              :showFilter="true"
+              ref="gridDaChuyenTTVT"
+              >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

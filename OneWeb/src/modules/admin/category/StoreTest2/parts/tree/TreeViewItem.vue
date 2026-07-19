@@ -1,0 +1,68 @@
+<template>
+    <ul class="">
+        <li v-for="(item, key) in temp_options"
+            v-bind:key="key"
+            :class="(item.children.length > 0 ? 'haschild' : '') + (item.isOpen ? ' open' : '')">
+            <a @click.prevent="item.isOpen = !item.isOpen; changeSelectedItem($event, item)"
+            class="tree-link"
+            :class="selectedValue === item[valueField] ? 'selected highlight1' : ''">{{ item[labelField] }}</a>
+            <template v-if="item.children && item.children.length > 0">
+                <tree-view-item
+                :selectedValue="selectedValue"
+                v-on="$listeners"
+                :options="item.children"
+                :labelField="labelField"
+                :valueField="valueField">
+                </tree-view-item>
+            </template>
+        </li>
+    </ul>
+</template>
+
+<script>
+export default {
+  name: 'tree-view-item',
+  props: {
+    options: Array,
+    labelField: String,
+    valueField: String,
+    selectedValue: {
+      default: null,
+      type: [Number, String]
+    }
+  },
+  computed: {
+    temp_options: function () {
+      return this.options
+    }
+  },
+  methods: {
+    changeSelectedItem (event, item) {
+      if (event.offsetX < 0) {
+        event.target.closest('li').classList.toggle('open')
+        this.$emit('isOpenChange', item)
+      } else {
+        // this.current = item.donvi_id
+        this.$emit('changeSelectedItem', item)
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.tree-link {
+  cursor: pointer;
+}
+.tree-link.active {
+  color: blue;
+}
+
+.tree-plus ul li.haschild > a:before {
+    content: "\E6BA";
+}
+
+.tree-plus ul li.haschild.open > a:before {
+    content: "\E6B8";
+}
+</style>

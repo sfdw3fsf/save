@@ -1,0 +1,345 @@
+<div>
+        <div class="list-actions-top">
+            <div class="pull-left">
+                <ul class="list">
+                    <li>
+                        <a href="#/cabman/bando-matdo-phantu-dancu" @click="printVNPTMap()">
+                            <span class="icon nc-icon-glyph location_map-pin"></span>Bản đồ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#/cabman/bando-matdo-phantu-dancu" @click="xuatFile()">
+                            <span class="icon one-download"></span>Xuất file
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#/cabman/bando-matdo-phantu-dancu">
+                            <span class="icon nc-icon-glyph ui-1_eye-19"></span>Xem
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="pull-right">
+                <div class="padt8 padb8 text-main"><span class="icon ui-1_lock nc-icon-glyph"></span> Quyền truy cập:
+                    cấp độ {{quyenTruyCap}}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="page-content">
+            <div class="row">
+                <Split>
+                    <SplitArea :size="pSize" :minSize="100">
+                        <div>
+                            <div class="box-form">
+                                <div class="legend-title">
+                                    <div class="pull-left">Phân tích mật độ hạ tầng và hộ dân</div>
+                                    <div class="pull-right" v-if="pSize>10">
+                                        <a href="javascript:void(0)" class="link fa fa-angle-double-left" @click="pSize=10"></a>
+                                    </div>
+                                    <div class="pull-right" v-if="pSize<=10">
+                                        <a href="javascript:void(0)" class="link fa fa-angle-double-right" @click="pSize=30"></a>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="title-bg-main">
+                                    <span class="title">Thông tin khu vực trên bản đồ</span>
+                                </div>
+                                <p>Tọa độ trung tâm: {{thongTinKhuVuc.ToaDo}}</p>
+                                <p>Mức zoom: {{thongTinKhuVuc.Zoom}}</p>
+                                <p>Tổng diện tích: {{thongTinKhuVuc.TongDienTich}} {{thongTinKhuVuc.donvi}}</p>
+                                <div class="title-bg-main">
+                                    <span class="title">Tùy chọn phân tích</span>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w120">Kiểu bản đồ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" ref="cboKieuBanDo" class="form-control"
+                                                v-model="dataSelected.kieuBanDo" @change="onChangeKieuBanDo()">
+                                                <option v-for="(kieu,index) in dskieuBanDo" :value="index">
+                                                    {{kieu.kieubando}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w120">Loại bản đồ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="cboLoaiBanDo" class="form-control"
+                                                v-model="dataSelected.loaiBanDo" @change="onChangeLoaiBanDo()">
+                                                <option v-for="(kieu,index) in dsloaiBanDo" :value="index">
+                                                    {{kieu.loaibando}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row" v-if="dataSelected.kieuBanDo==0">
+                                    <div class="key w120">Dữ liệu</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="cboDuLieu" class="form-control"
+                                                v-model="dataSelected.dulieu">
+                                                <option v-for="(kieu,index) in dsduLieu" :value="index">{{kieu.dulieu}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row" v-if="dataSelected.kieuBanDo==1">
+                                    <div class="key w120">Nhà cung cấp</div>
+                                    <div class="value">
+                                        <div class="bss-1828-list-checks-ncc list-group" ref="chuquan"
+                                            style="max-height: 200px;margin-bottom: 10px;overflow: scroll;">
+                                            <b-list-group class="item" v-for="(cc,index) in dsnhaCC" :key="index">
+                                                <b-list-group-item>
+                                                    <div class="check-action check-color">
+                                                        <input type="checkbox" :id="cc.CHUQUAN_ID" class="check"
+                                                            @click="getChecked(cc.CHUQUAN_ID,$event)">
+                                                        <span class="name">{{cc.TENCHUQUAN}}</span>
+                                                    </div>
+                                                    <div class="shape" :style="cc.MAU"></div>
+                                                </b-list-group-item>
+                                            </b-list-group>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key w120">Phạm vi</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <div class="select-custom">
+                                                <select name="" id="cboPhamVi" class="form-control"
+                                                    v-model="dataSelected.phamvi">
+                                                    <option v-for="(kieu,index) in dsphamVi" :value="index">
+                                                        {{kieu.phamvi}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row" v-if="dataSelected.kieuBanDo==1">
+                                    <div class="key w120">Kích thước hạt</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="cboKTHat" class="form-control"
+                                                v-model="dataSelected.kichthuocHat">
+                                                <option v-for="kieu in dskichThuocHat.kichthuoc" :value="kieu">
+                                                    {{kieu}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="value w30 nowrap padt7">
+                                        Pixel
+                                    </div>
+                                </div>
+                                <div class="info-row" v-if="dataSelected.kieuBanDo==0">
+                                    <div class="key w120">Kích thước bút vẽ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="cboPKTButVe" class="form-control"
+                                                v-model="dataSelected.kichThuocButVe">
+                                                <option v-for="kieu in dskichThuocButVe.kichthuoc"
+                                                    :value="kieu">
+                                                    {{kieu}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="value w30 nowrap" v-if="dataSelected.kieuBanDo==0">
+                                        <div class="check-action mart7">
+                                            <input type="checkbox" class="check" @change="onChangeCanBang()">
+                                            <span class="name">Tự cân bằng</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row" v-if="dataSelected.kieuBanDo==0">
+                                    <div class="key w120">Độ sắc nét ({{valuebar}})%</div>
+                                    <div class="value">
+                                        <b-form-input id="range-2" v-model="valuebar" type="range" min="0" max="100"
+                                            step="1">
+                                        </b-form-input>
+                                        <!-- <div class="slider-box mart15">
+                                    <div class="bar" style="width: 20%;">
+                                        
+                                       <span class="slider-drag"></span>
+                                    </div>
+                                </div> -->
+                                    </div>
+                                </div>
+                                <div class="group-buttons -bottom tright">
+                                    <button class="btn-main btn" :class="{'disable-btn': stateButton.isDisableLamMoi}"
+                                        @click="lamMoi()">
+                                        <span class="f20 inline vcenter one-reload"></span>
+                                        Làm mới
+                                    </button>
+                                    <button class="btn-second btn"
+                                        :class="{'disable-btn': stateButton.isDisablePhanTich}" @click="phantich()">
+                                        <span class="f20 inline vcenter one-forward"></span> Phân tích
+                                    </button>
+                                </div>
+                                <div class="title-bg-main mart10">
+                                    <span class="title">Kết quả phân tích</span>
+                                </div>
+                                <p>{{ketquaPhanTich.TongSoKC_HD}}</p>
+                                <p>{{ketquaPhanTich.MatDoTB}}</p>
+                                <p
+                                    style="background: #219653;border: 0.5px solid #219653; padding: 7px 10px;color: #fff;text-align: center;">
+                                    100%</p>
+                                <p
+                                    style="background: #F39738;border: 0.5px solid #F39738; padding: 7px 10px;color: #fff;text-align: center;margin-top: 240px;">
+                                    Phân tích mật độ hạ tầng và số dân</p>
+                            </div>
+                        </div>
+                    </SplitArea>
+                    <SplitArea :size="100-pSize" :minSize="300">
+                        <div>
+                            <!-- <div class="box-form">
+                                <div class="bss-1828-mapcanvas">
+                                    <div class="file-canvas relative" style="height: 933px;">
+                                        <div ref="map">
+                                            <GMap id="chonbando" ref="mapcontrol" :infoMapDefault="infoMapDefault"
+                                                @dokhoangcach="dokhoangcach" @getRecKVCon="getRecKVCon"
+                                                @luuToaDoBanDo="luuToaDoBanDo" @anThongTinKV="anThongTinKV"
+                                                @infoMapCurrent="infoMapCurrent"></GMap>
+                                        </div>
+                                        <div class="map-note" v-show="isDoKC">
+                                            <p>Nhấn [Enter] để hoàn thiện phép đo</p>
+                                            <p>Nhấn [Escape] để hủy phép đo</p>
+                                            <p>Xóa phép đo cũ trước khi muốn thực hiện lại</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="map-actions" v-if="isShowPhanTich">
+                                        <div class="title" @click="hienthiThongtin">{{titleKV}}
+                                        </div>
+                                        <div class="actions" v-show="!isViewThongTin">
+                                            <a href="javascript:void(0)" class="btn btn-second" @click="vehinhtron">
+                                                <span class="one-circle-dot"></span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-second" @click="vehinhcn">
+                                                <span class="one-design-square-plus"></span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-second" @click="vehinhdagiac">
+                                                <span class="one-design-per"></span>
+                                            </a>
+                                        </div>
+
+                                        <div class="box-map-note" style="position: absolute; left: -245px;"
+                                            v-show="isViewThongTin">
+                                            <div class="box-form marb0">
+                                                <div class="legend-title">Thông tin khu vực đang chọn</div>
+                                                <div class="article" v-show="!showData">Chưa có dữ liệu
+                                                </div>
+                                                <div class="article" v-show="showData">
+                                                    <p class="fw6">I. Dung lượng thị trường</p>
+                                                    <div class="text-desc">
+                                                        <p>1. Tổng dân cư: ~ {{dungLuongThiTruong.tongDanCu}}</p>
+
+                                                        <p>2. Thị phần VNPT: {{dungLuongThiTruong.thiphanVNPT}}</p>
+                                                        <ul>
+                                                            <li>Fiber: {{dungLuongThiTruong.tongFiber}}</li>
+                                                            <li>Mega: {{dungLuongThiTruong.tongMega}}</li>
+                                                            <li>MyTV: {{dungLuongThiTruong.tongMyTV}}</li>
+                                                            <li>CD/Gphone/IMS: {{dungLuongThiTruong.tongCD}}</li>
+                                                        </ul>
+
+                                                        <p>3. Thị phần Viettel: {{dungLuongThiTruong.thiphanViettel}}
+                                                        </p>
+
+                                                        <p>4. Thị phần FPT: {{dungLuongThiTruong.thiphanFPT}}</p>
+
+                                                    </div>
+                                                    <p class="fw6">II. Thông tin hạ tầng</p>
+
+                                                    <div class="text-desc">
+                                                        <p>1. Năng lực hạ tầng VNPT:</p>
+                                                        <ul>
+                                                            <li>Tổng số kết cuối:
+                                                                {{nangLucHaTang.haTangVNPT.tongSoKetCuoi}}</li>
+                                                            <li>Tổng dung lượng lắp đặt:
+                                                                {{nangLucHaTang.haTangVNPT.dungLuongLapDat}}
+                                                            </li>
+                                                            <li>Tổng dung lượng đã dùng:
+                                                                {{nangLucHaTang.haTangVNPT.dungLuongDaDung}}
+                                                            </li>
+                                                        </ul>
+
+                                                        <p>2. Năng lực hạ tầng Viettel:</p>
+                                                        <ul>
+                                                            <li>Tổng số kết cuối:
+                                                                {{nangLucHaTang.haTangViettel.tongSoKetCuoi}}</li>
+                                                            <li>Tổng dung lượng lắp đặt:
+                                                                {{nangLucHaTang.haTangViettel.dungLuongLapDat}}
+                                                            </li>
+                                                            <li>Tổng dung lượng đã dùng:
+                                                                {{nangLucHaTang.haTangViettel.dungLuongDaDung}}
+                                                            </li>
+                                                        </ul>
+
+                                                        <p>3. Năng lực hạ tầng FPT:</p>
+                                                        <ul>
+                                                            <li>Tổng số kết cuối:
+                                                                {{nangLucHaTang.haTangFPT.tongSoKetCuoi}}</li>
+                                                            <li>Tổng dung lượng lắp đặt:
+                                                                {{nangLucHaTang.haTangFPT.dungLuongLapDat}}
+                                                            </li>
+                                                            <li>Tổng dung lượng đã dùng:
+                                                                {{nangLucHaTang.haTangFPT.dungLuongDaDung}}
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div v-show="showData">
+                                                <p
+                                                    style="background: #F39738;border: 0.5px solid #F39738; padding: 7px 10px;color: #fff;text-align: center;">
+                                                    Thông tin khu vực đang chọn</p>
+                                                <div class="list-note box-form marb0">
+                                                    <div class="item">
+                                                        <div class="icon one-circle-dot btn btn-second"  @click="xemDataKVTron()"></div> Xem thông tin
+                                                        khu vực nhỏ
+                                                        theo bán kính
+                                                    </div>
+                                                    <div class="item" >
+                                                        <div class="icon one-design-square-plus  btn btn-second" @click="xemDataKVHcn()"></div> Xem
+                                                        thông tin khu vực nhỏ theo hình chữ nhật
+                                                    </div>
+                                                    <div class="item" >
+                                                        <div class="icon one-design-per btn btn-second" @click="xemDataKVPolygon()"></div> Xem thông tin
+                                                        khu vực nhỏ theo hình tự vẽ
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="box-form">
+                                <div class="bss-1830-mapcanvas sitemap-chart-canvas">
+                                    <div ref="map">
+                                        <BanDoVNPT
+                                            ref="mapcontrol"
+                                            menuMapId="mapVNPT"
+                                            :center="center">
+                                        </BanDoVNPT>
+                                        <div class="zoom-actions-bottom">
+                                            <a href="javascript:void(0)" class="btn btn-main" v-b-tooltip.hover title="Phóng to" @click="zoomIn()">
+                                                <span class="icon -ap icon-plus3"></span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-main" v-b-tooltip.hover title="Thu nhỏ" @click="zoomOut()">
+                                                <span class="icon -ap icon-minus3"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SplitArea>
+                </Split>
+            </div>
+        </div> 
+</div>

@@ -1,0 +1,291 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li :class="{disabled : searchForm.trangThaiId == 1}">
+                <a href="#" @click.prevent="onClickSearch">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            <li :class="{disabled : searchForm.trangThaiId == 1}">
+                <a href="#" @click.prevent="onClickGiao">
+                    <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+            </li>
+            <li :class="{disabled : searchForm.trangThaiId == 0}">
+                <a href="#" @click.prevent="onClickHuyGiao">
+                    <span class="icon one-cancel"></span>Hủy giao
+                </a>
+            </li>
+            <li :class="{disabled : searchForm.trangThaiId == 1}">
+                <a href="#" @click.prevent="onClickCapNhat">
+                    <span class="icon one-reload1"></span>Cập nhật ĐV
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="onClickExport">
+                    <span class="icon one-download"></span>Xuất file
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w100">Mã giao dịch</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="showPopupSearchContract">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" ref="maGd" v-model="searchForm.maGd" class="form-control ">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w80">Ngày giao</div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24"
+                                    :placeholder="'Chọn ngày'" :format="'dd/MM/yyyy'" :showClearButton="false"
+                                    v-model="searchForm.ngayGiao"
+                                    @change="onClickSearch">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+
+                    <div class="info-row">
+                        <div class="key">Trạng thái phiếu</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select v-model="searchForm.trangThaiId" @change="onClickSearch" class="form-control">
+                                    <option value="0">Chưa giao</option>
+                                    <option value="1">Đã giao</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" @change="onChangeLoaiHD" v-model="searchForm.ckbLoaiHD"
+                                    class="check">
+                                <span class="name">Loại HĐ</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select v-model="searchForm.loaiHDId" :disabled="!searchForm.ckbLoaiHD"
+                                    class="form-control" @change="onChangeLoaiHD">
+                                    <option v-for="dv in dsLoaiHD" v-bind:value="dv.LOAIHD_ID">{{dv.TEN_LOAIHD}}
+                                    </option>
+                                </select> -->
+                                <SelectExt v-model.trim="searchForm.loaiHDId" :dataSource="dsLoaiHD" dataTextField="TEN_LOAIHD"
+                    dataValueField="LOAIHD_ID" :disabled="!searchForm.ckbLoaiHD" @change="onChangeLoaiHD"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="checkbox" v-model="searchForm.ckbDichVu" @change="onChangeLoaiHD"
+                                    class="check">
+                                <span class="name">Dịch vụ</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select v-model="searchForm.dichVuId" :disabled="!searchForm.ckbDichVu"
+                                    class="form-control" @change="onChangeLoaiHD">
+                                    <option v-for="dv in dsDichVu" v-bind:value="dv.DICHVUVT_ID">{{dv.TEN_DVVT}}
+                                    </option>
+                                </select> -->
+                                <SelectExt v-model.trim="searchForm.dichVuId" :dataSource="dsDichVu" dataTextField="TEN_DVVT"
+                    dataValueField="DICHVUVT_ID" :disabled="!searchForm.ckbDichVu" @change="onChangeLoaiHD"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input type="checkbox" @change="getHuongGiao" v-model="searchForm.ckbQuyTrinh"
+                                    class="check">
+                                <span class="name">Quy trình:</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select v-model="searchForm.quyTrinhId" :disabled="!searchForm.ckbQuyTrinh"
+                                    class="form-control"  @change="getHuongGiao">
+                                    <option v-for="dv in dsQuyTrinh" v-bind:value="dv.QUYTRINH_ID">{{dv.QUYTRINH}}
+                                    </option>
+                                </select> -->
+                                <SelectExt v-model.trim="searchForm.quyTrinhId" :dataSource="dsQuyTrinh" dataTextField="QUYTRINH"
+                    dataValueField="QUYTRINH_ID" :disabled="!searchForm.ckbQuyTrinh" @change="getHuongGiao"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-title mart20">Thông tin giao phiếu</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+
+                    <div class="info-row">
+                        <div class="key w100">Hướng giao</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select v-model="updateForm.huongGiaoId" @change="onChangeHuongGiao" class="form-control">
+                                    <option v-for="dv in dsHuongGiao" v-bind:value="dv.HUONGGIAO_ID">{{dv.HUONGGIAO}}
+                                    </option>
+                                </select> -->
+                                <SelectExt v-model.trim="updateForm.huongGiaoId" :dataSource="dsHuongGiao" dataTextField="HUONGGIAO"
+                    dataValueField="HUONGGIAO_ID" @change="onChangeHuongGiao"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key">Mã giao dịch</div>
+                        <div class="value">
+                            <input type="text" v-model="updateForm.maGd" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w70">Ngày giao</div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24"
+                                    :placeholder="'Chọn ngày'" 
+                                    :format="'dd/MM/yyyy HH:mm'" 
+                                    :showClearButton="false"
+                                    v-model="updateForm.ngayGiao"
+                                    >
+                                </ejs-datepicker>
+
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w100">Số máy/Acc</div>
+                        <div class="value">
+                            <input type="text" v-model="updateForm.maTb" class="form-control highlight">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+
+                    <div class="info-row">
+                        <div class="key w80">Số QĐ</div>
+                        <div class="value">
+                            <input type="text" v-model="updateForm.soQd" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+
+                    <div class="info-row">
+                        <div class="key">Đơn vị nhận</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select :disabled="searchForm.trangThaiId == 1" v-model="updateForm.donViNhanId" class="form-control">
+                                    <option v-for="dv in dsDonViNhan" v-bind:value="dv.DONVI_ID">{{dv.TEN_DV}}</option>
+                                </select>
+                                <!-- <SelectExt v-model.trim="updateForm.donViNhanId" :dataSource="dsDonViNhan" dataTextField="TEN_DV"
+                    dataValueField="DONVI_ID" :disabled="searchForm.trangThaiId == 1" /> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+
+                    <div class="info-row">
+                        <div class="key w100">Nội dung giao</div>
+                        <div class="value">
+                            <input type="text" v-model="updateForm.noiDungGiao" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+
+                    <div class="info-row">
+                        <div class="key">Địa chỉ TC</div>
+                        <div class="value">
+                            <input type="text" v-model="updateForm.diaChiCT" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="legend-title mart20">
+            <div class="pull-left">
+                Danh sách phiếu yêu cầu
+            </div>
+            <div class="pull-right red">
+                {{times}}
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="table-content">
+            <!-- <DataGrid2 v-bind:columns="columns"
+            v-bind:dataSource="dsHDTB" :showFilter="true" dataKeyField="PHIEU_ID"
+            :showColumnCheckbox=true
+            :selectedRow=0
+            ref="table"
+            @selectedRowChanged="choseRowTable"
+            @selectedItemsChanged="checkRowTable"
+            >
+          </DataGrid2> -->
+          <DataGrid v-bind:columns="columns"
+            v-bind:dataSource="dsHDTB" :showFilter="true" dataKeyField="PHIEU_ID"
+            :showColumnCheckbox=true
+            ref="table"
+            @rowClicked="choseRowTable"
+            :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="false"
+            :selectionSettings="{checkboxOnly: true, type: 'Multiple'}"
+            >
+          </DataGrid>
+        </div>
+    </div>
+    <!-- <b-modal id="modal-export" hide-footer modal-class="modal-export"  title="Xuất dữ liệu" no-close-on-backdrop size="lg">
+        <ModalExport :data="dsHDTB" :columnsIn="columns"></ModalExport>
+    </b-modal> -->
+    <SearchAccountModal ref="searchAccountModal" v-on:accept="onChapNhan"/>
+    <appModalXuatDuLieu id="modal-export" :thuocTinh="columns" :data="dsHDTB" tenFileXuat="GiaoPhieuXLTB.xlsx"/>
+    
+</div>

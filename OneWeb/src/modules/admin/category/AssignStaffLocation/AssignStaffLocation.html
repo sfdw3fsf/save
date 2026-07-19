@@ -1,0 +1,157 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">GÁN VỊ TRÍ NHÂN VIÊN</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="#">Lập hợp đồng</a></li>
+            <li class="breadcrumb-item active">Lắp đặt mới</li>
+        </ul>
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li @click="btnLamMoi()">
+                <a>
+                    <span class="icon one-reload"></span>Làm mới(F5)
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-on:click="Onclick()" v-model="params.chkDVval">
+                                <span class="name">Đơn vị</span>
+                            </div>
+                        </div>
+                        <div class="control_wrapper">
+                            <treeselect v-model="defaultValueTree" :multiple="false" :options="listItemDonViGoc"
+                                v-on:select="onChangeTreeSelect" :disabled="params.isDonVi" noResultsText="Không có dữ liệu"
+                                placeholder="Vui lòng chọn đơn vị"  :normalizer="removeNoChildren" :defaultExpandLevel="1" :clearable="false"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" @click="chk_LoaiNV = !chk_LoaiNV"
+                                    :checked="chk_LoaiNV">
+                                <span class="name">Loại NV</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model="params.p_loaiNV" :options="params.p_loaiNV_options"
+                                    @select="onChangeLoaiNV" :disabled="!chk_LoaiNV"/>
+                            </div>
+                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Mã NV
+                        </div>
+                        <div class="value">
+                            <input type="text" v-model="params.p_manhanvien" autofocus ref="params.p_manhanvien"
+                                class="form-control highlight" @keyup.enter="onSearch">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" @click="chk_ViTri = !chk_ViTri"
+                                    :checked="chk_ViTri">
+                                <span class="name">Vị trí</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom" >
+                                <SelectExt v-model="params.p_vitri_id" :options="params.p_vitri_options" :disabled="!chk_ViTri"
+                                @select="onChangeViTri" />
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách nhân viên</div>
+            <div class="table-content">
+                <table class="table-result table-gachle">
+                    <DataGrid v-bind:columns="[
+                    { fieldName: 'MA_NV', headerText: 'Mã nhân viên', textAlign: 'left'},
+                    { fieldName: 'TEN_NV', headerText: 'Tên nhân viên', textAlign: 'left' },
+                    { fieldName: 'MA_DV', headerText: 'Mã đơn vị', textAlign: 'left' },
+                    { fieldName: 'TEN_DV', headerText: 'Tên đơn vị', textAlign: 'left' } ]"
+                     v-bind:dataSource="listboxNV"
+                        :showColumnCheckbox="false" :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                        @selectedRowChanged="grdNVChanged" :enabledSelectFirstRow="true">
+                    </DataGrid>
+                </table>
+            </div>
+        </div>
+        <div class="box-move-select-table">
+            <div class="box-col box-form">
+                <div class="legend-title">Danh sách vị trí đã gắn</div>
+                <div class="table-content">
+                    <k-table :columns="columns_DSVTriDaGan" :dataSources="params.ds_vtdagan_table"
+                        @dataCheckeds="checkedDataDaGan" :allowCheckBox="true" :allowFilter="true"
+                        :rowSelectedIndex="1" />
+                    <!--  <table class="table-result table-gachle">
+                        <DataGrid v-bind:columns="[
+                        {fieldName: 'VITRI', headerText: 'Vị trí', allowFiltering: true, allowSorting: false, cellCssClass: 'text-left'},
+                        {fieldName: 'CHUCDANH', headerText: 'Chức danh', allowFiltering: true, allowSorting: false, cellCssClass: 'text-left'},
+                    ]" v-bind:dataSource="params.ds_vtdagan_table" :showFilter="true" :showColumnCheckbox="true"
+                            @selectedItemsChanged="selectedDataDaGan" dataKeyField="VITRI_ID"
+                            :defaultColumnCheckboxChecked="false">
+                        </DataGrid>
+                    </table> -->
+                </div>
+
+            </div>
+            <div class="actions">
+                <button class="btn" @click="btnDeleteVT()">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button class="btn" @click="btnInsertVT()">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+            </div>
+            <div class="box-col box-form">
+                <div class="legend-title">Danh sách vị trí chưa gắn</div>
+                <div class="table-content">
+                    <k-table class="table-result table-gachle" :columns="columns_DSVTriChuaGan"
+                        :dataSources="params.ds_vtchuagan_table" @dataCheckeds="checkedDataChuaGan"
+                        :allowCheckBox="true" :allowFilter="true" :rowSelectedIndex="1" />
+                    <!--  <table class="table-result table-gachle">
+                        <DataGrid v-bind:columns="[
+                        {fieldName: 'VITRI', headerText: 'Vị trí', allowFiltering: true, allowSorting: false, cellCssClass: 'text-left'},
+                    ]" v-bind:dataSource="params.ds_vtchuagan_table" :showFilter="true" :showColumnCheckbox="true"
+                            @selectedItemsChanged="selectedDataChuaGan" dataKeyField="VITRI_ID"
+                            :defaultColumnCheckboxChecked="false">
+                        </DataGrid>
+                    </table> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+    <script type="application/javascript" src="../vendor/jquery/split.js"></script>
+</div>

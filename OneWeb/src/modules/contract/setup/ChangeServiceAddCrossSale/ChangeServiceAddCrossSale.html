@@ -1,0 +1,510 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header"/>
+  <ActionTop :actions="actions" @onActionClick="onActionClick"/>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="row">
+        <div class="col-sm-6 col-12"></div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row marb0">
+            <div class="key nowrap w60">
+              <div class="check-action">
+                <input type="checkbox" v-model="chkCTV.checked" @change="chkCTV_CheckedChanged" class="check fw6">
+                <span class="name fw6">Cộng tác viên</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" ref="txtCTV" v-model="formProps.txtCTV" class="form-control fw6">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row marb0">
+            <div class="key nowrap w60">
+              <div class="check-action">
+                <input type="checkbox" class="check fw6" v-model="chkNguoiGT.checked"
+                       @change="chkNguoiGT_CheckedChanged">
+                <span class="name fw6">Người giới thiệu</span>
+              </div>
+            </div>
+            <div class="value">
+              <input type="text" ref="chkNguoiGT" v-model="formProps.txtNguoiGT" class="form-control fw6">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row marb0">
+            <div class="key nowrap w60 fw6">
+              Tổng tiền
+            </div>
+            <div class="value">
+              <vue-numeric class="form-control fw6" ref="txtTongTienHD"
+                           separator="," v-model="formProps.txtTongTienHD"
+                           placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">
+        Thông tin phiếu yêu cầu
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w100">Mã giao dịch</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="btnLayMaGD_Click">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <SearchContractModal ref="popupSearchContract" :loai_hd_id="modelSearchContract.loai_hd_id"
+                                         :dichvu_id="modelSearchContract.dichvu_id"
+                                         :trangthai_hd="modelSearchContract.trangthai_hd"
+                                         :donvi_id="modelSearchContract.donvi_id"
+                                         :donvi_dl_id="modelSearchContract.donvi_dl_id"
+                                         :ngay_yc="modelSearchContract.ngay_yc" @accept="acceptSearchContract"/>
+                    <input type="text" ref="txtMaGD" v-model="formProps.txtMaGD" class="form-control highlight fw6"
+                           v-on:keyup.enter="txtMaGD_KeyPress">
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Mã hợp đồng</div>
+                <div class="value">
+                  <input type="text" ref="txtMaHD" v-model="formProps.txtMaHD" class="form-control fw6">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w100">Ngày yêu cầu</div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker v-model="formProps.dtpNgayYeuCau" format="DD/MM/YYYY" type="date"
+                                   ref="dtpNgayYeuCau"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Ngày lập HĐ</div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker v-model="formProps.dtpNgayLapHD" format="DD/MM/YYYY" type="date"
+                                   ref="dtpNgayLapHD"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key">Dịch vụ</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 ref="cboDichVuVT" v-model="cboDichVuVT.value"
+                             :options="cboDichVuVT.list" :settings="settingSelect2"/>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="info-row">
+                <div class="key">Kiểu yêu cầu</div>
+                <div class="value">
+                  <div class="select-custom" ref="ds_kieuld">
+                    <select2 :settings="{ dropdownParent: $refs['ds_kieuld'] }"
+                        v-model="cboKieuLD.value" class="select2"
+                        :options="cboKieuLD.list.map(e=> ({id: e.kieuld_id, text: e.ten_kieuld}))"
+                        @change="cboKieuLD_SelectedValueChanged"
+                        @select="Click_kieuld=true" 
+                        @open="Click_kieuld=true" 
+                        @close="PopupThongSo();Click_kieuld=false"
+                      >
+                    </select2>
+                  </div>
+                  <!-- <div class="select-custom" @click="cboKieuLD_Click">
+                    <ejs-combobox
+                      ref="cboKieuLD"
+                      :dataSource='cboKieuLD.list'
+                      :fields="{ text: 'ten_kieuld', value: 'kieuld_id' }"
+                      v-model="cboKieuLD.value"
+                      @change="cboKieuLD_SelectedValueChanged"
+                      @focus="cboKieuLD_Click"></ejs-combobox>
+                  </div> -->
+                </div>
+
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w140">Loại hình</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ejs-combobox
+                      ref="cboKieuLD"
+                      :dataSource='cboLoaihinhTB.list'
+                      :fields="{ text: 'text', value: 'id' }"
+                      v-model="cboLoaihinhTB.value"
+                      @change="cboLoaihinhTB_SelectedValueChanged"
+                    ></ejs-combobox>
+                    <!--                    <Select2 ref="cboLoaihinhTB" v-model="cboLoaihinhTB.value"
+                                                 :options="cboLoaihinhTB.list" :settings="settingSelect2"/>-->
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w140">Mã HĐ - TTKD</div>
+                <div class="value">
+                  <input type="text" ref="txtMaHD_TTKD" v-model="formProps.txtMaHD_TTKD"
+                         :disabled="disabledBox.txtMaHD_TTKD" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="legend-title mart20" style="display: flex">
+            <div>Thông tin thuê bao</div>
+            <div style="margin-left: 50px" v-show="lblCanhBaoVisible">
+              <h5 class="fw6 red text-center">{{ lblCanhBao }}</h5>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w100">Số máy/Acc</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="btnTKMaTB_Click">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" ref="txtMaTB" v-model="formProps.txtMaTB" class="form-control highlight fw6"
+                           v-on:keyup.enter="txtMaTB_KeyPress">
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Hướng kết nối</div>
+                <div class="value">
+                  <input type="text" class="form-control" ref="txtHuongKN" v-model="formProps.txtHuongKN">
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Tên thuê bao</div>
+                <div class="value">
+                  <input type="text" class="form-control fw6" ref="txtTenTB" v-model="formProps.txtTenTB">
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Địa chỉ TB</div>
+                <div class="value">
+                  <input type="text" class="form-control fw6" ref="txtDiaChiTB" v-model="formProps.txtDiaChiTB">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w100">Số ảo</div>
+                <div class="value">
+                  <input type="text" class="form-control highlight fw6" ref="txtSoAo" v-model="formProps.txtSoAo">
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Trạng thái TB</div>
+                <div class="value">
+                  <input type="text" class="form-control text-danger italic" ref="txtTrangThaiTB"
+                         v-model="formProps.txtTrangThaiTB">
+                </div>
+              </div>
+              <div class="info-row" v-show="showThongSoTc">
+                <div class="key w120">Thông số thi công</div>
+                <div class="value">
+                  <button class="btn btn-primary btn-sm pull-left" @click="btnDiemDau_Click"
+                          v-show="btnDiemDau.visible">
+                    Điểm đầu
+                  </button>
+                  <button class="btn btn-primary btn-sm pull-right" @click="btnDiemCuoi_Click"
+                          v-show="btnDiemCuoi.visible">
+                    Điểm cuối
+                  </button>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Mã ERP</div>
+                <div class="value">
+                  <input type="text" class="form-control" ref="txtMaERP" v-model="formProps.txtMaERP">
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Mã BSS</div>
+                <div class="value">
+                  <input type="text" class="form-control" ref="txtMaBSS" v-model="formProps.txtMaBSS">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w100">Địa chỉ LĐ</div>
+            <div class="value">
+              <input type="text" class="form-control fw6" ref="txtDiaChiLD fw6" v-model="formProps.txtDiaChiLD">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w100">Địa chỉ LĐ đầu</div>
+            <div class="value">
+              <input type="text" class="form-control fw6" ref="txtDiaChiLD_Dau" v-model="formProps.txtDiaChiLD_Dau">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w100">Địa chỉ LĐ cuối</div>
+            <div class="value">
+              <input type="text" class="form-control fw6" ref="txtDiaChiLD_Cuoi" v-model="formProps.txtDiaChiLD_Cuoi">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w100">Ghi chú</div>
+            <div class="value">
+              <input type="text" class="form-control" ref="txtGhiChu" v-model="formProps.txtGhiChu">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="legend-title mart20">Thông tin khách hàng</div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key">Mã khách hàng</div>
+                <div class="value">
+                  <input type="text" class="form-control fw6" ref="txtMaKH" v-model="formProps.txtMaKH">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w140">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="chkNgay_HHTD.checked"
+                           :disabled="chkNgay_HHTD.disabled">
+                    <span class="name">Ngày hết hạn TD</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker v-model="formProps.dtpNgayHH_TD" format="DD/MM/YYYY" type="date"
+                                   ref="dtpNgayHH_TD" :disabled="!chkNgay_HHTD.checked"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key">Tên khách hàng</div>
+                <div class="value">
+                  <input type="text" class="form-control fw6" ref="txtTenKH" v-model="formProps.txtTenKH">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w140">Mã dự án</div>
+                <div class="value">
+                  <input type="text" class="form-control fw6" ref="txtMaDuAn" v-model="formProps.txtMaDuAn">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key">Địa chỉ KH</div>
+            <div class="value">
+              <input type="text" class="form-control fw6" ref="txtDiaChiKH" v-model="formProps.txtDiaChiKH">
+            </div>
+          </div>
+          <div class="legend-title mart20">Lý do</div>
+          <div class="info-row">
+            <div class="key"></div>
+            <div class="input-more-button">
+              <button class="btn" :disabled="btnEditLyDoHuy.disabled" @click="btnEditLyDoHuy_Click">
+                <span class="-ap icon-more_horiz"></span>
+              </button>
+              <ejs-listbox
+                :cssClass="'list-lydohuy'"
+                locale='vi-VN'
+                :dataSource="lvLyDoHuy.data"/>
+            </div>
+          </div>
+          <div class="legend-title mart20">Chi tiết tiền khoản mục</div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key">Tổng tiền</div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="btnTien_Click">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <vue-numeric class="form-control tright fw6 red" ref="txtTongTien"
+                                 separator="," v-model.number="formProps.txtTongTien" :precision="formProps.txtTongTien !== 0 ? 2 : 0"
+                                 placeholder="0" output-type="Number"></vue-numeric>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w140">
+                  Tổng VAT
+                </div>
+                <div class="value">
+                  <vue-numeric class="form-control tright red fw6" ref="txtTongVat"
+                               separator="," v-model.number="formProps.txtTongVat" :precision="formProps.txtTongTien !== 0 ? 2 : 0"
+                               placeholder="0" output-type="Number"></vue-numeric>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="row">
+        <div class="col-sm-2 col-12">
+          <div class="legend-title">DS thuê bao</div>
+          <div class="table-content">
+            <ejs-listview id='flat-list'
+                          :dataSource='lvwThueBao.data'
+                          :height="300"
+                          :enableVirtualization='lvwThueBao.enableUi'
+                          :headerTitle='lvwThueBao.headerTitle'
+                          :select="lvwThueBao_SelectedIndexChanged"
+                          showHeader='true'>
+            </ejs-listview>
+          </div>
+        </div>
+        <div class="col-sm-10 col-12">
+          <div class="legend-title">Dánh sách dịch vụ gia tăng bán
+          </div>
+          <div class="grid-dvgt">
+            <DataGrid ref="dgvDVGT" class="table-result table-gachle" v-bind:columns="dgvDVGT.headers"
+                      v-bind:dataSource="dgvDVGT.data" :showColumnCheckbox="false"
+                      :selectionSettings="dgvDVGT.selectionOptions"
+                      @cellSelected="dgvDVGT_CellContentClick"
+                      @recordDoubleClick="dgvDVGT_CellContentDoubleClick"
+                      :enable-paging-server="false" :allowPaging="true" :showFilter="false"
+                      :enabled-select-first-row="true"></DataGrid>
+          </div>
+          <div class="legend-title mart15" v-show="tabOneActive">
+            <div class="title pull-left mart7">{{ lineLabel7 }}</div>
+            <div class="pull-right" style="padding-left:20px">
+              <span class="name font-weight-normal">Kiểu yêu cầu thi công</span>
+              <div class="value font-weight-normal" style=" width:300px ;display:inline-block !important">
+                <div class="select-custom font-weight-normal">
+                  <Select2 ref="cboKieuLD_TC" v-model="cboKieuLD_TC.value"
+                           :options="cboKieuLD_TC.list" :settings="settingSelect2"/>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="legend-title mart15" v-show="tabTwoActive">
+            <div class="title pull-left mart7">{{ lineLabel9 }}</div>
+            <div class="pull-right" style="padding-left:20px">
+              <span class="name font-weight-normal">Kiểu yêu cầu thi công</span>
+              <div class="value" style=" width:300px ;display:inline-block !important">
+                <div class="select-custom font-weight-normal">
+                  <Select2 ref="cboKieuLD_TC" v-model="cboKieuLD_TC_TSL.value"
+                           :options="cboKieuLD_TC_TSL.list" :settings="settingSelect2"/>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div v-show="!showTabHeader">
+            <DataGrid ref="dgvDVGTTC" class="table-result table-gachle" v-bind:columns="dgvDVGTTC.headers"
+                      v-bind:dataSource="dgvDVGTTC.data" :showColumnCheckbox="false"
+                      :enable-paging-server="false"
+                      :selectionSettings="dgvDVGTTC.selectionOptions"
+                      @cellSelected="dgvDVGTTC_CellContentClick"
+                      :allowPaging="true" :showFilter="true" :editSettings='editSettings'
+                      :enabled-select-first-row="true"></DataGrid>
+          </div>
+          <div v-show="showTabHeader">
+            <b-tabs pills
+                    card
+                    vertical
+                    class="tabs-dvgt"
+                    @activate-tab="tabCtDVGTActiveTab"
+            >
+              <b-tab title="Điểm đầu" active>
+                <DataGrid ref="dgvDVGTTC" class="table-result table-gachle" v-bind:columns="dgvDVGTTC.headers"
+                          v-bind:dataSource="dgvDVGTTC.data" :showColumnCheckbox="false"
+                          :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                          :selectionSettings="dgvDVGTTC.selectionOptions"
+                          @cellSelected="dgvDVGTTC_CellContentClick"
+                          :enabled-select-first-row="true"></DataGrid>
+              </b-tab>
+              <b-tab title="Điểm cuối">
+                <DataGrid ref="dgvDVGTTC_TSL" class="table-result table-gachle" v-bind:columns="dgvDVGTTC_TSL.headers"
+                          v-bind:dataSource="dgvDVGTTC_TSL.data" :showColumnCheckbox="false"
+                          :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                          :selectionSettings="dgvDVGTTC_TSL.selectionOptions"
+                          @cellSelected="dgvDVGTTC_TSL_CellContentClick"
+                          :enabled-select-first-row="true"></DataGrid>
+              </b-tab>
+            </b-tabs>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ChonTinhTLS ref="popupChonTinhTLS" @chonTinhTLSAccept="chonTinhTLSAccept"/>
+  <frm-chon-tinh ref="popupChonTinh" @closeChonTinh="closeChonTinh"/>
+  <DSTBCungMa ref="popupDSTBCungMa"/>
+  <popup-tra-cuu-thue-bao ref="popupTraCuuThueBao" @chapnhan="chapNhanTraCuuThueBao"/>
+  <frmCTTienKM ref="frmCTTienKM" @closeDialog="frmCTTienKMCloseDialog"/>
+  <InHopDong ref="popupInHD" :params="modelInHD"/>
+  <DangKyLyDoHuyBC ref="popupDangKyLyDoHuyBC" @form-close="acceptDangKyLyDoHuyBC"/>
+  <ThongTinHenKhachHangModal ref="ThongTinHenKhachHangModal" :hdkh_id="Number(this.hdkh_id)"
+                             :quyenduoc_hen="this.quyen_duoc_hen"/>
+  <ejs-dialog :enableResize='true' :visible="false" ref="thongtinemail" :header='"Thông tin Email"' :allowDragging='true'
+              showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <ThongTinEmail :hdkh_id="Number(hdkh_id)" :khachhang_id="khachhang_id"/>
+  </ejs-dialog>
+  <ejs-dialog :enableResize='true' :visible="false" ref="thongtinlienhe" :header='"Thông tin liên hệ"' :allowDragging='true'
+              showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <ThongTinLienHe :hdkh_id="Number(hdkh_id)" :khachhang_id="khachhang_id"/>
+  </ejs-dialog>
+  <ThongSoTSL ref="popupThongSoTSL" @chapnhan="chapnhanThongSoTSL"/>
+  <NguoiGT ref="frmNguoiGT" @chonNhanvien="chonNhanvien"/>
+  <ThongSoCoDinh ref="frmThongSoCoDinh" @capnhat="capnhat_TSCD"
+                 :pLoaihinhTB="ThongSoCoDinhModel.pLoaihinhTB" :tinhtc="ThongSoCoDinhModel.tinhtc"
+                 :_ploaitb_ld="ThongSoCoDinhModel.ploaitb_ld" :_ploaitb="ThongSoCoDinhModel.ploaitb"
+                 :_thuebao_id_ban="ThongSoCoDinhModel.thuebao_id_ban"
+                 :_thuebao_id_thicong="ThongSoCoDinhModel.thuebao_id_thicong" :_vloaihd="ThongSoCoDinhModel.vloaihd"
+                 :khachhang_id="ThongSoCoDinhModel.khachhang_id" :Text="'Đổi thông số cố định/IMS'"
+                 :hdkh_id="Number(ThongSoCoDinhModel.hdkh_id)"/>
+  <ejs-dialog :enableResize='true' :visible='false' ref='TocDoMucCuocDialog' :position='position'
+              :allowDragging="draggable"
+              :header='"Chọn tốc độ mức cước theo đối tượng"' showCloseIcon='true' :target='targetTop' height="800"
+              width='70%'>
+    <TocDoMucCuoc ref='TocDoMucCuocPopup' :thongso_ban="thongso_ban" :thongso_tc="thongso_tc"
+                  :_ploaitb_ld="cboLoaihinhTB.value" :_ploaitb_td="cboLoaihinhTB.value"
+                  :tinhtc="tinh.tinhthicong_id" :_vloaihd="7" :thuebao_id_tc="thuebao_tc_id" :thuebao_id="thuebao_id"
+                  @accept="acceptTocDoMucCuoc"
+    />
+  </ejs-dialog>
+  <frmTCDBTBKH @chapnhan="setDBTB" ref="frmTC_DBTB_KH" :khachhang_id="Number(khachhang_id)" :hdkh_id="Number(hdkh_id)"
+               :vkieu="1" :thuebao_id="Number(thuebao_id)"/>
+  <frmThongSoWan ref="frmThongSoWan" @closeThongSoWan="CloseHienThiChonThongSo"></frmThongSoWan>
+  <TKTBChuyenDich ref="TKTBChuyenDich" :dulieu="this.TKTBChuyenDichProps" @closeTKTBChuyenDich="closeTKTBChuyenDich"/>
+</div>

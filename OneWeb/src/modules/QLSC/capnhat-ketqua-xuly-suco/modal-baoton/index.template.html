@@ -1,0 +1,146 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span>Báo tồn sự cố</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="onClickBtnCapNhat">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-reload1"></span> Cập nhật 
+                    </a>
+                </li>
+                <li @click="onClickBtnHuy">
+                    <a href="javascript:void(0)">
+                        <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy phiếu 
+                    </a>
+                </li>
+                <li @click="onClickBtnHuongDan">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-book1"></span> Hướng dẫn 
+                    </a>
+                </li>
+        
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Thông tin báo tồn</div>
+                        <div class="info-row">
+                            <div class="key">Nhóm sự cố</div>
+                            <div class="value" ref="ref-select-nhom-suco">        
+                                <SelectExt
+                                    :settings="{dropdownParent: $refs['ref-select-nhom-suco']}"
+                                    v-model="nhomScId" 
+                                    :dataSource="dsNhomSuCo" 
+                                    :disabled="true"
+                                    dataValueField="NHOMSC_ID"
+                                    dataTextField="NHOM_SC" />
+                            </div> 
+                        </div>
+                        <div class="info-row">
+                            <div class="key">Nhóm tồn</div>
+                            <div class="value" ref="ref-select-nhom-ton">        
+                                <SelectExt
+                                    :settings="{dropdownParent: $refs['ref-select-nhom-ton']}"
+                                    v-model="nhomTonId" 
+                                    :dataSource="dsNhomTon" 
+                                    dataValueField="NHOMTON_ID"
+                                    dataTextField="NHOM_TON" />
+                            </div> 
+                        </div>
+                        <div class="info-row">
+                            <div class="key">Nguyên nhân tồn <bss-required-marker /></div>
+                            <div class="value" ref="ref-select-nguyennhan-ton">
+                                <bss-error-marker :has-error="$v.nguyenNhanTonId.$error">
+                                    <SelectExt
+                                        :settings="{dropdownParent: $refs['ref-select-nguyennhan-ton']}"
+                                        v-model="$v.nguyenNhanTonId.$model" 
+                                        :dataSource="dsNguyenNhanTon" 
+                                        dataValueField="NNTON_ID"
+                                        dataTextField="NN_TON" />
+                               </bss-error-marker>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Thông tin báo tồn</div>
+                        <div class="info-row">
+                            <div class="key w120">Nhân viên báo tồn <bss-required-marker />                            </div>
+                            <div class="value" ref="ref-select-nhanvien">
+                                <bss-error-marker :has-error="$v.nhanVienId.$error">
+                                    <SelectExt
+                                        :settings="{dropdownParent: $refs['ref-select-nhanvien']}"
+                                        v-model="$v.nhanVienId.$model" 
+                                        :dataSource="dsNhanVien" 
+                                        dataValueField="NHANVIEN_ID"
+                                        dataTextField="TEN_NV" />
+                               </bss-error-marker>
+                            </div> 
+                        </div>
+                        <div class="info-row">
+                            <div class="key w120">Ngày báo tồn <bss-required-marker /></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.ngayBaoTon.$error">
+                                    <ejs-datetimepicker
+                                        :style="{'padding-top': '7px'}"
+                                        class="form-control bg-none bor0 fw6 text h24"
+                                        placeholder="" 
+                                        v-model="$v.ngayBaoTon.$model"
+                                        format="dd/MM/yyyy HH:mm"></ejs-datetimepicker>
+                               </bss-error-marker>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w120">Ghi chú tồn</div>
+                            <div class="value">
+                                <input type="text" v-model="ghiChu" maxlength="500" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách lịch sử báo tồn</div>
+                <DataGrid v-bind:columns="[
+                        {fieldName: 'NGAY_BT', headerText: 'Ngày báo tồn', allowFiltering: true,},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                        {fieldName: 'NHANVIEN_BT', headerText: 'Người báo tồn', allowFiltering: true},
+                        {fieldName: 'DONVI_BT', headerText: 'Đơn vị báo tồn', allowFiltering: true},
+                        {fieldName: 'NGAY_CN', headerText: 'Ngày cập nhật', allowFiltering: true},
+                        {fieldName: 'NGUOI_CN', headerText: 'Người cập nhật', allowFiltering: true}
+                    ]"
+                    v-bind:dataSource="dsBaoTon"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    @selectedRowChanged="onSelectRow"></DataGrid>
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-xacnhan-xoa" centered title="Thông báo" size="sm" @ok="okXoaPhieuTon">        
+        <span>Bạn có muốn hủy phiếu báo tồn đang chọn không?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+   </b-modal>
+</b-modal>

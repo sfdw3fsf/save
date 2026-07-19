@@ -1,0 +1,214 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onAddNew" :disabled="!buttons.btnAddNew.enabled">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave" :disabled="!buttons.btnSave.enabled">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onCancel" :disabled="!buttons.btnCancel.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onEdit" :disabled="!buttons.btnEdit.enabled">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onDelete" :disabled="!buttons.btnDelete.enabled">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+      <li>
+        <a @click="btnImportExcel_Click" style="cursor: pointer;"> <span class="icon one-upload"></span> Import </a>
+      </li>
+      <li>
+        <a @click="btnExportExcel_Click" style="cursor: pointer;"> <span class="icon one-download"></span> Export </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin loại vật liệu kết nối</div>
+
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w150">ID loại vật liệu kết nối <span class="required">*</span></div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                :value="form.id ? form.id : ''"
+                :placeholder="!form.id ? 'Tự sinh' : ''"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w150">Loại vật liệu <span class="required">*</span></div>
+            <div class="value">
+              <SelectExt
+                v-model="form.loaivlId"
+                dataTextField="TEN"
+                dataValueField="ID"
+                :dataSource="[...loaiVatLieuSelectionList]"
+                :disabled="!controls.selectLoaiVatLieu.enabled"
+                :class="{ 'is-invalid': controls.selectLoaiVatLieu.invalid }"
+              />
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w150">Tên loại vật liệu <span class="required">*</span></div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': controls.txtTen.invalid }"
+                v-model="form.ten"
+                :disabled="!controls.txtTen.enabled"
+              />
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w150">Thông số kỹ thuật <span class="required">*</span></div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': controls.txtThongSo.invalid }"
+                v-model="form.thongSo"
+                :disabled="!controls.txtThongSo.enabled"
+              />
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w150">Ghi chú</div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="form.ghiChu" :disabled="!controls.txtGhiChu.enabled" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-4 col-12">
+          <div class="info-row">
+            <div class="key w100">Hiệu lực</div>
+            <div class="value padt4">
+              <div class="check-action">
+                <input
+                  type="checkbox"
+                  class="check"
+                  v-model="form.suDung"
+                  :true-value="1"
+                  :false-value="0"
+                  :disabled="!controls.chkHieuLuc.enabled"
+                /><span class="name"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w100">Icon <span class="required">*</span></div>
+            <div class="value">
+              <div>
+                <button
+                  v-if="controls.txtIcon.enabled"
+                  class="btn btn-main lh14"
+                  @click="onClickUploadIcon"
+                  :disabled="!controls.txtIcon.enabled || uploadingIcon"
+                >
+                  <span class="-ap icon-more_horiz"></span>
+                  Chọn ảnh
+                </button>
+
+                <button
+                  class="btn btn-danger lh14"
+                  v-if="false"
+                  @click="onRemoveIcon"
+                  :disabled="!controls.txtIcon.enabled"
+                >
+                  <span class="one-trash"></span> Xoá
+                </button>
+
+                <input
+                  ref="fileInputIcon"
+                  type="file"
+                  accept="image/*"
+                  @change="onChangeIconFile($event)"
+                  style="display: none"
+                />
+              </div>
+
+              <!-- Preview để riêng -->
+              <div v-if="form.iconPath || pendingIconFile" class="preview mt-2">
+                <div v-if="loadingImageUrl" class="image-loading fixed-icon-box">
+                  <div style="text-align: center;">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="sr-only">Đang tải...</span>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 12px; color: #6c757d;">Đang tải ảnh...</div>
+                  </div>
+                </div>
+                <img
+                  v-else
+                  :src="pendingIconPreviewUrl || displayIconUrl || form.iconPath"
+                  alt="icon"
+                  class="fixed-icon-box img-fluid"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DataGrid -->
+    <div class="box-form">
+      <div class="legend-title">Danh sách loại vật liệu kết nối</div>
+      <DataGrid
+        v-bind:columns="[
+          {fieldName: 'ID', headerText: 'ID Loại vật liệu kết nối', width: 100, textAlign: 'Left'},
+          {fieldName: 'TEN_LOAI_VATLIEU', headerText: 'Loại vật liệu', textAlign: 'Left', allowFiltering: true},
+          {fieldName: 'TEN', headerText: 'Tên loại vật liệu', textAlign: 'Left', allowFiltering: true},
+          {fieldName: 'THONGSO_KYTHUAT', headerText: 'Thông số kỹ thuật', textAlign: 'Left', allowFiltering: true},
+          {fieldName: 'SUDUNG', headerText: 'Hiệu lực', allowFiltering: true, textAlign: 'Center', width: 70}
+        ]"
+        :dataSource="dsVatLieuKetNoi"
+        :showFilter="true"
+        :allowPaging="true"
+        :allowExcelExport="true"
+        :enablePagingServer="false"
+        :showColumnCheckbox="true"
+        @selectedItemsChanged="onSelectRowCheckbox"
+        @rowSelected="grdItems_RowSelected"
+        dataKeyField="ID"
+        ref="grdItems"
+      >
+      </DataGrid>
+    </div>
+  </div>
+
+  <ModalImportExcel
+    ref="modalImportExcel"
+    :title="importConfig.title"
+    :tableColumns="importConfig.tableColumns"
+    :templateFileName="importConfig.templateFileName"
+    :processExcelData="processLoaiVLKNExcelData"
+    :formatCellValue="formatLoaiVLKNCellValue"
+    :validationRules="importConfig.validationRules"
+    :checkDataResult="importConfig.checkDataResult"
+    @check-data="handleCheckData"
+  />
+</div>

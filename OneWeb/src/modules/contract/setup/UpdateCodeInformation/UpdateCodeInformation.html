@@ -1,0 +1,170 @@
+<ejs-dialog
+  :enableResize='true'
+  :allowDragging='true'
+  :visible='false'
+  ref="dlgUpdateCodeInformation"
+  :header='"Cập nhật thông tin mã in ghép"'
+  :animationSettings='animationSettings'
+  showCloseIcon=true width='80%'
+  :target='target'
+  :open="dialogOpen"
+  :close="close"
+  :isModal="true"
+>
+  <div class="modal-content popup-box">
+    <ActionTop :actions="actions" @onActionClick="onActionClick"/>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="legend-title">Thông tin tạo mã in ghép</div>
+        <div class="row">
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w90">Mã KH</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="showPopupSearchAccount">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" ref="txtMaKH" class="form-control" v-model.trim="formThongTinTaoMaGhep.txtMaKH"
+                         v-on:keyup.enter="txtMaKH_KeyPress">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w90">Mã in ghép</div>
+              <div class="value">
+                <input type="text" ref="txtMaIG" readonly v-model.trim="formThongTinTaoMaGhep.txtMaIG"
+                       class="form-control highlight">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w130">Đơn vị quản lý</div>
+              <div class="value">
+                <div class="select-custom">
+                  <Select2 ref="cboDonViQL" v-model="cboDonViQL.selectedValue" :disabled="true"
+                           :options="cboDonViQL.list" :settings="settingSelect2"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w90">Mã NVTC</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="showPopUpNhanVienTC">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" readonly ref="txtMaNVTC" class="form-control highlight"
+                         v-model.trim="formThongTinTaoMaGhep.txtMaNVTC" value="">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w90">Tuyến thu</div>
+              <div class="value">
+                <input type="text" readonly ref="txtMaTuyen" class="form-control highlight"
+                       v-model.trim="formThongTinTaoMaGhep.txtMaTuyen">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w90">Địa chỉ IG</div>
+              <div class="value">
+                <div class="select-custom">
+                  <div class="input-more-button" @click="btnDiaChiIG_Click">
+                    <button class="btn">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" ref="txtDiaChiIG" class="form-control"
+                           v-model.trim="formThongTinTaoMaGhep.txtDiaChiIG">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title">
+          <div class="title">Danh sách mã in ghép</div>
+        </div>
+        <div class="table-content">
+          <DataGrid ref="gridDsMaInGhep" v-bind:columns="dsMaInGhep.headers"
+                    v-bind:dataSource="dsMaInGhep.list" :showColumnCheckbox="false"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    @rowClicked="selectMaInGhep" @selectedRowChanged="gridDsMIGSelectedChange"></DataGrid>
+        </div>
+      </div>
+      <div class="box-move-select-table mart20">
+        <div class="box-col">
+          <div class="legend-title">
+            <div class="title">Danh sách mã thanh toán đã gán</div>
+          </div>
+          <DataGrid ref="gridDsMaTTDaGan" v-bind:columns="dsMaTTDaGan.headers"
+                    v-bind:dataSource="dsMaTTDaGan.list" :showColumnCheckbox="true"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    :enabled-select-first-row="false"
+                    @selectedItemsChanged="gridDsMaTTDaGanChecked"></DataGrid>
+        </div>
+        <div class="actions">
+          <button class="btn" @click="boGan">
+            <span class="fa fa-angle-right"></span>
+          </button>
+          <button class="btn" @click="boGanAll">
+            <span class="fa fa-angle-double-right"></span>
+          </button>
+          <button class="btn" @click="gan">
+            <span class="fa fa-angle-left"></span>
+          </button>
+          <button class="btn" @click="ganAll">
+            <span class="fa fa-angle-double-left"></span>
+          </button>
+        </div>
+        <div class="box-col">
+          <div class="legend-title">
+            <div class="title">Danh sách mã thanh toán chưa gán</div>
+          </div>
+          <DataGrid ref="gridDsMaTTChuaGan" v-bind:columns="dsMaTTChuaGan.headers"
+                    v-bind:dataSource="dsMaTTChuaGan.list" :showColumnCheckbox="true"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    :enabled-select-first-row="false"
+                    @selectedItemsChanged="gridDsMaTTChuaGanChecked"></DataGrid>
+        </div>
+      </div>
+    </div>
+    <b-modal id="popupSearchAccount" size="xl"
+             hide-footer
+             hide-header
+             hide-header-close
+             body-class="modal-body p-0">
+      <div class="popup-body">
+        <SearchAccount :isPopup="true" @form-close="closeSearchAccount"></SearchAccount>
+      </div>
+    </b-modal>
+
+    <b-modal id="popupDonViQL" size="xl"
+             hide-footer
+             hide-header
+             hide-header-close
+             body-class="modal-body p-0">
+      <div class="popup-body">
+        <popupChonGrid :dulieu="dulieuDVQL" @form-close="ChonDonViQL"></popupChonGrid>
+      </div>
+    </b-modal>
+
+    <ModalChonDiaChi :data="dataSelected" modal-id="popupChonDiaChi" @xacnhan="XacNhanDiaChi"></ModalChonDiaChi>
+
+    <TimNhanVienThuCuoc :input="dulieuNVTC" @response-data="XacNhanNhanVienThuCuoc($event)" ref="dlgTimKiemNVTC"
+                        id="dlgTimKiemNVTC"></TimNhanVienThuCuoc>
+  </div>
+</ejs-dialog>

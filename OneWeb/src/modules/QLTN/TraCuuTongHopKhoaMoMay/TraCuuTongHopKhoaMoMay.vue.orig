@@ -1,0 +1,213 @@
+<template src="./TraCuuTongHopKhoaMoMay.html"></template>
+<style scoped src="./TraCuuTongHopKhoaMoMay.scss"></style>
+<script>
+import Vue from "vue"
+import { DialogPlugin } from '@syncfusion/ej2-vue-popups'
+
+Vue.use(DialogPlugin)
+
+import { mapActions, mapGetters } from 'vuex'
+import rtable from '../components/RTable/RTable.vue'
+import select2 from '@/components/Select2.vue'
+import CommonAPI from '../api/Commons'
+import API from '../api/TraCuuTongHopKhoaMoMayAPI'
+import moment from 'moment'
+import xlsx from "xlsx"
+
+export default Vue.extend({
+    components: { appSelect2: select2, rtable },
+    name: 'TraCuuTongHopKhoaMoMay',
+    async created () {
+        await this.getDanhSachDichVuVienThong();
+        if (this.danhSachDichVuVienThongGetter !== undefined) {
+            this.danhSachDichVuVienThongGetter.forEach(item => {
+                this.dsDichVu.push({ id: item.DICHVUVT_ID, text: item.TEN_DVVT })
+            });
+        }
+        await this.getLoaiHinhTB(this.dichVuSelected);
+    },
+    mounted () {
+        console.log(this.$el)
+    },
+    computed: {
+        ...mapGetters('qltnCommon', ['danhSachDichVuVienThongGetter']),
+
+        dsLoaiHinh() {
+            let danhSach = [];
+            if (this.dsLoaiHinhTB.length !== 0) {
+                this.dsLoaiHinhTB.forEach(item => {
+                    danhSach.push({ id: item.LOAITB_ID, text: item.TEN_LOAIHINH })
+                });
+            }
+            return danhSach;
+        }
+    },
+    data () {
+        return {
+            animationSettings: { effect: 'Zoom' },
+            dichVuSelected: 1,
+            dichVuChecked: false,
+            dsDichVu: [],
+            loaiHinhSelected: 1,
+            loaiHinhChecked: false,
+            dsLoaiHinhTB: [],
+            tuNgay: new Date(),
+            denNgay: new Date(),
+            today: new Date(),
+            items: [],
+            errorMessage: '',
+            tableTitles: [
+                'Kiểu', 'Chiều khóa', 'Tự động', 'Nhân công', 'Tổng SL'
+            ],
+            fields: [
+                {
+                    key: 'KIEU',
+                    label: 'Kiểu'
+                },
+                {
+                    key: 'CHIEUKHOA',
+                    label: 'Chiều khóa',
+                    tdClass: 'text-right'
+                },
+                {
+                    key: 'TUDONG',
+                    label: 'Tự động',
+                    tdClass: 'text-right'
+                },
+                {
+                    key: 'NHANCONG',
+                    label: 'Nhân công',
+                    tdClass: 'text-right'
+                },
+                {
+                    key: 'TONG_SL',
+                    label: 'Tổng SL',
+                    tdClass: 'text-right'
+                }
+            ]
+        }
+    },
+    methods: {
+        ...mapActions('qltnCommon', ['getDanhSachDichVuVienThong']),
+        openDialog () {
+          this.$refs.dlgKhoaMoMay.show()
+        },
+        async getLoaiHinhTB(id) {
+            try {
+                this.loading(true);
+                this.dsLoaiHinhTB = [];
+                let response = await CommonAPI.getDanhSachLoaiHinhThueBao(this.axios, id);
+                if (response.data.error_code === 'BSS-00000000' && response.data.data !== undefined) {          
+                    if (response.data.data.length > 0) {
+                        response.data.data.forEach(item => {
+                            this.dsLoaiHinhTB.push({ id: item.LOAITB_ID, text: item.TEN_LOAIHINH })
+                        })
+                    }                        
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+            finally {
+                this.loading(false);
+            }
+        },
+
+        async getLichSuKhoaMoMay() {
+            try {
+                this.loading(true);
+                let lichSuParams = {
+                    tuNgay: moment(this.tuNgay).format('DD/MM/YYYY'),
+                    denNgay: moment(this.denNgay).format('DD/MM/YYYY'),
+                    dichVuVTId: this.dichVuChecked ? this.dichVuSelected : 0,
+                    loaiTBId: this.loaiHinhChecked ? this.loaiHinhSelected : 0
+                };
+                let response = await API.getLichSuKhoaMoMay(this.axios, lichSuParams);
+                if (response.data.error_code === 'BSS-00000000' && response.data.data !== undefined) {
+                    this.items = response.data.data;
+                }
+            }
+            catch (error) {
+                console.log(error.response);
+                this.errorMessage = error.response.data.message_detail != null ? error.response.data.message_detail : '';
+            }
+            finally {
+                this.loading(false);
+            }
+        },
+
+        async onSearch() {
+            this.items = [];
+            if (this.tuNgay === null) {
+                this.$toast.warning('Vui lòng chọn giá trị cho từ ngày!');
+            } else if (this.denNgay === null) {
+                this.$toast.warning('Vui lòng chọn giá trị cho đến ngày!');
+            } else {
+                await this.getLichSuKhoaMoMay();
+                if (this.items.length > 0) {
+                    return;
+                } else if (this.errorMessage !== ''){
+                    this.$toast.warning('Không có dữ liệu, vui lòng thử lại.');
+                    this.errorMessage = '';
+                } else {
+                    this.$toast.warning('Không có dữ liệu, vui lòng thử lại.');
+                }
+            }
+        },
+
+        onExcelExport() {
+            if (this.items.length <= 0) {
+                this.$toast.warning("Chưa có danh sách để xuất excel!");
+                return;
+            }
+            this.loading(true);
+            try {
+                var ds = xlsx.utils.json_to_sheet(this.items);
+
+                //Change excel table header:
+                var range = xlsx.utils.decode_range(ds['!ref']);
+                let colIndex = 0;
+                for(var C = range.s.c; C <= range.e.c; ++C) {
+                    var address = xlsx.utils.encode_col(C) + "1"; // <-- first row, column number C
+                    if(!ds[address]) continue;
+                    ds[address].v = this.tableTitles[colIndex++];
+                }
+                var wb = xlsx.utils.book_new();
+                xlsx.utils.book_append_sheet(wb, ds, "Tong hop khoa mo may");
+                xlsx.writeFile(wb, "Danh-sach-tong-hop-khoa-mo-may.xlsx");
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.loading(false);
+            }
+        },
+
+        close() {
+            //Clear data before closing modal:
+            this.items = [];
+            this.dichVuSelected = 1;
+            this.dichVuChecked = false;
+            this.loaiHinhSelected = 1;
+            this.loaiHinhChecked = false;
+            this.tuNgay = this.today;
+            this.denNgay = this.today;
+            // this.$bvModal.hide('modal-tracuutonghopkhoamomay');
+            this.$refs.dlgKhoaMoMay.hide()
+        },
+        dialogOpen () {
+
+        },
+        dialogClose () {
+
+        },
+    },
+    watch: {
+        dichVuSelected: {
+            handler: async function (value) {
+                await this.getLoaiHinhTB(value);
+                this.loaiHinhSelected = Number(this.dichVuSelected) === 1 ? 1 : this.dsLoaiHinhTB[0].id;
+            }
+        }
+    }
+})
+</script>

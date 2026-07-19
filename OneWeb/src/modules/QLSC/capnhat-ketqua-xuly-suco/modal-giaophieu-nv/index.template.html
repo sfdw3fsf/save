@@ -1,0 +1,144 @@
+<b-modal 
+    ref="ref-modal-giaophieu-nv"
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span> Giao phiếu nhân viên</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$refs['ref-modal-giaophieu-nv'].hide()">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="onClickBtnGhiLai">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-save"></span> Ghi lại
+                    </a>
+                </li>
+                <li @click="onClickBtnSms">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-email"></span>Gửi SMS
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body modal-giaophieu-nhanvien">
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách nhân viên</div>
+                    <div class="pull-right">
+                        <a href="javascript:void(0)" class="link nc-icon-outline arrows-1_refresh-69" @click="onClickBtnLamMoiDsCanGiao"></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w100">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkTrungTam">
+                                    <span class="name">Trung tâm</span>
+                                </div>
+                            </div>
+                            <div class="value" ref="ref-select-ttvt">        
+                                <SelectExt
+                                    :settings="{dropdownParent: $refs['ref-select-ttvt']}"
+                                    v-model="ttvtId" 
+                                    :dataSource="dsTtvt" 
+                                    :disabled="!chkTrungTam"
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w100">
+                                Tổ Kỹ thuật
+                            </div>
+                            <div class="value" ref="ref-select-tokt">        
+                                <SelectExt
+                                    :settings="{dropdownParent: $refs['ref-select-tokt']}"
+                                    v-model="toKtId" 
+                                    :dataSource="dsToKt" 
+                                    :disabled="!chkTrungTam"
+                                    dataValueField="DONVI_ID"
+                                    dataTextField="TEN_DV" />
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <div class="table-content mart10">
+                    <DataGrid
+                        ref="grid-nhanvien-can-giao"
+                        class="table-result"
+                        panelDataHeight="200"
+                        :editSettings="{allowEditing: true, mode: 'Batch'}"
+                        v-bind:columns="[
+                            {fieldName: '', headerText: 'Chọn', textAlign: 'Center', allowFiltering: false, width: '50', allowEditing: false, template: getColumnTemplateCheckbox(this)},
+                            {fieldName: 'MA_NV', headerText: 'Mã NV', allowFiltering: true, width: '130', allowEditing: false },
+                            {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, width: '130', allowEditing: false },
+                            {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true, width: '130', allowEditing: false },
+                            {fieldName: 'SO_DT', headerText: 'Điện thoại', allowFiltering: true, width: '130', allowEditing: false },
+                            {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ', textAlign: 'Left', allowFiltering: true, width: '200', allowEditing: true },
+                            {fieldName: 'GHICHU', headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true, width: '130', allowEditing: true },
+                            {fieldName: '', headerText: '', textAlign: 'Center', allowFiltering: false, width: '50', allowEditing: false, template: getColumnTemplateBtnXoa(this) },
+                            {fieldName: 'KEY', visible: false, isPrimaryKey: true },
+                        ]"        
+                        v-bind:dataSource="dsCanGiao"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        @cellSaved="onCellSaved"
+                        @queryCellInfo="onQueryCellInfoNhanVien"></DataGrid>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách nhân viên đã giao nhiệm vụ</div>
+                    <div class="pull-right">
+                        <a href="javascript:void(0)" class="link nc-icon-outline arrows-1_refresh-69" @click="onClickBtnLamMoiDsDaGiao"></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content">
+                    <DataGrid
+                        ref="grid-nhanvien-da-giao"
+                        class="table-result"
+                        panelDataHeight="100"
+                        v-bind:columns="[
+                            {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'MA_NV', headerText: 'Mã NV', allowFiltering: true, width: '130' },
+                            {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, width: '130' },
+                            {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true, width: '130' },
+                            {fieldName: 'SO_DT', headerText: 'Điện thoại', textAlign: 'Right', allowFiltering: true, width: '130' },
+                            {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ', allowFiltering: true, width: '130' },
+                            {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, width: '130' },
+                            {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, width: '130' },
+                        ]"        
+                        v-bind:dataSource="dsDaGiao"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        @selectedRowChanged="onSelectRowNvDaGiao"></DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal ref="modal-xacnhan-gui-sms" centered title="Thông báo" size="sm" @ok="okGuiSms">        
+        <span>Bạn có muốn nhắn tin giao việc cho nhân viên đang chọn không?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+   </b-modal>   
+</b-modal>

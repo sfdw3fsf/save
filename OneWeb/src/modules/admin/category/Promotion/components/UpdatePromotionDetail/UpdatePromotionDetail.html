@@ -1,0 +1,498 @@
+<div class="modal modal-show" id="popupTCTTTB">
+    <div class="modal-dialog" style="width: 100%; max-width:95%;">
+        <div class="modal-content popup-box">
+            <div class="popup-header">
+                <div class="title"><span class="icon one-notepad"></span> Cập nhật chi tiết khuyến mại</div>
+                <div class="close -ap icon-close" data-dismiss="modal" @click.prevent="$emit('close')">
+                </div>
+            </div>
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li class="pointer">
+                        <a @click.prevent="btnGhiLaiOnClick" :class="buttonStatus.btnSave ? '' : 'disabled'">
+                            <span class="icon one-save"></span> Ghi lại
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="btnNhapMoiOnClick" :class="buttonStatus.btnAddNew ? '' : 'disabled'">
+                            <span class="icon one-file-plus"></span> Nhập mới
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="btnHuyOnClick" :class="buttonStatus.btnCancel ? '' : 'disabled'">
+                            <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="btnXoaOnClick" :class="buttonStatus.btnDelete ? '' : 'disabled'">
+                            <span class="icon one-trash"></span> Xóa
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="btnCopyOnClick" :class="buttonStatus.btnCopy ? '' : 'disabled'">
+                            <span class="icon one-copy"></span> Copy
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="() => { isShowLaborSource = true; }">
+                            <span class="icon one-nguonlaodong"></span> Nguồn LĐ
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="handShowPromotionQuota" :class="buttonStatus.btnDinhMuc ? '' : 'disabled'">
+                            <span class="icon one-file-edit"></span> Định mức
+                        </a>
+                    </li>
+                    <li class="pointer">
+                        <a @click.prevent="handShowPromotionCTKhoanmuc" :class="buttonStatus.btnCTKhoanmuc ? '' : 'disabled'">
+                            <span class="icon one-file-edit"></span> CT Khoản mục
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="popup-body">
+                <div class="row">
+                    <div class="col-sm-5 col-9">
+                        <div class="box-form">
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Mã KM
+                                        </div>
+                                        <div class="value">
+                                            <ejs-textbox :class="{ hasError: $v.form.ma_km.$error }" ref="maKm"
+                                                type="text" v-model="form.ma_km" class="form-control">
+                                            </ejs-textbox>
+                                            </ejs-textbox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">
+                                            <div class="list-checks text-main">
+                                                <div class="item">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" v-model="form.sua_km_cuoc" class="check">
+                                                        <span class="name">Sửa KM cước</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" v-model="form.sua_kmld" class="check">
+                                                        <span class="name">Sửa KMLĐ</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Tên KM<span class="red"> *</span></div>
+                                <div class="value">
+                                    <ejs-textbox ref="tenKm" :class="{ hasError: $v.form.ten_km.$error }"
+                                        v-model="form.ten_km" type="text" class="form-control"></ejs-textbox>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12" v-if="!form.tyle_vat">
+                                    <div class="info-row">
+                                        <div class="key w90">Tiền KMLĐ</div>
+                                        <div class="value">
+                                            <ejs-numerictextbox id="tien_kmlddt" format="N" :showSpinButton='false'
+                                                v-model="form.tien_kmld" :value="form.tien_kmld"
+                                                @change="onChangVat('vat_km', 'tien_kmld','form')"
+                                                class="form-control tright pr-2">
+                                            </ejs-numerictextbox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12" :class="form.tyle_vat ? '' : 'col-sm-5'">
+                                    <div class="info-row">
+                                        <span v-if="!form.tyle_vat" style="display: contents !important;">
+                                            <div class="key w70">Vat KM</div>
+                                            <div class="value">
+                                                <ejs-numerictextbox id="vat_kmdt" format="N" :showSpinButton='false'
+                                                    v-model="form.vat_km" :value="form.vat_km"
+                                                    class="form-control tright pr-2">
+                                                </ejs-numerictextbox>
+                                            </div>
+                                        </span>
+                                        <span style="display: contents;" v-if="form.tyle_vat">
+                                            <div class="key w90">Tỷ lệ KM LĐ<span class="red"> *</span></div>
+                                            <div class="value">
+                                                <ejs-numerictextbox id="tyleKMLDdt" format="n1" :showSpinButton='false'
+                                                    v-model="form.tyleKMLD" :value="form.tyleKMLD" :max="100"
+                                                    class="form-control tright pr-2">
+                                                </ejs-numerictextbox>
+                                            </div>
+                                        </span>
+                                        <div class="value w30 nowrap padt7">
+                                            <div class="check-action">
+                                                <input type="checkbox" v-model="form.tyle_vat" disabled class="check">
+                                                <span class="name">Tỷ lệ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Nguồn LĐ</div>
+                                <div class="value">
+                                    <ejs-textbox id="input-ld" v-model="form.nguon_ld" class="form-control highlight"
+                                        :multiline="true" style="height: 100px;resize: none;">
+                                    </ejs-textbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-15">
+                        <div class="box-form">
+                            <div class="info-row">
+                                <div class="key w60">Nội dung<span class="red"> *</span></div>
+                                <div class="value input-nd" :class="{ 'e-error': $v.form.noi_dung.$error }">
+                                    <ejs-textbox ref="noiDung" v-model="form.noi_dung" :multiline="true"
+                                        class="form-control fw6" style="resize: none;">
+                                    </ejs-textbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5 col-9">
+                        <div class="box-form">
+                            <div class="info-row">
+                                <div class="key w90">Nguồn KM<span class="red"> *</span></div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <ejs-dropdownlist :dataSource="danhSachNguonKM" ref="nguonKM"
+                                            v-model="form.nguonkm_id" :showClearButton='true' class="combobox"
+                                            :fields="{ text: 'ten_nguon', value: 'nguonkm_id' }"
+                                            @filtering="onFilteringDropDownList($event, danhSachNhomKM, 'ten_nguon')"
+                                            :allowFiltering='true'>
+                                        </ejs-dropdownlist>
+                                        <!-- :fields="{ text: 'ten_dv', value: 'donvi_id' }"
+                                        @filtering="onFilteringDropDownList($event, danhSachDonViDL, 'ten_dv')" -->
+                                        <!-- <select name="" id="" class="form-control">
+                                            <option value=""></option>
+                                        </select> -->
+                                    </div>
+                                </div>
+                                <div class="value w30 nowrap padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" v-model="form.phan_bo" class="check">
+                                        <span class="name">Phân bố</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Kiểu bắt đầu<span class="red"> *</span></div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="combobox" v-model="form.kieu_batdau"
+                                                    :dataSource="danhSachKieubatdau"
+                                                    :fields="{ text: 'name', value: 'id' }"
+                                                    @filtering="onFilteringDropDownList($event, danhSachNhomKM, 'name')"
+                                                    :allowFiltering='true'>
+                                                </ejs-dropdownlist>
+                                                <!-- <select name="" id="" class="form-control">
+                                                    <option value=""></option>
+                                                </select> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Nhóm KM</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="combobox" ref="nhomKm" v-model="form.nhom_km"
+                                                    :dataSource="danhSachNhomKM"
+                                                    :fields="{ text: 'ten_ts', value: 'ma_ts' }" :allowFiltering='true'
+                                                    @filtering="onFilteringDropDownList($event, danhSachNhomKM, 'ten_ts')">
+                                                </ejs-dropdownlist>
+                                                <!-- <select name="" id="" class="form-control">
+                                                    <option value=""></option>
+                                                </select> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Tháng BDKM<span class="red"> *</span></div>
+                                        <div class="value">
+                                            <ejs-tooltip class="tooltipcontainer"
+                                                content="Sau mấy tháng bắt đầu được hưởng khuyến mại. Ví dụ: Hưởng ngày trong tháng nghiệp thu thì Tháng BĐKM=0"
+                                                target="#thang_bdkm">
+                                                <ejs-textbox id="thang_bdkm"
+                                                    :class="{ hasError: $v.form.thang_bdkm.$error }" type="text"
+                                                    v-model="form.thang_bdkm" class="form-control tright fw6 pr-2">
+                                                </ejs-textbox>
+                                            </ejs-tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Hưởng KM<span class="red"> *</span></div>
+                                        <div class="value">
+                                            <ejs-tooltip class="tooltipcontainer"
+                                                content="Số tháng được hưởng chi tiết khuyến mại" target="#HuongKM">
+                                                <ejs-textbox id="HuongKM" :class="{ hasError: $v.form.huong_km.$error }"
+                                                    type="text" ref="HuongKM" v-model="form.huong_km"
+                                                    class="form-control tright fw6 pr-2">
+                                                </ejs-textbox>
+                                            </ejs-tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    <div class="list-checks red fw6">
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" v-model="km_theo_tien_tyle" value="0" class="check">
+                                                <span class="name">Khuyến mại theo tiền, tỷ lệ %</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" v-model="km_theo_tien_tyle" value="1" class="check">
+                                                <span class="name">Khuyến mại theo tiền phải trả
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-12">
+                                    <div class="info-row" v-show="!form.tyle_cuoctb">
+                                        <div class="key w90">Cước SD <span class="red"> *</span></div>
+                                        <div class="value">
+                                            <ejs-numerictextbox id="cuoc_sddt" ref="CuocSD" :showSpinButton='false'
+                                                :enabled="km_theo_tien_tyle == 0"
+                                                :class="{ hasError: $v.form.cuoc_sd.$error }"
+                                                class="form-control tright fw6 pr-2" :max="form.cuoctb_maximun"
+                                                :format=" form.cuoctb_decimal == 0 ? 'N' : 'n3'"
+                                                :decimals="form.cuoctb_decimal != 0 ? 3 :''" v-model="form.cuoc_sd"
+                                                :value="form.cuoc_sd"></ejs-numerictextbox>
+                                        </div>
+                                    </div>
+                                    <div class="info-row" v-show="form.tyle_cuoctb">
+                                        <div class="key w90">Tỷ lệ SD<span class="red"> *</span></div>
+                                        <div class="value">
+                                            <ejs-numerictextbox id="cuoc_sdtldt" ref="CuocTyleSD"
+                                                :showSpinButton='false' :enabled="km_theo_tien_tyle == 0"
+                                                :class="{ hasError: $v.form.tyle_sd.$error }"
+                                                class="form-control tright fw6 pr-2" :max="form.cuoctb_maximun"
+                                                :format=" form.cuoctb_decimal == 0 ? 'N' : 'n3'"
+                                                :decimals="form.cuoctb_decimal != 0 ? 3 :''" v-model="form.tyle_sd"
+                                                :value="form.tyle_sd"></ejs-numerictextbox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <span v-show="!form.tyle_cuoctb" style="display: contents !important;">
+                                            <div class="key " style="width: 68px;">Cước TB<span class="red"> *</span>
+                                            </div>
+                                            <div class="value">
+                                                <ejs-numerictextbox id="cuoc_tbdt" ref="CuocTB" :showSpinButton='false'
+                                                    :enabled="km_theo_tien_tyle == 0"
+                                                    :class="{ hasError: $v.form.cuoc_tb.$error }"
+                                                    class="form-control tright fw6 pr-2" :max="form.cuoctb_maximun"
+                                                    :format=" form.cuoctb_decimal == 0 ? 'N' : 'n3'"
+                                                    :decimals="form.cuoctb_decimal != 0 ? 3 :''" v-model="form.cuoc_tb"
+                                                    :value="form.cuoc_tb"></ejs-numerictextbox>
+                                            </div>
+                                        </span>
+                                        <span v-show="form.tyle_cuoctb" style="display: contents !important;">
+                                            <div class="key w70">Tỷ lệ TB<span class="red"> *</span></div>
+                                            <div class="value">
+                                                <ejs-numerictextbox id="cuoc_tbtldt" ref="CuocTyleTB"
+                                                    :showSpinButton='false' :enabled="km_theo_tien_tyle == 0"
+                                                    :class="{ hasError: $v.form.tyle_tb.$error }"
+                                                    class="form-control tright fw6 pr-2" :max="form.cuoctb_maximun"
+                                                    :format=" form.cuoctb_decimal == 0 ? 'N' : 'n3'"
+                                                    :decimals="form.cuoctb_decimal != 0 ? 3 :''" v-model="form.tyle_tb"
+                                                    :value="form.tyle_tb"></ejs-numerictextbox>
+                                            </div>
+                                        </span>
+                                        <div class="value w30 nowrap padt7">
+                                            <div class="check-action">
+                                                <input type="checkbox" v-model="form.tyle_cuoctb"
+                                                    :disabled="km_theo_tien_tyle == 1" class="check">
+                                                <span class="name">Tỷ lệ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7 col-15">
+                                    <div class="info-row">
+                                        <div class="key w90">Tiền SD <span class="red">
+                                                *</span></div>
+                                        <div class="value">
+                                            <ejs-numerictextbox id="tien_sd" format="N" :showSpinButton='false'
+                                                :enabled="km_theo_tien_tyle == 1"
+                                                :class="{ hasError: $v.form.tien_sd.$error }" v-model="form.tien_sd"
+                                                :value="form.tien_sd" class="form-control tright pr-2">
+                                            </ejs-numerictextbox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Tiền TB <span class="red">
+                                                *</span></div>
+                                        <div class="value">
+                                            <ejs-numerictextbox ref="tienTb" id="tien_tb" format="N"
+                                                :showSpinButton='false' :enabled="km_theo_tien_tyle == 1"
+                                                :class="{ hasError: $v.form.tien_tb.$error }" v-model="form.tien_tb"
+                                                :value="form.tien_tb" class="form-control tright pr-2">
+                                            </ejs-numerictextbox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Ghi chú </div>
+                                <div class="value content">
+                                    <ejs-textbox v-model="form.ghi_chu" ref="ghiChu"
+                                        :class="{ hasError: $v.form.ghi_chu.$error }" :multiline="true" name=""
+                                        class="form-control" style="height: 130px;resize: none;"></ejs-textbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-15">
+                        <div class="nav tabs tab-over">
+                            <a href="#" @click.prevent="()=>{ selectedTab = 0}" class="minw0 padl4 padr4 pointer"
+                                :class="{active: selectedTab == 0}">Đặt cọc - Ưu
+                                đãi khác</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 1}" :class="{'active': selectedTab == 1}"
+                                class="minw0 padl4 padr4 pointer ">Dịch vụ GT</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 2}" :class="{'active': selectedTab == 2}"
+                                class="minw0 padl4 padr4 pointer">KM thiết bị</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 3}" :class="{'active': selectedTab == 3}"
+                                class="minw0 padl4 padr4 pointer">Loại hình TB</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 4}" :class="{'active': selectedTab == 4}"
+                                class="minw0 padl4 padr4 pointer">Trả góp thiết bị</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 5}" :class="{'active': selectedTab == 5}"
+                                class="minw0 padl4 padr4 pointer">Gói tham gia</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 6}" :class="{'active': selectedTab == 6}"
+                                class="minw0 padl4 padr4 pointer">Tòa nhà</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 7}" :class="{'active': selectedTab == 7}"
+                                    class="minw0 padl4 padr4 pointer">Loại nhà</a>
+                            <a href="#" @click.prevent="()=>{ selectedTab = 8}" :class="{'active': selectedTab == 8}"
+                                class="minw0 padl4 padr4 pointer">Trang bị</a> 
+                            <a href="#" @click.prevent="()=>{ selectedTab = 9}" :class="{'active': selectedTab == 9}"
+                                class="minw0 padl4 padr4 pointer">DS Khuyến mãi</a>   
+                        </div>
+                        <div class="tab-content">
+                            <Deposit v-show="selectedTab == 0" :form="formTabDeposit" ref="Deposit" />
+                            <ServiceGT v-show="selectedTab == 1" :form="formTabServiceGT"
+                                v-model="formTabDeposit.nhom_datcoc_id"
+                                @onChange="onChangVat('vat_giamcuoc_sd','tyle_giamcuoc_sd','formTabServiceGT')" />
+                            <EquipmentPromotion v-show="selectedTab == 2" :form="fromKuyenMaiThietBi"
+                                @onChange="onChangVat('vat_km','tien_km','fromKuyenMaiThietBi')" />
+                            <PromotionType v-show="selectedTab == 3" />
+                            <Installment v-show="selectedTab == 4" :form="fromTraGopThietBi" />
+                            <Package v-show="selectedTab == 5" />
+                            <Toanha v-show="selectedTab == 6" />
+                            <Loainha v-show="selectedTab == 7" />
+                            <Trangbi v-show="selectedTab == 8" />
+                            <DSKhuyenmai v-show="selectedTab == 9" />
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="list-checks red fw6">
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="checkbox" v-model="form.tu_ncc" class="check">
+                                <span class="name">Từ NCC khác chuyển sang</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="checkbox" v-model="form.hien_thi" class="check">
+                                <span class="name">Hiển thị mặc định</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                        <DataGrid v-bind:columns="[
+                                    {fieldName: 'chitietkm_id', headerText: 'ID', allowFiltering: true, width: '50', },
+                                    {fieldName: 'ten_ctkm', headerText: 'Tên chi tiết KM', allowFiltering: true, },
+                                    {fieldName: 'cuoc_sd', headerText: 'Tiền KM', allowFiltering: true, width: '200'},
+                                    {fieldName: 'tyle_kmld', headerText: 'Tỷ lệ KMLĐ', allowFiltering: true,  width: '200'},
+                                     {fieldName: 'nhom_km', headerText: 'Nhóm', allowFiltering: true,},
+                                ]"
+                                ref="vueTableDetail"
+                                :commands="[
+                                { name: 'save', cssClass: 'pad3 mar5 lh14 icon -ap one-edit btn-primary btn-search', iconCss: 'fa fa-times', width: 100 },
+                                ]"
+                                :commandColumn="{headerText: 'Thao tác', width: 90, cellCssClass: 'center', firstColumn: true, show: true}"
+                                @commandClicked="gridCommand_Thaotac"
+                                :showColumnCheckbox='false'
+                                v-bind:dataSource="danhSachChiTiet"
+                                @selectedRowChanged="rowSelected"
+                                :enable-paging-server="false"
+                                :allowPaging="true"
+                                :allowSelection='true'
+                                :multiple="false"
+                                :enabled-select-first-row="true"
+                                :showFilter="true">
+                        </DataGrid>
+                         <!--<div class="grid-ext grid-ext-freeze">
+                            <ejs-grid height="150" v-if="!tableLoading" ref="vueTableDetail" :dataSource="danhSachChiTiet"
+                                :allowPaging="true" :pageSettings="pageSettings" :allowSorting="false"
+                                :allowFiltering="true" :selectedRowIndex=0 :rowSelected='rowSelected'
+                                :pagerTemplate="pagerTemplate" gridLines="Both">
+                                <e-columns>
+                                    <e-column template="<span class='fa selected-flag'></span>" :allowFiltering="false"
+                                        filterTemplate="<span></span>" width="20" maxWidth="20" minWidth="20"
+                                        textAlign="center" :customAttributes="{ class: 'column-selected-flag' }"
+                                        :freeze="'left'" :allowResizing="false" clipMode="Ellipsis"></e-column>
+                                    <e-column field="chitietkm_id" id="Grid1" headerText="ID" width="120"
+                                        headerTextAlign="center" textAlign="center" :filter="{ operator: 'contains' }">
+                                    </e-column>
+                                    <e-column field="ten_ctkm" id="Grid1" headerText="Tên tiết KM" headerTextAlign="center"
+                                        textAlign='Left' :filter="{ operator: 'contains' }">
+                                    </e-column>
+                                    <e-column field="cuoc_sd" id="Grid1" headerText="Hiển thị MĐ" width="200"
+                                        headerTextAlign="center" format="N" type="number" textAlign='Right'
+                                        :filter="{ operator: 'contains' }">
+                                    </e-column>
+                                    <e-column field="tyle_kmld" id="Grid1" headerText="Nhóm KM" width="200"
+                                        headerTextAlign="center" format="N" type="number" textAlign='Right'
+                                        :filter="{ operator: 'contains' }">
+                                    </e-column>
+                                </e-columns>
+                            </ejs-grid>
+                        </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+        <labor-source v-if="isShowLaborSource" @close="() => { isShowLaborSource = false; }"  :chitietkm_id="chitietkm_id"
+            :formInput="form"
+            :tyleVat="form.tyle_vat"
+            @onChapNhapNguon="onChapNhapNguon" />
+    <promotion-quota v-if="isShowPromotionQuota" :chitietkm_id="chitietkm_id"
+        @close="() => { isShowPromotionQuota = false; }" />
+    <popupThemChiTietKm ref="popupThemChiTietKm" />
+</div>

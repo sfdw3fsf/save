@@ -1,0 +1,139 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a @click="tsbtnTaiDuLieu_Click()">
+                        <span class="icon one-chart-area"></span> Tải dữ liệu(F5)
+                    </a>
+                </li>
+                <li  @click="tsbtnNhanBienLai_Click()" :class="{'disable-btn': isDisable_NhanBienlai}">
+                    <a>
+                        <span class="icon nc-icon-glyph shopping_receipt-list-43"></span>Nhận biên lai(F6)
+                    </a>
+                </li>
+                <li >
+                    <a v-b-modal.popup-luotgiao>
+                        <span class="icon one-luotgiao"></span>Lượt giao(F7)
+                    </a>
+                    <Luotgiao />
+                   
+                </li>
+                <li @click="tsbtnDanhDauBLHong_Click()" :class="{'disable-btn': isDisable_BaohongBL}">
+                    <a >
+                        <span class="icon one-double-check"></span>Đánh dấu BL hỏng(F8)
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </vue-nav>
+    <div class="page-content">
+        <div class="grid-stack-box">
+            <div class="box-col box-form" id="boxLeft" style="width: calc(50% - 8px);">
+                <div class="legend-title">Thông tin phiếu biên lai</div>
+                <div class="info-row">
+                    <div class="key w70">Loại phiếu</div>
+                    <div class="value">
+                        <div class="select-custom" ref="dsloaiphieu">
+                            <SelectExt v-model.trim="dataSelected.loaiphieu_id" :settings="{dropdownParent: $refs['dsloaiphieu']}" :dataSource="dsLOAIPHIEU" dataTextField="LOAIPHIEU" dataValueField="LOAIPHIEU_ID" @change="onChangeLoaiPhieu($event)" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w70">Kho giao</div>
+                    <div class="value">
+                        <div class="select-custom" ref="dskhogiao">
+                            <SelectExt id="cbb_khogiaonv" v-model.trim="dataSelected.kho_giaonv_id" :settings="{dropdownParent: $refs['dskhogiao']}" :dataSource="ds_KhoGiaoNV" dataTextField="ten_kho" dataValueField="kho_id" @change="onChangeKhoGiao($event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w70">Kho nhận</div>
+                    <div class="value">
+                        <div class="select-custom" ref="dskhonhan">
+                            <SelectExt id="cbb_khonhan" v-model.trim="dataSelected.kho_nhan_id" :settings="{dropdownParent: $refs['dskhonhan']}" :dataSource="ds_KhoNhan" dataTextField="ten_kho" dataValueField="kho_id" @change="onChangeKhoNhan($event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w70">Biểu mẫu</div>
+                    <div class="value">
+                        <div class="select-custom" ref="dsloaibienlai">
+                            <SelectExt id="cbb_loaibienlai" v-model.trim="dataSelected.loaibienlai_id" :settings="{dropdownParent: $refs['dsloaibienlai']}" :dataSource="lstLoaiBL" dataTextField="ten_loaibl" dataValueField="loaibienlai_id" @change="onChangeLoaiBL($event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w70">Nội dung</div>
+                    <div class="value">
+                        <textarea v-model="input_noidung" class="form-control highlight" style="height: 100px; resize: none"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="gutter gutter-horizontal" style="width: 16px;"></div>
+            <div class="box-col box-form" id="boxRight" style="width: calc(50% - 8px);">
+                <div class="legend-title">Danh sách biên lai mới</div>
+                <DataGrid v-bind:columns="collumnsDSBLMOI" 
+                          v-bind:dataSource="options.ds_BienLaiMoi" 
+                          :showColumnCheckbox="true" 
+                          :showFilter="true" 
+                          :allowPaging="true" 
+                          :enablePagingServer="false"
+                          :enabledSelectFirstRow="true"  
+                          :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" 
+                          @rowSelected="gridBLMoi_FocusedRowChanged" @rowDeselected="gridBLMoi_RowDeselected" panelDataHeight="250">
+                </DataGrid>
+            </div>
+        </div>
+        <div class="box-move-select-table">
+            <div class="box-col box-form">
+                <div class="legend-title">Biên lai trong kho</div>
+                <DataGrid v-bind:columns="collumnsDSBL_TRONGKHO" 
+                v-bind:dataSource="options.ds_BienLaiTrongKho" 
+                :showColumnCheckbox="true" 
+                :showFilter="true"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :enabledSelectFirstRow="true" 
+                @queryCellInfo = "griddataGridCellCreated"
+                @rowSelected="gridBLTrongKho_FocusedRowChanged"
+                @rowDeselected="gridBLTrongKho_RowDeselected" 
+                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" 
+                panelDataHeight="250">
+                </DataGrid>
+            </div>
+            <div class="actions">
+                <button v-if="dataSelected.loaiphieu_id==1" @click="tsbtnChuyenGiaoKho_Click" class="btn" >
+                    <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button v-if="dataSelected.loaiphieu_id==3" @click="tsbtnTraBienLaiTrongKho_Click" class="btn">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button v-if="dataSelected.loaiphieu_id==1" @click="tsbtnHuyGiaoKho_Click" class="btn">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+                <button v-if="dataSelected.loaiphieu_id==3" @click="btnPreviousTraPhieu_Click" class="btn">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+            </div>
+            <div class="box-col box-form">
+                <div class="legend-title">Biên lai đã giao kho</div>
+                <DataGrid v-bind:columns="collumnsDSBL_DAGIAOKHO" 
+                v-bind:dataSource="options.ds_BienLaiDaGiaoKho" 
+                :showColumnCheckbox="true" 
+                :showFilter="true" 
+                ref="BLDaGiao"
+                :allowPaging="true" 
+                :enablePagingServer="false" 
+                :enabledSelectFirstRow="true" 
+                @rowSelected="gridBLDaGiao_FocusedRowChanged" 
+                @rowDeselected="gridBLDaGiao_RowDeselected" 
+                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                panelDataHeight="250">
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+</div>

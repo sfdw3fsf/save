@@ -1,0 +1,2 @@
+import AssignTechStaffLocation from './AssignTechStaffLocation'
+export default AssignTechStaffLocation

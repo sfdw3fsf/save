@@ -1,0 +1,113 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onAdd" :disabled="!canAdd">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave" :disabled="!canSave">
+          <span class="icon one-save"></span> Ghi lại
+        </b-link>
+      </li>
+
+      <li>
+        <b-link href="javascript:void(0)" @click="onCancel" :disabled="!canCancel">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy bỏ
+        </b-link>
+      </li>
+
+      <li>
+        <b-link href="javascript:void(0)" @click="onEdit" :disabled="!canEdit">
+          <span class="icon one-print"></span>Sửa
+        </b-link>
+      </li>
+
+      <li>
+        <b-link href="javascript:void(0)" @click="onDelete" :disabled="!canDelete">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+
+      <li>
+        <b-link href="javascript:void(0)" @click="onImportExcel" :disabled="!canImportExcel">
+          <span class="icon one-file-excel"></span>Import
+        </b-link>
+      </li>
+
+      <li>
+        <b-link href="javascript:void(0)" @click="onExportExcel" :disabled="!canExportExcel">
+          <span class="icon one-file-excel"></span>Export
+        </b-link>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <div class="box-form">
+      <p class="legend-title">Thông tin lớp kết nối</p>
+
+      <div class="row">
+        <div class="info-row col-sm-6 col-12">
+          <label class="key w120">ID Đơn Vị <span class="red">*</span></label>
+          <input type="text" class="form-control" disabled v-model="currentItem.id" />
+        </div>
+
+        <div class="col-sm-6 col-12 info-row">
+          <label class="key w120">Hiệu lực</label>
+
+          <div class="check-action padt4">
+            <input type="checkbox" class="check" :disabled="!canEditField" v-model="currentItem.suDung" :true-value="1"
+              :false-value="0" /><span class="name"></span>
+          </div>
+        </div>
+
+        <div class="info-row col-sm-6 col-12">
+          <label class="key w120">Tên Đơn Vị <span class="red">*</span></label>
+          <input type="text" class="form-control"
+            :class="{ 'is-invalid': isInvalid(currentItem.ten) && canEditField && touchedFields.ten}"
+            :disabled="!canEditField" @blur="touchedFields.ten = true" v-model="currentItem.ten" />
+        </div>
+
+        <div class="info-row col-sm-6 col-12">
+          <label class="key w120">Tên Tắt</label>
+          <input type="text" class="form-control" :disabled="!canEditField" v-model="currentItem.tenTat" />
+        </div>
+
+        <div class="info-row col-sm-6 col-12">
+          <label class="key w120">Mô Tả</label>
+          <input type="text" class="form-control" :disabled="!canEditField" v-model="currentItem.moTa" />
+        </div>
+
+        <div class="info-row col-sm-6 col-12">
+          <label class="key w120">Ghi Chú </label>
+          <input type="text" class="form-control" :disabled="!canEditField" v-model="currentItem.ghiChu" />
+        </div>
+      </div>
+    </div>
+
+    <div class="box-form">
+      <p class="legend-title">Danh sách Lớp kết nối</p>
+
+      <DataGrid ref="grdItems" :allowPaging="true" :enablePagingServer="false" :showColumnCheckbox="true"
+        v-bind:columns="[
+                        {fieldName: 'DONVISH_ID', headerText: 'ID', width: 70, textAlign: 'Left'},
+                        {fieldName: 'TEN', headerText: 'Tên đơn vị', textAlign: 'Left'},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', textAlign: 'Left'},
+                        {fieldName: 'SUDUNG', headerText: 'Hiệu lực', width: 120,valueAccessor: mapToHieuLuc, textAlign: 'Left'},
+                                ]" v-bind:dataSource="DonViList" @rowSelected="grdItems_RowSelected"
+        @rowDeselected="grdItems_RowDeselected" @selectedItemsChanged="onSelectRowCheckbox" :allowExcelExport="true">
+      </DataGrid>
+    </div>
+  </div>
+
+
+  <ModalImportExcel ref="modalImportExcel" :title="importConfig.title" :tableColumns="importConfig.tableColumns"
+    :gridColumns="importConfig.gridColumns" :templateFileName="importConfig.templateFileName"
+    :processExcelData="processDonViExcelData" :formatCellValue="formatDonViCellValue"
+    :validationRules="importConfig.validationRules" :checkDataResult="importConfig.checkDataResult"
+    @check-data="handleCheckData" :useHeaderMapping="true" />
+
+</div>

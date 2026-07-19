@@ -1,0 +1,113 @@
+<b-modal
+    v-model="modalShow"
+    size="lg"
+    no-close-on-backdrop
+    hide-footer
+    hide-header
+    @shown="shownModal"
+    hide-header-close >
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span>Tìm kiếm kết cuối</div>            
+            <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+            </div>
+        </div>        
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w60">TTVT</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" class="form-control" v-model="TTVT_ID" @change="onChangeTTVT" :disabled="!choPhepDoiTramTbi">                                        
+                                        <option v-for="(item, index) in ds_TTVT" :key="index" :value="item.DONVI_ID">{{ item.TEN_DV }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Tổng đài</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" class="form-control" v-model="TRAM_ID" :disabled="!choPhepDoiTramTbi">
+                                        <option v-for="(item, index) in ds_TRAM" :key="index" :value="item.DONVI_ID">{{ item.TEN_DV }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w60">Tổ</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" class="form-control" v-model="TOKT_ID" :disabled="!choPhepDoiTramTbi">
+                                        <option v-for="(item, index) in ds_TOKT" :key="index" :value="item.DONVI_ID">{{ item.TEN_DV }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkCAPGOC">
+                                    <span class="name">Cáp gốc</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <!-- <div class="select-custom">
+                                    <select name="" id="" :disabled="!chkCAPGOC" class="form-control" v-model="CAP_ID">
+                                        <option v-for="(item, index) in ds_CAPGOC" :key="index" :value="item.CAP_ID">{{ item.KYHIEU }}</option>
+                                    </select>
+                                </div> -->
+                                <ComboboxGrid id="ds-capgoc" ref="ds-capgoc" 
+                                v-bind:columns="[
+                                {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},       
+                                {fieldName: 'TEN_CAP', headerText: 'Tên cáp', allowFiltering: true}                                                         
+                                ]" 
+                                v-bind:dataSource="ds_CAPGOC" textField="KYHIEU" valueField="CAP_ID"      
+                                :disabled="!chkCAPGOC"                          
+                                @selectedChanged="ds_CAPGOC_SelectedChanged">
+                                </ComboboxGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group marb0">
+                    <input type="text" class="form-control highlight italic" placeholder="Tìm kết cuối theo ký hiệu" v-on:keyup.enter="NAP_DS_KETCUOI" v-model.trim="TimKetCuoi">
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách kết cuối</div>               
+                <!-- <ejs-grid  ref="grid" gridLines='Both' :recordDoubleClick= 'selected' :selectedRowIndex=0 height='350' :allowGrouping='true' :groupSettings='groupOptions'  :allowFiltering='true' :dataSource="ds_KETCUOI" :allowPaging="false" :pageSettings='pageSettings' :allowResizing='true' :allowScrolling='true'>
+                    <e-columns>                                
+                        <e-column field='LOAI_KC' headerText='Loại KC' textAlign='Left' width=50 :customAttributes="customAttributes" ></e-column>
+                        <e-column field='KYHIEU' headerText='Ký hiệu KC' width=120 isPrimaryKey='true' :customAttributes="customAttributes" ></e-column>
+                        <e-column field='DIACHI' headerText='Địa chỉ KC' textAlign='Left'  width=90 :customAttributes="customAttributes" ></e-column>
+                        <e-column field='PHANLOAI_KC' headerText='Phân loại' textAlign='Left' width=90 :customAttributes="customAttributes" ></e-column>                                               
+                    </e-columns>
+                </ejs-grid> -->
+                <DataGrid id="grid" ref="grid" 
+                        v-bind:columns="
+                        [                                                                            
+                            {fieldName: 'LOAI_KC', width : 100 , headerText: 'Loại KC', allowFiltering: true},                             
+                            {fieldName: 'KYHIEU', width : 130 , headerText: 'Ký hiệu KC', allowFiltering: true},
+                            {fieldName: 'DIACHI', width : 120 , headerText: 'Địa chỉ KC', allowFiltering: true},
+                            {fieldName: 'PHANLOAI_KC', width : 120 , headerText: 'Phân loại', allowFiltering: false, isGroupedColumn:true}                          
+                        ]"                                  
+                        v-bind:dataSource="ds_KETCUOI" :showFilter="true"  :allowResizing="true" :allowSorting="false"                         
+                        :enable-paging-server="false"        
+                        @recordDoubleClick= 'selected'                       
+                        :allowPaging="true">
+                </DataGrid>          
+            </div>
+        </div>
+    </div>    
+</b-modal>

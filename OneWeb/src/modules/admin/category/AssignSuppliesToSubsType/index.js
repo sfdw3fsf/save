@@ -1,0 +1,2 @@
+import AssignSuppliesToSubsType from './AssignSuppliesToSubsType'
+export default AssignSuppliesToSubsType

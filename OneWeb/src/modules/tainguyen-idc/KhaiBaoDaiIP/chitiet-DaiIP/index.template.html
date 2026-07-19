@@ -1,0 +1,223 @@
+<ejs-dialog :enableResize="true" :allowDragging="false" :visible="false" ref="ModalChiTietDaiIP"
+  :animationSettings="animationSettings" :showHeader="false" :showCloseIcon="false" width="100%" height="auto"
+  :target="target">
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        {{
+        this.isViewDaiIP
+        ? 'Chi tiết Dải IP: ' + (this.form.pDiaChiDaiIP || 'Chưa có Dải IP')
+        : (this.form.pId > 0
+        ? 'Chỉnh sửa Dải IP: ' + this.form.pDiaChiDaiIP
+        : 'Thêm mới Dải IP')
+        }}
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onEdit" :disabled="!this.isViewDaiIP">
+            <span class="icon one-edit"></span>Chỉnh sửa
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="this.isViewDaiIP">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2">
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title">Khai báo tài nguyên dải IP</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Loại dải IP <span class="red">*</span></div>
+              <div class="value">
+                <SelectExt :dataSource="form.dsLoaiIP" dataTextField="TEN" dataValueField="ID"
+                  v-model="form.pLoaiDaiIPId" @change="this.onLoaiIPChange" :disabled="isViewDaiIP" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Loại IP</div>
+              <form style="margin-top: 7px;">
+                  <div class="value d-flex">
+                    <div class="item mr-3">
+                      <div class="check-action">
+                      <input type="radio" v-model.number="form.pLoaiDaiIP" :value="showIPv4 ? 1 : 0" :disabled="true" />
+                      <span class="name">{{ showIPv4 ? 'IP v4' : 'IP v6' }}</span>
+                    </div>
+                  </div>
+                  </div>
+              </form>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Phạm vi</div>
+              <form style="margin-top: 7px;">
+                <div class="value d-flex">
+                    <div class="item mr-3">
+                      <div class="check-action">
+                      <input type="radio" v-model.number="form.pPhanLoai" :value="showPhamVi ? 1 : 0" :disabled="true" />
+                      <span class="name">{{ showPhamVi ? 'Internet' : 'Intranet' }}</span>
+                    </div>
+                  </div>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Địa chỉ Dải IP cha</div>
+              <div class="value">
+                <SelectExt v-model="form.pDiaChiDaiIPChaId" @change="this.onChangeDaiIPCha" dataTextField="TEN"
+                  dataValueField="ID" :dataSource="[...form.dsDaiIPCha]" :disabled="isDaiIPChaRead" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Đơn vị thực hiện <span class="red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pDonviThuchienTen" :disabled="true">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Địa chỉ IP/Dải IP <span class="red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pDiaChiDaiIP" :disabled="isViewDaiIP">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Người thực hiện<span style="color: red;">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pNguoiThuchienTen" :disabled="true">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Ký hiệu <span style="color: red;">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pKyHieu" :disabled="isViewDaiIP">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">IDC <span class="red">*</span></div>
+              <div class="value">
+                <SelectExt :dataSource="form.dsIdc" dataTextField="IDC_TEN" dataValueField="IDC_ID"
+                  v-model="form.pIDCId" @change="this.onIDCChange" :disabled="isViewDaiIP" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">IP đầu <span v-if="form.pDiaChiDaiIPChaId > 0" style="color: red;">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pIPDau" :disabled="isIPDauRead">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Căn cứ khai báo</div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pCanCuKhaiBao" :disabled="isViewDaiIP">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">IP cuối <span v-if="form.pDiaChiDaiIPChaId > 0" style="color: red;">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pIPCuoi" :disabled="isIPCuoiRead">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Trạng thái sử dụng<span style="color: red;">*</span></div>
+              <div class="value">
+                <SelectExt :dataSource="[...dsTrangthai]" dataTextField="TT_TEN" dataValueField="TT_ID"
+                  v-model="form.pTrangthaiId" @change="this.onTrangThaiChange" :disabled="true" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">SubnetMask <span class="red">*</span></div>
+              <div class="value">
+                <SelectExt v-model="form.pSubnetMaskId" @change="this.onChangeSubnetMask" dataTextField="TEN"
+                  dataValueField="ID" :dataSource="[...form.dsSubnetMark]" :disabled="isViewDaiIP" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Thời điểm khai báo<span style="color: red;">*</span></div>
+              <div class="value">
+                <div class="input-icon-right">
+                  <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="'Chọn ngày'"
+                    v-model="form.dtpThoidiemKhaibao" format="dd/MM/yyyy" :enabled="!isViewDaiIP" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Gateway <span style="color: red;">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" v-model.trim="form.pGateway" :disabled="isViewDaiIP">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Ghi chú</div>
+              <div class="value">
+                <div class="input-icon-right">
+                  <input type="text" class="form-control" v-model.trim="form.pGhichu" :disabled="isViewDaiIP">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

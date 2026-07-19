@@ -1,0 +1,3 @@
+import HoanThienHoSoChuyenDoiLoaiHinhThueBao from "./HoanThienHoSoChuyenDoiLoaiHinhThueBao.vue";
+
+export default HoanThienHoSoChuyenDoiLoaiHinhThueBao;

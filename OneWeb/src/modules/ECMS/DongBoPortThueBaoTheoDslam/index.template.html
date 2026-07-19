@@ -1,0 +1,561 @@
+<div>
+  <b-modal v-model="modalXoa" title="" size="sm" @ok="xacNhanXoa">
+    <span>Bạn thật sự muốn xóa dữ liệu không?</span>
+  </b-modal>
+  <ModalXuatDuLieu
+    id="modal-xuat-dulieu"
+    :thuocTinh="dsThuocTinh"
+    :data="dsThueBao"></ModalXuatDuLieu>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li :class="{'disabled': isDisableNhapMoi}">
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickNhapMoi">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </a>
+      </li>
+      <li :class="{'disabled': isDisableGhiLai}">
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickGhiLai">
+          <span class="icon one-save"></span>Ghi lại
+        </a>
+      </li>
+      <li :class="{'disabled': isDisableKichHoat}">
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickKichHoat">
+          <span class="icon one-file-arrow-up"></span>Kích hoạt
+        </a>
+      </li>
+      <li>
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickHuy">
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+        </a>
+      </li>
+      <li :class="{'disabled': isDisableXoa}">
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickXoa">
+          <span class="icon one-trash"></span>Xóa
+        </a>
+      </li>
+      <li :class="{'disabled': isDisableHoanThien}">
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickHoanThien">
+          <span class="icon one-file-check"></span>Hoàn thiện
+        </a>
+      </li>
+      <li>
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickExportExcel">
+          <span class="icon one-xlsx"></span>Xuất Excel
+        </a>
+      </li>
+      <li>
+        <a href="#/ecms/dong-bo-port-thue-bao-theo-dslam" @click="onClickXuatFile">
+          <span class="icon one-download"></span>Xuất file
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin Dslam</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w70">Bras <span style="color: red">*</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <select v-model="selectedBras" name="" class="form-control" id="selectBras" @change="onChangeSelectedBras">
+                  <option v-for="item in this.dsBras" v-bind:value="item.BRAS_ID">{{item.TENBRAS}}</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w70">Account</div>
+            <div class="value">
+                <input type="text" value="" class="form-control" v-model="maThueBao" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key w70">Dslam <span style="color: red">*</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <select v-model="selectedDslam" id="selectDslam" class="form-control" @click="onChangeSelectedDslam">
+                  <option v-for="item in this.dsDslam" v-bind:value="item.DSLAM_ID" >{{item.TENDSLAM}}</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách thuê bao</div>
+      <div class="table-content grid-ext">
+        <ejs-grid ref='grid':dataSource="dsThueBao" rowHeight=38 width="100%" locale="vi-VN" :filterSettings='filterOptions'
+                  :allowPaging='true' :pageSettings='pageSettings' :allowFiltering='true' :allowSorting='true'
+                  :rowSelected="selectedThueBao" :rowDeselected="deselectedThueBao" :allowPdfExport='true' :allowExcelExport='true'
+                  gridLines='Both'
+        >
+          <e-columns>
+            <e-column template="<span class='fa selected-flag'></span>" :allowFiltering="false" filterTemplate="<span></span>"
+                      width="26" maxWidth="26" minWidth="26" textAlign="center" :customAttributes="{class: 'column-selected-flag'}"
+                      ></e-column>
+            <e-column type='checkbox' :allowFiltering='false' :allowSorting='false' width='60'></e-column>
+            <e-column field='MA_TB' headerText='Account' headerTextAlign='center' width='120' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='LOAIHINH_TB' headerText='Loại hình TB' headerTextAlign='center' width='150' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='NGAY_SD' headerText='Ngày SD' width='200' headerTextAlign='center' textAlign='right' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SYSTEM' headerText='System' width='90' headerTextAlign='center' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='RACK' headerText='Rack' textAlign='right' headerTextAlign='center' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SHELF' headerText='Shelf' textAlign='right' headerTextAlign='center' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SLOT' headerText='Slot' textAlign='right' headerTextAlign='center' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='PORT' headerText='Port' textAlign='right' headerTextAlign='center' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='VPI' headerText='Vpi' textAlign='right' headerTextAlign='center' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='VCI' headerText='Vci' textAlign='right' headerTextAlign='center' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SELFID01' headerText='Self01' headerTextAlign='center' textAlign='right' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SELFID02' headerText='Self02' headerTextAlign='center' textAlign='right' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SELFID03' headerText='Self03' headerTextAlign='center' textAlign='right' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='SELFID04' headerText='Self04' headerTextAlign='center' textAlign='right' width='90' :filter=' { operator: "contains" }'></e-column>
+            <e-column field='TRANGTHAI' headerText='Trạng thái' headerTextAlign='center' width='150' :filter=' { operator: "contains" }'></e-column>
+          </e-columns>
+        </ejs-grid>
+      </div>
+
+<!--      <div class="table-content">-->
+<!--      <table class="table-result table-gachle">-->
+<!--        <thead class="center">-->
+<!--        <tr>-->
+<!--          <th class="w20"></th>-->
+<!--          <th class="w20">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>Account</th>-->
+<!--          <th>Loại hình TB</th>-->
+<!--          <th>Ngày SD</th>-->
+<!--          <th>System</th>-->
+<!--          <th>Rack</th>-->
+<!--          <th>Shelf</th>-->
+<!--          <th>Slot</th>-->
+<!--          <th>Port</th>-->
+<!--          <th>Vpi</th>-->
+<!--          <th>Self01</th>-->
+<!--          <th>Self02</th>-->
+<!--          <th>Self03</th>-->
+<!--          <th>Self04</th>-->
+<!--          <th>Trạng thái</th>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <th class="w20"></th>-->
+<!--          <th class="w20">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" disabled="" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--          <th>-->
+<!--            <div class="input-icon-right">-->
+<!--              <input type="text" class="form-control">-->
+<!--              <span class="icon nc-icon-outline ui-1_zoom"></span>-->
+<!--            </div>-->
+<!--          </th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        <tr class="highlight">-->
+<!--          <td class="w20 center">-->
+<!--            <span class="fa fa-play text-main"></span>-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td class="selected highlight1"></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td class="w20 center">-->
+<!--          </td>-->
+<!--          <td class="w20 center">-->
+<!--            <div class="check-action">-->
+<!--              <input type="checkbox" class="check">-->
+<!--              <span class="name"></span>-->
+<!--            </div>-->
+<!--          </td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--          <td></td>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--      </table>-->
+<!--    </div>-->
+<!--      <div class="tc-pagination">-->
+<!--        <a href="#" class="btn  one-arrow-left-forward"></a>-->
+<!--        <a href="#" class="btn fa fa-angle-double-left"></a>-->
+<!--        <a href="#" class="btn fa fa-angle-left"></a>-->
+<!--        <span class="text">Bản ghi</span>-->
+<!--        <div class="dropdown inline">-->
+<!--          <div class="fw6 input-number" data-toggle="dropdown">-->
+<!--            <span class="text-main">10</span>/1033-->
+<!--          </div>-->
+<!--          <div class="dropdown-menu">-->
+<!--            <a href="#" class="dropdown-item">10</a>-->
+<!--            <a href="#" class="dropdown-item">20</a>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <a href="#" class="btn fa fa-angle-right"></a>-->
+<!--        <a href="#" class="btn fa fa-angle-double-right"></a>-->
+<!--        <a href="#" class="btn one-arrow-right-forward"></a>-->
+<!--      </div>-->
+    </div>
+  </div>
+</div>
+

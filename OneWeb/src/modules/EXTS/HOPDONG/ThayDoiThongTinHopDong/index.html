@@ -1,0 +1,931 @@
+<div class="">
+  <ModalChonDiaChiKH modalId="popupChonDiaChiKH" :data="dataSend" @xacnhan="getDiaChiKhachHang" :isStrictMode="true"/>
+  <ModalChonDiaChiNDD modalId="popupChonDiaChiNDD" :data="dataSend" @xacnhan="getDiaChiNDD"/>
+  <ModalChonDiaChiHK modalId="popupChonDiaChiHK" :data="dataSend" @xacnhan="getDiaChiHK"/>
+  <ModalChonDiaChiTT modalId="popupChonDiaChiTT" :data="dataSend" @xacnhan="getDiaChiTT"/>
+  <ModalChonDiaChiTB modalId="popupChonDiaChiTB" :data="dataSend" @xacnhan="getDiaChiTB"/>
+  <ModalDanhSachBienDong modalId="popupDanhSachBienDong" :data="dataSend" @xacnhan="getGiaoDich"/>
+  <ChiTietNganhNghe id="popupChiTietNganhNghe" :objChiTietNganhNghe="objChiTietNganhNghe" @objTNC="getTNC"></ChiTietNganhNghe>
+  <ModalTracnghiemExt ref="ModalTracnghiemExt"/>
+  <b-modal id="popupCongTacVien" size="xl"
+           hide-footer
+           hide-header
+           hide-header-close
+           body-class="modal-body p-0">
+    <CongTacVien modalId="popupCongTacVien" @form-close="xacNhanCongTacVien" @acceptChangeCTV="xacNhanCongTacVien" isPopup="true"/>
+  </b-modal>
+
+  <b-modal id="popupNguoiGioiThieu" size="xl"
+           hide-footer
+           hide-header
+           hide-header-close
+           body-class="modal-body p-0">
+    <NguoiGioiThieu modalId="popupNguoiGioiThieu" @form-close="xacNhanNguoiGioiThieu" @acceptChangeNGT="xacNhanNguoiGioiThieu" isPopup="true"/>
+  </b-modal>
+
+  <b-modal id="popupChangeCustomerInfor" size="xl" dialog-class="modal-thaydoi-ttkh" title="Thay đổi thông tin khách hàng"
+             hide-footer
+             body-class="modal-body p-0">
+      <div class="popup-body popup-thaydoi-ttkh">
+        <ChangeCustomerInfor :isPopup="true" :dulieu="ChangeCustomerInfor_data" @form-close="closeChangeCustomerInfor"></ChangeCustomerInfor>
+      </div>
+    </b-modal>
+
+  <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" :loai_hd_id="null" :dichvu_id="null" :ngay_yc="null" :ngay_kt="null" :trangthai_hd="null" />
+
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript:void(0)" @click="nhapMoiClick()">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" @click="ghiLaiClick()">
+          <span class="icon one-save"></span>Ghi lại
+        </a>
+      </li>
+      <li v-if="activeQuyTrinhXacMinhCapNhatTTLH">
+        <a href="javascript:void(0)" @click="ycThayDoiThongTinClick" :class="!hasHDKH ? 'disabled' : ''">
+          YC thay đổi thông tin
+        </a>
+      </li>
+      <li v-if="activeQuyTrinhXacMinhCapNhatTTLH">
+        <a href="javascript:void(0)" @click="pdThayDoiThongTinClick" :class="!hasHDKH ? 'disabled' : ''">
+          PD thay đổi thông tin
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="row">
+        <div class="col-sm-4 col-12">
+          <div class="info-row">
+            <div class="key">Mã giao dịch <span style="color: red">*</span></div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="chonMaGiaoDich">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control highlight" @keypress="maGiaoDichKeypress" v-model="maGiaoDich" :class="{ 'is-invalid': $v.maGiaoDich.$error }">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8 col-12">
+          <div class="row">
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w90">Sửa thông tin</div>
+                <div class="value">
+                  <div class="select-custom" ref="cboSuaThongTin">
+                    <SelectExt
+                      v-model="suaThongTinId"
+                      :settings="{dropdownParent: $refs['cboSuaThongTin']}"
+                      :dataSource="dsSuaThongTin"
+                      :disabled="disableSuaThongTin"
+                      dataTextField="thongtin"
+                      dataValueField="thongtin_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w90">Kiểu HĐ/PL</div>
+                <div class="value">
+                  <div class="select-custom" ref="cboKieuHopDong">
+                    <SelectExt
+                      v-model.trim="kieuHopDongId"
+                      :settings="{dropdownParent: $refs['cboKieuHopDong']}"
+                      :dataSource="dsKieuHopDong"
+                      dataTextField="kieu_hd"
+                      dataValueField="kieuhd_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w90">Lý do <span style="color: red">*</span></div>
+                <div class="value">
+                  <input type="text" class="form-control highlight" v-model="lyDo" :class="{ 'is-invalid': $v.lyDo.$error }">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="box-form">
+          <div class="legend-title">Cộng tác viên</div>
+          <div class="row">
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="info-row">
+                  <div class="key w120">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" @change="onChangeCTV" v-model="isCheckCTV" :disabled="suaThongTinId != 4">
+                      <span class="name">Cộng tác viên</span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="congTacVien" :disabled="suaThongTinId != 4">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="info-row">
+                  <div class="key w120">
+                    HT Tiếp thị
+                  </div>
+                  <div class="value">
+                    <div class="select-custom" ref="cboHinhThucTiepThi">
+                      <SelectExt
+                        v-model.trim="hinhThucTiepThiId"
+                        :disabled="suaThongTinId != 4"
+                        :settings="{dropdownParent: $refs['cboHinhThucTiepThi']}"
+                        :dataSource="dsHinhThucTiepThi"
+                        dataTextField="hinhthuc_tthi"
+                        dataValueField="httthi_id"/>
+<!--                      <select name="" id="" class="form-control">-->
+<!--                        <option value=""></option>-->
+<!--                      </select>-->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="box-form">
+          <div class="legend-title">Người giới thiệu</div>
+          <div class="info-row">
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input type="checkbox" class="check" @change="onChangeNGT" v-model="isCheckNguoiGT" :disabled="suaThongTinId != 5">
+                  <span class="name">Người GT</span>
+                </div>
+              </div>
+              <div class="value">
+                <input type="text" class="form-control" v-model="nguoiGT" :disabled="suaThongTinId != 5">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Thông tin khách hàng</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Mã hợp đồng <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control fw6 text" v-model="maHopDong" :class="{ 'is-invalid': $v.maHopDong.$error }" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Ngày yêu cầu
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="date" class="form-control" v-model="ngayYeuCau" :disabled="suaThongTinId != 1">
+<!--                    <input type="text" class="form-control">-->
+<!--                    <span class="icon one-calendar"></span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Mã KH <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control fw6 text" v-model="maKH"
+                         :class="{ 'is-invalid': $v.maKH.$error }"
+                         :disabled="suaThongTinId != 1"
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Ngày lập HĐ
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="date" class="form-control" v-model="ngayLapHD" :disabled="suaThongTinId != 1">
+<!--                    <input type="text" class="form-control">-->
+<!--                    <span class="icon one-calendar"></span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Tên khách hàng <span style="color: red">*</span>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control fw6 text" v-model="tenKhachHang"
+                     :class="{ 'is-invalid': $v.tenKhachHang.$error }"
+                     :disabled="suaThongTinId != 1 || activeQuyTrinhXacMinhCapNhatTTLH"
+              >
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Địa chỉ KH <span style="color: red">*</span>
+            </div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="diaChiKhachHangClick()" :disabled="suaThongTinId != 1">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control fw6 text" v-model="diaChiKhachHang" :class="{ 'is-invalid': $v.diaChiKhachHang.$error || customError.diaChiKhachHang}" :disabled="suaThongTinId != 1">
+              </div>
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Loại giấy tờ <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboLoaiGiayTo">
+                    <bss-error-marker :has-error="$v.loaiGiayToId.$error">
+                    <SelectExt
+                      v-model="loaiGiayToId"
+                      :disabled="suaThongTinId != 1"
+                      :settings="{dropdownParent: $refs['cboLoaiGiayTo']}"
+                      :dataSource="dsLoaiGiayTo"
+                      dataTextField="loai_gt"
+                      dataValueField="loaigt_id"/>
+                    </bss-error-marker>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Số giấy tờ <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="soGiayTo" :class="{ 'is-invalid': $v.soGiayTo.$error }" :disabled="suaThongTinId != 1 || activeQuyTrinhXacMinhCapNhatTTLH">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Ngày cấp <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="date" class="form-control" v-model="ngayCapGT" :class="{ 'is-invalid': $v.ngayCapGT.$error }" :disabled="suaThongTinId != 1">
+<!--                    <input type="text" class="form-control" value="__/__/____">-->
+<!--                    <span class="icon one-calendar"></span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Nơi cấp
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="noiCapGT" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Ngày hết hạn
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="date" class="form-control" v-model="ngayHetHan" :disabled="suaThongTinId != 1">
+<!--                    <input type="text" class="form-control" value="__/__/____">-->
+<!--                    <span class="icon one-calendar"></span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Ngày sinh/TL <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="date" class="form-control" v-model="ngaySinh" :class="{ 'is-invalid': $v.ngaySinh.$error || customError.ngaySinh }" :disabled="suaThongTinId != 1">
+<!--                    <input type="text" class="form-control" value="__/__/____">-->
+<!--                    <span class="icon one-calendar"></span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Giới tính
+                </div>
+                <div class="value">
+                  <div class="list-checks mart7">
+                    <div class="item">
+                      <div class="check-action">
+                        <input type="radio" class="check" v-model="gioiTinh" :disabled="suaThongTinId != 1">
+                        <span class="name">Không</span>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="check-action">
+                        <input type="radio" class="check" v-model="gioiTinh" value="0" :disabled="suaThongTinId != 1">
+                        <span class="name">Nam</span>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="check-action">
+                        <input type="radio" class="check" v-model="gioiTinh" value="1" :disabled="suaThongTinId != 1">
+                        <span class="name">Nữ</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Quốc tịch
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboQuocTich">
+                    <SelectExt
+                      v-model="quocTichId"
+                      :disabled="suaThongTinId != 1"
+                      :settings="{dropdownParent: $refs['cboQuocTich']}"
+                      :dataSource="dsQuocTich"
+                      @change="onChangeQuocTich($event)"
+                      dataTextField="tenquoctich"
+                      dataValueField="quoctich_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Ngành nghề <span style="color: red">*</span>
+                </div>
+                <div class="input-more-button">
+                  <button class="btn" @click="nganhNgheClick" :disabled="suaThongTinId != 1">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <div class="select-custom" ref="cboNganhNghe">
+                    <bss-error-marker :has-error="$v.nganhNgheId.$error">
+                      <SelectExt
+                        v-model="nganhNgheId"
+                        :disabled="suaThongTinId != 1"
+                        :settings="{dropdownParent: $refs['cboNganhNghe']}"
+                        :dataSource="dsNganhNghe"
+                        dataTextField="tennganhnghe"
+                        dataValueField="nganhnghe_id"/>
+                    </bss-error-marker>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Dân tộc
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboDanToc">
+                    <SelectExt
+                      v-model="danTocId"
+                      :disabled="suaThongTinId != 1"
+                      :settings="{dropdownParent: $refs['cboDanToc']}"
+                      :dataSource="dsDanToc"
+                      dataTextField="tendantoc"
+                      dataValueField="dantoc_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Loại khách hàng
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboLoaiKhachHang">
+                    <SelectExt
+                      v-model="loaiKhachHangId"
+                      :disabled="suaThongTinId != 1"
+                      :settings="{dropdownParent: $refs['cboLoaiKhachHang']}"
+                      :dataSource="dsLoaiKhacHang"
+                      dataTextField="ten_loaikh"
+                      dataValueField="loaikh_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  KH lớn
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboKhachHangLon">
+                    <SelectExt
+                      v-model="khachHangLonId"
+                      :disabled="suaThongTinId != 1"
+                      :settings="{dropdownParent: $refs['cboKhachHangLon']}"
+                      :dataSource="dsKhachHangLon"
+                      dataTextField="ten_lkhl"
+                      dataValueField="khlon_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Người đại diện
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="nguoiDaiDien"
+                         :disabled="suaThongTinId != 1" :class="{ 'is-invalid': $v.nguoiDaiDien.$error }">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Chức vụ
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="chucVu" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Địa chỉ NĐD
+            </div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="diaChiNDDClick()" :disabled="suaThongTinId != 1">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control " v-model="diaChiNDD" :disabled="suaThongTinId != 1">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Điện thoại <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="dienThoai" :class="{ 'is-invalid': $v.dienThoai.$error || customError.dienThoai }" :disabled="suaThongTinId != 1 || activeQuyTrinhXacMinhCapNhatTTLH">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Fax
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="fax" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Hộ khẩu
+            </div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="hoKhauClick()" :disabled="suaThongTinId != 1">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control " v-model="hoKhau" :disabled="suaThongTinId != 1">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Nơi cấp HK
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="noiCapHK" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Ngày cấp
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="date" class="form-control" v-model="ngayCapHK" :disabled="suaThongTinId != 1">
+<!--                    <input type="text" class="form-control">-->
+<!--                    <span class="icon one-calendar"></span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Ngân hàng
+            </div>
+            <div class="value w20 padt7">
+              <div class="check-action">
+                <input type="checkbox" class="check" v-model="isCheckNH" :disabled="suaThongTinId != 1">
+                <span class="name"></span>
+              </div>
+            </div>
+            <div class="value">
+              <div class="select-custom" ref="cboNganHang">
+                <SelectExt
+                  v-model="nganHangId"
+                  :disabled="suaThongTinId != 1 || isCheckNH == false"
+                  :settings="{dropdownParent: $refs['cboNganHang']}"
+                  :dataSource="dsNganHang"
+                  dataTextField="ten_nh"
+                  dataValueField="nganhang_id"/>
+<!--                <select name="" id="" class="form-control">-->
+<!--                  <option value=""></option>-->
+<!--                </select>-->
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Tài khoản
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="taiKhoan" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Mã số thuế
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="maSoThue" :disabled="suaThongTinId != 1">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Đặc trưng
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="dacTrung" :disabled="suaThongTinId != 1">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Thông tin thanh toán</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="table-content">
+            <DataGrid ref="gridDsThanhToan" v-bind:columns="[
+                            {fieldName: 'ma_tt', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'ten_tt', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'diachi_tt', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting: true}
+                        ]"
+                      v-bind:dataSource="dsThanhToan"
+                      :showFilter="true"
+                      :disabled="suaThongTinId != 2"
+                      @selectedRowChanged="gridDsThanhToan_rowSelected"
+                      dataKeyField="HDTT_ID"
+            >
+            </DataGrid>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Tên thanh toán <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="tenThanhToan"
+                         :disabled="suaThongTinId != 2" :class="{ 'is-invalid': $v.tenThanhToan.$error }">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Hình thức TT <span style="color: red">*</span>
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboHinhThucThanhToan">
+                    <bss-error-marker :has-error="$v.hinhThucThanhToanId.$error">
+                      <SelectExt
+                        v-model="hinhThucThanhToanId"
+                        :disabled="suaThongTinId != 2"
+                        :settings="{dropdownParent: $refs['cboHinhThucThanhToan']}"
+                        :dataSource="dsHinhThucThanhToan"
+                        dataTextField="hinhthuc_tt"
+                        dataValueField="httt_id"/>
+                    </bss-error-marker>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Địa chỉ CT <span style="color: red">*</span>
+            </div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="diaChiChungTuClick()" :disabled="suaThongTinId != 2">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control " v-model="diaChiChungTu" :class="{ 'is-invalid': $v.diaChiChungTu.$error }" :disabled="suaThongTinId != 2">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Tài khoản
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="taiKhoanTT" :disabled="suaThongTinId != 2">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Chủ TK
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="chuTaiKhoan" :disabled="suaThongTinId != 2">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Ngân hàng
+                </div>
+                <div class="value w20 padt7">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="isCheckNganHangTT" :disabled="suaThongTinId != 2">
+                    <span class="name"></span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="nganHangThanhToanClick()" :disabled="suaThongTinId != 2">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <div class="select-custom" ref="cboNganHangTT">
+                      <SelectExt
+                        v-model="nganHangThanhToanId"
+                        :disabled="suaThongTinId != 2 || isCheckNganHangTT == false"
+                        :settings="{dropdownParent: $refs['cboNganHangTT']}"
+                        :dataSource="dsNganHang"
+                        dataTextField="ten_nh"
+                        dataValueField="nganhang_id"/>
+<!--                      <select name="" id="" class="form-control">-->
+<!--                        <option value=""></option>-->
+<!--                      </select>-->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Mã số thuế
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="maSoThueTT" :disabled="suaThongTinId != 2">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Thông tin thuê bao</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="table-content">
+            <DataGrid ref="gridDsThueBao" v-bind:columns="[
+                            {fieldName: 'ma_tb', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'trangthai_dongbo', headerText: 'Trạng thái đồng bộ', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'trangthai_hd', headerText: 'Trạng thái hợp đồng', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'ten_tb', headerText: 'Tên thuê bao', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'diachi_tb', headerText: 'Địa chỉ', allowFiltering: true, allowSorting: true}
+                        ]"
+                      v-bind:dataSource="dsThueBao"
+                      :disabled="suaThongTinId != 3"
+                      :showFilter="true"
+                      @selectedRowChanged="gridDsThueBao_rowSelected"
+                      dataKeyField="HDTB_ID"
+            >
+            </DataGrid>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Số máy/Acc
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="maThueBao" :disabled="suaThongTinId != 3">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Số ảo
+                </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="soAo" :disabled="suaThongTinId != 3">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w120">
+                  Dịch vụ
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboDichVuVT">
+                    <SelectExt
+                      v-model="dichVuVTId"
+                      @change="onChangeDichVuVT($event)"
+                      :disabled="suaThongTinId != 3"
+                      :settings="{dropdownParent: $refs['cboDichVuVT']}"
+                      :dataSource="dsDichVuVT"
+                      dataTextField="ten_dvvt"
+                      dataValueField="dichvuvt_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key">
+                  Loại hình
+                </div>
+                <div class="value">
+                  <div class="select-custom" ref="cboLoaiHinh">
+                    <SelectExt
+                      v-model="loaiHinhId"
+                      :disabled="suaThongTinId != 3"
+                      :settings="{dropdownParent: $refs['cboLoaiHinh']}"
+                      :dataSource="dsLoaiHinhTB"
+                      dataTextField="loaihinh_tb"
+                      dataValueField="loaitb_id"/>
+<!--                    <select name="" id="" class="form-control">-->
+<!--                      <option value=""></option>-->
+<!--                    </select>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Tên thuê bao <span style="color: red">*</span>
+            </div>
+            <div class="value">
+              <input type="text" class="form-control" v-model="tenThueBao"
+                     :disabled="suaThongTinId != 3" :class="{ 'is-invalid': $v.tenThueBao.$error }">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">
+              Địa chỉ TB <span style="color: red">*</span>
+            </div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="diaChiThueBaoClick()" :disabled="suaThongTinId != 3">
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+                <input type="text" class="form-control " v-model="diaChiThueBao"
+                       :disabled="suaThongTinId != 3" :class="{ 'is-invalid': $v.diaChiThueBao.$error || customError.diaChiThueBao }">
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Ghi chú</div>
+            <div class="value">
+              <textarea name="" class="form-control" rows="2" v-model="ghiChu"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

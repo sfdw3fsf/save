@@ -1,0 +1,275 @@
+<div >
+  <!-- BEGIN toolbar-->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" v-on:click.prevent="getDanhSach">
+            <span class="icon design_bullet-list-67 nc-icon-glyph"></span>Danh sách
+        </a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="deletePhieu" :class="{ disabled: listPhieuThanhToanResult.length === 0 }">
+            <span class="icon one-file-trash"></span>Xóa phiếu
+        </a>
+        <PopupXacNhanXoaPhieu ref="refXoaPhieuTT" :kycuoc="f_kycuoc" :dsPhieu="phieuSelected" @acceptChange="deletePhieuThuHandler"></PopupXacNhanXoaPhieu>
+        <!--
+        <PopupXacNhanXoaPhieu ref="refXoaPhieuTT" :kycuoc="f_kycuoc" :dsPhieu="selectedRows" @acceptChange="deletePhieuThuHandler"></PopupXacNhanXoaPhieu>
+        -->
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="editPhieu" :class="{ disabled: listPhieuThanhToanResult.length === 0 }">
+            <span class="icon one-calendar-sync"></span>Đổi ngày
+        </a>
+        <!--
+        <PopupThayDoiNgayThanhToan ref="dlgThayDoiNgayTT" :kycuoc="f_kycuoc" :phieu="selectedRow" @acceptChange="updateDatePhieuThuHandler"></PopupThayDoiNgayThanhToan>
+        -->
+        <SuaNgayTT ref="dlgThayDoiNgayTT" 
+                    :kycuoc="f_kycuoc" 
+                    :dsPhieu="phieuSelected"
+                    :kiemtra_matkhau="params.p_kiemtra_mk"
+                    @acceptChange="updateDatePhieuThuHandler">
+                </SuaNgayTT>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="printPhieu" :class="{ disabled: listPhieuThanhToanResult.length === 0 }">
+          <span class="icon one-print"></span>In phiếu
+        </a>
+        <PopupInPhieuThu ref="refPopupInPhieuThu" @accept="acceptPrintPhieuThuHandler"></PopupInPhieuThu>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="exportExcel" :class="{ disabled: listPhieuThanhToanResult.length === 0 }">
+            <span class="icon one-excel"></span>Xuất Excel
+        </a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="syncVNP" :class="{ disabled: listPhieuThanhToanResult.length === 0 }">
+            <span class="icon one-change"></span>Đồng bộ VNP
+        </a>
+      </li>
+    </ul>
+  </div>
+  <!-- BEGGIN content-->
+  <div class="page-content">
+    <!-- Kỳ hóa đơn -->
+    <div class="box-form">
+      <div class="pull-right w120">
+        <app-ky-cuoc></app-ky-cuoc>
+      </div>
+    <div class="clearfix"></div>
+    </div>
+
+    <!-- Thông tin thanh toán -->
+    <div class="box-form">
+      <div class="legend-title">
+          Thông tin thanh toán
+      </div>
+      <div class="row">
+        <div class="col-sm-2 col-12">
+            <div class="info-row">
+                <div class="key w110">
+                    Ngày thanh toán
+                </div>
+                <div class="value">
+                  <ejs-datepicker
+                    v-model="params.p_tungay_thanhtoan"
+                    :value="config.default"
+                    :max="config.max"
+                    :format="'dd/MM/yyyy'"
+                    :allowEdit=false
+                    :showClearButton=false
+                    >
+                  </ejs-datepicker>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 col-12">
+            <div class="info-row">
+                <div class="key w90">
+                    <div class="">
+                        <b-form-checkbox
+                          v-model = "params.p_chk_dengay_thanhtoan"
+                          class = "check"
+                          value = '1'
+                          unchecked-value = '0'
+                        >
+                          <span class="name">Đến ngày</span>
+                        </b-form-checkbox>
+                    </div>
+                </div>
+                <div class="value">
+                  <ejs-datepicker
+                    v-model="params.p_denngay_thanhtoan"
+                    :value="config.default"
+                    :max="config.max"
+                    :format="'dd/MM/yyyy'"
+                    :enabled="f_dengay_enabled"
+                    :allowEdit=false
+                    :showClearButton=false
+                    >
+                  </ejs-datepicker>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key w60">
+                Tổng trả
+            </div>
+            <div class="value">
+              <div class="input-icon-right calculator-box">
+                <vue-numeric :min="0" class="form-control tright red bold" currency="" separator="," v-model="$data.params.p_tongtra"></vue-numeric>
+                <span class="icon one-calculator" @click="isCalculatorShow = !isCalculatorShow"></span>
+                <app-calculator @display="$data.params.p_tongtra = $event" :value="$data.params.p_tongtra" :is-show="isCalculatorShow" @close="isCalculatorShow = !isCalculatorShow"></app-calculator>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 col-12">
+          <div class="info-row">
+            <div class="key w50">
+                Mã TT
+            </div>
+            <div class="value">
+              <b-form-input class="form-control highlight" v-model="params.p_ma_ttoan"></b-form-input>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 col-12">
+            <div class="note mart5"><span class="text-warning one-alert inline vcenter f24 "></span> {{label_kycuoc}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- result -->
+    <div class="">
+      <Split>
+        <SplitArea :size="40">
+          <div id="leftPane">
+            <div id ='vertical_splitter' class="vertical_splitter">
+              <div class="box-form box-col marb0" id="boxTop">
+                <div class="legend-title">Danh sách User</div>
+                <div class="table-content" style="height: calc(100% - 80px);">
+                  <DataGrid
+                    v-bind:columns="columnsDSUsers"
+                    v-bind:dataSource="listUserResult"
+                    v-bind:aggregates="[
+                      {field: 'STT', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggCountUser},
+                      {field: 'TONGTIEN', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggSumTONGTIENUser},
+                      {field: 'TONGPHIEU', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggSumTONGPHIEUUser}
+                    ]"
+                    :enablePagingServer="false"
+                    :enabledSelectFirstRow="true"
+                    :showFilter="false"
+                    :allowPaging="true"
+                    :allowExcelExport="true"
+                    :totalRecords="pageinfoDSUsers.totalElement"
+                    :pageSize="pageinfoDSUsers.maxSize"
+                    :pageIndex="pageinfoDSUsers.page"
+                    :panelDataHeight='"150"'
+                    :key="dsUserKey"
+                    ref="gridDSUsers"
+                    @selectedRowChanged="dsUsersRowChanged"
+                    >
+                  </DataGrid>
+                </div>
+              </div>
+    
+              <div class="box-col box-form" id="boxRight">
+                <div class="legend-title">Hình thức thanh toán</div>
+                <div class="table-content"  style="height: calc(100% - 80px);">
+                  <DataGrid
+                    v-bind:columns="columnsDSHTTT"
+                    v-bind:dataSource="listHTTTResult"
+                    v-bind:aggregates="[
+                      {field: 'STT', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggCountHTTT},
+                      {field: 'TONGTIEN', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggSumTONGTIENHTTT},
+                      {field: 'TONGPHIEU', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.aggSumTONGPHIEUHTTT}
+                    ]"
+                    :enabledSelectFirstRow="true"
+                    :showFilter="false"
+                    :allowPaging="true"
+                    :allowExcelExport="true"
+                    :totalRecords="pageinfoDSHTTT.totalElement"
+                    :pageSize="pageinfoDSHTTT.maxSize"
+                    :pageIndex="pageinfoDSHTTT.page"
+                    :panelDataHeight='"150"'
+                    :key="dsHTTTKey"
+                    @selectedRowChanged="dsHTTTRowChanged"
+                    ref="gridDSHTTT"
+                    >
+                  </DataGrid>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SplitArea>
+        <SplitArea :size="60">
+          <div id="rightPane">
+            <div class="box-col box-form">
+              <div class="legend-title">Danh sách phiếu thanh toán</div>
+              <div class="table-content" id="ds-phieutt">
+                <DataGrid3
+                  v-bind:columns="[
+                  {fieldName: '_CHECK', headerText: '', visible: false},
+                  {fieldName: 'PHIEU_ID', isPrimaryKey: true, visible: false},
+                  {fieldName: 'STT', headerText: 'STT', allowFiltering: false, width: 80, textAlign: 'Center'},
+                  {fieldName: 'NGAY_TT', headerText: 'Ngày trả', allowFiltering: true, width: 130},
+                  {fieldName: 'NGAY_CN', headerText: 'Ngày cập nhật', allowFiltering: true, width: 130},
+                  {fieldName: 'MANV_TC', headerText: 'Đại lý', allowFiltering: true, width: 150},
+                  {fieldName: 'MA_DL', headerText: 'Mã Đại lý', allowFiltering: true, width: 150},
+                  {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, width: 100},
+                  {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true, width: 130},
+                  {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, width: 130},
+                  {fieldName: 'TIEN_TRA', headerText: 'Tiền trả', allowFiltering: true, format:'N0', type: 'number', width: 150, cssClass: 'tien-tra'},
+                  {fieldName: 'LANTRA', headerText: 'Lần trả', allowFiltering: true, format:'N0', type: 'number', width: 100},
+                  {fieldName: 'SO_HD', headerText: 'Số HĐ', allowFiltering: true, width: 100},
+                  {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, width: 150},
+                  {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, width: 200},
+                  {fieldName: 'NGUOI_CN', headerText: 'Người gạch', allowFiltering: true, width: 150},
+                  {fieldName: 'CHUNGTU', headerText: 'Chứng từ', allowFiltering: true, width: 100},
+                  {fieldName: 'THUNGAN', headerText: 'Thu ngân', allowFiltering: true, width: 150},
+                  {fieldName: 'HDDT', headerText: 'HDDT', allowFiltering: true, width: 100},
+                  {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, width: 100},
+                  {fieldName: 'NGANHANG', headerText: 'Ngân hàng', allowFiltering: true, width: 120},
+                  {fieldName: 'NGAYNGANHANG', headerText: 'Ngày ngân hàng', allowFiltering: true, width: 120},
+                  {fieldName: 'SO_TC', headerText: 'Số tham chiếu', allowFiltering: true, width: 100},
+                  {fieldName: 'MA_CHUAN', headerText: 'Mã chuẩn chi', allowFiltering: true, width: 100},
+                  {fieldName: 'DOITAC', headerText: 'Đối tác', allowFiltering: true, width: 100},
+                  {fieldName: 'PHIEU_ID_NEO', headerText: 'Phiếu ID NEO', allowFiltering: true, width: 150},
+                  {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', visible: false},
+                  {fieldName: 'TRANGTHAI', textAlign: 'Center', headerText: 'Trạng thái', allowFiltering: true, width: 120, template: this.statusTemplate/*, freeze: 'Right'*/}                  
+                ]"
+                  v-bind:dataSource="listPhieuThanhToanResult"
+                  v-bind:aggregates="[
+                    {field: 'STT', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customCountAgg},
+                    {field: 'TIEN_TRA', type: 'Custom', footerTemplate: this.customTemplate, customAggregateFn: this.customAggregate}
+                  ]"
+                  dataKeyField="PHIEU_ID"
+                  :selectionSettings="selectionSettings"
+                  :showFilter="true"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  :allowExcelExport="true"
+                  :showColumnCheckbox="true"
+                  :enabledSelectFirstRow="false"
+                  :totalRecords="pageinfoDSPhieuTT.totalElement"
+                  :pageSize="pageinfoDSPhieuTT.maxSize"
+                  :pageIndex="pageinfoDSPhieuTT.page"
+                  @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                  @keyPressed="keyPressedHandler"
+                  :panelDataHeight='"520"'
+                  :key="keyDSPhieuTT"
+                  ref="gridDSPhieuTT"
+                  >
+                </DataGrid3>
+              </div>
+    
+            </div>
+          </div>
+        </SplitArea>
+      </Split>
+          
+      
+    </div>
+  </div>
+</div>

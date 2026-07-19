@@ -1,0 +1,354 @@
+<div >
+    
+
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="getDanhSach">
+                    <span
+                        class="icon nc-icon-glyph design_bullet-list-67"
+                    ></span
+                    >Danh sách
+                </a>
+            </li>
+            <li
+                v-show="!isTab"
+                v-b-tooltip.hover.right
+                title="Chuyển thuê bao sang nhắc nợ"
+            >
+                <a href="javascript:void(0)" @click="nhacNo">
+                    <span class="icon one-file-noti"></span>Nhắc nợ
+                </a>
+            </li>
+            <li v-show="isTab">
+                <a href="javascript:void(0)" @click="huyNhacNo">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span
+                    >Hủy nhắc
+                </a>
+            </li>
+            <li v-show="isTab">
+                <a href="javascript:void(0)" @click="huyLanNhac">
+                    <span class="icon one-trash"></span>Xóa nhắc
+                </a>
+            </li>
+            <li
+                v-show="isTab"
+                v-b-tooltip.hover.right
+                title="Hoàn thiện nhắc nợ"
+            >
+                <a href="javascript:void(0)" @click="capNhat">
+                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span
+                    >Hoàn thiện
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="showAlert()">
+                    <span class="icon one-download"></span>Xuất file
+                </a>
+                <appModalXuatDuLieu
+                    id="modal-xuat-dulieu"
+                    :thuocTinh="!isTab ? dsThuocTinhNhacNo: dsThuocTinhDaNhacNo"
+                    :data="!isTab ? formChuaNhac.listNhacNo : formDaNhac.listDaNhacNo"
+                />
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb6">
+            <div class="pull-right">
+                <app-ky-cuoc @handleChangeKyCuoc="handleKyCuoc"></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="nav tab-over tabs">
+            <a
+                href="javascript:;"
+                :class="{active:!isTab}"
+                @click="isTab=false"
+                data-toggle="tab"
+                >Phiếu chưa nhắc (F2)</a
+            >
+            <a
+                href="javascript:;"
+                data-toggle="tab"
+                :class="{active:isTab}"
+                @click="isTab=true"
+                >Phiếu đã nhắc (F3)</a
+            >
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tabChuaNhac" v-show="!isTab">
+                <div class="grid-stack-box">
+                    <div class="box-col box-form col-6" id="boxLeft">
+                        <div class="info-row">
+                            <div class="key w70">Dịch vụ</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select
+                                        v-model="formChuaNhac.selectedDichVu"
+                                        class="form-control"
+                                    >
+                                        <option
+                                            v-for="item in listDichVuVTGetter"
+                                            :value="item.DICHVUVT_ID"
+                                            >{{item.TEN_DVVT}}</option
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w70">Lần tạo DL</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select
+                                        v-model="formChuaNhac.selectedLanTaoDichVu"
+                                        class="form-control"
+                                    >
+                                        <option
+                                            v-for="item in listLanTaoDuLieuGetter"
+                                            :value="item.LANTAO_NN_ID"
+                                            >{{item.NGAY_TAO}}</option
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-col box-form col-6" id="boxRight">
+                        <div class="info-row">
+                            <div class="key w70">Đơn vị QL</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select
+                                        v-model="formChuaNhac.selectedDonVi"
+                                        class="form-control"
+                                    >
+                                        <option :value="-1">Tất cả</option>
+                                        <option
+                                            v-for="item in listDonViGetter"
+                                            :value="item.DONVI_ID"
+                                            >{{item.TEN_DV}}</option
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">Số lượng</div>
+                                    <div class="value">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            :value="formChuaNhac.soLuong | currency"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">Tổng tiền</div>
+                                    <div class="value">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            :value="formChuaNhac.tongTien | currency"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-stack-box">
+                    <div class="box-col box-form col-6" id="boxLeft1">
+                        <div class="legend-title">Danh sách nhắc nợ</div>
+                        <DataGrid2
+                            :columns="fieldNhacNo"
+                            :dataSource="formChuaNhac.listNhacNo"
+                            :showFilter="true"
+                            :showColumnCheckbox="true"
+                            dataKeyField="MA_TB"
+                            @selectedItemsChanged="selectedItemsChangedCu"
+                            @selectedRowChanged="selectedRowChangedCu"
+                        >
+                        </DataGrid2>
+                    </div>
+                    <div class="box-col box-form col-6" id="boxRight1">
+                        <div class="legend-title">Danh sách không nhắc nợ</div>
+                        <div class="box-move-select-table">
+                            <div class="actions w40 padl0">
+                                <button class="btn" @click="move()">
+                                    <span class="fa fa-angle-right"></span>
+                                </button>
+                                <button class="btn" @click="moveAll()">
+                                    <span
+                                        class="fa fa-angle-double-right"
+                                    ></span>
+                                </button>
+                                <button class="btn" @click="unmove()">
+                                    <span class="fa fa-angle-left"></span>
+                                </button>
+                                <button class="btn" @click="unmoveAll()">
+                                    <span
+                                        class="fa fa-angle-double-left"
+                                    ></span>
+                                </button>
+                            </div>
+                            <div
+                                class="box-col"
+                                style="width:calc(100% - 40px);"
+                            >
+                                <DataGrid2
+                                    :columns="fieldKhongNhacNo"
+                                    :dataSource="formChuaNhac.listKhongNhacNo"
+                                    :showFilter="true"
+                                    :showColumnCheckbox="true"
+                                    dataKeyField="MA_TB"
+                                    @selectedItemsChanged="selectedItemsChangedMoi"
+                                    @selectedRowChanged="selectedRowChangedMoi"
+                                >
+                                </DataGrid2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane active" id="tabDaNhac" v-show="isTab">
+                <div class="grid-stack-box">
+                    <div class="box-col box-form col-6" id="boxLeft2">
+                        <div class="legend-title">Thông tin tìm kiếm</div>
+                        <div class="info-row">
+                            <div class="key w70">Dịch vụ</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select
+                                        v-model="formDaNhac.selectedDichVu"
+                                        class="form-control"
+                                    >
+                                        <option
+                                            v-for="item in listDichVuVTGetter"
+                                            :value="item.DICHVUVT_ID"
+                                            >{{item.TEN_DVVT}}</option
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">Lần nhắc</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select
+                                                v-model="formDaNhac.selectedLanNhacNo"
+                                                class="form-control"
+                                            >
+                                                <option
+                                                    v-for="item in listLanNhacNoGetter"
+                                                    :value="item.GIAOPHIEU_NN_ID"
+                                                    >{{item.NGAYGIAO}}</option
+                                                >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">Trạng thái</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select
+                                                v-model="formDaNhac.selectedTrangThai"
+                                                class="form-control"
+                                            >
+                                                <option
+                                                    v-for="item in listTrangThai"
+                                                    :value="item.value"
+                                                    >{{item.name}}</option
+                                                >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-col box-form col-6" id="boxRight2">
+                        <div class="legend-title">Thông tin lượt nhắc</div>
+                        <div class="info-row">
+                            <div class="key w70">Đơn vị QL</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select
+                                        v-model="formDaNhac.selectedDonVi"
+                                        class="form-control"
+                                    >
+                                        <option :value="-1">Tất cả</option>
+                                        <option
+                                            v-for="item in listDonViGetter"
+                                            :value="item.DONVI_ID"
+                                            >{{item.TEN_DV}}</option
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">Số lượng</div>
+                                    <div class="value">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            :value="formDaNhac.soLuong | currency"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w70">Tổng tiền</div>
+                                    <div class="value">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            :value="formDaNhac.tongTien | currency"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        Danh sách thuê bao đã nhắc nợ
+                    </div>
+                    <div class="table-content">
+                        <DataGrid2
+                            :columns="fieldDaNhacNo"
+                            :dataSource="formDaNhac.listDaNhacNo"
+                            :showFilter="true"
+                            :showColumnCheckbox="true"
+                            dataKeyField="MA_TB"
+                            @selectedItemsChanged="selectedItemsChangedDaNhac"
+                            @selectedRowChanged="selectedRowChangedDaNhac"
+                        >
+                        </DataGrid2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

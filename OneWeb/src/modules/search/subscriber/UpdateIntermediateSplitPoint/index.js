@@ -1,0 +1,3 @@
+import UpdateIntermediateSplitPoint from './UpdateIntermediateSplitPoint'
+
+export default UpdateIntermediateSplitPoint

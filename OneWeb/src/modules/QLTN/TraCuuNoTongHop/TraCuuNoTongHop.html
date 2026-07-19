@@ -1,0 +1,318 @@
+<div>
+  <app-tra-cuu-thong-tin-thue-bao ref="refTraCuuTTTB" :kycuoc="f_kycuoc"></app-tra-cuu-thong-tin-thue-bao>
+  <app-danh-sach-thue-bao ref="refDanhSachThueBao" :ma_tt="params.p_ma_tt" :kycuoc="f_kycuoc" @accept="acceptChonMaTBHandler"></app-danh-sach-thue-bao>
+  <ChonThanhToan ref="refChonThanhToan" :ds_tt="ds_thanhtoan" @acceptChonMaThanhToan="acceptChonMaTTHandler"></ChonThanhToan>
+  <!-- BEGIN TOOLBAR -->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" v-on:click.prevent="onSearch"><span class="icon one-file-search"></span>Tìm kiếm</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="doInPhieuThu" title="In lịch sử nợ trả theo mã thanh toán"><span class="icon  one-print"></span> In DS</a>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="onPopUpLSChuyenPhieu" title="Tìm kiếm thêm"><span class="icon  nc-icon-outline ui-1_zoom-in"></span> Tìm thêm</a>
+        <app-lich-su-chuyen-phieu
+          ref="refLichSuChuyenPhieu"
+          :ma_tt="params.p_ma_tt"
+        >
+        </app-lich-su-chuyen-phieu>
+      </li>
+      <li>
+        <a href="#" v-on:click.prevent="onPopUpNhatKy"><span class="icon  one-remember"></span> Nhật ký</a>
+        <app-nhat-ky-thu-no
+          ref="refNhatKyThuNo"
+          :ma_tt="params.p_ma_tt"
+        >
+        </app-nhat-ky-thu-no>
+      </li>
+    </ul>
+  </div>
+  <!-- BEGIN CONTENT-->
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">
+          <div class="pull-left">Thông tin tra cứu</div>
+          <div class="pull-right red">
+              <span class="one-alert text-warning"></span> {{lbl_thongtin}}
+          </div>
+          <div class="pull-right" style="color: blue!important;" v-show="lbl_thongtin2 !== null">{{lbl_thongtin2}}</div>
+          <div class="row"  v-show="config.p_hienthi_loai_tien">
+            <div class="col-sm-3 col-12">
+              <div class="info-row">                
+                <div class="value">
+                          <div>
+                            <ejs-dropdownlist width="95%":change="onChangeLoaiTien" :allowFiltering="true" :dataSource='params.p_loaitien_options' :fields="config.fieldsLoaiTien" v-model = "params.p_loaitien" :placeholder="'Chọn loại tiền'"></ejs-dropdownlist>
+                          </div>
+                </div>
+              </div>
+            </div>          
+          </div>
+          <div class="clearfix"></div>
+      </div>
+      <b-form-group v-slot="{ ariaDescribedby }">
+        <div class="row">
+          <div class="col-sm-10 col-12">
+            <div class="info-row">
+                <div class="key w100">
+                  <div class="">
+                    <b-form-radio v-model="f_search_option" name="p_name" :aria-describedby="ariaDescribedby" value="0">
+                      <span class="name">Mã TT</span>
+                    </b-form-radio>
+                  </div>
+                </div>
+                <div class="value">
+                    <div class="row">
+                      <div class="col-sm-3 col-12">
+                        <b-form-input @focus="params.p_search_option = '0'" class="form-control highlight"  @keyup.enter="onSearch" v-model="params.p_ma_tt"></b-form-input>
+                      </div>
+                      <div class="col-sm-9 col-12">
+                        <div class="input-more-button">
+                          <button class="btn" v-on:click.prevent="popupTimThongTinTT">
+                            <span class="-ap icon-more_horiz"></span>
+                          </button>
+                          <b-form-input readonly class="form-control text-main" v-model="params.p_ten_tt" :title="params.p_ten_tt"></b-form-input>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-2 col-12">
+              <div class="info-row">
+                  <div class="key w90">
+                    Từ ngày
+                  </div>
+                  <div class="value">
+                    <ejs-datepicker
+                      v-model="p_tungay"
+                      :value="config.dateConfig.value"
+                      :max="config.dateConfig.max"
+                      :format="config.dateConfig.format"
+                      :allowEdit=false
+                      :showClearButton=false
+                      >
+                    </ejs-datepicker>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-10 col-12">
+            <div class="info-row">
+              <div class="key w100">
+                <div class="">
+                  <b-form-radio v-model="f_search_option" name="p_name" :aria-describedby="ariaDescribedby" value="1" :disabled="!config.p_f_hienthi_matb">
+                    <span class="name">Số máy/Acc</span>
+                  </b-form-radio>
+                </div>
+              </div>
+              <div class="value">
+                <div class="row">
+                  <div class="col-sm-3 col-12">
+                    <b-form-input @focus="params.p_search_option = '1'" class="form-control highlight" @keyup.enter="onSearch" v-model="params.p_somay_acc" :disabled="!config.p_f_hienthi_matb"></b-form-input>
+                  </div>
+                  <div class="col-sm-9 col-12">
+                    <div class="input-more-button">
+                      <button class="btn" v-on:click.prevent="popupDSThueBao">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                      <b-form-input readonly class="form-control text-main" v-model="params.p_diachi_tt" :title="params.p_diachi_tt"></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2 col-12">
+            <div class="info-row">
+              <div class="key w90">
+                Đến ngày
+              </div>
+              <div class="value">
+                <div class="input-icon-right">
+                  <ejs-datepicker ref='datepickr'
+                    v-model="p_denngay"
+                    :value="config.dateConfig.value"
+                    :max="config.dateConfig.max"
+                    :format="config.dateConfig.format"
+                    :allowEdit=false
+                    :showClearButton=false
+                    >
+                  </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </b-form-group>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">{{params.p_lbl_nohientai}}</div>
+                <div class="pull-right">
+                    <a href="#" class="btn btn-main lh14 pad4" title="Hiển thị theo thuê bao" v-bind:class = "config.p_f_hienthi_no_thuebao ? 'btn-main' : 'btn-disabled'" v-on:click.prevent="onChangeHienThiNoHienTai(1)">
+                      <span class="nc-icon-outline files_single-content-03"></span>
+                    </a>
+                    <a href="#" class="btn btn-main lh14 pad4" title="Hiển thị theo tháng" v-bind:class = "config.p_f_hienthi_no_thang ? 'btn-main' : 'btn-disabled'" v-on:click.prevent="onChangeHienThiNoHienTai(2)">
+                        <span class="one-calendar"></span>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="table-content" style="height: 300px;">
+              <DataGrid
+                v-bind:columns="this.params.p_loaitien==1?columnsNoChiTiet:columnsNoChiTiet_USD"
+                v-bind:aggregates="this.params.p_loaitien==1?[
+                  {field: 'TONGNO', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                  {field: 'NOGOC', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                  {field: 'THUE', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                  {field: 'HOAHONG', type: 'Sum', format: 'N0', footerTemplate: this.footerSum}
+                  ]:
+                  [
+                  {field: 'TONGNO', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                  {field: 'NOGOC', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                  {field: 'THUE', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                  {field: 'HOAHONG', type: 'Sum', format: 'N2', footerTemplate: this.footerSum}
+                  ]"
+                ref="grdNoHienTai"
+                :panelDataHeight='"150"'
+                v-bind:dataSource="resultNoHienTai"
+                :showFilter="true"
+                :allowPaging="true"
+                :totalRecords="noHienTaiPageInfo.totalElement"
+                :pageIndex="noHienTaiPageInfo.page"
+                :pageSize="noHienTaiPageInfo.pageSize"
+                :key="keyNoHienTai"
+                >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">Thông tin nợ tổng hợp</div>
+                <div class="pull-right">
+                    <a href="#" class="btn btn-main lh14 pad4" title="Hiển thị thông tin nợ đầu kỳ" v-bind:class = "config.p_f_nodauky ? 'btn-main' : 'btn-disabled'" v-on:click.prevent="onChangeHienThiLoaiNo(1)">
+                      <span class="">D</span>
+                    </a>
+                    <a href="#" class="btn btn-main lh14 pad4" title="Hiển thị thông tin nợ phát sinh" v-bind:class = "config.p_f_nops ? 'btn-main' : 'btn-disabled'" v-on:click.prevent="onChangeHienThiLoaiNo(2)">
+                      <span class="">P</span>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="table-content" style="height: 300px;">
+              <DataGrid
+                v-bind:columns="this.params.p_loaitien==1?columnsNoTongHop:columnsNoTongHop_USD"
+                ref="grdNoTongHop"
+                :panelDataHeight='"150"'
+                v-bind:dataSource="resultNoTongHop"
+                :showFilter="true"
+                :allowPaging="true"
+                :totalRecords="noTongHopPageInfo.totalElement"
+                :pageIndex="noTongHopPageInfo.page"
+                :pageSize="noTongHopPageInfo.pageSize"
+                :key="keyNoTongHop"
+                @selectedRowChanged="noTongHopRowChanged"
+                >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">
+                Thông tin phiếu thanh toán
+            </div>
+            <div class="table-content" style="height: 250px;">
+              <DataGrid
+                v-bind:columns="this.params.p_loaitien==1?columnsPhieuTT:columnsPhieuTT_USD"
+                ref="grdDSTToan"
+                v-bind:dataSource="resultDanhSachPhieuTToan"
+                v-bind:aggregates="this.params.p_loaitien==1?[
+                  {field: 'KYTRA', type: 'Count', format: 'N0', footerTemplate: this.footerCount},
+                  {field: 'TONGTRA', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                ]:[
+                {field: 'KYTRA', type: 'Count', format: 'N0', footerTemplate: this.footerCount},
+                {field: 'TONGTRA', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+              ]"
+                :showFilter="true"
+                :allowPaging="true"
+                :totalRecords="phieuTTPageInfo.totalElement"
+                :pageIndex="phieuTTPageInfo.page"
+                :pageSize="phieuTTPageInfo.pageSize"
+                :key="keyPhieuTT"
+                @selectedRowChanged="phieuTTRowChanged"
+                >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">Thông tin chi tiết phiếu thanh toán</div>
+                <div class="pull-right">
+                    <a href="#" class="btn btn-main lh14 pad4" title="Hiển thị theo thuê bao" v-bind:class = "config.p_f_hienthi_tt_thuebao ? 'btn-main' : 'btn-disabled'" v-on:click.prevent="onChangeHienThiPhieuTT(1)">
+                        <span class="nc-icon-outline files_single-content-03"></span>
+                    </a>
+                    <a href="#" class="btn btn-main lh14 pad4" title="Hiển thị theo tháng" v-bind:class = "config.p_f_hienthi_tt_thang ? 'btn-main' : 'btn-disabled'" v-on:click.prevent="onChangeHienThiPhieuTT(2)">
+                        <span class="one-calendar"></span>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="table-content" style="height: 250px;">
+              <DataGrid
+                v-bind:columns="this.params.p_loaitien==1?[
+                  {fieldName: 'TENKHOANMUC', headerText: 'Tên khoản mục', textAlign: 'Left', allowFiltering: true},
+                  {fieldName: 'TONGTRA', headerText: 'Tiền trả', textAlign: 'Right', allowFiltering: true, type:'number', format:'N0', cssClass: 'tien-tra'},
+                  {fieldName: 'TRAGOC', headerText: 'Trả gốc', textAlign: 'Right', allowFiltering: true, type:'number', format:'N0'},
+                  {fieldName: 'TRATHUE', headerText: 'Trả thuế', textAlign: 'Right', allowFiltering: true, type:'number', format:'N0'},
+                  {fieldName: 'CHIHOAHONG', headerText: 'Chi hoa hồng', textAlign: 'Right', allowFiltering: true, type:'number', format:'N0'},
+                  {fieldName: 'VIETTAT', headerText: 'Loại tiền', textAlign: 'Left', allowFiltering: true}
+                  ]:[
+                  {fieldName: 'TENKHOANMUC', headerText: 'Tên khoản mục', textAlign: 'Left', allowFiltering: true},
+                  {fieldName: 'TONGTRA', headerText: 'Tiền trả', textAlign: 'Right', allowFiltering: true, type:'number', format:'N2', cssClass: 'tien-tra'},
+                  {fieldName: 'TRAGOC', headerText: 'Trả gốc', textAlign: 'Right', allowFiltering: true, type:'number', format:'N2'},
+                  {fieldName: 'TRATHUE', headerText: 'Trả thuế', textAlign: 'Right', allowFiltering: true, type:'number', format:'N2'},
+                  {fieldName: 'CHIHOAHONG', headerText: 'Chi hoa hồng', textAlign: 'Right', allowFiltering: true, type:'number', format:'N2'},
+                  {fieldName: 'VIETTAT', headerText: 'Loại tiền', textAlign: 'Left', allowFiltering: true}
+                  ]"
+                ref="grdTTChiTiet"
+                v-bind:dataSource="resultTToanChiTiet"
+                v-bind:aggregates="this.params.p_loaitien==1?[
+                  {field: 'TENKHOANMUC', type: 'Count', format: 'N0', footerTemplate: this.footerCount},
+                  {field: 'TONGTRA', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                  {field: 'TRAGOC', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                  {field: 'TRATHUE', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                  {field: 'CHIHOAHONG', type: 'Sum', format: 'N0', footerTemplate: this.footerSum},
+                ]:
+                [
+                  {field: 'TENKHOANMUC', type: 'Count', format: 'N2', footerTemplate: this.footerCount},
+                  {field: 'TONGTRA', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                  {field: 'TRAGOC', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                  {field: 'TRATHUE', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                  {field: 'CHIHOAHONG', type: 'Sum', format: 'N2', footerTemplate: this.footerSum},
+                ]"
+                :showFilter="true"
+                :allowPaging="true"
+                :totalRecords="phieuCTPageInfo.totalElement"
+                :pageIndex="phieuCTPageInfo.page"
+                :pageSize="phieuCTPageInfo.pageSize"
+                :key="keyPhieuCT"
+                >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

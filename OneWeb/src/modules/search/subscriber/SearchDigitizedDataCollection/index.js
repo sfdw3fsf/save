@@ -1,0 +1,3 @@
+import SearchDigitizedDataCollection from './SearchDigitizedDataCollection'
+
+export default SearchDigitizedDataCollection

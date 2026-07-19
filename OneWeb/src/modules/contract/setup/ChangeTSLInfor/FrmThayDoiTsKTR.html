@@ -1,0 +1,323 @@
+
+<div id="FrmThayDoiTsKTR">
+  <!-- breadcrumb -->
+  <breadcrumb :header="header"></breadcrumb>
+  <!-- menu -->
+  <b-nav id="tlstpTop" pills="" class="menu">
+    <b-nav-item :disabled="!isEnableCapNhatButton" v-on:click="CapNhat"><span class="one-save"></span> Cập nhật</b-nav-item>
+    <b-nav-item v-on:click="Xacnhan"><span class="one nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận (Không thay đổi TT)</b-nav-item>
+    <b-nav-item :disabled="!isEnableHuyButton"
+    v-on:click="Huy"
+    ><span class="one-cancel text-danger bold"></span> Hủy</b-nav-item>
+  </b-nav>
+  <!-- form -->
+  <b-container fluid="" class="p-2 page-content">
+    <b-row class="m-0">
+      <b-col class="box-form p-2 mr-1 overflow-hidden">
+        <div class="legend-title mb-2">
+          <b-form inline="">
+            <span class="mr-5">Thông tin thuê bao</span>
+            <span class="mr-2 text-danger bold">Trạng thái dữ liệu</span>
+            <b-radio-group v-model="radioTrangThaiDuLieu">
+              <b-radio value="1">Danh bạ</b-radio>
+              <b-radio value="2">Hợp đồng</b-radio>
+            </b-radio-group>
+          </b-form>
+        </div>
+        <b-row>
+          <b-col cols="7">
+            <div class="info-row">
+              <div class="key">Account</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" ref="refInputMaTB" class="form-control bold highlight" @keyup.enter="onMaTbEnter" :value="maTb" @change="e=>maTb=e.target.value"/>
+                </div>
+              </div>
+            </div>
+            <!-- <b-form-group label="Account" label-cols="1" label-class="lblw-120"
+              label-for="txtAcc">
+              <b-input-group>
+                <b-button variant="outline-primary">...</b-button>
+                <b-form-input type="text"  id="txtAcc" v-model="maTb"
+                v-on:keyup.enter="onMaTbEnter"
+                class="form-control"
+                ></b-form-input>
+              </b-input-group>
+            </b-form-group> -->
+          </b-col>
+          <b-col>
+            <b-form-group label="Tốc độ kênh" label-cols="1"
+              label-class="lblw-120">
+              <b-form-select :options="dsTocDoKenh"
+                v-model="tocDoKenhId"
+                value-field="TOCDO_ID"
+                text-field="TOCDO"
+                :disabled="true"
+                >
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="7">
+            <b-form-group label="Tên thuê bao" label-cols="1"
+              label-class="lblw-120">
+              <b-form-input v-model="tenThueBao"
+              :disabled="true"
+              ></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group label="Số PLHĐ cũ" label-cols="1"
+              label-class="lblw-120">
+              <b-form-input v-model="soPLHDCu"
+              :disabled="true"
+              ></b-form-input>
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-col>
+      <b-col class="box-form p-2 ml-1 overflow-hidden">
+        <div class="legend-title mb-2">
+          &nbsp;
+        </div>
+        <b-row>
+          <b-col cols="7">
+            <b-form-group label="Dịch vụ" label-cols="1" label-class="lblw-120">
+              <b-form-select :options="dsDichVuVT"
+                v-model="dichVuVienThongId"
+                value-field="DICHVUVT_ID"
+                text-field="TEN_DVVT"
+                :disabled="true"
+                >
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group label="Loại hình" label-cols="1"
+              label-class="lblw-120">
+              <b-form-select :options="dsLoaiHinhTB"
+                v-model="loaiHinhThueBaoId"
+                value-field="LOAITB_ID"
+                text-field="LOAIHINH_TB"
+                :disabled="true"
+                >
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="7">
+            <b-form-group label="Trạng thái TB" label-cols="1"
+              label-class="lblw-120">
+              <b-form-input v-model="trangThaiThueBao"
+              :disabled="true"
+              ></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group label="Số PLHĐ mới" label-cols="1"
+              label-class="lblw-120">
+              <b-form-input v-model="soPLHDMoi"></b-form-input>
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row>
+    <b-row class="m-0">
+      <b-col class="box-form p-2 mr-1 overflow-hidden">
+        <div class="legend-title mb-2">
+          Thông số kỹ thuật cũ
+        </div>
+        <endpoint header="Điểm đầu" header-class="bold"
+        ref="diemDauCu" class="disabled"
+        :SO_AO="thongSoCu.diemDau.soAo"
+        :THIETBI="thongSoCu.diemDau.thietBiId"
+        :SERIAL="thongSoCu.diemDau.serial"
+        :LOAI_CAP="thongSoCu.diemDau.loaiCapId"
+        :SVLAN="thongSoCu.diemDau.sVlan"
+        :CVLAN="thongSoCu.diemDau.cvLan"
+        :CAP_GOC="thongSoCu.diemDau.capGoc"
+        :CAP_NGON="thongSoCu.diemDau.capNgon"
+        :ADSL_CAP="thongSoCu.diemDau.adslCap"
+        :ADSL_PORT="thongSoCu.diemDau.adslPort"
+        :TUCAP_GOC="thongSoCu.diemDau.tuCapGoc"
+        :TUCAP_NGON="thongSoCu.diemDau.tuCapNgon"
+        :NASPORT_ID="thongSoCu.diemDau.nasPortId"
+        :VRF_VFI="thongSoCu.diemDau.vrfVfiId"
+        :DOICAP_GOC="thongSoCu.diemDau.doiCapGoc"
+        :DOICAP_NGON="thongSoCu.diemDau.doiCapNgon"
+        :THIETBI_TRUYENDAN="thongSoCu.diemDau.tbiTruyenDan"
+        :IP_WAN="thongSoCu.diemDau.ipWan"
+        :LIEN_TU="thongSoCu.diemDau.lienTu"
+        :HOPCAP_NGON="thongSoCu.diemDau.hopCapNgon"
+        :TIME_SLOT="thongSoCu.diemDau.timeSlot"
+        :LINK="thongSoCu.diemDau.link"
+        :CULY="thongSoCu.diemDau.cuLy"
+        :TUYEN_CAP="thongSoCu.diemDau.tuyenCap"
+        :DIACHI="thongSoCu.diemDau.diaChi"
+        :DONVI="thongSoCu.diemDau.donViId"
+        :DS_THIETBI="thongSoCu.diemDau.dsThieBi"
+        :DS_LOAICAP="thongSoCu.diemDau.dsLoaiCap"
+        :DS_DONVI="thongSoCu.diemDau.dsDonVi"
+        
+        
+        ></endpoint>
+      </b-col>
+      <b-col class="box-form p-2 ml-1 overflow-hidden">
+        <div class="legend-title mb-2">
+          &nbsp;
+        </div>
+        <endpoint header="Điểm cuối" header-class="bold"
+        ref="diemCuoiCu" class="disabled"
+        :SO_AO="thongSoCu.diemCuoi.soAo"
+        :THIETBI="thongSoCu.diemCuoi.thietBiId"
+        :SERIAL="thongSoCu.diemCuoi.serial"
+        :LOAI_CAP="thongSoCu.diemCuoi.loaiCapId"
+        :SVLAN="thongSoCu.diemCuoi.sVlan"
+        :CVLAN="thongSoCu.diemCuoi.cvLan"
+        :CAP_GOC="thongSoCu.diemCuoi.capGoc"
+        :CAP_NGON="thongSoCu.diemCuoi.capNgon"
+        :ADSL_CAP="thongSoCu.diemCuoi.adslCap"
+        :ADSL_PORT="thongSoCu.diemCuoi.adslPort"
+        :TUCAP_GOC="thongSoCu.diemCuoi.tuCapGoc"
+        :TUCAP_NGON="thongSoCu.diemCuoi.tuCapNgon"
+        :NASPORT_ID="thongSoCu.diemCuoi.nasPortId"
+        :VRF_VFI="thongSoCu.diemCuoi.vrfVfiId"
+        :DOICAP_GOC="thongSoCu.diemCuoi.doiCapGoc"
+        :DOICAP_NGON="thongSoCu.diemCuoi.doiCapNgon"
+        :THIETBI_TRUYENDAN="thongSoCu.diemCuoi.tbiTruyenDan"
+        :IP_WAN="thongSoCu.diemCuoi.ipWan"
+        :LIEN_TU="thongSoCu.diemCuoi.lienTu"
+        :HOPCAP_NGON="thongSoCu.diemCuoi.hopCapNgon"
+        :TIME_SLOT="thongSoCu.diemCuoi.timeSlot"
+        :LINK="thongSoCu.diemCuoi.link"
+        :CULY="thongSoCu.diemCuoi.cuLy"
+        :TUYEN_CAP="thongSoCu.diemCuoi.tuyenCap"
+        :DIACHI="thongSoCu.diemCuoi.diaChi"
+        :DONVI="thongSoCu.diemCuoi.donViId"
+        :DS_THIETBI="thongSoCu.diemCuoi.dsThieBi"
+        :DS_LOAICAP="thongSoCu.diemCuoi.dsLoaiCap"
+        :DS_DONVI="thongSoCu.diemCuoi.dsDonVi"
+        ></endpoint>
+      </b-col>
+    </b-row>
+    <b-row class="m-0">
+      <b-col class="box-form p-2 mr-1 overflow-hidden">
+        <div class="legend-title mb-2">
+          Thông số kỹ thuật mới
+        </div>
+        <endpoint ref="diemDauMoi" :isDisabled="!isSuaDiemDau"
+        :SO_AO="thongSoMoi.diemDau.soAo"
+        :THIETBI="thongSoMoi.diemDau.thietBiId"
+        :SERIAL="thongSoMoi.diemDau.serial"
+        :LOAI_CAP="thongSoMoi.diemDau.loaiCapId"
+        :SVLAN="thongSoMoi.diemDau.sVlan"
+        :CVLAN="thongSoMoi.diemDau.cvLan"
+        :CAP_GOC="thongSoMoi.diemDau.capGoc"
+        :CAP_NGON="thongSoMoi.diemDau.capNgon"
+        :ADSL_CAP="thongSoMoi.diemDau.adslCap"
+        :ADSL_PORT="thongSoMoi.diemDau.adslPort"
+        :TUCAP_GOC="thongSoMoi.diemDau.tuCapGoc"
+        :TUCAP_NGON="thongSoMoi.diemDau.tuCapNgon"
+        :NASPORT_ID="thongSoMoi.diemDau.nasPortId"
+        :VRF_VFI="thongSoMoi.diemDau.vrfVfiId"
+        :DOICAP_GOC="thongSoMoi.diemDau.doiCapGoc"
+        :DOICAP_NGON="thongSoMoi.diemDau.doiCapNgon"
+        :THIETBI_TRUYENDAN="thongSoMoi.diemDau.tbiTruyenDan"
+        :IP_WAN="thongSoMoi.diemDau.ipWan"
+        :LIEN_TU="thongSoMoi.diemDau.lienTu"
+        :HOPCAP_NGON="thongSoMoi.diemDau.hopCapNgon"
+        :TIME_SLOT="thongSoMoi.diemDau.timeSlot"
+        :LINK="thongSoMoi.diemDau.link"
+        :CULY="thongSoMoi.diemDau.cuLy"
+        :TUYEN_CAP="thongSoMoi.diemDau.tuyenCap"
+        :DIACHI="thongSoMoi.diemDau.diaChi"
+        :DONVI="thongSoMoi.diemDau.donViId"
+        :DS_THIETBI="thongSoMoi.diemDau.dsThieBi"
+        :DS_LOAICAP="thongSoMoi.diemDau.dsLoaiCap"
+        :DS_DONVI="thongSoMoi.diemDau.dsDonVi"
+        
+        >
+          <template slot="header">
+            <b-form inline="">
+              <b class="mr-5">Điểm đầu</b>Chọn port
+              <b-button variant="outline-primary" size="sm" class="ml-2" :class="{'disabled':!isSuaDiemDau}"
+                style="padding: 2px"
+                v-on:click="chonPortDau"
+                >
+                <span class="one-check text-success"></span> N.công
+              </b-button>
+              <b-form-checkbox class="absolute text-danger bold" 
+              v-model="isSuaDiemDau" 
+              style="right:7px">
+                Sửa điểm đầu
+              </b-form-checkbox>
+            </b-form>
+          </template>
+        </endpoint>
+      </b-col>
+      <b-col class="box-form p-2 ml-1 overflow-hidden">
+        <div class="legend-title mb-2">
+          &nbsp;
+        </div>
+        <endpoint ref="diemCuoiMoi" :isDisabled="!isSuaDiemCuoi"
+        :SO_AO="thongSoMoi.diemCuoi.soAo"
+        :THIETBI="thongSoMoi.diemCuoi.thietBiId"
+        :SERIAL="thongSoMoi.diemCuoi.serial"
+        :LOAI_CAP="thongSoMoi.diemCuoi.loaiCapId"
+        :SVLAN="thongSoMoi.diemCuoi.sVlan"
+        :CVLAN="thongSoMoi.diemCuoi.cvLan"
+        :CAP_GOC="thongSoMoi.diemCuoi.capGoc"
+        :CAP_NGON="thongSoMoi.diemCuoi.capNgon"
+        :ADSL_CAP="thongSoMoi.diemCuoi.adslCap"
+        :ADSL_PORT="thongSoMoi.diemCuoi.adslPort"
+        :TUCAP_GOC="thongSoMoi.diemCuoi.tuCapGoc"
+        :TUCAP_NGON="thongSoMoi.diemCuoi.tuCapNgon"
+        :NASPORT_ID="thongSoMoi.diemCuoi.nasPortId"
+        :VRF_VFI="thongSoMoi.diemCuoi.vrfVfiId"
+        :DOICAP_GOC="thongSoMoi.diemCuoi.doiCapGoc"
+        :DOICAP_NGON="thongSoMoi.diemCuoi.doiCapNgon"
+        :THIETBI_TRUYENDAN="thongSoMoi.diemCuoi.tbiTruyenDan"
+        :IP_WAN="thongSoMoi.diemCuoi.ipWan"
+        :LIEN_TU="thongSoMoi.diemCuoi.lienTu"
+        :HOPCAP_NGON="thongSoMoi.diemCuoi.hopCapNgon"
+        :TIME_SLOT="thongSoMoi.diemCuoi.timeSlot"
+        :LINK="thongSoMoi.diemCuoi.link"
+        :CULY="thongSoMoi.diemCuoi.cuLy"
+        :TUYEN_CAP="thongSoMoi.diemCuoi.tuyenCap"
+        :DIACHI="thongSoMoi.diemCuoi.diaChi"
+        :DONVI="thongSoMoi.diemCuoi.donViId"
+        :DS_THIETBI="thongSoMoi.diemCuoi.dsThieBi"
+        :DS_LOAICAP="thongSoMoi.diemCuoi.dsLoaiCap"
+        :DS_DONVI="thongSoMoi.diemCuoi.dsDonVi"
+        >
+          <template slot="header">
+            <b-form inline="">
+              <b class="mr-5">Điểm cuối</b>Chọn port
+              <b-button variant="outline-primary" size="sm" class="ml-2" :class="{'disabled':!isSuaDiemCuoi}"
+              v-on:click="chonPortCuoi"
+                style="padding: 2px">
+                <span class="one-check text-success"></span> N.công
+              </b-button>
+              <b-form-checkbox class="absolute text-danger bold"
+              v-model="isSuaDiemCuoi"
+              style="right:7px">
+                Sửa điểm cuối
+              </b-form-checkbox>
+            </b-form>
+          </template>
+        </endpoint>
+      </b-col>
+    </b-row>
+  </b-container>
+  <chonport
+  ref="frmChonPortDau" @select="onSelectPortDau"
+  ></chonport>
+  <chonport
+  ref="frmChonPortCuoi" @select="onSelectPortCuoi"
+  ></chonport>
+</div>

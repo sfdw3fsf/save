@@ -1,0 +1,353 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChonThietBi"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+  :zIndex="1000"
+  :position="{ X: 'center', Y: 'top' }"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        Danh sách thiết bị
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onTimKiem"> <span class="icon one-search"></span> Tìm kiếm </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onChonThietBi">
+            <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chọn
+          </b-link>
+        </li>
+        <!-- <li>
+          <b-link href="javascript:void(0)" @click="closeModal">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li> -->
+      </ul>
+    </div>
+    <div class="modal-content p-2">
+      <div class="nav tab-over tabs">
+        <a
+          href="#tabDsThietBi"
+          v-on:click="onChangeTab(1)"
+          data-toggle="tab"
+          class="tab"
+          :class="{active: tab_index == 1}"
+          >Thiết bị</a
+        >
+        <a href="#tabDsRack" v-on:click="onChangeTab(2)" data-toggle="tab" class="tab" :class="{active: tab_index == 2}"
+          >Rack</a
+        >
+      </div>
+      <div class="tab-content">
+        <!-- TAB 1: DANH SÁCH THIẾT BỊ -->
+        <div class="tab-pane" id="tabDsThietBi" :class="{active: tab_index == 1}">
+          <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Tại IDC</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.idcId"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :dataSource="idcList"
+                      placeholder="Chọn IDC"
+                      :disabled="enabledIDC"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Mảng thiết bị</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.mangTB"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :dataSource="mangTBList"
+                      @select="onChangeMangTB"
+                      placeholder="Chọn mảng thiết bị"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Hệ thống</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.heThong"
+                      :dataSource="heThongList"
+                      dataTextField="text"
+                      dataValueField="id"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Loại thiết bị</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.loaiTB"
+                      :dataSource="loaiTBList"
+                      dataTextField="text"
+                      dataValueField="id"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" v-if="isKhachHang">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Khách hàng</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="searchForm.tenKhachHang"
+                      placeholder="Nhập tên khách hàng..."
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Mã thuê bao</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="searchForm.maThueBao"
+                      placeholder="Nhập mã thuê bao..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" v-if="isKhachHang">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Mã hợp đồng</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="searchForm.maHopDong"
+                      placeholder="Nhập mã hợp đồng..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DataGrid
+            ref="grdItems"
+            :allowPaging="true"
+            :enablePagingServer="false"
+            :showColumnCheckbox="false"
+            v-bind:columns="type !== null ? [
+                  { fieldName: 'ID', headerText: 'ID thiết bị', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'TEN', headerText: 'Tên thiết bị', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'CS_DINHDANH', headerText: 'Công suất', textAlign: 'Left', width: '130px' },
+                  { fieldName: 'IDC_TEN', headerText: 'IDC', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'TOANHA', headerText: 'Tòa nhà', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left',  width: '200px'},
+                  { fieldName: 'IDC_RACK', headerText: 'Rack', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'U', headerText: 'U', textAlign: 'Left',  width: '100px'},
+                  { fieldName: 'TRANGTHAI_VH_TEN', headerText: 'Trạng thái vận hành', textAlign: 'Left',  width: '180px'},
+                  { fieldName: 'MA_TS', headerText: 'Mã tài sản', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'MA_KH', headerText: 'Mã KH', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'MA_TB', headerText: 'Mã thuê bao', textAlign: 'Left',  width: '150px'}
+                ]: [
+                  { fieldName: 'ID', headerText: 'ID thiết bị', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'TEN', headerText: 'Tên thiết bị', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'CS_DINHDANH', headerText: 'Công suất', textAlign: 'Left', width: '130px' },
+                  { fieldName: 'IDC_TEN', headerText: 'IDC', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'TOANHA', headerText: 'Tòa nhà', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left',  width: '200px'},
+                  { fieldName: 'IDC_RACK', headerText: 'Rack', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'U', headerText: 'U', textAlign: 'Left',  width: '100px'},
+                  { fieldName: 'TRANGTHAI_VH_TEN', headerText: 'Trạng thái vận hành', textAlign: 'Left',  width: '180px'},
+                  { fieldName: 'MA_TS', headerText: 'Mã tài sản', textAlign: 'Left',  width: '150px'},
+                ]"
+            :dataSource="ds_thietbi"
+            :enabledSelectFirstRow="true"
+            @selectedRowChanged="onSelectedRowChanged"
+          >
+          </DataGrid>
+        </div>
+        <!-- TAB 2: DANH SÁCH RACK -->
+        <div class="tab-pane" id="tabDsRack" :class="{active: tab_index == 2}">
+          <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Tại IDC</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.idcId"
+                      dataTextField="text"
+                      dataValueField="id"
+                      :dataSource="idcList"
+                      placeholder="Chọn IDC"
+                      :disabled="enabledIDC"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Loại rack</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.loaiRack"
+                      dataTextField="TEN"
+                      dataValueField="ID"
+                      :dataSource="loaiRackList"
+                      placeholder="Chọn loại rack"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Trạng thái vận hành</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.trangthai_vh"
+                      :dataSource="trangThaiVHList"
+                      dataTextField="TRANGTHAI_VH"
+                      dataValueField="TTVH_ID"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Trạng thái rack CCDV</div>
+                  <div class="value">
+                    <SelectExt
+                      v-model="searchForm.trangThaiRack"
+                      :dataSource="trangThaiRackList"
+                      dataTextField="TEN"
+                      dataValueField="TRANGTHAI_ID"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" v-if="isKhachHang">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Khách hàng</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="searchForm.tenKhachHang"
+                      placeholder="Nhập tên khách hàng..."
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Mã thuê bao</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="searchForm.maThueBao"
+                      placeholder="Nhập mã thuê bao..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" v-if="isKhachHang">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w180">Mã hợp đồng</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="searchForm.maHopDong"
+                      placeholder="Nhập mã hợp đồng..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DataGrid
+            ref="grdItems"
+            :allowPaging="true"
+            :enablePagingServer="false"
+            :showColumnCheckbox="false"
+            v-bind:columns="type !== null ? [
+                  { fieldName: 'RACK_ID', headerText: 'ID ', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'TEN_RACK', headerText: 'Tên Rack', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TEN_LOAIRACK', headerText: 'Loại Rack', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'VITRI_RACK', headerText: 'Vị trí Rack', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left',  width: '150px'},
+                  //{ fieldName: 'TOANHA', headerText: 'Tòa nhà', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'TEN_MATSAN', headerText: 'Mặt sàn', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'TEN_PHONG', headerText: 'Phòng/Zone', textAlign: 'Left',  width: '200px'},
+                  { fieldName: 'TRANGTHAI_VH', headerText: 'Trạng thái vận hành', textAlign: 'Left',  width: '180px'},
+                  { fieldName: 'TEN_CCDV', headerText: 'Trạng thái rack CCDV', textAlign: 'Left',  width: '180px'},
+                  { fieldName: 'MA_TS', headerText: 'Mã tài sản', textAlign: 'Left',  width: '150px'},
+                  {fieldName: 'SOHUU_RACK', headerText: 'Sở hữu', width: 100, textAlign: 'Left'},
+                  { fieldName: 'MA_KH', headerText: 'Mã KH', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'MA_TB', headerText: 'Mã thuê bao', textAlign: 'Left',  width: '150px'}
+                ]: [
+                  { fieldName: 'RACK_ID', headerText: 'ID ', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'TEN_RACK', headerText: 'Tên Rack', textAlign: 'Left', width: '180px' },
+                  { fieldName: 'TEN_LOAIRACK', headerText: 'Loại Rack', textAlign: 'Left', width: '100px' },
+                  { fieldName: 'VITRI_RACK', headerText: 'Vị trí Rack', textAlign: 'Left', width: '150px' },
+                  { fieldName: 'TEN_IDC', headerText: 'IDC', textAlign: 'Left',  width: '150px'},
+                  //{ fieldName: 'TOANHA', headerText: 'Tòa nhà', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'TEN_MATSAN', headerText: 'Mặt sàn', textAlign: 'Left',  width: '150px'},
+                  { fieldName: 'TEN_PHONG', headerText: 'Phòng/Zone', textAlign: 'Left',  width: '200px'},
+                  { fieldName: 'TRANGTHAI_VH', headerText: 'Trạng thái vận hành', textAlign: 'Left',  width: '180px'},
+                  { fieldName: 'TEN_CCDV', headerText: 'Trạng thái rack CCDV', textAlign: 'Left',  width: '180px'},
+                  { fieldName: 'MA_TS', headerText: 'Mã tài sản', textAlign: 'Left',  width: '150px'},
+                  {fieldName: 'SOHUU_RACK', headerText: 'Sở hữu', width: 100, textAlign: 'Left'},
+                ]"
+            :dataSource="ds_Rack"
+            :enabledSelectFirstRow="true"
+            @selectedRowChanged="onSelectedRowChanged"
+          >
+          </DataGrid>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

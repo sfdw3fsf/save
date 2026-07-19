@@ -1,0 +1,2 @@
+import CompleteEquipmentPurchase from './CompleteEquipmentPurchase'
+export default CompleteEquipmentPurchase

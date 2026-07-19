@@ -1,0 +1,159 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" v-on:click.prevent="LayDS" :class="{disabled : false}" title="Lấy dữ liệu thuê bao đặc biệt trong tháng">
+                    <span class="icon one-file-attach1"></span>Lấy DS
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="NhapMoi" :class="{disabled : isAddNew || dsThueBao.length <= 0}" title="Nhập mới">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li :class="{prevent : isSaving}">
+                <a href="#" v-on:click.prevent="GhiLai" title="Ghi lại">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="Huy" title="Hủy">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="Xoa" :class="{disabled : isAddNew || dsThueBao.length <= 0}" title="Xóa">
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="DocFileThem" title="Đọc file thêm TBĐB">
+                    <span class="icon one-book"></span>Đọc file thêm
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="DocFileXoa" title="Đọc file xóa TBĐB">
+                    <span class="icon one-book"></span>Đọc file xóa
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="XuatFile2" title="Xuất File">
+                    <span class="icon one-download"></span>Xuất File
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb6">
+            <div class="pull-right custom-kycuoc">
+                <app-ky-cuoc @handleChangeKyCuoc="handleKyHoaDon"></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">Thông tin thuê bao</div>
+                <div class="pull-right text-main">
+                    <span class="text-warning one-alert"></span> Các thuê bao sẽ không bị chêm trong tháng
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Số máy/Acc <span class="required">*</span></div>
+                        <div class="value">
+                            <input ref="soMay" v-model="form.soMay" type="text" class="form-control highlight"
+                                v-on:keyup.enter="getThueBao" :disabled="isType != 1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Dịch vụ</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select v-model="form.idDichVu" name="" id="" class="form-control" disabled>
+                                    <option v-for="(item, index) in danhSachDichVuVienThong" :key="index"
+                                        :value="item.DICHVUVT_ID">
+                                        {{item.TEN_DVVT}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w100">Tên TB</div>
+                        <div class="value">
+                            <input v-model="form.tenTB" type="text" class="form-control fw6" value="" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            <div class="check-action">
+                                <input v-model="form.checkNgayTH" type="checkbox" class="check">
+                                <span class="name">Ngày TH</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <!-- <div class="input-icon-right">
+                        <input type="text" class="form-control">
+                        <span class="icon one-calendar"></span>
+                    </div> -->
+                            <ejs-datepicker class="form-control bg-none bor0 fw6 text" :placeholder="waterMark"
+                                :format="dateFormat" :showClearButton="false" v-model="form.ngayTH"
+                                :enabled="form.checkNgayTH">
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            <div class="check-action">
+                                <input v-model="form.checkDenNgay" type="checkbox" class="check">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker class="form-control bg-none bor0 fw6 text" :placeholder="waterMark"
+                                :format="dateFormat" :showClearButton="false" v-model="form.denNgay"
+                                :enabled="form.checkDenNgay">
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w100">Địa chỉ lắp đặt</div>
+                        <div class="value">
+                            <input v-model="form.diaChi" type="text" class="form-control fw6" value="" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w90">Ghi chú</div>
+                <div class="value">
+                    <input v-model="form.ghiChu" type="text" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách thuê bao</div>
+            <DataGrid :columns="fields" :dataSource="dsThueBao" :showFilter="true" :showColumnCheckbox="true"
+                dataKeyField="THUEBAO_ID" @selectedItemsChanged="selectedItemsChangedMoi"
+                @rowClicked="selectedRowChangedMoi" ref="danhsach" :allowPaging="true" :enablePagingServer="false"
+                :enabledSelectFirstRow="false" :aggregates="PTAggregatesColumns"
+                :selectionSettings="{checkboxOnly: true, type: 'Multiple'}" />
+        </div>
+        <PopupDocFileThem :kyCuoc="kyCuoc" @sendData="sendData" />
+        <PopupDocFileXoa :kyCuoc="kyCuoc" @sendData="sendData" />
+        <appModalXuatDuLieu id="modal-xuat-dulieu" :thuocTinh="dsThuocTinh" :data="dsThueBao"/>
+    </div>
+</div>

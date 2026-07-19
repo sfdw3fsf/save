@@ -1,0 +1,84 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onViewAll">
+          <span class="icon one-eye"></span>Xem toàn bộ mặt sàn
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onZoomIn" :class="{ disabled: isZoomInDisabled }">
+          <i class="fa fa-search-plus"></i> Phóng to
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onZoomOut" :class="{ disabled: isZoomOutDisabled }">
+          <i class="fa fa-search-minus"></i> Thu nhỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onReset">
+          <span class="icon one-refresh"></span> Đặt lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onAddNewMatsan">
+          <span class="icon one-file-plus"></span> Nhập mới Mặt sàn
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onEditMatsan">
+          <span class="icon one-edit"></span> Chỉnh sửa Mặt sàn
+        </b-link> 
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <div class="diagram-workspace">
+      <div class="left-panel">
+        <div class="panel-body">
+          <ejs-symbolpalette id="symbolpalette" ref="symbolpalette" :expandMode="'Multiple'" :palettes="palettes"
+            :width="'100%'" :height="'100%'" :symbolHeight="80" :symbolWidth="100"
+            :symbolMargin="{ left: 10, right: 10, top: 10, bottom: 10 }" :getNodeDefaults="getNodeDefaults"
+            :getSymbolInfo="getSymbolInfo"></ejs-symbolpalette>
+        </div>
+      </div>
+      <div class="right-panel">
+        <div class="diagram-container">
+          <div v-if="!isFloorDataLoaded"
+            style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
+            <div style="text-align: center;">
+              <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+              <div>Đang tải thông tin mặt sàn...</div>
+            </div>
+          </div>
+          <ejs-diagram v-if="isFloorDataLoaded" id="diagram" ref="diagramObj" :width="'100%'" :height="'100%'" :tool="7"
+            :snapSettings="snapSettings" :scrollSettings="scrollSettings" :pageSettings="pageSettings"
+            :selectedItems="selectedItems" :contextMenuSettings="contextMenuSettings" :commandManager="commandManager"
+            :getNodeDefaults="getDiagramNodeDefaults" :drop="onDrop" :positionChange="onPositionChange"
+            :dragging="onDragging" :contextMenuOpen="onContextMenuOpen" 
+            :contextMenuClick="onContextMenuClick" :scrollChange="onScrollChange"></ejs-diagram>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <room-detail-modal ref="roomDetailModal" :roomDetail="selectedRoomDetail" @close="onModalClose" />
+
+  <draw-polygon-modal ref="drawPolygonModal" :floorWidth="floorWidth" :floorHeight="floorHeight"
+    @confirm="onPolygonDrawingConfirmed" @cancel="onPolygonDrawingCancelled" />
+
+  <view-all-elements-modal ref="viewAllElementsModal" />
+
+  <b-modal v-model="showEditModal" :title="modalTitle" size="xl" hide-footer @hidden="handleModalClose"
+    modal-class="modal-edit-matsan">
+    <FormMatSan v-if="showEditModal" :key="'edit-modal-' + modalComponentKey" :itemId="selectedMatsanId" :itemType="'ZONE'"
+      :mode="modalMode" @saveSuccessed="handleModalSave" @cancelSave="handleModalClose" />
+  </b-modal>
+</div>

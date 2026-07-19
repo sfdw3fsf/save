@@ -1,0 +1,116 @@
+<div>
+  <div class="page">
+    <div :class="{
+        'hidden': !nodeSelected.attributes.type || ['none'].includes(nodeSelected.attributes.type),
+        'px-2 row pt-4': nodeSelected.attributes.type && !['none'].includes(nodeSelected.attributes.type),
+        'padding-top-4': hasListActionsTop,
+      }">
+      
+      <div class="col-sm-2 col-12">
+        <!-- Cây hạ tầng ở phần dưới -->
+        <div class="sodo-hatang">
+          <div class="legend-title">Sơ đồ hạ tầng và thiết bị</div>
+          <CayHaTang ref="caySoDoThietBi" @nodeSelected="cayHaTang_nodeSelected" :loadDataWhenCreate="true"> </CayHaTang>
+        </div>
+      </div>
+      <div class="col-sm-10 col-12">
+        <template v-if="nodeSelected.attributes.type === 'none'">
+          <!-- Map hiển thị large khi chưa chọn node -->
+        </template>
+        <template v-else>
+          <div class="list-actions-top">
+            <ul class="list">
+              <li>
+                <b-link href="javascript:void(0)" @click="onAddNewItemClick"> <span class="icon one-file-plus"></span> {{getNewItemLabel()}}</b-link>
+              </li>
+              <li>
+                <b-link href="javascript:void(0)" @click="onEditItemClick"> <span class="icon one-edit"></span> {{getEditItemLabel()}}</b-link>
+              </li>
+              <li v-if="canAddChild">
+                <b-link href="javascript:void(0)" @click="onAddChildClick"> <span class="icon one-file-plus"></span> {{addChildButtonLabel}}</b-link>
+              </li>
+              <!-- Export button for Mat San (Floor) and Phong/Zone (Room/Zone) -->
+              <li v-if="nodeSelected.attributes.type == 'MATSAN' || nodeSelected.attributes.type === 'ZONE'">
+                <b-link href="javascript:void(0)" @click="onExportClick"> <span class="icon one-download"></span> Export</b-link>
+              </li>
+            </ul>
+          </div>
+          <component :is="currentComponent" ref="dynamicComponent" :modalItemID="nodeSelected.attributes.id"
+          :id="nodeSelected.attributes.id"
+            :parentId="nodeSelected.parentId"
+            :key="nodeSelected.attributes.type + '-' + nodeSelected.id + '-' + componentKey" @error="handleError"
+            @loading="isLoading = $event"
+            @view-toanha-detail="handleViewToaNhaDetail"
+            @view-matsan-detail="handleViewMatSanDetail"
+            @view-rack-detail="handleViewRackDetail"
+            @selectObjectTaiNguyen="handleSelectObjectTaiNguyen">
+          </component>
+        </template>
+      </div>
+    </div>
+    
+    <div v-if="isMapLarge" class="map-container map-large">
+      <div class="col-6">
+        <VietNamMap ref="vietnamMap" :idc-list="idcList" :is-map-large="isMapLarge" @markers-cleared="onMarkersCleared"
+            @marker-mode-toggled="onMarkerModeToggled" @idc-details-clicked="onIdcDetailsClicked"
+            @edit-marker="onIdcEditClicked" />
+      </div>
+      <!-- IDC list panel -->
+      <div class="idc-list-panel col-6 pt-3">
+        <DanhSachIDC v-if="isMapLarge" :items="idcList" @idc-details-clicked="onIdcDetailsClicked($event)" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Thêm mới động -->
+  <b-modal
+    v-model="showAddModal"
+    :title="modalTitle"
+    size="xl"
+    hide-footer
+    @hidden="handleModalClose"
+    modal-class="modal-add-tainguyen"
+  > 
+    <component
+      v-if="modalComponent && showAddModal"
+      :is="modalComponent"
+      :key="'modal-' + nodeSelected.attributes.type + '-' + modalComponentKey"
+      :parentId="nodeSelected.attributes.parentID"
+      :parentType="nodeSelected.attributes.parentType"
+      :itemId="nodeSelected.attributes.id"
+      :itemType="nodeSelected.attributes.type"
+      :mode="modalMode"
+      @saveSuccessed="handleModalSave"
+      @cancelSave="handleModalClose"
+    />
+    <div v-else class="text-center p-4">
+      <p class="text-muted">Không tìm thấy form tương ứng</p>
+    </div>
+  </b-modal>
+
+  <!-- Modal Thêm mới con (Child) -->
+  <b-modal
+    v-model="showAddChildModal"
+    :title="modalChildTitle"
+    size="xl"
+    hide-footer
+    @hidden="handleModalChildClose"
+    modal-class="modal-add-tainguyen"
+  > 
+    <component
+      v-if="modalChildComponent && showAddChildModal"
+      :is="modalChildComponent"
+      :key="'modal-child-' + childType + '-' + modalChildComponentKey"
+      :parentId="nodeSelected.attributes.id"
+      :parentType="nodeSelected.attributes.type"
+      :itemId="null"
+      :itemType="childType"
+      :mode="modalChildMode"
+      @saveSuccessed="handleModalChildSave"
+      @cancelSave="handleModalChildClose"
+    />
+    <div v-else class="text-center p-4">
+      <p class="text-muted">Không tìm thấy form tương ứng</p>
+    </div>
+  </b-modal>
+</div>

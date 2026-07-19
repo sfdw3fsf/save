@@ -1,0 +1,203 @@
+<div>
+
+    <!-- Form -->
+    <div class="list-actions-top">
+        <ul class="list">
+            <li @click="tsbtnLayTT_Click">
+                <a>
+                    <span class="icon one-file-attach"></span>Lấy TT
+                </a>
+            </li>
+            <li :class="{ disabledInput: !Enabled.tsbtnThemmoi }" @click="tsbtnThemmoi_Click">
+                <a>
+                    <span class="icon  one-file-plus"></span> Thêm mới
+                </a>
+            </li>
+            <li :class="{ disabledInput: !Enabled.tsbtnCapNhat }" @click="tsbtnSave_Click">
+                <a>
+                    <span class="icon  one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li :class="{ disabledInput: !Enabled.tsbtnHuy }" @click="tsbtnHuy_Click">
+                <a>
+                    <span class="icon  nc-icon-glyph ui-1_circle-remove"></span> Hủy bỏ
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        Thông tin Serial GP
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Chứng từ <span class="required">*</span></div>
+
+                                <div class="input-more-button -left">
+                                    <button class="btn" @click="btnTraCuuCT_Click">
+                                        <span class="-ap icon-more_horiz"></span>
+
+                                    </button>
+                                    <div class="info-row">
+                                        <input type="text" class="form-control" v-model="txtChungTu" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Serial GP cũ <span class="required">*</span></div>
+                                <div class="value">
+                                    <div class="info-row">
+                                        <input type="text" class="form-control" v-model="txtCu" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Serial GP mới <span class="required">*</span></div>
+                                <div class="value">
+                                    <div class="info-row">
+                                        <input type="text" class="form-control" v-model="txtMoi" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend-title">
+                        Lịch sử sửa đổi Serial GP
+                    </div>
+                    <div class="table-content">
+
+                        <DataGrid ref="gridLichSu" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: 'SERIAL_GP_CU', headerText: 'Serial_GP cũ', allowFiltering: true, allowSorting: true },
+                            {fieldName: 'SERIAL_GP_MOI', headerText: 'Serial_GP mới', allowFiltering: true, allowSorting: true, }, 
+                            {fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true, allowSorting: true,}, 
+                            {fieldName: 'NGAY_CN', headerText: 'Ngày CN', allowFiltering: true, allowSorting: true, },       
+                            ]" v-bind:dataSource="DSLichSu" :showFilter="true"
+                            @selectedRowChanged="gridLichSuSelectRow" :allowPaging="true" :enablePagingServer="false">
+                        </DataGrid>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        Xem ảnh
+                    </div>
+                    <div class="row">
+                        <div class="key" style="width:110px">Upload ảnh <span class="required">*</span></div>
+                        <div class="value" style="width:40px">
+                            <div class="input-more-button -left">
+                                <button class="btn" @click="chooseFile">
+                                    <span class="-ap icon-more_horiz"></span>
+                                    <b-form-file v-show="false" ref="ref-choose-file" @change="onChangeFile"
+                                        accept=".jpg, .jpeg, .jpe, .jfif, .png"></b-form-file>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="value" style="width:50px">
+                            <div class="input-more-button -left">
+                                <button class="btn" @click="showTools">
+                                    <span class="one-search"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="box-form">
+                    <div class="row">
+                        <div :class="boxImgMain">
+                            <div class="info-row" v-if="isShowToolsImg">
+                                <div class="key nowrap actions-icon-btn padt0">
+                                    <button class="btn btn-main" @click="scalePlus()">
+                                        <span class="nc-icon-outline ui-1_zoom-in"></span>
+                                    </button>
+                                    <button class="btn btn-main" @click="scaleMinus()">
+                                        <span class="nc-icon-outline ui-1_zoom-out"></span>
+                                    </button>
+                                    <button class="btn btn-main" @click="scaleNone()">
+                                        <span class="nc-icon-outline ui-1_zoom"></span>
+                                    </button>
+                                    <button class="btn btn-main" @click="rotateLeft()">
+                                        <span class="one-reload-back"></span>
+                                    </button>
+                                    <button class="btn btn-main" @click="rotateRight()">
+                                        <span class="one-reload-next"></span>
+                                    </button>
+
+                                    <button class="btn btn-main" @click="hiddenPreview()">
+                                        <span class="nc-icon-outline design_image"></span>
+                                    </button>
+                                    <button class="btn btn-main" @click="downloadImg()">
+                                        <span class="nc-icon-outline media-1_camera-20"></span>
+                                    </button>
+                                </div>
+                                <div class="value w90">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" @change=""
+                                            v-model="cssImg.widthMainImg">
+                                            <option v-for="width in listWidth" v-bind:value="width">
+                                                {{width}}%</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="image-canvas" style="overflow: scroll;">
+                                <img id="ImgPreview1" alt="" :src="srcImg"
+                                    v-bind:style="{ width: cssImg.widthMainImg + '%' , transform: 'rotate(' + cssImg.rotate + 'deg)' }"
+                                    class="fullw">
+                            </div>
+                        </div>
+                        <div :class="boxImgPreview" style="border-left: 1px solid #e0e0e0" v-if="isShowToolsImg">
+                            <div class="title-bg-main" v-if="!isHiddenPreview">
+                                <span class="title">Xem trước</span>
+                            </div>
+                            <div class="image-canvas" v-if="!isHiddenPreview">
+                                <img id="ImgPreview2" :src="srcImg" alt="" style="width: 100%">
+                            </div>
+
+                            <div class="title-bg-main mart10 padt5 padb5">
+                                <div class="pull-left mart5 title">
+                                    Danh sách ảnh
+                                </div>
+                                <div class="pull-right">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="cssImg.widthImg">
+                                            <option v-bind:value="25">Nhỏ</option>
+                                            <option v-bind:value="50">TB</option>
+                                            <option v-bind:value="75">Lớn</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="image-canvas">
+                                <div class="list-image">
+                                    <div class="item marb10">
+                                        <img id="ImgPreview3" :src="srcImg" alt=""
+                                            v-bind:style="{ width: cssImg.widthImg + '%'}">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ejs-dialog :visible='false' ref="popupTraCuuChungTu" :animationSettings='animationSettings' :showCloseIcon=true
+        :enableResize=true :allowDragging=true width='80%' height="80%" :isModal='true' :close='XacNhan_TraCuuChungTu'
+        :closeOnEscape='true' header='<div class="main-title">Tra cứu chứng từ</div>'>
+        <TraCuuChungTu ref="frmTraCuuChungTu" class=""></TraCuuChungTu>
+    </ejs-dialog>
+</div>

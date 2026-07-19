@@ -1,0 +1,263 @@
+<div class="modal-content popup-box">
+    <div class="popup-header">
+        <div class="title"><span class="icon one-notepad"></span> Cập nhật nhật ký</div>
+        <div class="close -ap icon-close" data-dismiss="modal" @click="onClose">
+        </div>
+    </div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" v-on:click.prevent="onClickAddNew" title="Thêm mới">
+                    <span class="icon nc-icon-glyph ui-1_circle-add"></span>Thêm mới
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="onClickUpdate" title="Sửa">
+                    <span class="icon nc-icon-glyph ui-1_edit-74"></span>Sửa
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="onClickDelete" title="Xóa">
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="onClickUpload"
+                    title="Cấu trúc file gồm MA_TT,NGAY,HTDD_ID,LYDO_ID,NOI_DUNG,KET_QUA,DE_XUAT,GHI_CHU">
+                    <span class="icon one-upload"></span>Đọc File
+                </a>
+
+            </li>
+
+            <li>
+                <a href="#" v-on:click.prevent="onClickDownload" title="Export">
+                    <span class="icon one-download"></span>Xuất file
+                </a>
+
+            </li>
+
+
+        </ul>
+    </div>
+    <div class="popup-body">
+        <input type="file" @change="changPathFile" accept=".xlsx, .xls" ref="docfile" id="docfile"
+            style="display: none" />
+        <div class="box-form">
+            <div class="legend-title">
+                Thông tin cập nhật
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Mã TT</div>
+                        <div class="value">
+                            <input type="text" v-model="formData.MA_TT" class="form-control highlight">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Ký HĐ</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select v-model="kyHDId" @change="getChuKyNoByKyHD()" class="form-control">
+                                    <option v-for="item in kyHD" v-bind:value="item.ID">{{item.CHUKYNO}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Chu kỳ</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select v-model="chuKyId" class="form-control">
+                                    <option v-for="item in chuKy" v-bind:value="item.CHUKY">{{item.CHUKY}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Tên TT</div>
+                        <div class="value">
+                            <input type="text" v-model="formData.TEN_TT" disabled class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Địa chỉ TT</div>
+                        <div class="value">
+                            <input type="text" v-model="formData.DIACHI_TT" disabled class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Số ĐT</div>
+                        <div class="value">
+                            <input type="text" v-model="formData.SO_DT" disabled class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Mã tuyến</div>
+                        <div class="value">
+                            <input type="text" v-model="formData.MA_TUYEN" disabled class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80"> Tiền nợ</div>
+                        <div class="value">
+                            <input type="text" v-model="formData.TIENNO" disabled class="form-control tright" value="0">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Lý do</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select v-model="formUpdate.lyDoId" class="form-control">
+                                    <option v-for="ld in lyDo" v-bind:value="ld.LYDOTRA_ID">{{ld.NOIDUNG}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Ngày đến</div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24"
+                                    :placeholder="'Nhập ngày'" :format="'dd/MM/yyyy'" :showClearButton="false"
+                                    v-model="formUpdate.ngayDen">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Hình thức</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select v-model="formUpdate.hinhThucId" class="form-control">
+                                    <option v-for="ht in hinhThuc" v-bind:value="ht.HTKN_ID">{{ht.HINHTHUC_KN}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">ND đôn đốc</div>
+                        <div class="value">
+                            <input type="text" v-model="formUpdate.noiDung" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Kết quả</div>
+                        <div class="value">
+                            <input type="text" v-model="formUpdate.ketQua" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Đề xuất</div>
+                        <div class="value">
+                            <input type="text" v-model="formUpdate.deXuat" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="info-row">
+                        <div class="key w80">Ghi chú</div>
+                        <div class="value">
+                            <input type="text" v-model="formUpdate.ghiChu" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left mart7">Danh sách file đính kèm</div>
+                <div class="pull-right">
+                    <a href="#" v-on:click.prevent="onClickAddNewRow">
+                        <span class="icon nc-icon-glyph ui-1_circle-add"></span>
+                    </a>
+                    <!-- <input type="button" class="icon nc-icon-glyph ui-1_circle-add"> -->
+                    <input type="file" @change="onChangeFileUpload" ref="fileInput" id="upload" style="display: none" />
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="table-content">
+                <DataGrid v-bind:columns="[
+                            {fieldName: 'ID_FILE', headerText: 'STT', allowFiltering: false, allowSorting: false,allowEditing: false, width:60},
+                            {fieldName: 'TEN_FILE', headerText: 'Tiêu đề', allowFiltering: false, allowSorting: false,allowEditing: false },
+                            {fieldName: 'FILE_PATH', headerText: 'File', allowFiltering: false, allowSorting: false},
+                            {fieldName: 'NGUOI_CN', headerText: 'Người tạo', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'NGAY_CN', headerText: 'Ngày tạo', allowFiltering: true, allowSorting: false},
+                            {fieldName: '', headerText: 'Thao tác', allowFiltering: true, allowSorting: false,template: getColumnTemplateThaoTac(this),width:100},
+                            ]" v-bind:dataSource="dsNKFile" :showFilter="false" :showColumnCheckbox="false"
+                    :defaultColumnCheckboxChecked="false" :allowPaging="false" @selectedRowChanged="onSelectRowGridFile"
+                    ref="table1">
+                </DataGrid>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                Danh sách các lần đôn đốc
+            </div>
+            <div class="table-content">
+                <DataGrid2 v-bind:columns="[
+                    {fieldName: 'LANTHU', headerText: 'Lần đến thứ', allowFiltering: false, allowSorting: false},
+                    {fieldName: 'NGAYDEN_CONVERT', headerText: 'Ngày đôn đốc', allowFiltering: true, allowSorting: false},
+                    {fieldName: 'LYDO', headerText: 'Lý do', allowFiltering: true, allowSorting: false},
+                    {fieldName: 'HINHTHUC', headerText: 'Hình thức', allowFiltering: true, allowSorting: false},
+                    {fieldName: 'NOIDUNG', headerText: 'Nội dung', allowFiltering: true, allowSorting: false},
+                    {fieldName: 'KETQUA', headerText: 'Kết quả', allowFiltering: true, allowSorting: false},
+                    {fieldName: 'DEXUAT', headerText: 'Đề xuất', allowFiltering: true, allowSorting: false},
+                    ]" v-bind:dataSource="dsNK" :showFilter="false" :showColumnCheckbox="false"
+                    :defaultColumnCheckboxChecked="false" @selectedRowChanged="onSelectRowGrid" ref="table">
+                </DataGrid2>
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-export-nhatky" hide-footer modal-class="modal-export" title="Xuất dữ liệu" no-close-on-backdrop
+        size="lg">
+        <div>
+            <div>
+                <ModalExport :data="dataExport" :columnsIn="columnsExport"></ModalExport>
+            </div>
+        </div>
+    </b-modal>
+</div>

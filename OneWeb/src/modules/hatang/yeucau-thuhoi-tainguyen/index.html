@@ -1,0 +1,540 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" @click="onAddNew" :disabled="!buttons.btnAddNew.enabled">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave" :disabled="!buttons.btnSave.enabled">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onCancel" :disabled="!buttons.btnCancel.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onEdit" :disabled="!buttons.btnEdit.enabled">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onDelete" :disabled="!buttons.btnDelete.enabled">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onThucHien" :disabled="!buttons.btnThucHien.enabled">
+          <span class="icon one-file-arrow-right"></span>Gửi yêu cầu</b-link
+        >
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin chung</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Số phiếu</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :disabled=true
+                    v-model="currentItem.ten"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Sở cứ thu hồi<span class="red">*</span></div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :disabled="!controls.txtTen.enabled"
+                    v-model="currentItem.socu"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Trạng thái yêu cầu</div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="dsTrangThaiYeuCau"
+                    dataTextField="TEN"
+                    dataValueField="ID"
+                    :disabled=true
+                    v-model="currentItem.trangThaiYeuCauId"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Sản phẩm dịch vụ<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="dsSPDV"
+                    @change="onChangeSPDV()"
+                    dataTextField="TENNOIBO"
+                    dataValueField="ID"
+                    :disabled="!controls.txtMaHaTang.enabled"
+                    v-model="currentItem.sanPhamDichVuId"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Đơn vị yêu cầu</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :disabled="!controls.txtMaHaTang.enabled"
+                    v-model="currentItem.donvi_yeucau"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Tên SPDV</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :disabled="!controls.txtMaHaTang.enabled"
+                    v-model="currentItem.tenSPDV"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Người gửi</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :disabled="!controls.txtMaHaTang.enabled"
+                    v-model="currentItem.nguoiGoi"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Cụm dịch vụ</div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="dsCumDV"
+                    dataTextField="TEN"
+                    dataValueField="ID"
+                    :disabled="!controls.txtMaHaTang.enabled"
+                    v-model="currentItem.cumDichVuId"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key w150">Ngày gửi</div>
+                <div class="value">
+                  <ejs-datepicker
+                    :enabled="controls.txtMaHaTang.enabled"
+                    v-model="currentItem.ngayGoi"
+                    :format="'dd/MM/y'"
+                    :allowEdit="true"
+                    :showClearButton="false"
+                    ref="ngayGoi"
+                    class="form-control bg-none bor0 fw6"
+                 
+                  >
+                  </ejs-datepicker>
+                </div>
+
+                <!-- <div class="value">
+                    <input type="text" class="form-control" :disabled="!controls.txtMaHaTang.enabled" v-model="currentItem.ngayGoi" />
+                  </div> -->
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key w150">Ngày hoàn thành</div>
+                <div class="value">
+                  <ejs-datepicker
+                    :enabled="controls.txtNgayHoanThanh.enabled"
+                    v-model="currentItem.ngayHoanThanh"
+                    :format="'dd/MM/y'"
+                    :allowEdit="true"
+                    :showClearButton="false"
+                    ref="ngayHoanThanh"
+                    class="form-control bg-none bor0 fw6"
+
+                  >
+                  </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="info-row">
+                <div class="key w150">Ngày bắt đầu thu hồi</div>
+                <div class="value">
+                  <ejs-datepicker
+                    :enabled="controls.txtMaHaTang.enabled"
+                    v-model="currentItem.ngayBatDauThuHoi"
+                    :format="'dd/MM/y'"
+                    :allowEdit="true"
+                    :showClearButton="false"
+                    ref="ngayBatDauThuHoi"
+                    class="form-control bg-none bor0 fw6"
+                  >
+                  </ejs-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 col-12">
+              <div class="info-row pointer-events" style="display: inline-flex; align-items: left;;">
+                <a style="display: block; font-weight: 300;padding-top: 8px;color: #007bff;"
+                  @click.prevent="triggerFileInput" >
+                  <span class="icon one-book">
+                    File đính kèm
+                  </span>
+                </a>
+                <a v-if="fileName || currentItem.urlFile" style="padding-top: 8px;color: #007bff; padding-left: 40px;"
+                  @click.prevent="downloadFile()">
+                 <span  class="icon one-download">Tải file </span>
+                </a>
+                <!-- <span v-if="currentItem.tenfile" style="padding-left: 10px; font-weight: bold; color:  #007bff;">
+                  {{ currentItem.tenfile }} // Đưa tên file lên để người dùng biết đang tải file nào
+                </span> -->
+                <input ref="fileInput" type="file" id="upload"  class="hidden" @change="onChangeFile" />
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w150">Ghi chú</div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                :disabled="!controls.txtGhiChu.enabled"
+                v-model="currentItem.ghiChu"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Xác nhận thu hồi-->
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title">Xác nhận thu hồi</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Ý kiến xác nhận <span class="red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" :disabled="true" v-model="currentItem.yKienXacNhan" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Ngắt tài nguyên</div>
+              <div class="value">
+                <input type="text" class="form-control" :disabled="true" v-model="currentItem.ngatTaiNguyen" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end  Xác nhận thu hồi -->
+      <!-- Thực hiện thu hồi-->
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title">Thực hiện thu hồi</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w180">Ý kiến thực hiện thu hồi máy ảo <span class="red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" :disabled="true" v-model="currentItem.yKienThuHoi" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Trạng thái thu hồi IP</div>
+              <div class="value">
+                <input type="text" class="form-control" :disabled="true" v-model="currentItem.trangThaiThuHoi" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w180">Ý kiến thực hiện thu hồi backup</div>
+          <div class="value">
+            <input type="text" class="form-control" :disabled="true" v-model="currentItem.yKienThuHoiBacKup" />
+          </div>
+        </div>
+      </div>
+      <!-- end  Thực hiện thu hồi -->
+    </div>
+    <div class="box-form">
+      <div class="row">
+        <div class="legend-title">Thông tin yêu cầu thu hồi</div>
+      </div>
+      <!-- Danh sách TAB  -->
+      <div class="row">
+        <div class="">
+          <div class="nav tabs tab-over">
+            <a href="#tab1" data-toggle="tab" :class="{active: currentTab===1}" @click="setCurrentTab(1)">Ảo hóa </a>
+
+            <a href="#tab2" data-toggle="tab" :class="{active: currentTab===2}" @click="setCurrentTab(2)"
+              >Container - K8s</a
+            >
+
+            <a href="#tab3" data-toggle="tab" :class="{active: currentTab===3}" @click="setCurrentTab(3)">IDG</a>
+
+            <a href="#tab4" data-toggle="tab" :class="{active: currentTab===4}" @click="setCurrentTab(4)">Backup</a>
+            <button
+              class="btn btn-sm btn-primary ml-2"
+              @click="openModal(currentTab)"
+              :disabled="!controls.txtTen.enabled"
+            >
+              +
+            </button>
+          </div>
+
+          <div class="tab-content">
+            <!-- tab Ảo hóa -->
+            <div class="tab-pane" id="tab1" :class="{active: currentTab===1}">
+              <div class="row">
+                <DataGrid
+                  :columns="colsAoHoa"
+                  :dataSource="dsAoHoa"
+                  :showColumnCheckbox="true"
+                  :showFilter="true"
+                  ref="grdAoHoa"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  v-bind:commands="[
+                    {name: 'XOAAOHOA', cssClass: 'btn-primary fa fa-trash-o', width: 20, disabled: !controls.txtTen.enabled }
+                    ]"
+                v-bind:commandColumn="{headerText: 'Thao tác', textAlign: 'Left', show: true}"
+                @commandClicked="grid_onCommandClicked"
+                >
+                </DataGrid>
+              </div>
+            </div>
+            <!-- tab ContainerK8 -->
+            <div class="tab-pane" id="tab2" :class="{active: currentTab===2}">
+              <div class="box-form">
+                <div class="row">
+                  <DataGrid
+                    :columns="colsContainerK8"
+                    :dataSource="dsContainerK8"
+                    :showColumnCheckbox="true"
+                    :showFilter="true"
+                    ref="grdContainerK8"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    v-bind:commands="[
+                    {name: 'XOAK8', cssClass: 'btn-primary fa fa-trash-o', width: 20, disabled: !controls.txtTen.enabled }
+                    ]"
+                v-bind:commandColumn="{headerText: 'Thao tác', textAlign: 'Left', show: true}"
+                @commandClicked="grid_onCommandClicked"
+                >
+                  >
+                  </DataGrid>
+                </div>
+              </div>
+            </div>
+            <!-- tab IDG -->
+            <div class="tab-pane" id="tab3" :class="{active: currentTab==3}">
+              <div class="box-form">
+                <div class="row">
+                  <DataGrid
+                    :columns="colsIDG"
+                    :dataSource="dsIDG"
+                    :showColumnCheckbox="true"
+                    :showFilter="true"
+                    ref="grdIDG"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    v-bind:commands="[
+                    {name: 'XOAIDG', cssClass: 'btn-primary fa fa-trash-o', width: 20, disabled: !controls.txtTen.enabled }
+                    ]"
+                v-bind:commandColumn="{headerText: 'Thao tác', textAlign: 'Left', show: true}"
+                @commandClicked="grid_onCommandClicked"
+                >
+                  >
+                  </DataGrid>
+                </div>
+              </div>
+            </div>
+            <!-- tab thu hôi -->
+            <div class="tab-pane" id="tab4" :class="{active: currentTab==4}">
+              <div class="box-form">
+                <div class="row">
+                  <DataGrid
+                    :columns="colsBackup"
+                    :dataSource="dsBackup"
+                    :showColumnCheckbox="true"
+                    :showFilter="true"
+                    ref="grdBackup"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    v-bind:commands="[
+                    {name: 'XOABACKUP', cssClass: 'btn-primary fa fa-trash-o', width: 20, disabled: !controls.txtTen.enabled }
+                    ]"
+                v-bind:commandColumn="{headerText: 'Thao tác', textAlign: 'Left', show: true}"
+                @commandClicked="grid_onCommandClicked"
+                >
+                  >
+                  </DataGrid>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danh sách ZONE -->
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách Yêu cầu thu hồi</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <DataGrid
+                ref="grdItems"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :showColumnCheckbox="false"
+                v-bind:columns="[
+                            {fieldName: 'STT', headerText: 'STT', textAlign: 'Left'},
+                            {fieldName: 'TEN', headerText: 'Số phiếu', textAlign: 'Left'},
+                            {fieldName: 'DONVI_YC', headerText: 'Đơn vị yêu cầu', textAlign: 'Left'},
+                            {fieldName: 'NGAY_GOI', headerText: 'Ngày gửi', textAlign: 'Left'},
+                            {fieldName: 'NGUOI_GOI', headerText: 'Người gửi', textAlign: 'Left'},
+                            {fieldName: 'MUCDICH_SD', headerText: 'Mục đích sử dụng', textAlign: 'Left'},
+                            {fieldName: 'SPDV', headerText: 'Sản phẩm dịch vụ', textAlign: 'Left'},
+                            {fieldName: 'TEN_SPDV', headerText: 'Tên sản phẩm dịch vụ', textAlign: 'Left'},
+                            {fieldName: 'HATANG_MANG', headerText: 'Hạ tầng mạng', textAlign: 'Left'},
+                            {fieldName: 'TRANGTHAI_YEUCAU', headerText: 'Trạng thái yêu cầu', textAlign: 'Left'}
+                            
+                            ]"
+                v-bind:dataSource="danhSachYeuCau"
+                @rowSelected="grdItems_RowSelected"
+                @rowDeselected="grdItems_RowDeselected"
+              >
+                >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <b-modal id="addModal" v-model="isModalOpen" :title="modalTitle" size ="xl">
+    <div>
+      <!-- Nội dung modal -->
+      <div v-if="currentTab === 1">
+        <div class="legend-title">Danh sách Ảo hóa All</div>
+        <div class="row">
+          <DataGrid
+            ref="grdAoHoaAll"
+            :columns="colsAoHoaAll"
+            :dataSource="dsAoHoaAll"
+            :showColumnCheckbox="true"
+            :showFilter="true"
+            :allowPaging="true"
+            :enablePagingServer="false"
+          >
+          </DataGrid>
+        </div>
+      </div>
+  
+      <div v-if="currentTab === 2">
+        <div class="legend-title">Danh sách Container - K8s All</div>
+        <div class="row">
+          <DataGrid
+            ref="grdContainerK8All"
+            :columns="colsContainerK8"
+            :dataSource="dsContainerK8All"
+            :showColumnCheckbox="true"
+            :showFilter="true"
+            :allowPaging="true"
+            :enablePagingServer="false"
+          >
+          </DataGrid>
+        </div>
+      </div>
+  
+      <div v-if="currentTab === 3">
+        <div class="legend-title">Danh sách IDG All</div>
+        <div class="row">
+          <DataGrid
+            ref="grdIDGAll"
+            :columns="colsIDGAll"
+            :dataSource="dsIDGAll"
+            :showColumnCheckbox="true"
+            :showFilter="true"
+            :allowPaging="true"
+            :enablePagingServer="false"
+          >
+          </DataGrid>
+        </div>
+      </div>
+  
+      <div v-if="currentTab === 4">
+        <div class="legend-title">Danh sách Backup All</div>
+        <div class="row">
+          <DataGrid
+            ref="grdBackupAll"
+            :columns="colsBackup"
+            :dataSource="dsBackupAll"
+            :showColumnCheckbox="true"
+            :showFilter="true"
+            :allowPaging="true"
+            :enablePagingServer="false"
+          >
+          </DataGrid>
+        </div>
+      </div>
+    </div>
+  
+    <template #modal-footer>
+      <button class="btn btn-secondary" @click="closeModal">Đóng</button>
+      <button class="btn btn-primary" @click="saveModal">Lưu</button>
+    </template>
+  </b-modal>
+</div>

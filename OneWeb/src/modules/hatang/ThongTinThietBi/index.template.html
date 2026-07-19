@@ -1,0 +1,528 @@
+<div>
+  <div class="list-actions-top" v-show="!isViewOnly">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnNew.enabled" @click="onNewClick">
+          <span class="icon one-file-plus"></span>Nhập mới</b-link
+        >
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnSave.enabled" @click="onSaveClick">
+          <span class="icon one-save"></span>Ghi lại</b-link
+        >
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onCancelClick" :disabled="!buttons.btnCancel.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnEdit.enabled" @click="onEditClick">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa</b-link
+        >
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnDelete.enabled" @click="onDeleteClick">
+          <span class="icon one-trash"></span>Xóa</b-link
+        >
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <!-- Thông tin chung -->
+          <div class="row">
+            <div class="col-12">
+              <div class="legend-title">Thông tin chung</div>
+            </div>
+            <div class="col-6">
+              <div class="info-row">
+                <div class="key w150">Mã thiết bị</div>
+                <div class="value">
+                  <input type="text" class="form-control" disabled v-model="currentItem.mathietbi" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Tên thiết bị<span class="red">*</span></div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.ten"
+                    :disabled="!thongTinChungControls.txt_ten.enabled"
+                    :class="{'is-invalid': thongTinChungControls.txt_ten.invalid}"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Ký hiệu TB</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.kyhieu"
+                    :disabled="!thongTinChungControls.txt_kyhieu.enabled"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Mã TB CĐS ĐHIT</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.mathietbi_infra"
+                    :disabled="!thongTinChungControls.txt_mathietbi_infra.enabled"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Thiết bị cha</div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="parentDeviceList"
+                    dataTextField="ten"
+                    dataValueField="id"
+                    v-model="currentItem.thietbicha_id"
+                    :disabled="!thongTinChungControls.select_thietbicha_id.enabled"
+                  />
+                </div>
+              </div>
+              <!-- Show khi loại thiết bị là tử đĩa -->
+              <div v-show="isDiskShelf" class="info-row">
+                <div class="key w150">Loại tủ đĩa<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="discTypeList"
+                    dataTextField="TEN"
+                    dataValueField="ID"
+                    v-model="currentItem.loaitudia_id"
+                    :disabled="!thongTinChungControls.select_loaitudia_id.enabled"
+                    :class="{invalidBox: this.thongTinChungControls.select_loaitudia_id.invalid}"
+                  />
+                </div>
+              </div>
+              <!-- Show khi loại thiết bị là thiết bị mạng -->
+              <div v-show="isNetwork" class="info-row">
+                <div class="key w150">Chủng loại thiết bị<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="equipmentCategoryList"
+                    dataTextField="MODEL"
+                    dataValueField="ID"
+                    v-model="currentItem.chungloaithietbi_id"
+                    :disabled="!thongTinChungControls.select_chungloaithietbi_id.enabled"
+                    :class="{invalidBox: this.thongTinChungControls.select_chungloaithietbi_id.invalid}"
+                  />
+                </div>
+              </div>
+              <!-- Cho phép chọn nhiều -->
+              <div class="info-row">
+                <div class="key w150">IP Quản trị</div>
+                <div class="value">
+                  <!-- <SelectExt /> -->
+                  <treeselect
+                    :multiple="true"
+                    v-model="currentItem.ip_ids"
+                    :options="IPAddressList"
+                    placeholder="IP Address"
+                    :disable-branch-nodes="false"
+                    :append-to-body="true"
+                    style="overflow-y:auto;"
+                    :disabled="!thongTinChungControls.select_ip_ids.enabled"
+                    :normalizer="normalizer"
+                    :limit="100"
+                  ></treeselect>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="row">
+                <div class="info-row col-6">
+                  <div class="key w150">Hiệu lực</div>
+                  <div class="value padt4">
+                    <div class="check-action">
+                      <input
+                        type="checkbox"
+                        class="check"
+                        :true-value="1"
+                        :false-value="0"
+                        v-model="currentItem.hieu_luc"
+                        :disabled="!thongTinChungControls.checkbox_hieu_luc.enabled"
+                      /><span class="name"></span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Show khi loại thiết bị là thiết bị máy chủ -->
+                <div v-show="isServer" class="info-row col-6">
+                  <div class="key w150">Thiết bị HSM</div>
+                  <div class="value padt4">
+                    <div class="check-action">
+                      <input
+                        type="checkbox"
+                        class="check"
+                        :true-value="1"
+                        :false-value="0"
+                        v-model="currentItem.hsm"
+                        :disabled="!thongTinChungControls.checkbox_hsm.enabled"
+                      /><span class="name"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Loại thiết bị <span class="red">*</span></div> 
+                <div class="value">
+                  <SelectExt
+                    :dataSource="deviceTypeList"
+                    dataTextField="TEN"
+                    dataValueField="ID"
+                    v-model="currentItem.loaithietbi_id"
+                    :disabled="!thongTinChungControls.select_loaithietbi_id.enabled"
+                    :class="{invalidBox: thongTinChungControls.select_loaithietbi_id.invalid}"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Loại khách hàng</div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="customerTypeList"
+                    dataTextField="name"
+                    dataValueField="id"
+                    v-model="currentItem.loaikhachhang"
+                    :disabled="!thongTinChungControls.select_loaikhachhang.enabled"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Serial Number</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.serial_number"
+                    :disabled="!thongTinChungControls.txt_serial_number.enabled"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Model thiết bị</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.model"
+                    :disabled="!thongTinChungControls.txt_part_number.enabled"
+                  />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w150">Part Number</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.part_number"
+                    :disabled="!thongTinChungControls.txt_model.enabled"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-12 px-3">
+              <div class="info-row">
+                <div class="key w150">Ghi chú</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.ghi_chu"
+                    :disabled="!thongTinChungControls.txt_ghi_chu.enabled"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End -->
+
+          <!-- Đặc tính thiết bị -->
+          <DacTinhThietBi
+            ref="DeviceCharacteristics"
+            :isServer="isServer"
+            :isNetwork="isNetwork"
+            :isDiskShelf="isDiskShelf"
+            :isIDC="isIDC"
+            :isOther="isOther"
+            :currentItem="currentItem"
+          />
+          <!-- End -->
+
+          <!-- Năng lực lưu trữ -->
+          <StorageCapacity v-show="isDiskShelf" ref="StorageCapacity" :isDiskShelf="isDiskShelf" />
+          <!-- End -->
+
+          <!-- Thông tin lắp đặt và thông tin kiểm kê, quản lý -->
+          <div class="row">
+            <div class="col-6 px-0">
+              <div class="col-12">
+                <div class="legend-title">Thông tin vị trí lắp đặt thiết bị</div>
+              </div>
+              <div class="row col-12">
+                <div class="col-6">
+                  <div class="info-row">
+                    <div class="key w150">IDC đặt thiết bị</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="IDCList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        v-model="currentItem.idc_id"
+                        :disabled="!thongTinLapDatControls.select_idc_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Toà nhà</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="alterBuildingList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        v-model="currentItem.building_id"
+                        :disabled="!thongTinLapDatControls.select_building_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Mặt sàn</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="alterFloorList"
+                        dataTextField="DIEN_TICH"
+                        dataValueField="ID"
+                        v-model="currentItem.floor_id"
+                        :disabled="!thongTinLapDatControls.select_floor_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Phòng/Zone</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="alterZoneList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        v-model="currentItem.zone_id"
+                        :disabled="!thongTinLapDatControls.select_zone_id.enabled"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="info-row">
+                    <div class="key w150">Rack</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="alterRackList"
+                        dataTextField="MA_TS"
+                        dataValueField="ID"
+                        v-model="currentItem.rack_id"
+                        :disabled="!thongTinLapDatControls.select_rack_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Số lượng U cần đặt</div>
+                    <div class="value">
+                      <input
+                        type="number"
+                        class="form-control"
+                        v-model="currentItem.unit_qty"
+                        :disabled="!thongTinLapDatControls.txt_unit_qty.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">U trên</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="UpperUList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :disabled="!thongTinLapDatControls.select_up_unit_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">U dưới</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="LowerUList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        :disabled="!thongTinLapDatControls.select_down_unit_id.enabled"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 px-0">
+              <div class="col-12">
+                <div class="legend-title">Thông tin kiểm kê, quản lý tài sản</div>
+              </div>
+              <div class="row col-12">
+                <div class="col-6">
+                  <div class="info-row">
+                    <div class="key w150">Mã dự án</div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="currentItem.project_code"
+                        :disabled="!thongTinQuanLyControls.txt_project_code.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Tên dự án</div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="currentItem.project_name"
+                        :disabled="!thongTinQuanLyControls.txt_project_name.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Thẻ tài sản</div>
+                    <div class="value">
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="currentItem.so_the_ts"
+                        :disabled="!thongTinQuanLyControls.txt_so_the_ts.enabled"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="info-row">
+                    <div class="key w150">Đơn vị quản lý</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="donViQuanLyList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        v-model="currentItem.donviqly_id"
+                        :disabled="!thongTinQuanLyControls.select_donviqly_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Phòng/Tổ quản lý</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="phongBanQuanLyList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        v-model="currentItem.phongbanqly_id"
+                        :disabled="!thongTinQuanLyControls.select_phongbanqly_id.enabled"
+                      />
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <div class="key w150">Cá nhân quản lý</div>
+                    <div class="value">
+                      <SelectExt
+                        :dataSource="nguoiQuanLyList"
+                        dataTextField="TEN"
+                        dataValueField="ID"
+                        v-model="currentItem.nguoiqly_id"
+                        :disabled="!thongTinQuanLyControls.select_nguoiqly_id.enabled"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Show khi loại thiết bị là tủ đĩa -->
+    <AllocationInfo
+      v-show="isDiskShelf"
+      :VMList="VMList"
+      :NFSList="NFSList"
+      :controllerList="controllerList"
+      :shelvesList="shelvesList"
+      :historyList="deviceRelationHistory"
+    />
+    <!-- End -->
+
+    <!-- Show khi loại thiết bị khác tủ đĩa -->
+    <template v-show="!isDiskShelf">
+      <!-- Interface, Power, Console -->
+      <PortType
+        v-show="!isDiskShelf"
+        ref="PortType"
+        :deviceData="currentItem"
+        :interfaceList="interfaceList"
+        :powerList="powerList"
+        :consoleList="consoleList"
+        :portInterfaceList="portInterfaceList"
+        :portTypeInterfaceList="portTypeInterface"
+        :portPowerList="portPowerList"
+        :portTypePowerList="portTypePower"
+        :portConsoleList="portConsoleList"
+        :portTypeConsoleList="portTypeConsole"
+      />
+      <!-- End -->
+
+      <!-- Thông tin thiết bị đầu nối, hạ tầng, colocation, lịch sử -->
+      <DeviceRelationInfo
+        v-show="!isDiskShelf"
+        :connectorList="connectorList"
+        :infraList="infraList"
+        :colocationList="colocationList"
+        :historyList="deviceRelationHistory"
+      />
+      <!-- End -->
+    </template>
+
+    <!-- Danh sách thiết bị -->
+    <div class="row" v-show="!isViewOnly">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="col-12">
+              <div class="legend-title">Danh sách thiết bị</div>
+            </div>
+          </div>
+          <div class="table-content">
+            <div class="grid-ext grid-ext-nodata">
+              <DataGrid
+                :columns="dataCols"
+                :dataSource="dataSource"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :showColumnCheckbox="true"
+                ref="grdItems"
+                @rowSelected="rowSelected"
+                @rowDeselected="rowUnselected"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ModalThemCard ref="modalThemCard" @send-data="handleModalThemCard"></ModalThemCard>
+</div>

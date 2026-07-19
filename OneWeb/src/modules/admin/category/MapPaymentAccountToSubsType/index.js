@@ -1,0 +1,2 @@
+import MapPaymentAccountToSubsType from './MapPaymentAccountToSubsType.vue'
+export default MapPaymentAccountToSubsType

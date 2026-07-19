@@ -1,0 +1,456 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">{{ header.title }}</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="javascript: void(0)" class="router-link-active">Xử lý thuê bao</a></li>
+            <li class="breadcrumb-item"><a href="javascript: void(0)" class="router-link-active">Tiếp nhận thông tin Khóa/Mở nợ cước</a></li>
+        </ul>
+    </div>
+
+    <template>
+        <div>
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li>
+                        <a href="javascript: void(0)" @click="onGetTT" title="Lấy thông tin mới">
+                            <span class="icon one-file-attach1"></span>Lấy TT
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0)" @click="onUpdateTT" title="Cập nhật">
+                            <span class="icon one-reload1"></span>Cập nhật
+                        </a>
+                    </li>
+                    <li v-if="display_Params.giaoViecBtn_Visible">
+                        <a href="javascript: void(0)" @click="onGiaoViec" :class="{'disabled': !display_Params.giaoViecBtn_Enable}" title="Giao việc cho nhân viên thực hiện">
+                            <span class="icon one-file-edit2"></span>Giao việc
+                        </a>
+                    </li>
+                    <li v-if="display_Params.kichHoatBtn_Visible">
+                        <a href="javascript: void(0)" @click="onKichHoat" :class="{'disabled': !display_Params.kichHoatBtn_Enable}" :title="display_Params.kichHoatBtn_Tooltip">
+                            <span class="icon one-file-arrow-up"></span>Kích hoạt
+                        </a>
+                    </li>
+<!--                    <li v-if="display_Params.kichhoatCnttBtn_Visible">-->
+                    <li>
+<!--                        <a href="javascript: void(0)" @click="show_ppWorkflowActivation" :title="display_Params.kichHoatCnttBtn_Tooltip">-->
+                        <a href="javascript: void(0)" @click="show_ppWorkflowActivation" :class="{'disabled': !display_Params.kichhoatCnttBtn_Enable}" :title="display_Params.kichHoatCnttBtn_Tooltip">
+                            <span class="icon one-file-arrow-up"></span>Kích hoạt toàn trình
+                        </a>
+                    </li>
+                    <li v-if="display_Params.giaoPhieuBtn_Visible">
+                        <a href="javascript: void(0)" @click="onGiaoPhieu" :class="{'disabled': !display_Params.giaoPhieuBtn_Enable}" title="Giao phiếu">
+                            <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                        </a>
+                        <PopupGiaoPhieu
+                            ref="popupGiaoPhieu"
+                            :huongGiaoId = "common_Params.huongGiaoId_GP"
+                            :dichVuId = "pyc_Params.dichVu_Selected"
+                            @closeDialog="closeDialogHandler"
+                        >
+                        </PopupGiaoPhieu>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0)" @click="onDeleteHD" v-show="display_Params.xoaHDBtn_Visible" title="Xóa HĐ">
+                            <span class="icon one-trash"></span>Xoá HĐ
+                        </a>
+                    </li>
+                    <li v-if="display_Params.hoanCongBtn_Visible">
+                        <a href="javascript: void(0)" @click="onVer2_HoanCong" :class="{'disabled': !display_Params.hoanCongBtn_Enable}" title="Cập nhật kết quả">
+                            <span class="icon one-hoancong"></span>Hoàn công
+                        </a>
+                    </li>
+                    <li v-if="display_Params.hoanThanhBtn_Visible">
+                        <a href="javascript: void(0)" @click="onHoanThanh" :class="{'disabled': !display_Params.hoanThanhBtn_Enable}" title="Hoàn thành">
+                            <span class="icon one-file-check"></span>Hoàn thành
+                        </a>
+                    </li>
+                    <li v-if="display_Params.hoanThienBtn_Visible">
+                        <a href="javascript: void(0)" @click="onHoanThien" :class="{'disabled': !display_Params.hoanThienBtn_Enable}" title="Hoàn thiện hồ sơ">
+                            <span class="icon one-file-check"></span>Hoàn thiện
+                        </a>
+                    </li>
+                    <li v-if="display_Params.traPhieuBtn_Visible">
+                        <a href="javascript: void(0)" @click="onTraPhieu" :class="{'disabled': !display_Params.traPhieuBtn_Enable}" title="Trả phiếu thi công">
+                            <span class="icon one-file-back"></span>Trả phiếu
+                        </a>
+                    </li>
+                    <li v-if="display_Params.tsbtnCreatIssue_Visible">
+                        <a href="javascript: void(0)" @click="onCreateIssue" :class="{'disabled': !display_Params.tsbtnCreatIssue_Enable}" title="Gửi IT360">
+                            <span class="dropdown-icon one-mobile-plus"></span> Gửi IT360
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="javascript: void(0)" data-toggle="dropdown" :class="{'disabled': !display_Params.xuatFileBtn_Enable}" title="Xuất file">
+                            <span class="icon one-download"></span>Xuất file
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="javascript: void(0)" @click="onXuatFile" class="text-primary">
+                                    <span class="dropdown-icon one-download"></span> Xuất excel
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript: void(0)" @click="onXuatText" class="text-primary">
+                                    <span class="dropdown-icon one-file-trash"></span>  {{ display_Params.xuatTextBtn_Title }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li v-if="display_Params.giaoPhieuBtn_Visible">
+                        <a  href="javascript: void(0)" ref="tsbtnCapNhatDV" @click="btnCapNhatDVClick" :class="{'disabled': !display_Params.giaoPhieuBtn_Enable}"  title="Cập nhật thông tin đơn vị">
+                          <span class="icon one-file-save"></span>Cập nhật ĐV
+                        </a>
+                    </li>
+                    <appModalXuatDuLieu
+                        id="modal-xuat-file"
+                        :thuocTinh="[
+                            {fieldName: 'HDKH_ID', headerText: 'HDKH_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'HDTB_ID', headerText: 'HDTB_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'STATUS', headerText: 'STATUS', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'MA_TB', headerText: 'MA_TB', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'TEN_TB', headerText: 'TEN_TB', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'DIACHI_TB', headerText: 'DIACHI_TB', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'DIACHI_LD', headerText: 'DIACHI_LD', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'THUEBAO_ID', headerText: 'THUEBAO_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'PHIEU_ID', headerText: 'PHIEU_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'NGAY_HT', headerText: 'NGAY_HT', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'GHICHU', headerText: 'GHICHU', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'TEN_DV', headerText: 'TEN_DV', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'NGAYGIAO', headerText: 'NGAYGIAO', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'TEN_STATUS', headerText: 'TEN_STATUS', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'KIEUYC', headerText: 'KIEUYC', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'KIEU_YC', headerText: 'KIEU_YC', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'TEN_DVGT', headerText: 'TEN_DVGT', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'NOIDUNG', headerText: 'NOIDUNG', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'CHIEU_KM', headerText: 'CHIEU_KM', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'CHIEUKHOA', headerText: 'CHIEUKHOA', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'THANGNAM_TT', headerText: 'THANGNAM_TT', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'NGAY_HT_GP', headerText: 'NGAY_HT_GP', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'TTHD_ID', headerText: 'TTHD_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'TRANGTHAI_HD', headerText: 'TRANGTHAI_HD', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'DICHVUVT_ID', headerText: 'DICHVUVT_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'LOAITB_ID', headerText: 'LOAITB_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'DONVI_ID', headerText: 'DONVI_ID', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'NGUOI_CN', headerText: 'NGUOI_CN', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'ND_THUCHIEN', headerText: 'ND_THUCHIEN', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'CACH_KM', headerText: 'CACH_KM', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'KIEU_MEGA', headerText: 'KIEU_MEGA', allowFiltering: true, allowSorting: false, width: 120},
+                            {fieldName: 'LOAIHINH_TB', headerText: 'LOAIHINH_TB', allowFiltering: true, allowSorting: false, width: 120}
+                        ]"
+                        :data="thueBao_grid.items"
+                    />
+                </ul>
+
+            </div>
+            <div class="page-content" style="top: 80px !important; padding-bottom: 56px;">
+                <div class="box-form">
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="legend-title">Thông tin phiếu yêu cầu</div>
+                            <div class="info-row">
+                                <div class="key w90">Dịch vụ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2
+                                            :options = "pyc_Params.dichVu_Options"
+                                            v-model = "pyc_Params.dichVu_Selected"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Quy trình</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2
+                                            :options = "pyc_Params.quyTrinh_Options"
+                                            v-model = "pyc_Params.quyTrinh_Selected"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="pyc_Params.loaiHinh_Checked">
+                                        <span class="name">Loại hình</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select2
+                                            :options = "pyc_Params.loaiHinh_Options"
+                                            v-model = "pyc_Params.loaiHinh_Selected"
+                                            :disabled = "!pyc_Params.loaiHinh_Checked"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">
+                                    Số máy/Acc
+                                </div>
+                                <div class="value">
+                                    <input type="text" class="form-control highlight" v-model="pyc_Params.soMayAcc" @keyup.enter="onKeyPress" ref="soMayAcc">
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Kiểu YC</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="pyc_Params.kieuYC_Selected">
+                                            <option v-for="item in pyc_Params.kieuYC_Options" :value="item.id">{{ item.text }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Thu hồi Tbị</div>
+                                <div class="value">
+                                    <div class="list-checks mart7">
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" checked name="rad1" class="check" :value="1" v-model="pyc_Params.thuHoiTB" :disabled="!pyc_Params.thuHoiTB_Enable">
+                                                <span class="name">{{ common_Params.giaoTheoQD_Title }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" name="rad1" class="check" :value="0" v-model="pyc_Params.thuHoiTB" :disabled="!pyc_Params.thuHoiTB_Enable">
+                                                <span class="name">Giao ngay</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Nội dung TH</div>
+                                <div class="value">
+                                    <div class="input-more-button -right">
+                                        <button class="btn" @click="onUpdateNoiDungTH">
+                                            <span class="nc-icon-outline ui-1_edit-74"></span>
+                                        </button>
+                                        <input type="text" class="form-control" v-model="pyc_Params.noiDungTH" ref="noiDungTH" :class="{'is-invalid': $v.pyc_Params.noiDungTH.$error }">
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="list-checks-ver red mart10">
+                                <div class="item marb10">
+                                    <div class="check-action">
+                                        <input type="checkbox" checked name="cb1" class="check" v-model="pyc_Params.boQuaLoiKhiKichHoat">
+                                        <span class="name">Bỏ qua lỗi khi kích hoạt để kích hoạt thuê bao tiếp theo</span>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="checkbox" name="cb1" class="check" v-model="pyc_Params.boQuaLoiKhiHoanCong">
+                                        <span class="name">Bỏ qua lỗi khi hoàn công để hoàn công thuê bao tiếp theo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-12">
+                          <div class="nav tabs tab-over">
+                            <a  href="#tab1" data-toggle="tab" class="minw0 active">TT giao việc/ Lý do hủy</a>
+                            <a @click="xTabControl_SelectedPageChanged('TabIT360')" href="#TabIT360" data-toggle="tab" class="minw0">Y/C IT 360</a>
+                          </div>
+                          <div class="tab-content">
+                            <div class="tab-pane active" id="tab1">
+                              <div class="legend-title">Thông tin giao việc</div>
+                              <div class="row">
+                                <div class="col-sm-6 col-12">
+                                  <div class="info-row">
+                                    <div class="key w90">Người GV</div>
+                                    <div class="value">
+                                      <div class="select-custom">
+                                        <select2
+                                          :options = "gv_Params.nguoiGV_Options"
+                                          v-model = "gv_Params.nguoiGV_Selected"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                  <div class="info-row">
+                                    <div class="key w90">
+                                      <div class="check-action" title="Ngày giao việc">
+                                        <input type="checkbox" class="check" v-model="gv_Params.ngayGV_Checked">
+                                        <span class="name">Ngày GV</span>
+                                      </div>
+                                    </div>
+                                    <div class="value">
+                                      <ejs-datepicker
+                                        v-model="gv_Params.ngayGV"
+                                        :value="gv_Params.today"
+                                        :format="'dd/MM/y hh:mm a'"
+                                        locale='en-US'
+                                        :showClearButton="false"
+                                        :enabled="gv_Params.ngayGV_Checked"
+                                      >
+                                      </ejs-datepicker>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                  <div class="info-row">
+                                    <div class="key w90">
+                                      <div class="check-action" title="Ngày hoàn thành">
+                                        <input type="checkbox" class="check" v-model="gv_Params.ngayHT_Checked">
+                                        <span class="name">Ngày HT</span>
+                                      </div>
+                                    </div>
+                                    <div class="value">
+                                      <ejs-datepicker
+                                        v-model="gv_Params.ngayHT"
+                                        :value="gv_Params.today"
+                                        :format="'dd/MM/y hh:mm a'"
+                                        locale='en-US'
+                                        :showClearButton="false"
+                                        :enabled="gv_Params.ngayHT_Checked"
+                                      >
+                                      </ejs-datepicker>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="table-content">
+                                <DataGrid v-bind:columns="[
+                                    {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, allowSorting: false, width: 120},
+                                    {fieldName: 'SO_DT', headerText: 'Điện thoại', allowFiltering: true, allowSorting: false, width: 100},
+                                    {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ', allowFiltering: true, allowSorting: false, width: 150},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, width: 200}
+                                ]"
+                                          v-bind:dataSource="nhanVien_grid.items"
+                                          :showFilter="true"
+                                          :allowPaging="true"
+                                          :enablePagingServer="false"
+                                          ref="nhanVienGrid"
+                                          @selectedRowChanged="onNhanVienTHSelected"
+                                          :panelDataHeight='"75"'
+                                >
+                                </DataGrid>
+                              </div>
+                              <div class="legend-title mart20">Lý do huỷ
+                                <button class="btn btn-second"
+                                        v-show="display_Params.lyDoHuyBtn_Visible"
+                                        title="Điều chỉnh/bổ sung lý do hủy của khối kỹ thuật"
+                                        @click="onChangeLyDoHuy"
+                                >
+                                  Lý do
+                                </button>
+                              </div>
+                              <div class="table-content">
+                                <DataGrid v-bind:columns="[
+                                    {fieldName: 'LYDOHUY', headerText: 'Lý do hủy', allowFiltering: true, allowSorting: false, width: 120},
+                                    {fieldName: 'KIEU_HUY', headerText: 'Kiểu', allowFiltering: true, allowSorting: false, width: 120},
+                                    {fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true, allowSorting: false, width: 150},
+                                    {fieldName: '', headerText: 'Thao tác', allowFiltering: false, allowSorting: false, width: 100, template: deleteTemplate, cssClass: 'text-center'}
+                                ]"
+                                          v-bind:dataSource="lyDo_grid.items"
+                                          :showFilter="true"
+                                          :allowPaging="true"
+                                          :enablePagingServer="false"
+                                          ref="lyDoGrid"
+                                          @selectedRowChanged="onLyDoSelected"
+                                          :panelDataHeight='"75"'
+                                >
+                                </DataGrid>
+                              </div>
+                            </div>
+                            <div class="tab-pane" id="TabIT360">
+                              <div class="legend-title">Thông tin IT360</div>
+                              <div class="row">
+                                <div class="table-content">
+                                  <DataGrid v-bind:columns="[
+                                      {fieldName: 'key', headerText: 'Số phiếu', allowFiltering: true, customAttributes: { class: 'bold' }, autoFit: true},
+                                      {fieldName: 'ngay_cn', headerText: 'Ngày CN', allowFiltering: true, type: 'dateTime', format: 'dd/MM/yyyy hh:mm a', autoFit: true},
+                                      {fieldName: 'nguoi_cn', headerText: 'Người tạo', allowFiltering: true , allowHtml : false, autoFit: true},
+                                      {fieldName: 'url', headerText: 'URL', allowFiltering: true , allowHtml : true, autoFit: true},
+                                  ]"
+                                            :dataSource="list_it360"
+                                            @selectedRowChanged="grvIssues_FocusedRowChanged"
+                                            :enable-paging-server="false"
+                                            :allowPaging="true"
+                                            :showFilter="true">
+                                  </DataGrid>
+                                </div>
+                                <div class="info-row mart20">
+                                  <div class="key w90">Tiêu đề</div>
+                                  <div class="value">
+                                    <textarea maxlength="400" v-model="tieude_jira" class="form-control bold text-main" style="height:62px;resize:none" id="" cols="30" rows="10"></textarea>
+                                  </div>
+                                </div>
+                                <div class="info-row">
+                                  <div class="key w90">Trạng thái</div>
+                                  <div class="value">
+                                    <div class="select-custom bold text-main">
+                                      <select2 :options="ds_trangthai_jira" v-model="trangthai_jira_value">
+                                      </select2>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="info-row">
+                                  <div class="key w90">Resolution</div>
+                                  <input type="text"  class="form-control" v-model="jira_resolution_name"/>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="legend-title mart20">
+                        <div class="pull-left">
+                            Danh sách thuê bao khoá mở máy do nợ cước
+                        </div>
+                        <div class="pull-right">
+                            <div class="list-checks">
+                                <div class="item normal">
+                                    <div class="check-action">
+                                        <input type="radio" checked name="rad2" class="check" v-model="pyc_Params.loaiPhieu" :value="0">
+                                        <span class="name">Phiếu mới</span>
+                                    </div>
+                                </div>
+                                <div class="item normal">
+                                    <div class="check-action">
+                                        <input type="radio" name="rad2" class="check" v-model="pyc_Params.loaiPhieu" :value="1">
+                                        <span class="name">Phiếu trả lại</span>
+                                    </div>
+                                </div>
+                                <div class="item red">
+                                    Thông báo:
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <DataGrid v-bind:columns="thueBao_grid.fields"
+                        v-bind:dataSource="thueBao_grid.items"
+                        dataKeyField="MA_TB"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :showColumnCheckbox="false"
+                        :panelDataHeight='"400"'
+                        ref="thueBaoGrid"
+                        @rowSelected="onThueBaoSelected"
+                    >
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+        <CreateIssue ref="dialogCreateIssue"/>
+        <CreateIssue_V1 ref='dialogCreateIssue_v1'/>
+
+
+        <ppWorkflowActivation
+          ref="ppWorkflowActivation"
+          @closeFormKichhoatToantrinh="closeFormKichhoatToantrinh"
+        />
+        <PopupCapNhatDV ref="popupCapNhatDV"></PopupCapNhatDV>
+    </template>
+</div>

@@ -1,0 +1,138 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li @click="linkTaiFileMau_Click">
+        <a href="javascript:void(0)">
+          <span class="icon one-template"></span>File mẫu
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content nhap-duan-taisan-theofile">
+    <div class="box-form">
+      <div class="legend-title">
+        Chọn file
+      </div>
+      <div class="info-row">
+        <div class="value">
+          <b-form-file 
+            ref="ref-upload-file"
+            @change="onFileChange" 
+            placeholder="" 
+            accept=".xls, .xlsx"></b-form-file>
+        </div>
+        <div class="key padl10">Đối tượng nhập</div>
+        <div class="value w80 nowrap">
+          <div class="list-checks mart7">
+            <div class="item">
+              <div class="check-action">
+                <input type="radio" class="check" v-model="doiTuong" value="DUAN">
+                <span class="name">Dự án</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="check-action">
+                <input type="radio" class="check" v-model="doiTuong" value="TAISAN">
+                <span class="name">Tài sản</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex">
+        <div class="flex-grow-1">
+          <div class="list-actions-top" style="box-shadow: none;border: 0px;">
+            <ul class="list">
+              <li>
+                <button class="btn btn-link" @click="buttonReadFile_Click"><span class="icon one-file-refresh"></span>Nạp lại</button>
+              </li>
+              <li :class="{'disable-btn': disableButton}">
+                <button class="btn btn-link" @click="buttonExecute_Click" :disabled="disableButton"><span class="icon -ap icon-checkmark2"></span>Thực thi</button>
+              </li>
+              <li :class="{'disable-btn': disableButton}">
+                <button class="btn btn-link" @click="buttonExportFile_Click" :disabled="disableButton"><span class="icon one-xlsx"></span>Xuất excel</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="info-row">
+            <div class="key fw6">
+              *Ghi chú:
+            </div>
+            <div class="value">
+              <div>-Tải về file mẫu <a href="javascript:void(0)" class="link underline inline padt7 padb7"
+                  @click="linkTaiFileMau_Click">Click vào đây</a></div>
+              <div>-Chương trình chỉ đọc dữ liệu từ sheet có tên "TAISAN" và "DUAN"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav tabs tab-over">
+      <a href="#tabDuAn" data-toggle="tab" @click="doiTuong = 'DUAN'" :class="{active: doiTuong == 'DUAN', show: doiTuong == 'DUAN'}">Dự án</a>
+      <a href="#tabTaiSan" data-toggle="tab" @click="doiTuong = 'TAISAN'" :class="{active: doiTuong == 'TAISAN', show: doiTuong == 'TAISAN'}">Tài sản</a>
+    </div>
+    <div class="tab-content box-form">
+      <div id="tabDuAn" class="tab-pane" :class="{active: doiTuong == 'DUAN', show: doiTuong == 'DUAN'}">
+        <ejs-grid 
+            ref='grid-duan' 
+            gridLines='Both'
+            locale='vi-VN'
+            :dataSource="dsDuAn" 
+            :allowFiltering='true'
+            :allowResizing='true'
+            :allowSorting='true'
+            :editSettings='{allowEditing: true, mode: "Batch"}'
+            :selectionSettings="{enableToggle: false}"
+            :rowSelected='onRowSelectedDuAn'
+            :created="onCreateGridDuAn"
+            :cellSaved="onCellSavedDuAn"
+            :queryCellInfo="onQueryCellInfo"
+            :actionComplete="onActionComplete"
+            :dataBound="onDataBoundDuAn">
+            <e-columns>
+                <e-column headerText='' textAlign="Center" width="20" :allowFiltering="false" :template='columnTemplate'></e-column>
+                <e-column field='TRANG_THAI' headerText='Trạng thái cập nhật' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate' :allowEditing="false"></e-column>
+                <e-column field='SOQD_DT' headerText='Số quyết định đầu tư' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='SOQD_QT' headerText='Số quyết định quyết toán' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='MA_CT' headerText='Mã công trình (*)' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='SOHIEU_CT' headerText='Số hiệu công trình (*)' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='GHICHU' headerText='Ghi chú' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='NGAY_NT' headerText='Ngày nghiệm thu'  textAlign="Right" headerTextAlign='Center' :filterBarTemplate='filterBarTemplate' :edit="editNgay"></e-column>
+                <e-column field='KEY' headerText='' :visible="false" :isPrimaryKey="true"></e-column>
+            </e-columns>
+        </ejs-grid>
+      </div>
+      <div id="tabTaiSan" class="tab-pane" :class="{active: doiTuong == 'TAISAN', show: doiTuong == 'TAISAN'}">
+        <ejs-grid 
+            ref='grid-taisan' 
+            gridLines='Both'
+            locale='vi-VN'
+            :dataSource="dsTaiSan" 
+            :allowFiltering='true'
+            :allowResizing='true'
+            :allowSorting='true'
+            :editSettings='{allowEditing: true, mode: "Batch"}'
+            :selectionSettings="{enableToggle: false}"
+            :rowSelected='onRowSelectedTaiSan'
+            :created="onCreateGridTaiSan"
+            :cellSaved="onCellSavedTaiSan"
+            :queryCellInfo="onQueryCellInfo"
+            :actionComplete="onActionComplete"
+            :dataBound="onDataBoundTaiSan">
+            <e-columns>
+                <e-column headerText='' textAlign="Center" width="20" :allowFiltering="false" :template='columnTemplate'></e-column>
+                <e-column field='TRANG_THAI' headerText='Trạng thái cập nhật' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='TEN_TS' headerText='Tên tài sản' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='GIA' headerText='Giá' textAlign="Right" headerTextAlign='Center' :filterBarTemplate='filterBarTemplate' editType='numericedit' :edit="{params: { decimals: 0, min: 0, max: 999999999999 }}"></e-column>
+                <e-column field='SOHIEU_CT' headerText='Dự án' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate' :edit="editDropdownList" :drDataSource="dmDuAn" drValueName="DUAN_ID" drTextName="SOHIEU_CT"></e-column>
+                <e-column field='MA_TS' headerText='Mã tài sản (*)' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate'></e-column>
+                <e-column field='MA_DV' headerText='TTVT' headerTextAlign='Center' :filterBarTemplate='filterBarTemplate' :edit="editDropdownList" :drDataSource="dsTtvt" drValueName="DONVI_ID" drTextName="TEN_DV"></e-column>
+                <e-column field='KEY' headerText='' :visible="false" :isPrimaryKey="true"></e-column>
+            </e-columns>
+        </ejs-grid>
+      </div>
+    </div>
+  </div>
+</div>

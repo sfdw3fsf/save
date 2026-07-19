@@ -1,0 +1,167 @@
+<ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="dlgInThongBaoNo"
+  header='<div class="title"><span class="icon one-notepad"></span> In thông báo nợ</div>' :animationSettings='animationSettings' showCloseIcon=true width='80%' :target='target'
+  :open="dialogOpen" :close="close">
+  <div class="">
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="#" v-on:click.prevent="DanhSach" title="Danh sách">
+            <span class="icon nc-icon-glyph design_bullet-list-67"></span>Danh sách
+          </a>
+        </li>
+        <li>
+          <a href="#" v-on:click.prevent="InHD"  title="In hóa đơn">
+            <span class="icon one-print"></span>In HĐ
+          </a>
+        </li>
+        <li>
+          <a href="#" v-on:click.prevent="XuatFile" title="Xuất Excel">
+            <span class="icon one-xlsx-import"></span>Xuất Excel
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form padt8 padb5">
+        <div class="pull-right custom-kycuoc">
+          <app-ky-cuoc :disabled="true" @handleChangeKyCuoc="handleKyHoaDon"></app-ky-cuoc>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title">
+          <div class="pull-left">Thông tin tìm kiếm</div>
+          <div class="pull-right normal">
+            <div class="check-action">
+              <input v-model="checkXemTruoc" type="checkbox" class="check">
+              <span class="name">Xem trước khi in</span>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w80">
+                <div class="check-action">
+                  <input v-model="form.checkLanTao" type="checkbox" class="check">
+                  <span class="name">Lần tạo</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="input-icon-right">
+                  <!-- <input type="text" class="form-control">
+                  <span class="icon one-calendar"></span> -->
+                  <ComboboxGrid v-bind:columns="[
+                      {fieldName: 'NGAY_TAO', headerText: 'Ngày tạo', allowFiltering: true},
+                      {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, width: 100},
+                      {fieldName: 'TONGTIEN', headerText: 'Tổng tiền', allowFiltering: true, type:'number',format:'N0'},
+                      ]" v-bind:dataSource="dsLanTao" textField="NGAY_TAO" valueField="LANTAO_ID"
+                    @selectedChanged="lantao_selectedChanged" :disabled="!form.checkLanTao" placeholder="Chọn lần tạo"></ComboboxGrid>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">
+                <div class="check-action">
+                  <input v-model="form.checkNhanVien" type="checkbox" class="check">
+                  <span class="name">Nhân viên XL</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <!-- <select name="" id="" class="form-control">
+                    <option value=""></option>
+                  </select> -->
+                  <ComboboxGrid v-bind:columns="[
+                      {fieldName: 'MA_NV', headerText: 'Mã NV', allowFiltering: true, width: 120},
+                      {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true},
+                      ]" v-bind:dataSource="dsNhanVienXLN" textField="TEN_HIENTHI" valueField="NHANVIEN_ID"
+                    @selectedChanged="NV_selectedChanged" :disabled="!form.checkNhanVien" placeholder="Chọn nhân viên xử lý" :enabledSelectFirstRow="false"></ComboboxGrid>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w60">
+                Mẫu in
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <!-- <select name="" id="" class="form-control">
+                    <option value=""></option>
+                  </select> -->
+                  <SelectExt v-model.trim="form.mauIn" :dataSource="dsMauIn" dataTextField="TEN_BC"
+                    dataValueField="BAOCAO_ID" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w80">
+                <div class="check-action">
+                  <input v-model="form.checkQuan" type="checkbox" class="check">
+                  <span class="name">Quận</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <!-- <select name="" id="" class="form-control">
+                    <option value=""></option>
+                  </select> -->
+                  <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                    v-model="form.quan" locale='vi-VN' :dataSource='danhMucQuanHuyen' :allowFiltering='true'
+                    :fields="{value:'QUAN_ID', text: 'TEN_QUAN'}" :showSelectAll="true" :showDropDownIcon="true"
+                    :enabled="form.checkQuan" :value="form.quan" placeholder="Chọn quận"></ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w130">
+                <div class="check-action">
+                  <input v-model="form.checkPhongBH" type="checkbox" class="check">
+                  <span class="name">Phòng bán hàng</span>
+                </div>
+              </div>
+              <div class="value">
+                <div class="select-custom">
+                  <!-- <select name="" id="" class="form-control">
+                    <option value=""></option>
+                  </select> -->
+                  <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                    v-model="form.idPhongBH" locale='vi-VN' :dataSource='danhsachDonVi' :allowFiltering='true'
+                    :fields="{value:'DONVI_ID', text: 'TEN_DV'}" showSelectAll="true" :showDropDownIcon="true"
+                    :enabled="form.checkPhongBH" :value="form.idPhongBH" placeholder="Chọn phòng"></ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key">
+                <div class="check-action">
+                  <input v-model="form.checkKHDN" type="checkbox" class="check">
+                  <span class="name">Khách hàng DN</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-form">
+        <div class="legend-title">Danh sách khách hàng</div>
+        <DataGrid :columns="fields" :dataSource="dsKhachHang" :showFilter="true" :showColumnCheckbox="true"
+          :defaultColumnCheckboxChecked="true" dataKeyField="XULYNO_ID" ref="danhSach" :allowPaging="true" :enablePagingServer="false"/>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

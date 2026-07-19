@@ -1,0 +1,160 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    @shown="focusMyElement"
+    @hidden='hiddenModal'
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span> Trả phiếu vật tư
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="javascript:void(0)" @click="initForm()">
+                        <span  class="icon one-file-attach"></span> Lấy TT
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="capNhat()">
+                        <span class="icon one-save"></span> Trả phiếu
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title mart0">
+                    <div class="pull-left mart10">
+                        Thông tin phiếu giao
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Ngày giao</div>
+                            <div class="value" disabled>
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :enabled="false"
+                                :value="dateVal" :format="dateFormat" v-model="dataSelected.ngay_giao" ></ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Đơn vị giao</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="dataSelected.donvi_giao">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Nội dung</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="dataSelected.noidung_giao">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Người giao</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="dataSelected.nguoi_giao">
+                            </div>
+                        </div>
+                    </div>
+                                                
+                </div>
+      
+                 <div class="legend-title mart0">
+                    <div class="pull-left mart10">
+                        Thông tin phiếu trả
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Ngày trả</div>
+                            <div class="value" :disabled="true">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" 
+                                    :value="dateVal" :format="dateFormat" v-model="dataSelected.ngay_tra" ></ejs-datepicker>
+                            </div>
+                        </div> 
+                        <div class="info-row"> 
+                            <div class="key w100">Lý do trả <span style="color: red;">*</span></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.dataSelected.lydo_tra.$error">
+                                 <div class="select-custom" ref="lydo_tra">
+                                    <SelectExt v-model="dataSelected.lydo_tra"
+                                     :settings="{dropdownParent: $refs['lydo_tra']}" 
+                                     :dataSource="dsLydo" 
+                                     dataTextField="LYDOTRA"
+                                     dataValueField="LYDOTRA_ID"/>
+                                    </div>
+                                </bss-error-marker>  
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Nội dung trả <span style="color: red;">*</span></div>
+                            <div class="value">
+                                <textarea class="form-control" ref="txtNoiDung" v-model="dataSelected.noiDungTra" :class="{ 'is-invalid': $v.dataSelected.noiDungTra.$error}" style="height: 100px;" /> 
+                            </div>
+                        </div>
+                    </div>                                                                    
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title mart0">
+                    <div class="pull-left mart10">
+                        Danh sách phiếu yêu cầu
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content">
+                    <DataGrid ref="grid-phieu" v-bind:columns="[
+                    {fieldName: 'MA_HS_CC', headerText: 'Mã hồ sơ', allowFiltering: true,freeze:'Left'},
+                    {fieldName: 'LOAI_HS_CC', headerText: 'Loại hồ sơ', allowFiltering: true,freeze:'Left'},
+                    {fieldName: 'DONVI_NHAN', headerText: 'Đơn vị nhận', allowFiltering: true},
+                    {fieldName: 'DONVI_GIAO', headerText: 'Đơn vị giao', allowFiltering: true},
+                    {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true},
+                    {fieldName: 'ND_THUCHIEN', headerText: 'Nội dung', allowFiltering: true},
+                    {fieldName: 'NHANVIEN_GIAO', headerText: 'Nhân viên giao', allowFiltering: true},
+                    {fieldName: 'TEN_DVQL', headerText: 'Đơn vị QL', allowFiltering: true},
+                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                     ]"
+
+                     v-bind:dataSource="dsPhieu" 
+                     :showFilter="true"
+                     @selectedRowChanged="grid_phieu_selected"
+                      :totalRecords='dsPhieu.length'
+                      :allowPaging="true" 
+                     enalblepagingServer='false'></DataGrid>     
+                </div>
+            </div>
+        </div>
+    </div>
+</b-modal>
+           

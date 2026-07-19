@@ -1,0 +1,126 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link @click="onSearch()" href="javascript:void(0)"> <span class="icon one-search"></span>Tìm kiếm </b-link>
+      </li>
+      <li>
+        <b-link @click="openNewPopup()" href="javascript:void(0)">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+      <li>
+        <b-link @click="deleteMulti()" href="javascript:void(0)" :class="{ disabled: selectedItems.length === 0 }">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <!-- Search conditions -->
+    <div class="box-form">
+      <div class="row">
+        <div class="legend-title d-flex justify-content-between align-items-center">
+          Điều kiện tìm kiếm
+        </div>
+      </div>
+      <div class="row search-filter-row">
+        <div class="col-md-4 col-sm-6 col-12">
+          <div class="info-row d-flex align-items-center">
+            <div class="key w150">IDC</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.idcId"
+                placeholder="-- Chọn IDC --"
+                dataTextField="TEN"
+                dataValueField="ID"
+                :dataSource="idcList"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 col-12">
+          <div class="info-row d-flex align-items-center">
+            <div class="key w150">Tên hạ tầng mạng</div>
+            <div class="value">
+              <input
+                type="text"
+                class="form-control"
+                v-model="searchConditions.ten"
+                placeholder="Nhập tên hạ tầng mạng"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 col-12">
+          <div class="info-row d-flex align-items-center">
+            <div class="key w150">Trạng thái CCDV</div>
+            <div class="value">
+              <SelectExt
+                v-model="searchConditions.trangThaiCCDVId"
+                placeholder="-- Chọn trạng thái --"
+                dataTextField="TEN"
+                dataValueField="ID"
+                :dataSource="trangThaiCungCapDichVuList"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Grid -->
+    <div class="box-form">
+      <div class="row">
+        <div class="legend-title">Danh sách hạ tầng mạng</div>
+      </div>
+      <div class="table-content">
+        <DataGrid
+          v-bind:columns="[
+            {fieldName: 'id', headerText: 'ID Hạ tầng mạng', textAlign: 'Left', allowFiltering: true, width: 80},
+            {fieldName: 'ten', headerText: 'Tên hạ tầng mạng', textAlign: 'Left', allowFiltering: true, width: 200},
+            {fieldName: 'idcName', headerText: 'IDC', textAlign: 'Left', allowFiltering: true, width: 150},
+            {fieldName: 'congNgheName', headerText: 'Công nghệ triển khai', textAlign: 'Left', allowFiltering: true, width: 150},
+            {fieldName: 'trangThaiCCDVName', headerText: 'Trạng thái cung cấp dịch vụ', textAlign: 'Left', allowFiltering: true, width: 120},
+            {fieldName: 'actions', headerText: 'Thao tác', textAlign: 'Center', template: actionColumn(), width: 120}
+          ]"
+          :dataSource="haTangMangList"
+          :showFilter="true"
+          :allowPaging="true"
+          :enablePagingServer="false"
+          :allowExcelExport="true"
+          :enabledSelectFirstRow="false"
+          dataKeyField="id"
+          ref="grdItems"
+          @selectedItemsChanged="onSelectRowCheckbox"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- EJS Dialog for HaTangMangDetail -->
+  <ejs-dialog
+    :visible="false"
+    ref="haTangMangDialog"
+    :header="dialogMode === 'ADD' ? 'Thêm mới hạ tầng mạng' : dialogMode === 'EDIT' ? 'Chỉnh sửa hạ tầng mạng' : 'Chi tiết hạ tầng mạng'"
+    :animationSettings="animationSettings"
+    :beforeOpen="onDialogBeforeOpen"
+    :close="closeDetailModal"
+    width="90%"
+    height="auto"
+    showCloseIcon="true"
+    :target="dialogTarget"
+    :isModal="true"
+  >
+    <div class="modal-content popup-box">
+      <HaTangMangDetail
+        :mode="dialogMode"
+        :itemId="selectedItemId"
+        @saveSuccessed="onDetailSaved"
+        @cancelSave="closeDetailModal"
+      />
+    </div>
+  </ejs-dialog>
+</div>

@@ -1,0 +1,126 @@
+<div class="chi-tiet-idc">
+  <!-- Header với avatar và thông tin cơ bản -->
+  <div class="idc-header">
+    <div class="idc-avatar-section">
+      <div v-if="idcImageLoading" class="idc-avatar-skeleton"></div>
+      <img
+        v-else
+        class="idc-avatar-large"
+        :src="idcData.IMAGE_URL || ''"
+        @error="onImgErr"
+        alt="IDC Avatar"
+      />
+    </div>
+    <div class="idc-basic-info">
+      <h3 class="idc-title">{{ idcData.TEN_IDC }}</h3>
+      <div class="idc-subtitle">{{ idcData.TRANGTHAI_VH }}</div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>ID:</label>
+          <span>{{ idcData.IDC_ID }}</span>
+        </div>
+        <div class="info-item">
+          <label>Đơn vị:</label>
+          <span>{{ idcData.TEN_DV }}</span>
+        </div>
+        <div class="info-item">
+          <label>Thời điểm vận hành:</label>
+          <span>{{ formatDate(idcData.THOIDIEM_VANHANH) }}</span>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Tọa độ:</label>
+          <span>{{ coordinates }}</span>
+        </div>
+        <div class="info-item">
+          <label>Diện tích tổng thể:</label>
+          <span>{{ idcData.TONG_DIENTICH }} m²</span>
+        </div>
+        <div class="info-item">
+          <label>Diện tích phòng máy:</label>
+          <span>{{ idcData.TONG_DIENTICH_PHONGMAY }} m²</span>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item full-width">
+          <label>Địa chỉ:</label>
+          <span>{{ idcData.DIA_CHI }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="nav tab-over tabs">
+    <a
+      v-for="tab in tabs"
+      :key="tab.id"
+      :href="'#' + tab.id"
+      @click="activeTab = tab.id"
+      data-toggle="tab"
+      class="tab"
+      :class="{ active: activeTab === tab.id }"
+    >
+      {{ tab.label }}
+    </a>
+  </div>
+
+  <!-- Tabs Content -->
+  <div class="tabs-container">
+    <div class="tab-content">
+      <!-- Tab Tổng quan -->
+      <div v-show="activeTab === 'tongquan'" class="tab-pane">
+        <TongQuanTab
+          :idc-data="idcData"
+          :stats="stats"
+          @edit="$emit('close')"
+          @manage-details="handleManageDetails"
+        />
+      </div>
+
+      <!-- Tab Tòa nhà -->
+      <div v-show="activeTab === 'toanha'" class="tab-pane">
+        <ToaNhaTab
+          :toa-nha-list="toaNhaList"
+          :toa-nha-columns="toaNhaColumns"
+          @selectObjectTaiNguyen="$emit('selectObjectTaiNguyen', $event)"
+        />
+      </div>
+
+      <!-- Tab Mặt sàn -->
+      <div v-show="activeTab === 'matsan'" class="tab-pane">
+        <MatSanTab
+          :mat-san-list="matSanList"
+          :mat-san-columns="matSanColumns"
+          @selectObjectTaiNguyen="$emit('selectObjectTaiNguyen', $event)"
+        />
+      </div>
+
+      <!-- Tab Rack -->
+      <div v-show="activeTab === 'rack'" class="tab-pane">
+        <RackTab
+          :racks="racks"
+          :rack-columns="rackColumns"
+          @selectObjectTaiNguyen="$emit('selectObjectTaiNguyen', $event)"
+        />
+      </div>
+
+      <!-- Tab Nguồn điện -->
+      <div v-show="activeTab === 'nguondien'" class="tab-pane">
+        <NguonDienTab />
+      </div>
+
+      <!-- Tab Khách hàng -->
+      <div v-show="activeTab === 'khachhang'" class="tab-pane">
+        <KhachHangTab
+          :khach-hang-list="khachHangList"
+          :khach-hang-columns="khachHangColumns"
+        />
+      </div>
+    </div>
+  </div>
+</div>

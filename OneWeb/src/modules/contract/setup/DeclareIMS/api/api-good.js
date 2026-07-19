@@ -1,0 +1,23 @@
+export default {
+  fn_tt_loaihinh_tb: async (axios, data) => axios.post('/web-ccdv/khaibao-ims/fn_tt_loaihinh_tb', data),
+  thanh_ly_map_id: async (axios, data) => axios.post('/web-hopdong/thanhly/thanh_ly_map_id', data),
+  capnhat_ngaykh_status_v2: async (axios, data) => axios.post('/web-ccdv/khaibaoims/capnhat_ngaykh_status_v2', data),
+  sp_capnhat_slgoicuoc_ip_ims: async (axios, data) => axios.post('/web-ccdv/khaibao-ims/sp_capnhat_slgoicuoc_ip_ims', data),
+  sp_capnhat_status_hdtb: async (axios, data) => axios.post('/web-ccdv/khaibao-ims/sp_capnhat_status_hdtb', data),
+  sp_capnhat_ngayht: async (axios, data) => axios.post('/web-ccdv/khaibao-ims/sp_capnhat_ngayht', data),
+  sp_kt_taodb_thang: async (axios, data) => axios.get(`web-ccdv/khaibao-ims/sp_kt_taodb_thang?p_phanvung_id=${data.phanvung_id}&p_kyhoadon=${data.kyhoadon}`),
+  sp_capnhat_ngaykh: async (axios, data) => axios.post('/web-ccdv/khaibao-ims/sp_capnhat_ngaykh', data),
+  datmoithuebao: async (axios, data) => axios.post('/web-ccdv/kichhoatims/datmoithuebao', data),
+  fn_tt_bd_thuebao: async (axios, data) => axios.post('/web-tratruoc/thongtin_tratruoc_dn/fn_tt_bd_thuebao', data),
+  fn_tt_loaihinh_tb: async (axios, data) => axios.post('/web-tratruoc/thongtin_tratruoc_dn/fn_tt_loaihinh_tb', data),
+  fn_tt_kieu_ld: async (axios, data) => axios.post('/web-tratruoc/thongtin_tratruoc_dn/fn_tt_kieu_ld', data),
+  fn_kt_lap_kem_co_san: async (axios, data) => axios.post('/web-ccdv/tienhopdong/fn_kt_lap_kem_co_san', data),
+  sp_lay_ds_port_theo_ma_tb: async (axios, data) => axios.post('/web-ccdv/tienhopdong/sp_lay_ds_port_theo_ma_tb', data),
+  lay_ds_port_matb_tn: async (axios, data) => axios.get(`web-ccdv/khaibaoims/lay_ds_port_matb_tn?hdtb_id=${data.hdtb_id}&matb_tn=${data.matb_tn}`, data),
+  fn_tt_diachi_hdtb: async (axios, data) => axios.post(`web-tratruoc/thongtin_tratruoc_dn/fn_tt_diachi_hdtb`, data),
+  sp_tt_diachi: async (axios, data) => axios.post(`web-hopdong/laydulieu/sp_tt_diachi`, data),
+  lay_dslam_theo_port_id: async (axios, data) => axios.get(`web-ccdv/khaibaoims/lay_dslam_theo_port_id?portId=${data.portId}`, data),
+  sp_lay_ds_dslam_tt: async (axios, data) => axios.post(`web-ccdv/tienhopdong/sp_lay_ds_dslam_tt`, data),
+  lay_ds_port_tudong: async (axios, data) => axios.post(`web-ccdv/khaibaoims/lay_ds_port_tudong`, data),
+  lay_ds_port_tudong_hni: async (axios, data) => axios.post(`web-ccdv/khaibaoims/lay_ds_port_tudong_hni`, data)
+}

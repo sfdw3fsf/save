@@ -1,0 +1,2 @@
+import SearchMaintenanceSlipNotDone from './SearchMaintenanceSlipNotDone.vue'
+export default SearchMaintenanceSlipNotDone

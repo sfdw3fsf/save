@@ -1,0 +1,210 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="LayTT">
+                    <span class="icon one-reload1"></span>Lấy TT
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="HoanThanh" :class="{disabled : !enableHoanThanh}">
+                    <span class="icon fa fa-check-circle"></span>Hoàn thành
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="ThanhLy">
+                    <span class="icon  fa fa-times-circle"></span> Thanh lý
+                </a>
+            </li>
+
+            <li>
+                <a href="#" @click.prevent="MoMay">
+                    <span class="icon one-key"></span>Mở máy
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="legend-title mart0">
+                        <div class="mart10 marb10">
+                            Danh sách kiểu yêu cầu
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <DataGrid :columns="[
+            {fieldName: 'STT', headerText: 'STT', allowFiltering: true, width: 70},
+            {fieldName: 'TEN_KIEULD', headerText: 'Kiểu yêu cầu', allowFiltering: true},
+            {fieldName: 'SL_CHUA_XL', headerText: 'Chưa XL', allowFiltering: true},
+            {fieldName: 'SL_DA_XL', headerText: 'Đã XL', allowFiltering: true},
+            ]" :dataSource="dsYeuCau" :showFilter="true" ref="gridDsYeuCau"
+                        @selectedRowChanged="kieuLD_selectedRowChanged" />
+                </div>
+                <div class="col-sm-8 col-12">
+                    <div class="legend-title mart0">
+                        <div class="pull-left mart10">
+                            Danh sách thuê bao
+                        </div>
+                        <div class="pull-right custom-kycuoc">
+                            <app-ky-cuoc :disabled="true" @handleChangeKyCuoc="handleKyHoaDon" :value="kyCuocView">
+                            </app-ky-cuoc>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="tabs nav tab-over">
+                        <a href="#tab1" data-toggle="tab" class="active" @click="onChangeTab(0)">Chưa xử lý</a>
+                        <a href="#tab2" data-toggle="tab" @click="onChangeTab(1)">Đã xử lý</a>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab1">
+                            <DataGrid :columns="[
+                            {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true},
+                            {fieldName: 'MA_LT', headerText: 'Số ảo', allowFiltering: true},
+                            {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', allowFiltering: true},
+                            {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true},
+                            {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+                            {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true},
+                            {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true},
+                            {fieldName: 'MA_TUYEN', headerText: 'Mã tuyến thu', allowFiltering: true},
+                            {fieldName: 'MA_NVTC', headerText: 'Mã NVTC', allowFiltering: true},
+                            ]" :dataSource="dsThueBaoChuaXL" :showFilter="true" ref="gridDsThueBaoChuaXL"
+                                :allowPaging="true" :enablePagingServer="false" dataKeyField="THUEBAO_ID"
+                                @selectedRowChanged="thuebao_selectedRowChanged" />
+                        </div>
+                        <div class="tab-pane" id="tab2">
+                            <DataGrid :columns="[
+                            {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true},
+                            {fieldName: 'MA_LT', headerText: 'Số ảo', allowFiltering: true},
+                            {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true},
+                            {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ lắp đặt', allowFiltering: true},
+                            {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true},
+                            {fieldName: 'MA_TUYEN', headerText: 'Mã tuyến thu', allowFiltering: true},
+                            {fieldName: 'MA_NVTC', headerText: 'Mã NVTC', allowFiltering: true},
+                            ]" :dataSource="dsThueBaoDaXL" :showFilter="true" ref="gridDsThueBaoDaXL"
+                                :allowPaging="true" :enablePagingServer="false" dataKeyField="THUEBAO_ID"
+                                @selectedRowChanged="thuebao_selectedRowChanged" />
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="legend-title">Thông tin thuê bao</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Dịch vụ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="idDichVu" :dataSource="danhSachDichVuVienThong"
+                                            dataTextField="TEN_DVVT" dataValueField="DICHVUVT_ID" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Số máy/Acc</div>
+                                <div class="value">
+                                    <input v-model="soMay" type="text" class="form-control highlight">
+                                </div>
+
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Loại KH</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="idLoaiKH" :dataSource="danhSachLoaiKH"
+                                            dataTextField="TEN_LOAIKH" dataValueField="LOAIKH_ID" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Loại hình</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="idLoaiHinh" :dataSource="danhSachLoaiHinhThueBao"
+                                            dataTextField="TEN_LOAIHINH" dataValueField="LOAITB_ID" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Trạng thái TB</div>
+                                <div class="value">
+                                    <input v-model="trangThaiTB" type="text" class="form-control">
+                                </div>
+
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Đối tượng</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt v-model.trim="idDoiTuong" :dataSource="dsDoiTuong"
+                                            dataTextField="TEN_DT" dataValueField="DOITUONG_ID" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Tên TB</div>
+                        <div class="value">
+                            <input v-model="tenTB" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Địa chỉ TT</div>
+                        <div class="value">
+                            <input v-model="diaChiTT" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Địa chỉ BC</div>
+                        <div class="value">
+                            <input v-model="diaChiBC" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Trạng thái TT</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <SelectExt v-model.trim="idTrangThaiTT" :dataSource="dsTrangThaiTT"
+                                    dataTextField="LYDOHUY" dataValueField="LYDOHUY_ID"
+                                    placeholder="Chọn trạng thái thanh toán" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Nội dung TH</div>
+                        <div class="value">
+                            <input v-model="noiDung" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="legend-title">Thông tin nợ hiện tại</div>
+                    <DataGrid :columns="[
+                    {fieldName: 'TENKHOANMUC', headerText: 'Tên khoản mục', allowFiltering: true},
+                    {fieldName: 'TONGNO', headerText: 'Tổng nợ', allowFiltering: true, format: 'N0', type: 'number'},
+                    {fieldName: 'NO_DK', headerText: 'Cộng nợ DK', allowFiltering: true, format: 'N0', type: 'number'},
+                    {fieldName: 'NO_PS', headerText: 'Cộng nợ PS', allowFiltering: true, format: 'N0', type: 'number'},
+                    {fieldName: 'CON_NO', headerText: 'Còn nợ', allowFiltering: true, format: 'N0', type: 'number'},
+                    {fieldName: 'TONG_TRA', headerText: 'Tổng đã trả', allowFiltering: true, format: 'N0', type: 'number'},
+                    {fieldName: 'DIEU_CHINH', headerText: 'Đã điều chỉnh', allowFiltering: true, format: 'N0', type: 'number'},
+                    ]" :dataSource="dsThongTinNo" :showFilter="true" ref="gridDsThongTinNo"
+                        :aggregates="aggregatesColumns" :key="keyReset"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <PopUpMoMay :soMay="soMay"/>
+</div>

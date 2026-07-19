@@ -1,0 +1,872 @@
+<div class="main-wrapper">
+  <div class="breadcrumb-top">
+    <div class="main-title">Cập nhật thông tin tòa nhà</div>
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+        </a></li>
+      <li class="breadcrumb-item"><a href="#">Quản trị hệ thống</a></li>
+      <li class="breadcrumb-item active">Danh mục</li>
+    </ul>
+  </div>
+  <div class="list-actions-top">
+    <ul class="list">
+
+      <li>
+        <a href="#" @click.prevent="btnLayTT">
+          <span class="icon one-file-attach"></span>Lấy TT (F3)
+        </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="btnNhapMoi" :class="{disabled: !isNhapMoi}">
+          <span class="icon one-file-plus"></span>Nhập mới (F5)
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="btnGhiLai" :class="{disabled: !isGhiLai}">
+          <span class="icon one-save"></span>Ghi lại (F9)
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="btnHuy" :class="{disabled: !isHuy}">
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="btnXoa" :class="{disabled: !isXoa}">
+          <span class="icon one-trash"></span>Xóa (F8)
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="btnGanIMS">
+          <span class="icon one-gan"></span>Gán dự án IMS
+        </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="openFormLichSu">
+          <icon icon="ic:baseline-history" /> Lịch sử
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="btnXuatExcel">
+          <span class="icon one-xlsx"></span>Xuất excel
+        </a>
+      </li>
+
+      <li>
+        <a href="javascript:void(0)" @click="tsbtnTT_TB" title="TT thuê bao">
+          <span class="icon "></span>TT thuê bao
+        </a>
+        <TraCuuTBToaNha ref="tbToaNha" :duan_id="p_duan_id" :toanha_id="p_toanha_id"></TraCuuTBToaNha>
+      </li>
+
+      <li>
+        <a href="javascript:void(0)" title="TT kết cuối" v-b-modal.tracuu-kc-toanha>
+          <span class="icon "></span>TT kết cuối
+        </a>
+        <TraCuuKCToaNha ref='tbToaNhaOther' :duan_id="p_duan_id" :toanha_id="p_toanha_id"></TraCuuKCToaNha>
+      </li>
+
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin tòa nhà</div>
+      <div class="grid-stack-box">
+        <div class="box-col box-form" id="boxLeft" style="width: calc(30% - 8px);">
+          <div class="info-row">
+            <div class="key w120">Dự án <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.duan.list" v-model="listbox.duan.value.id"
+                  @change="cboDuAn_EditValueChanged()">
+
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Tên tòa nhà <span class="red">(*)</span></div>
+            <div class="value">
+              <input type="text" v-model="tentoanha" ref="tentoanha" class="form-control">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Mã tòa nhà</div>
+            <div class="value">
+              <input type="text" v-model="matoanha" ref="matoanha" class="form-control" readonly>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w120">HT đầu tư <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.htdautu.list" v-model="listbox.htdautu.value.id" @change="">
+
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Đối tác <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.doitac.list" v-model="listbox.doitac.value.id" @change="">
+
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Loại tòa nhà <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.loaitoanha.list" v-model="listbox.loaitoanha.value.id" @change="">
+
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Địa chỉ <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="input-more-button-r">
+                <bss-error-marker :has-error="$v.diachiTB.DIACHI.$error">
+                  <input type="text" v-model="$v.diachiTB.DIACHI.$model" class="form-control" required
+                    title="Bạn chưa nhập địa chỉ">
+                </bss-error-marker>
+                <ModalChonDiaChi modalId="popupDiaChiTB" :data="diachiTB" @xacnhan="getDiaChiTB" />
+                <button class="btn" v-b-modal.popupDiaChiTB>
+                  <span class="-ap icon-more_horiz"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Người đại diện</div>
+            <div class="value">
+              <input type="text" v-model="nguoidaidien" ref="nguoidaidien" class="form-control">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">SĐT BQL</div>
+            <div class="value">
+              <input type="tel" v-model="sdtbql" ref="sdtbql" class="form-control">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w120">Chức vụ</div>
+            <div class="value">
+              <input type="text" v-model="chucvu" ref="chucvu" class="form-control">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Email</div>
+            <div class="value">
+              <input type="text" v-model="email" ref="email" class="form-control">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Đơn vị QLVH</div>
+            <div class="value">
+              <input type="text" v-model="dvQLVH" ref="qlvh" class="form-control">
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w120">Ghi chú</div>
+            <div class="value">
+              <textarea name="" class="form-control" v-model="ghichu" ref="ghichu"
+                style="height: 30px;resize: none;"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="gutter gutter-horizontal" style="width: 16px;"></div>
+        <div class="box-col box-form" id="boxMid" style="width: calc(40% - 16px);">
+
+
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Quy mô <span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.quymo.list" v-model="listbox.quymo.value.id" @change="">
+
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Loại cáp <span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.loaicap.list" v-model="listbox.loaicap.value.id" @change="">
+
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Diện tích (m2)</div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="dientich" id="dientich" ref="dientich"
+                    :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">SL tầng</div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="sltang" id="sltang" ref="sltang"
+                    :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">SL VP/N.Xưởng <span v-if="ma_tinh=='HCM'" style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="slvp" id="slvp" ref="slvp"
+                    :readonly="false" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">SL căn hộ <span style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="slcanho" id="slcanho" ref="slcanho"
+                    :readonly="false" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">SL Block</div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="sl_block" id="sl_block" ref="sl_block"
+                    :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">SL ShopHouse <span v-if="ma_tinh=='HCM'" style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="sl_shophouse" id="sl_shophouse"
+                    ref="sl_shophouse" :readonly="false" output-type="Number">
+                  </vue-numeric>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Ngày bàn giao</div>
+                <div class="value">
+                  <date-picker input-class="form-control" :format="dateFormat" :value-type="'format'"
+                    v-model="ngay_bg_canho" ref="ngay_bg_canho">
+                  </date-picker>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w120">Q.Mô HĐ <span v-if="ma_tinh=='HCM'" style="color: red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="quymo_hopdong" id="quymo_hopdong"
+                    ref="quymo_hopdong" :readonly="disabledQuyMo" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w120">Q.Mô TTHĐ</div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="quymo_thucte" id="quymo_thucte"
+                    ref="quymo_thucte" :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w120">SL C.Hộ BG <span style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="sl_canho_bg" id="sl_canho_bg"
+                    ref="sl_canho_bg" :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+              </div>
+              <!--              <div class="info-row">-->
+              <!--                <div class="key w120">Mô hình CCDV <span style="color:red">(*)</span></div>-->
+              <!--                <div class="value">-->
+              <!--                  <div class="select-custom">-->
+              <!--                    <SelectExt :options="listbox.mhccdv.list" v-model="listbox.mhccdv.value.id"-->
+              <!--                               @change="cboDVTiepThi_EditValueChanged()">-->
+              <!--                    </SelectExt>-->
+              <!--                  </div>-->
+              <!--                </div>-->
+              <!--              </div>-->
+
+              <div class="info-row" v-if="ma_tinh=='HCM'">
+                <div class="key w120">Đv tiếp thị <span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.dvtiepthi.list" v-model="listbox.dvtiepthi.value.id"
+                      @change="cboDVTiepThi_EditValueChanged()">
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row" v-if="ma_tinh=='HCM'">
+                <div class="key w120">Đv quản lý <span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.dvquanly.list" v-model="listbox.dvquanly.value.id"
+                      @change="DvQuanLyChange">
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row" v-if="ma_tinh=='HCM'">
+                <div class="key w120">Đội VT <span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.doivt.list" v-model="listbox.doivt.value.id" @change="">
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w120">Quy mô LĐ</div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="quymo_lapday" id="quymo_lapday"
+                    ref="quymo_lapday" :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+              <div class="info-row">
+                <div class="key w120">SL C.Hộ SD <span style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="sl_canho_sd" id="sl_canho_sd"
+                    ref="sl_canho_sd" :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+
+              </div>
+              <div class="info-row" v-if="ma_tinh=='HCM'">
+                <div class="key w160">DT DKiến <span style="color:red">(*)</span></div>
+                <div class="key w160" style="text-align:right">TB Fiber DKiến<span style="color:red">(*)</span></div>
+              </div>
+              <div class="row" v-if="ma_tinh=='HCM'">
+                <div class="col-sm-9 col-12">
+                  <div class="info-row">
+                    <div class="key w20">N1</div>
+                    <div class="value">
+                      <vue-numeric class="form-control tright" separator="," v-model="doanhthu_dukien_n1"
+                        id="doanhthu_dukien_n1" ref="doanhthu_dukien_n1" :readonly="false" output-type="Number">
+                      </vue-numeric>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                  <div class="info-row">
+
+                    <div class="value">
+                      <vue-numeric class="form-control tright" separator="," v-model="quymo_vnpt_n1" id="quymo_vnpt_n1"
+                        ref="quymo_vnpt_n1" :readonly="false" output-type="Number">
+                      </vue-numeric>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row" v-if="ma_tinh=='HCM'">
+                <div class="col-sm-9 col-12">
+                  <div class="info-row">
+                    <div class="key w20">N2</div>
+                    <div class="value">
+                      <vue-numeric class="form-control tright" separator="," v-model="doanhthu_dukien_n2"
+                        id="doanhthu_dukien_n2" ref="doanhthu_dukien_n2" :readonly="false" output-type="Number">
+                      </vue-numeric>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                  <div class="info-row">
+
+                    <div class="value">
+                      <vue-numeric class="form-control tright" separator="," v-model="quymo_vnpt_n2" id="quymo_vnpt_n2"
+                        ref="quymo_vnpt_n2" :readonly="false" output-type="Number">
+                      </vue-numeric>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row" v-if="ma_tinh=='HCM'">
+                <div class="col-sm-9 col-12">
+                  <div class="info-row">
+                    <div class="key w20">N3</div>
+                    <div class="value">
+                      <vue-numeric class="form-control tright" separator="," v-model="doanhthu_dukien"
+                        id="doanhthu_dukien" ref="doanhthu_dukien" :readonly="false" output-type="Number">
+                      </vue-numeric>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                  <div class="info-row">
+
+                    <div class="value">
+                      <vue-numeric class="form-control tright" separator="," v-model="quymo_vnpt" id="quymo_vnpt"
+                        ref="quymo_vnpt" :readonly="false" output-type="Number">
+                      </vue-numeric>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="info-row" v-if="ma_tinh!='HCM'">
+                <div class="key w120">DT Dự Kiến <span style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="doanhthu_dukien" id="doanhthu_dukien"
+                    ref="doanhthu_dukien" :readonly="false" placeholder="0" output-type="Number">
+                  </vue-numeric>
+                </div>
+              </div>
+
+              <div class="info-row" v-if="ma_tinh != 'HCM'">
+                <div class="key w120">TB Fiber DKiến <span style="color:red">(*)</span></div>
+                <div class="value">
+                  <vue-numeric class="form-control tright" separator="," v-model="quymo_vnpt" id="quymo_vnpt"
+                    ref="quymo_vnpt" :readonly="false" output-type="Number">
+                  </vue-numeric>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="info-row" v-if="ma_tinh !='HCM'">
+            <div class="key w120">Đv tiếp thị <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.dvtiepthi.list" v-model="listbox.dvtiepthi.value.id"
+                  @change="cboDVTiepThi_EditValueChanged()">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row" v-if="ma_tinh !='HCM'">
+            <div class="key w120">Đv quản lý <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.dvquanly.list" v-model="listbox.dvquanly.value.id"
+                  @change="DvQuanLyChange">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row" v-if="ma_tinh !='HCM'">
+            <div class="key w120">Đội VT <span class="red">(*)</span></div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.doivt.list" v-model="listbox.doivt.value.id" @change="">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w120">Mô hình CCDV <span v-if="ma_tinh =='HCM' || ma_tinh =='HNI'" class="red">(*)</span>
+            </div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.mhccdv.list" v-model="listbox.mhccdv.value.id" @change="">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w120">Thông tin QC</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.thongtinQC.list" v-model="listbox.thongtinQC.value.id" @change="">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w120">CP hoa hồng BH</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :options="listbox.cpHH.list" v-model="listbox.cpHH.value.id" @change="">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="gutter gutter-horizontal" style="width: 16px;"></div>
+        <div class="box-col box-form" id="boxRight" style="width: calc(30% - 8px);">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">Phạm vi</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.phamvi.list" v-model="listbox.phamvi.value.id" @change="">
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Hiện trạng</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.hientrang.list" v-model="listbox.hientrang.value.id" @change="">
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">Phân chia DT</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.phanchiadt.list" v-model="listbox.phanchiadt.value.id" @change="">
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Lý do PCDT</div>
+                <div class="value">
+                  <input type="text" v-model="lydopcdt" ref="lydopcdt" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">SS PTTB</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.sansangpttb.list" v-model="listbox.sansangpttb.value.id" @change="">
+
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Lý do chưa ss</div>
+                <div class="value">
+                  <input type="text" v-model="lydochuass" ref="lydochuass" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">TG CCDV</div>
+                <div class="value">
+                  <date-picker input-class="form-control" :format="dateFormat" :value-type="'format'"
+                    v-model="thoigianccdv" ref="thoigianccdv">
+                  </date-picker>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Tình trạng</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <SelectExt :options="listbox.tinhtrang.list" v-model="listbox.tinhtrang.value.id" @change="">
+
+                    </SelectExt>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">Tiến độ</div>
+                <div class="value">
+                  <input type="text" v-model="tiendo" ref="tiendo" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Tên tắt</div>
+                <div class="value">
+                  <input type="text" v-model="ten_vt" ref="ten_vt" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">Gói cước</div>
+                <div class="value">
+                  <input type="text" v-model="goicuoc" ref="goicuoc" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Mã IBS</div>
+                <div class="value">
+                  <input type="text" v-model="ma_ibs" ref="ma_ibs" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w85">Khuyến mại</div>
+                <div class="value">
+                  <input type="text" v-model="khuyenmai" ref="khuyenmai" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="chkVonDT.Checked" class="check">
+                    <span class="name">Vốn đầu tư</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="chkBMIS.Checked" class="check">
+                    <span class="name">Phần mềm QLTN BMIS</span>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="chkOLT.Checked" class="check">
+                    <span class="name">OLT xã hội hóa</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="checkONT" class="check">
+                    <span class="name">ONT xã hội hóa</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="ttda" class="check">
+                    <span class="name">TTDA giao cho ĐLBH</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="goiCuocToiThieu" class="check">
+                    <span class="name">Gói cước tối thiểu</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="TTHT" class="check">
+                    <span class="name">Tình trạng hạ tầng</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key ">
+                  <div class="check-action normal">
+                    <input type="checkbox" v-model="nhaMangKhac" @change="check()" class="check">
+                    <span class="name">Nhà mạng khác</span>
+                  </div>
+                  <button class="btn nhaMangKhac" @click="chiTietNhaMang()" v-if="checkNhaMang == true">
+                    Chi tiết
+                    <!-- <span class="-ap icon-more_horiz"></span> -->
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w95">NV Kỹ thuật</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :dataSource="listbox.nvkythuat.list" v-model="listbox.nvkythuat.value.id"
+                  dataValueField="nhanvien_id" dataTextField="ten_nv" @change="">
+
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w95">NV CSKH</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :dataSource="listbox.nvcskh.list" v-model="listbox.nvcskh.value.id"
+                  dataValueField="nhanvien_id" dataTextField="ten_nv" @change="">
+
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="key w95">NV BH</div>
+            <div class="value">
+              <div class="select-custom">
+                <SelectExt :dataSource="listbox.nvbanhang.list" v-model="listbox.nvbanhang.value.id"
+                  dataValueField="nhanvien_id" dataTextField="ten_nv" @change="">
+                </SelectExt>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w95">CTV "chân rết"</div>
+            <div class="value">
+              <textarea name="" class="form-control" v-model="ctv_bh" ref="ctv_cr"
+                style="height: 30px;resize: none;"></textarea>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+    <div class="box-form" hidden>
+      <div class="legend-title">
+        <span class="icon fa fa-angle-up"></span> Thông tin tìm kiếm
+      </div>
+      <div class="info-row">
+        <div class="key w80">
+          <div class="check-action">
+            <input type="checkbox" class="check" v-model="timtheoduan">
+            <span class="name">Dự án</span>
+          </div>
+        </div>
+        <div class="value">
+          <div class="select-custom">
+            <SelectExt :options="listbox.duan_timkiem.list" v-model="listbox.duan_timkiem.value.id" @change="DuAnChange"
+              :disabled="!isTimTheoDuAn">
+
+            </SelectExt>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w80">
+          <div class="check-action">
+            <input type="checkbox" class="check" v-model="timtheodoitac">
+            <span class="name">Đối tác</span>
+          </div>
+        </div>
+        <div class="value">
+          <div class="select-custom">
+            <SelectExt :options="listbox.doitac_timkiem.list" v-model="listbox.doitac_timkiem.value.id"
+              @change="DoiTacChange" :disabled="!isTimTheoDoiTac">
+
+            </SelectExt>
+          </div>
+        </div>
+      </div>
+    </div>
+    <nhacc ref="nhacc" />
+    <div class="box-form">
+      <div class="legend-title">Danh sách tòa nhà</div>
+      <div class="table-content">
+        <DataGrid v-bind:columns="listbox.ds_toanha.header" v-bind:dataSource="listbox.ds_toanha.list"
+          :enable-paging-server="false" :allowPaging="true" :showFilter="true" :showColumnCheckbox="false"
+          :allowExcelExport="true" @queryCellInfo='queryCellInfo' ref="grid" @rowClicked="rowClicked"
+          :enabledSelectFirstRow="true" @selectedRowChanged="gridChanged">
+        </DataGrid>
+
+
+      </div>
+
+    </div>
+  </div>
+  <b-modal id="popupComponents" size="xl" hide-footer :title="popupTitle" body-class="modal-body p-0">
+    <component :is="popupComponent" ref="popupComponent" :dulieu="popupComponentData" isPopup="true"
+      @form-close="popupClosed"></component>
+  </b-modal>
+  <LichSuModal ref="LichSuModal" />
+</div>

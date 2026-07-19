@@ -1,0 +1,370 @@
+<div class="mat-san-detail-form">
+  <!-- Action buttons -->
+  <div
+    class="list-actions-top"
+    style="position: sticky; top: 0; background: white; z-index: 10; margin-bottom: 15px;"
+    v-if="!isReadOnly"
+  >
+    <ul class="list">
+      <li>
+        <a href="#" @click.prevent="handleSave"> <span class="icon one-save"></span> Ghi lại </a>
+      </li>
+      <li>
+        <a
+          href="#"
+          @click.prevent="
+            $emit('cancel');
+            $emit('saveSuccessed', false);
+          "
+        >
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="box-form">
+    <div class="row">
+      <div class="legend-title">Thông tin mặt sàn</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">ID mặt sàn <span class="red">*</span></div>
+          <div class="value d-flex align-items-center justify-content-between">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.id"
+              :disabled="!isEditMode"
+              readonly
+              style="flex: 1;"
+            />
+            <div class="d-flex align-items-center ml-2">
+              Hiệu lực
+              <input
+                type="checkbox"
+                class="check ml-1"
+                v-model="currentItem.su_dung"
+                :true-value="1"
+                :false-value="0"
+                :disabled="isReadOnly"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Tên mặt sàn <span class="red">*</span></div>
+          <div class="value">
+            <input
+              type="text"
+              class="form-control"
+              v-model="currentItem.ten"
+              @blur="checkTenMatSanBlur"
+              :disabled="isReadOnly"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Kích thước tấm sàn (cm x cm)</div>
+          <div class="value d-flex align-items-center" style="gap: 4px;">
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.tam_san_rong"
+              :disabled="isReadOnly"
+              placeholder="Nhập chiều rộng"
+            />
+            x
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.tam_san_dai"
+              :disabled="isReadOnly"
+              placeholder="Nhập chiều dài"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Diện tích tổng thể (m²)<span class="red">*</span></div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.dien_tich"
+              :disabled="isReadOnly"
+              required
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <small v-if="tenMatSanExists" class="text-danger"> Tên mặt sàn đã tồn tại! </small>
+    <!-- Row 3: Tổng diện tích zone, Ảnh đại diện -->
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Tổng diện tích các phòng/zone (m²)</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.tong_dien_tich_zone"
+              disabled
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Ảnh đại diện</div>
+          <div class="value">
+            <div class="d-flex align-items-center" style="gap: 8px;">
+              <div
+                class="form-control d-flex align-items-center"
+                style="flex: 1; background-color: #fff; cursor: default;"
+              >
+                <span :style="{ color: currentItem.hinhanh ? '#333' : '#999' }">
+                  {{ getImageDisplayName() }}
+                </span>
+              </div>
+              <div class="dropdown" style="flex-shrink: 0;">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  type="button"
+                  id="dropdownImageButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  style="padding: 5px 10px; height: 34px;"
+                >
+                  <i class="fa fa-ellipsis-v" style="color: #007bff;"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownImageButton">
+                  <a
+                    class="dropdown-item"
+                    href="javascript:void(0)"
+                    @click="viewImage"
+                    :class="{'disabled': !currentItem.hinhanh}"
+                    :style="{ cursor: !currentItem.hinhanh ? 'not-allowed' : 'pointer', opacity: !currentItem.hinhanh ? 0.5 : 1 }"
+                  >
+                    <i class="fa fa-eye" style="color: #007bff;"></i> Xem ảnh
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="javascript:void(0)"
+                    @click="isEditMode ? uploadImage() : null"
+                    :class="{'disabled': isReadOnly}"
+                    :style="{ cursor: isReadOnly ? 'not-allowed' : 'pointer', opacity: isReadOnly ? 0.5 : 1 }"
+                  >
+                    <i class="fa fa-upload" style="color: #007bff;"></i> Tải ảnh lên
+                  </a>
+                </div>
+              </div>
+              <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" style="display: none;" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Thời điểm đưa vào sử dụng</div>
+          <div class="value">
+            <input type="date" class="form-control" v-model="currentItem.ngay_sd" :disabled="isReadOnly" required />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Trạng thái vận hành <span class="red">*</span></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="trangThaiVhList"
+              dataTextField="ten"
+              dataValueField="id"
+              v-model="currentItem.trangthai_vh"
+              :disabled="isReadOnly"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Ghi chú</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="currentItem.ghi_chu" :disabled="isReadOnly" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="legend-title">Vị trí mặt sàn</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Đơn vị IDC <span class="red">*</span></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="donviIdcList"
+              dataTextField="ten"
+              dataValueField="id"
+              v-model="selectedDonviIDC"
+              @change="onDonviIDCChange"
+              :disabled="isReadOnly"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">IDC <span class="red">*</span></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="filteredIdcList"
+              dataTextField="ten"
+              dataValueField="id"
+              v-model="selectedIDC"
+              @change="onIDCChange"
+              :disabled="isReadOnly"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Toà nhà <span class="red">*</span></div>
+          <div class="value">
+            <SelectExt
+              :dataSource="filteredBuildings"
+              dataTextField="TEN_TOANHA"
+              dataValueField="ID_TOANHA"
+              v-model="currentItem.toanha_id"
+              :disabled="isReadOnly"
+              required
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Vị trí mặt sàn</div>
+          <div class="value">
+            <div class="d-flex align-items-center" style="gap: 8px;">
+              <input
+                type="text"
+                class="form-control"
+                v-model="currentItem.vi_tri_toa_nha"
+                disabled
+                readonly
+                style="flex: 1;"
+              />
+              <span style="color: #666;">-</span>
+              <input
+                type="text"
+                class="form-control"
+                v-model="currentItem.vi_tri"
+                :disabled="isReadOnly"
+                placeholder="Ví dụ: Tầng 1, Khu A..."
+                style="flex: 1;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="legend-title">Năng lực lưu trữ</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Tổng số lượng rack thiết kế</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.tong_rack_thiet_ke"
+              disabled
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Tổng số lượng rack lắp đặt</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.tong_rack_lap_dat"
+              disabled
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Số rack còn lại</div>
+          <div class="value">
+            <input type="number" class="form-control" v-model.number="currentItem.so_rack_con_lai" disabled readonly />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="legend-title">Năng lực điện lưới</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w150">Công suất định danh thiết bị đã lắp đặt (kW)</div>
+          <div class="value">
+            <input
+              type="number"
+              class="form-control"
+              v-model.number="currentItem.cong_suat_dinh_danh"
+              disabled
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- THUỘC TÍNH BỔ SUNG -->
+    <ThuocTinhBoSung ref="thuocTinhBoSung" :matSanId="currentItem.id" :mode="mode" />
+  </div>
+
+  <!-- Modal xem ảnh -->
+  <b-modal v-model="showImageModal" title="Xem hình ảnh" size="lg" hide-footer centered>
+    <div class="text-center">
+      <img
+        v-if="currentItem.imageUrl"
+        :src="currentItem.imageUrl"
+        style="max-width: 100%; max-height: 70vh;"
+        alt="Hình ảnh mặt sàn"
+      />
+      <p v-else class="text-muted">Không có ảnh</p>
+    </div>
+  </b-modal>
+</div>

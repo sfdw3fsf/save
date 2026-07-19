@@ -1,0 +1,186 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li  @click="Timkiem()">
+                    <a href="#">
+                        <span class="icon one-search"></span>Tìm kiếm
+                    </a>
+                </li>
+                <li >
+                    <a href="#" @click="tsbtnNhapMoi_Click()" v-bind:class="{disabled: !tsbtnNhapMoi}" :disabled="!tsbtnNhapMoi">
+                        <span class="icon nc-icon-glyph ui-1_circle-add"></span>Thêm mới
+                    </a>
+                </li>
+                <li >
+                    <a href="#" @click="tsbtnGhiLai_Click()" v-bind:class="{disabled: !tsbtnGhiLai}" :disabled="!tsbtnGhiLai">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li >
+                    <a href="#" @click="tsbtnHuyBo_Click()" :disabled="!tsbtnHuyBo" v-bind:class="{disabled: !tsbtnHuyBo}">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Huỷ
+                    </a>
+                </li>
+                <li >
+                    <a href="#" @click="tsbtnXoaCauhoi_Click()" :disabled="!tsbtnXoa" v-bind:class="{disabled: !tsbtnXoa}">
+                        <span class="icon fa fa-close"></span>Xoá câu hỏi 
+                    </a>
+                </li>
+                <li >
+                    <a v-b-modal.popup-mangthi :disabled="!tsbtnMangthi" v-bind:class="{disabled: !tsbtnMangthi}">
+                        <span class="icon nc-icon-glyph design_bullet-list-69"></span>Mảng thi
+                    </a>
+                    <mangthi />
+                </li>
+                <li >
+                    <a v-b-modal.popup-chude :disabled="!tsbtnChuDe" v-bind:class="{disabled: !tsbtnChuDe}">
+                        <span class="icon -ap  icon-books"></span>Chủ đề
+                    </a>
+                    <chude />
+                </li>
+                
+            </ul>
+           
+        </div>
+    </vue-nav>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-3 col-12">
+                <div class="box-form">
+                    <div class="tree-plus" style="height: 650px;overflow: auto;">
+                        <ejs-treeview
+                            id="treeview"
+                            ref="treeObj"
+                            :fields="fieldsChude"
+                            :nodeSelected="nodeclick"
+                            @dataBound="onSelect"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12">
+                <div class="row">
+                    <div class="col-sm-8 col-12">
+                        <div class="box-form">
+                            <div class="legend-title">Thông tin câu hỏi</div> 
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Mảng thi <span class="red">(*)</span>:</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="dsMangThi">
+                                                <SelectExt id="cbb_MangThi" v-model.trim="dataSelected.mangthi_id" :settings="{dropdownParent: $refs['dsMangThi']}" :dataSource="options.lstMangthi" dataTextField="mangthi" dataValueField="mangthi_id" @change="onChangeMangThi($event)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Chủ đề <span class="red">(*)</span>:</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="dsChude">
+                                                <SelectExt id="cbb_Chude" v-model="dataSelected.chude_id" :settings="{dropdownParent: $refs['dsChude']}" :dataSource="options.lstChude" dataTextField="chude" dataValueField="chude_id" @change="onChangeChude($event)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Nội dung <span class="red">(*)</span>:</div>
+                                <div class="value">
+                                    <textarea name="" class="form-control" style="height: 100px;resize: none;" v-model="txtNoidung"></textarea>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90"></div>
+                                <div class="value">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="chkHienThiCH">
+                                        <span class="name">Hiển thị</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="legend-title mart20">
+                                <div class="pull-left">Đáp án</div>
+                                <div class="pull-right normal">
+                                    <a v-b-modal.popup-dapan>
+                                        <span class="ui-1_circle-add nc-icon-glyph text-success f20 marr5 inline vcenter"></span> Thêm đáp án
+                                    </a>
+                                    <dapan :idCauhoi = "cauhoi_id" :NdCauhoi = "txtNoidung" :NdDapan = "NdDapan" :Ketqua = "Ketqua"/>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <DataGrid
+                            v-bind:columns="collumnsDapan" 
+                            v-bind:dataSource="options.lstDapan" 
+                            :showFilter="true" 
+                            :commands="[
+                                    {name: 'Xóa', cssClass: 'pad3 mar5 lh14 icon one-trash btn-danger', iconCss: 'fa fa-times', width: 20},
+                                    {name: 'Sửa', cssClass: 'pad3 mar5 lh14 icon one-edit btn-primary', iconCss: 'fa fa-times', width: 20},
+                                ]"
+                            :commandColumn="{headerText: 'Thao tác', cellCssClass: 'w50 center', width: 20, firstColumn: false, show: true}"
+                            ref="Dapan"
+                            :allowPaging="true" 
+                            :enableVirtualization="false"
+                            :enablePagingServer="false" 
+                            :enabledSelectFirstRow="true" 
+                            @queryCellInfo = "griddataGridCellCreated"
+                            @commandClicked="gridDsDACommand"
+                            @selectedRowChanged="gridDA_FocusedRowChanged" 
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }">
+                            
+                            </DataGrid>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="box-form">
+                            <div class="file-canvas relative" style="height:460px" v-on:click.right="clickright">
+                                <div class="menu-context" v-if="hienthi">
+                                    <a href="#" v-bind:class="{disabled: !btnimage.cut}" :disabled="!btnimage.cut">
+                                        <span class="icon w20 nc-icon-glyph design_scissors-dashed"></span> Cut
+                                    </a>
+                                    <a href="#"  v-bind:class="{disabled: !btnimage.copy}" :disabled="!btnimage.copy">
+                                        <span class="icon w20 nc-icon-glyph files_single-copy-04"></span> Copy
+                                    </a>
+                                    <a href="#" v-bind:class="{disabled: !btnimage.palse}" :disabled="!btnimage.palse">
+                                        <span class="icon w20 nc-icon-glyph files_single-content-02"></span> Paste
+                                    </a>
+                                    <a href="#" @click="Delete" v-bind:class="{disabled: !btnimage.del}" :disabled="!btnimage.del">
+                                        <span class="icon w20 one-trash"></span> Delete
+                                    </a>
+                                    <a href="#" @click="Load" v-bind:class="{disabled: !btnimage.load}" :disabled="!btnimage.load">
+                                        <span class="icon w20 nc-icon-glyph files_folder-18"></span> 
+                                        <label for="chon">Load</label>
+                                    </a>
+                                    <input id="chon" type="file" accept="image/jpeg" @change=uploadImage  value="Load">
+                                    <a href="#" @click="downloadImg" v-bind:class="{disabled: !btnimage.save}" :disabled="!btnimage.save">
+                                        <span class="icon w20 one-save"></span> Save
+                                    </a>
+                                </div>
+                                <img v-bind:src="previewImage" ref="linkImage" width="100%" height="100%" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">Danh sách câu hỏi</div>
+                    <DataGrid v-bind:columns="collumnsCauhoi" 
+                    v-bind:dataSource="options.lstCauhoi" 
+                    :showFilter="true" 
+                    ref="Cauhoi"
+                    :allowPaging="true" 
+                    :enableVirtualization="false"
+                    :enablePagingServer="false" 
+                    :enabledSelectFirstRow="true" 
+                    @queryCellInfo = "gridCauhoidataGridCellCreated"
+                    @selectedRowChanged="gridCauhoi_FocusedRowChanged" 
+                    :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }">
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

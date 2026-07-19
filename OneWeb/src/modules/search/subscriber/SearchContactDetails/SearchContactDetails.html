@@ -1,0 +1,166 @@
+<div>
+  <breadcrumb :header="header" />
+  <vue-nav>
+    <ul class="list">
+      <li>
+          <a href="#" v-on:click="ThongTinLienHe_OnClick()">
+              <span class="icon nc-icon-glyph business_contacts"></span>Liên hệ
+          </a>
+      </li>
+      <li>
+          <a href="#"  v-on:click="ThongTinEmail_OnClick()" >
+              <span class="icon one-email"></span>Email
+          </a>
+      </li>
+      <li>
+          <a href="#" @click="showFormVT">
+              <span class="icon one-vt"></span>Vật tư
+          </a>
+      </li>
+      <li >
+          <a href="#"  @click.prevent="btnToaNha" >
+              <span class="icon one-building"></span>Tòa nhà
+          </a>
+      </li>
+      <li>
+          <a href="#" @click="onXemHSEkyc">
+              <span class="icon one-download"></span>Xem HS EKYC
+          </a>
+      </li>
+      <li>
+          <a href="#" @click="onDownloadCTS">
+              <span class="icon one-download"></span>Tải CTS
+          </a>
+      </li>
+      <li>
+        <a href="#" v-b-modal.popupThietbiIDC>
+            <span class="icon one-building"></span>Thiết bị IDC
+        </a>
+      </li>
+      <li>
+        <a @click="btnDSSoThanhVien_Click">
+            <span class="icon one-building"></span>Danh sách số thành viên
+        </a>
+      </li>
+      <li>
+        <a @click="btnDSSoThanhVienNgoaiMang_Click">
+            <span class="icon one-building"></span>Danh sách số ngoại mạng
+        </a>
+      </li>
+  </ul>
+  </vue-nav>
+  <div class="page-content">
+    <div class="nav tabs tab-over">
+      <a href="#tab1" data-toggle="tab" class="active">Thông tin khách hàng (F2)</a>
+      <a href="#tab2" data-toggle="tab">Thông tin thuê bao (F3)</a>
+    </div>
+    <div class="tab-content">
+      <div id="tab1" class="tab-pane active">
+        <ThongTinKhachHang :formProps="form_TTKH" :optionProps="options" @update-form-pr-kh="updateFormPropsKH" ></ThongTinKhachHang>
+        <ThongTinThanhToan :formProps="form_TTTT" :optionProps="options" @update-form-pr-tt="updateFormPropsTT" ></ThongTinThanhToan>
+        <div class="row">
+          <div class="col-sm-9 col-12">
+            <div class="box-form">
+              <div class="legend-title">
+                <div class="pull-left">Danh sách thanh toán</div>
+                <div class="pull-right red">
+                  Mã TT CCBS: {{this.form_TTTT.matt_ccbs}}
+                </div>
+                <div class="clearfix"></div>
+              </div>
+              <div class="table-content" style="height: 260px;">
+                <DataGrid ref="gvDSTT"
+                    v-bind:columns="gvDSTT.header"
+                    v-bind:dataSource="gvDSTT.list"
+                    :enable-paging-server="false"
+                    :show-checkbox = "false"
+                    :allowPaging="true"
+                    :showFilter="true"
+                    :showColumnCheckbox="false"
+                    :enabled-select-first-row="true"
+                    @selectedRowChanged=""
+                    @selectedItemsChanged=""
+                    @rowSelected="gvDSTT_rowSelected"
+                    @dataBound="gvDSTT_DataBound"
+                    :multiple="false"
+                  >
+                </DataGrid>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="box-form">
+              <div class="legend-title">Dịch vụ khác</div>
+              <textarea name="" class="form-control" style="height: 300px;resize: none;" v-model="form_TTTT.dv_khac"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tab2" class="tab-pane">
+        <ThongTinThueBao :formProps="form_TTTB" :titleProps="title" :optionProps="options" :visibles="visibles"></ThongTinThueBao>
+
+        <div class="legend-title mart20">
+          <div class="pull-left">Danh sách thuê bao</div>
+          <div class="pull-right">
+            <div class="check-action normal red">
+              <input type="checkbox" class="check" v-model="form_TTTB.chuyenmang==1">
+              <span class="name">Từ NCC khác chuyến sang</span>
+            </div>
+
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="table-content">
+          <DataGridCustom ref="gvDSTB"
+                v-bind:columns="gvDSTB.header"
+                v-bind:dataSource="gvDSTB.list"
+                :enabledSelectFirstRow="true"
+                :show-checkbox = "false"
+                :allowPaging="true"
+                :showFilter="true"
+                :showColumnCheckbox="false"
+                @selectedRowChanged=""
+                @rowSelected="gvDSTB_rowSelected"
+                @rowClicked="gvDSTB_rowClicked"
+                @dataBound="gvDSTB_DataBound"
+                @rowDataBound=""
+                :multiple="false"
+                dataKeyField="thuebao_id"
+                :enablePagingServer="true"
+                @pageChanged="gridDanhSachTB_pageChanged"
+                :totalRecords="totalRecords"
+                >
+          </DataGridCustom>
+        </div>
+      </div>
+    </div>
+  </div>
+  <TraCuuVatTuThueBao ref='formVattu' idModalTraCuuVT="ModalTraCuuVT"/>
+  <!-- <pop_toanha  :magd="form_TTKH.ma_kh" :sotb="form_TTTB.ma_tb" :tentb="form_TTKH.ten_kh"/>  -->
+  <!-- <ejs-dialog :enableResize='true' :visible="false" ref="thongtinlienhe" :header='"Thông tin liên hệ"'
+                showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <ThongTinLienHe  ref='thongTinLienHePopUp'  :hdkh_id="HdKhIdInt" :khachhang_id="KhachHangIdInt"/>
+  </ejs-dialog> -->
+    <!-- <ejs-dialog :enableResize='true' :visible="false" ref="thongtinemail" :header='"Thông tin Email"'
+        showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <ThongTinEmail  ref='thongTinEmailPopUp' :hdkh_id="HdKhIdInt" :khachhang_id="KhachHangIdInt"/>
+    </ejs-dialog> -->
+    <b-modal ref="ThongTinEmail" id="ThongTinEmail" size="xl" title="Thông tin Email" hide-footer
+        body-class="p-0 thanhtoan-modal">
+        <ThongTinEmail :viewOnly="true" :hdkh_id="hdkh_id" :khachhang_id="khachhang_id" />
+    </b-modal>
+    <b-modal ref="ThongTinLienHe" id="ThongTinLienHe" size="xl" title="Thông tin liên hệ" hide-footer
+        body-class="p-0 thanhtoan-modal">
+        <ThongTinLienHe :hdkh_id="hdkh_id" :khachhang_id="khachhang_id" />
+    </b-modal>
+    <ejs-dialog :enableResize='true' :allowDragging='true' :visible="false" ref="pop_toanha" :header='"Tra cứu thông tin tòa nhà"'
+                showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+            <ThueBao_ToaNha ref="formDiachi" :ma_gd="form_TTKH.ma_kh" :ma_kh="form_TTKH.ma_kh" :ma_tb="form_TTTB.ma_tb" :tag="'tracuu_danhba'" :dataDiachi="dataDiachi" />
+    </ejs-dialog>
+    <popupThietbiIDC modalId="popupThietbiIDC" :data="dataPopupThietbiIDC" @form-close="closePopupThietbiIDC"/>
+
+    <frmDanhSachSoThanhVien v-if="showFrmNhapDSSoThanhvien" ref="frmDanhSachSoThanhVien" :hdtb_id="0" :thuebao_id="form_TTTB.thuebao_id" @form-close="closeForm" />
+    <frmNhapDSThanhVienNgoaiMang ref="frmNhapDSThanhVienNgoaiMang"/>
+  <frmHoSoEKYCSMCA ref="ref_frmHoSoEKYCSMCA"/>
+</div>

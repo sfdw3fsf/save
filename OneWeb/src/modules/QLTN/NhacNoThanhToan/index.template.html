@@ -1,0 +1,295 @@
+<div >
+    
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onSearch" title="Hiển thị danh sách đã tạo danh sách hoặc đã nhắc nợ">
+                    <span class="icon nc-icon-glyph design_bullet-list-67"></span>Danh sách
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onCreate" title="Tạo danh sách cần nhắc nợ">
+                    <span class="icon one-clipart-add"></span>Tạo DL
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onChuyenNhac" title="Chuyển danh sách sang nhắc nợ chính thức">
+                    <span class="icon one-file-arrow-right1"></span>Chuyển nhắc
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onDeleteTT" title="Xóa thanh toán khỏi dữ liệu đã tạo">
+                    <span class="icon one-phone-remove"></span>Xóa TT
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onTaoFile" title="Tạo file dbf để gửi SMS">
+                    <span class="icon one-folder-add"></span>Tạo file
+                </a>
+                <appModalXuatDuLieu
+                    id="modal-xuat-file"
+                    :thuocTinh="excelExport.fields"
+                    :data="excelExport.items"
+                />
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onExcelExport" title="Xuất excel">
+                    <span class="icon one-excel"></span>Xuất Excel
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8">
+            <div class="legend-title padb3">
+                <div class="pull-left mart7">
+                    Thông tin nhắc nợ
+                </div>
+                <div class="pull-right">
+                    <app-ky-cuoc :isReadonly="true" :isDisabled="true"></app-ky-cuoc>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="grid-stack-box">
+                <div class="box-col box-form" id="boxLeft" style="width: 50%">
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w120">Đơn vị QL</div>
+                                <div class="value">
+                                    <div class="">
+                                        <select2
+                                            :options = "params.donVi_Options"
+                                            v-model = "params.donVi_Selected"
+                                        />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key w90">
+                                    Hình thức
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="params.hinhThuc_Selected">
+                                            <option value="0">Nợ đầu kỳ</option>
+                                            <option value="5">Nợ phát sinh</option>
+                                            <option value="1">Tổng nợ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w120">
+                                    Từ số tiền
+                                </div>
+                                <div class="value">
+                                    <div class="input-icon-right calculator-box">
+                                        <vue-numeric currency='' separator=',' v-model="params.tuTien" class="form-control highlight tright text-rose"></vue-numeric>
+                                        <span class="icon one-calculator" @click="params.tuTienCalculator = !params.tuTienCalculator"></span>
+                                        <Calculator @display="params.tuTien = $event" :value="params.tuTien" :is-show="params.tuTienCalculator" @close="params.tuTienCalculator = !params.tuTienCalculator"></Calculator>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key w90">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="params.denTien_Checked">
+                                        <span class="name">Đến tiền</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="input-icon-right calculator-box">
+                                        <vue-numeric currency='' separator=',' v-model="params.denTien" class="form-control highlight tright text-rose" :disabled="!params.denTien_Checked"></vue-numeric>
+                                        <span class="icon one-calculator" @click="params.denTienCalculator = !params.denTienCalculator" :disabled="!params.denTien_Checked"></span>
+                                        <Calculator @display="params.denTien = $event" :value="params.denTien" :is-show="params.denTienCalculator" @close="params.denTienCalculator = !params.denTienCalculator"></Calculator>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w120">
+                                    Ngày hết hạn
+                                </div>
+                                <div class="value">
+                                    <ejs-datepicker
+                                        v-model="params.ngayHetHan"
+                                        :value="params.today"
+                                        :format="'dd/MM/y'"
+                                        :showClearButton="false"
+                                        :placeholder="'Chọn ngày hết hạn'"
+                                    >
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12" title="Lọc dữ liệu đã được nhắc nợ">
+                            <div class="info-row">
+                                <div class="key">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="params.locMayDaNhacNo">
+                                        <span class="name">Lọc máy đã nhắc nợ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-col box-form" id="boxRight" style="width: 50%">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="info-row">
+                                <div class="key w90">Loại phiếu</div>
+                                <div class="value">
+                                    <div class="">
+                                        <select2
+                                            :options = "params.loaiPhieu_Options"
+                                            v-model = "params.loaiPhieu_Selected"
+                                        />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w90" title="Lọc dữ liệu theo loại khách hàng">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="params.loaiKH_Checked">
+                                        <span class="name">Loại KH</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="">
+                                        <select2
+                                            :options = "params.loaiKH_Options"
+                                            v-model = "params.loaiKH_Selected"
+                                            :disabled="!params.loaiKH_Checked"
+                                        />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key w90" title="Khách hàng lớn">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="params.KHLon_Checked">
+                                        <span class="name">KH lớn</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <ejs-multiselect
+                                            id='multiselect'
+                                            :dataSource='params.KHLon_Options'
+                                            mode="CheckBox"
+                                            locale='vi-VN'
+                                            :fields='selectFields'
+                                            v-model="params.KHLon_Selected"
+                                            :value="params.KHLon_Selected"
+                                            showSelectAll='true'
+                                            selectAllText="Chọn tất cả"
+                                            unSelectAllText="Bỏ chọn tất cả"
+                                            :allowFiltering='true'
+                                            showDropDownIcon='true'
+                                            placeholder="Chọn khách hàng lớn"
+                                            :enabled="params.KHLon_Checked"
+                                            :filtering='selectFiltering'
+                                        >
+                                        </ejs-multiselect>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="text-red">Thời gian tạo: {{ display_params.thoiGianTao }}</div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="text-red">Số lượng tạo: {{ display_params.soLuongTao }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid-stack-box">
+            <div class="box-form box-col" id="boxLeft1" style="width: 50%">
+                <div class="legend-title">
+                    Danh sách thanh toán
+                </div>
+                <DataGrid v-bind:columns="[
+                    {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, width: 150},
+                    {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, allowSorting: false, width: 150},
+                    {fieldName: 'SO_DT', headerText: 'Số điện thoại', allowFiltering: true, allowSorting: false, width: 150},
+                    {fieldName: 'NOIDUNG', headerText: 'Nội dung', allowFiltering: true, allowSorting: false, width: 200},
+                    {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false, width: 200},
+                    {fieldName: 'SOTIEN', headerText: 'Số tiền', allowFiltering: true, allowSorting: false, width: 150, type: 'number', format: 'N0', cssClass: 'text-red'},
+                    {fieldName: 'MA_NVTC', headerText: 'Mã NVTC', allowFiltering: true, allowSorting: false, width: 150},
+                    {fieldName: 'MA_TUYEN', headerText: 'Mã tuyến thu', allowFiltering: true, allowSorting: false, width: 150}
+                ]"
+                    v-bind:dataSource="thanhToan_grid.items"
+                    dataKeyField="THANHTOAN_ID"
+                    :showColumnCheckbox="true"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :allowExcelExport="true"
+                    :enablePagingServer="true"
+                    :enabledSelectFirstRow="false"
+                    :aggregates="TTAggregatesColumns"
+                    :totalRecords="thanhToan_grid.pageInfo.totalElement"
+                    :pageSize="thanhToan_grid.pageInfo.maxSize"
+                    :pageIndex="thanhToan_grid.pageInfo.page"
+                    @pageChanged="thanhToanGridpageChangeHandler"
+                    @selectedItemsChanged="onThanhToanChecked"
+                    ref="thanhToanGrid"
+                    :key="thanhToan_grid.key"
+                >
+                </DataGrid>
+            </div>
+            <div class="box-form box-col" id="boxRight1" style="width: 50%">
+                <div class="legend-title">
+                    Danh sách lần tạo
+                </div>
+                <DataGrid v-bind:columns="[
+                    {fieldName: 'LANTAO_TT_ID', headerText: 'ID', allowFiltering: true, allowSorting: false, width: 100},
+                    {fieldName: 'NGAY_TAO', headerText: 'Ngày tạo', allowFiltering: true, allowSorting: false, width: 170, cssClass: 'text-right'},
+                    {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-purple'},
+                    {fieldName: 'TONGTIEN', headerText: 'Tổng tiền', allowFiltering: true, allowSorting: false, width: 150, type: 'number', format: 'N0', cssClass: 'text-red'},
+                    {fieldName: 'TU_TIEN', headerText: 'Từ tiền', allowFiltering: true, allowSorting: false, width: 120, type: 'number', format: 'N0'},
+                    {fieldName: 'DANHAC', headerText: 'Đã nhắc', allowFiltering: true, allowSorting: false, width: 120},
+                    {fieldName: 'DEN_TIEN', headerText: 'Đến tiền', allowFiltering: true, allowSorting: false, width: 120, type: 'number', format: 'N0'},
+                    {fieldName: 'NGUOI_CN', headerText: 'Người tạo', allowFiltering: true, allowSorting: false, width: 120},
+                    {fieldName: '', headerText: 'Thao tác', allowFiltering: false, allowSorting: false, width: 100, template: deleteRefreshTemplate, cssClass: 'text-center'}
+                ]"
+                    v-bind:dataSource="lanTao_grid.items"
+                    dataKeyField="LANTAO_TT_ID"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    :aggregates="LTAggregatesColumns"
+                    @selectedRowChanged="onLanTaoSelected"
+                    ref="lanTaoGrid"
+                    :key="lanTao_grid.key"
+                >
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+</div>

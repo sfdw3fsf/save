@@ -1,0 +1,439 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="btnXem()" class="pointer">
+                    <span
+                        class="icon nc-icon-glyph design_bullet-list-67"
+                    ></span>
+                    Danh sách
+                </a>
+            </li>
+            <li
+                :class="{disabled:!btnCapNhatNgay_enable}"
+                v-show="btnCapNhatNgay_visible"
+            >
+                <a class="pointer" @click="btnCapNhat">
+                    <span class="icon  one-calendar-sync"></span> Cập nhật
+                </a>
+            </li>
+            <li :class="{disabled:!btnDuyet_enable}" v-show="btnDuyet_visible">
+                <a class="pointer" @click="btnDuyet">
+                    <span class="icon  one-calendar-sync"></span> Cập nhật
+                    duyệt</a
+                >
+            </li>
+            <li
+                :class="{disabled:!btnGiaoViec_enable}"
+                v-show="btnGiaoViec_visible"
+            >
+                <a class="pointer" @click="btnGiaoViec">
+                    <span class="icon one-sitemap-user"></span> Giao việc
+                </a>
+                <ejs-dialog
+                    :enableResize="true"
+                    :visible="false"
+                    ref="popupfrnGiaoPhieuNV"
+                    :header='"Giao phiếu nhân viên"'
+                    showCloseIcon="true"
+                    target=".main-wrapper"
+                    width="60%"
+                    height="80%"
+                >
+                    <appGiaoViecModal
+                        ref="frnGiaoPhieuNV"
+                        @giaoviec_success="giaoViecClosed"
+                    ></appGiaoViecModal>
+                </ejs-dialog>
+            </li>
+            <!-- <li
+        :class="{disabled:!btnGiaoPhieu_enable}"
+        v-show="btnGiaoPhieu_visible"
+      >
+        <a class="pointer">
+          <span class="icon   one-file-arrow-right1"></span> Giao phiếu
+        </a>
+      </li> -->
+            <!-- <li :class="{disabled:!btnPhieuThu_enable}" v-show="btnPhieuThu_visible">
+        <a class="pointer">
+          <span class="icon  one-file-arrow-left "></span> Phiếu thu
+        </a>
+      </li> -->
+            <li>
+                <a class="pointer" @click="exportExcel()">
+                    <span class="icon  one-excel"></span> Xuất Excel
+                </a>
+            </li>
+            <li :class="{disabled:!btnKichHoat_enable}" v-show="btnKichHoat_visible">
+                <a class="pointer" @click="onClickKichHoat">
+
+                        <span class="icon  one-file-arrow-up"></span> Kích hoạt
+
+                </a>
+            </li>
+            <li :class="{disabled:!btnHoanCong_enable}" v-show="btnHoanCong_visible">
+                <a class="pointer" @click="onClickHoanCong">
+
+                        <span class="icon  one-hoancong"></span> Hoàn công
+
+
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="onClickKS">
+                    <span class="icon one-file-search"></span> LS khảo sát
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <h5>{{labelFunctionTitle}}</h5>
+        <div class="grid-stack-box">
+            <Split style="height:520px;">
+                <SplitArea :size="49" :minSize="100">
+                    <div
+                        class="box-col box-form"
+                        style="height: 510px;"
+                        id="boxLeft1"
+                    >
+                        <div class="legend-title">
+                            <div class="title pull-left">
+                                Thông tin cập nhật
+                            </div>
+                            <div class="pull-right red">
+                                Thông báo:
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Dịch vụ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select
+                                                name=""
+                                                id=""
+                                                class="form-control"
+                                                v-model="valueDichVuVTSelected"
+                                                @change="cbbDichVuVTChanged"
+                                            >
+                                                <option
+                                                    v-for="item in cbbDichVuVT"
+                                                    :value="item.DICHVUVT_ID"
+                                                    >{{item.TEN_DVVT}}</option
+                                                >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Quy trình</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select
+                                                name=""
+                                                id=""
+                                                class="form-control"
+                                                v-model="valueQuyTrinhSelected"
+                                                @change="cbbQuyTrinhChanged"
+                                            >
+                                                <option
+                                                    v-for="item in cbbQuyTrinh"
+                                                    :value="item.QUYTRINH_ID"
+                                                    >{{item.QUYTRINH}}</option
+                                                >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Nhóm KQ</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select
+                                                name=""
+                                                id=""
+                                                class="form-control"
+                                                v-model="valueNhomKQSelected"
+                                                @change="cbbNhomKQChanged"
+                                            >
+                                                <option
+                                                    v-for="(item,index) in cbbNhomKQ"
+                                                    :value="item.NHOMKQ_ID"
+                                                    >{{item.NHOM_KQ}}</option
+                                                >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Kết quả</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select
+                                                name=""
+                                                id=""
+                                                class="form-control"
+                                                v-model="valueKQSelected"
+                                                @change="cbbKQSelectChanged"
+                                            >
+                                                <option
+                                                    v-for="item in cbbKQ"
+                                                    :value="item.KQXL_ID"
+                                                    >{{item.KETQUA_XL}}</option
+                                                >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">ND thực hiện</div>
+                                    <div class="value">
+                                        <textarea
+                                            class="form-control"
+                                            ref="refNDThucHien"
+                                            style="height: 250px;resize: vertical;"
+                                            :disabled="!txtNDThucHien_enable"
+                                            v-model="txtNDThucHien"
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Ghi chú</div>
+                                    <div class="value">
+                                        <textarea
+                                            class="form-control"
+                                            style="height: 250px;resize: vertical;"
+                                            :disabled="!txtGhiChu_enable"
+                                            v-model="txtGhiChu"
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row mart5">
+                            <div class="key w90 padt0">Thu hồi Tbị</div>
+                            <div class="value">
+                                <div class="list-checks">
+                                    <div class="item">
+                                        <div class="check-action">
+                                            <input
+                                                type="radio"
+                                                class="check"
+                                                value="Giao theo QĐ"
+                                                v-model="rdoChecked"
+                                                :disabled="!rdoGiao_TheoQD_enable"
+                                            />
+                                            <span class="name"
+                                                >Giao theo QĐ {{NGAY_THUHOI!=-1
+                                                ? (NGAY_THUHOI
+                                                +'ngày'):null}}</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="check-action">
+                                            <input
+                                                type="radio"
+                                                class="check"
+                                                value="Giao ngay"
+                                                v-model="rdoChecked"
+                                                :disabled="!rdoGiaoNgay_enable"
+                                            />
+                                            <span class="name">Giao ngay</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w90"></div>
+                                    <div class="value">
+                                        <div
+                                            class="check-action mart7"
+                                            v-show="chkDaThuDuoc_visible"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                class="check"
+                                                :checked="chkDaThuDuoc_checked"
+                                                v-model="chkDaThuDuoc_checked"
+                                            />
+                                            <span class="name"
+                                                >Đã thu được tiền
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div
+                                    class="info-row"
+                                    v-show="txtTongThu_visible"
+                                >
+                                    <div class="key w90">
+                                        Tổng thu
+                                    </div>
+                                    <div class="value">
+                                        <!-- <input
+                                            type="text"
+                                            class="form-control"
+                                            v-model="txtTongThu"
+                                        /> -->
+                                        <vue-numeric
+                                            class="form-control red"
+                                            v-model="txtTongThu"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div></div
+                ></SplitArea>
+                <SplitArea :size="50" :minSize="100">
+                    <div class="box-col box-form" id="boxRight1">
+                        <div class="legend-title">Thông tin giao việc</div>
+                        <div class="table-content">
+                            <DataGrid
+                                :columns="fieldsGiaoViec"
+                                :dataSource="dtGiaoViec"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                            ></DataGrid>
+                        </div>
+                        <div class="legend-title">
+                            <span class="title">Lý do huỷ</span>
+                            <button
+                                class="btn btn-second padt2 padb2 w80"
+                                @click="showLyDoHuy"
+                                v-show="btnLyDoHuyVisibled"
+                            >
+                                Lý do
+                            </button>
+                        </div>
+                        <div class="table-content">
+                            <!-- <table-c
+                :columns="fieldsLyDoHuy"
+                :dataSource="dtLyDoHuy"
+                @rowEventClicked="removeLyDoHuy"
+                :showComponent="getShowComponent"
+                :allowPaging="true"
+              ></table-c> -->
+                            <DataGrid
+                                :columns="fieldsLyDoHuy"
+                                :dataSource="dtLyDoHuy"
+                                @commandClick="removeLyDoHuy"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                            ></DataGrid>
+                        </div></div
+                ></SplitArea>
+            </Split>
+        </div>
+
+        <div class="tabs nav tab-over">
+            <a
+                href="#tabPhieuChoXN"
+                @click="selectedTab('tabPhieuChoXN')"
+                data-toggle="tab"
+                class="active"
+                >Phiếu chờ xác nhận</a
+            >
+            <a
+                href="#tabPhieuHuyXN"
+                @click="selectedTab('tabPhieuHuyXN')"
+                data-toggle="tab"
+                v-show="tabPhieuDaHuy"
+                >Phiếu đã huỷ yêu cầu</a
+            >
+        </div>
+        <div class="box-form tab-content">
+            <div class="tab-pane active" id="tabPhieuChoXN">
+                <DataGrid
+                    ref="gridPhieuChuaThu"
+                    :columns="fieldsChoXacNhan"
+                    :dataSource="dtPhieuChuaThu"
+                    :showFilter="true"
+                    :showColumnCheckbox="true"
+                    dataKeyField="HDTB_ID"
+                    @selectedItemsChanged="itemSelectedChangedPhieuChoXN"
+                    @selectedRowChanged="itemFocus"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    :aggregates="aggregatesColumns"
+                ></DataGrid>
+                <!-- @rowClicked="itemFocus" -->
+            </div>
+            <div class="tab-pane " id="tabPhieuHuyXN" v-show="tabPhieuDaHuy">
+                <DataGrid
+                    :columns="fieldsPhieuHuy"
+                    :dataSource="dtPhieuHuy"
+                    :showFilter="true"
+                    dataKeyField="MA_TT"
+                    @selectedItemsChanged="itemSelectedChangedPhieuHuyXN"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    @selectedRowChanged="selectedRowChanged"
+                ></DataGrid>
+            </div>
+        </div>
+        <b-modal
+            id="modal-export"
+            hide-footer
+            modal-class="modal-export"
+            title="Xuất dữ liệu"
+            no-close-on-backdrop
+            size="lg"
+        >
+            <app-export-excel
+                :data="dtPhieuChuaThu"
+                :columnsIn="fieldsChoXacNhan"
+            ></app-export-excel>
+        </b-modal>
+        <b-modal
+            id="modal-lydohuy"
+            hide-footer
+            modal-class="modal-lydohuy"
+            title="Thay đổi lý do hủy thuê bao (Dành cho khối kỹ thuật)"
+            no-close-on-backdrop
+            size="lg"
+            @hidden="resetModal"
+        >
+            <app-ly-do-huy
+                :kieu="1"
+                :hdTbId="hdtb_id"
+                :loaiTbId="loaitb_id"
+                :loaiLdId="loaild_id"
+                :hdtbId="hdtb_id"
+                :kieuLyDoHuyLHTB="kieu_lydohuy_lhtb"
+            ></app-ly-do-huy>
+        </b-modal>
+        <PopupLichSuKS :thueBaoId="thuebao_id" />
+         <b-modal size="sm" id="notice-kichhoat" hide-header hide-footer>
+                <p class="p-3" style="word-wrap: break-word;">
+                    {{msgKichHoat}}
+                </p>
+                <div class="text-center">
+                    <button id="ok-exit" @click="closeKHModal(true)" class="btn btn-primary">OK</button>
+                    <button class="btn btn-secondary ml-2" @click="closeKHModal(false)">Hủy</button>
+                </div>
+            </b-modal>
+        <PopUpCapNhatGiaoPhieu ref="popupCapNhatGiaoPhieu" @close="closePopUpCapNhatGP"/>
+    </div>
+</div>

@@ -1,0 +1,493 @@
+<div >
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="getCongNo()">
+                    <span class="icon  one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li>
+                <a
+                    href="javascript:void(0)"
+                    @click="handleCapNhat()"
+                    :class="{disabled: listCongNoGetter.length === 0}"
+                >
+                    <span class="icon  one-save"></span> Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="docFile()">
+                    <span class="icon one-book"></span> Đọc file
+                </a>
+                <PopupDocFile :lanTao="lanTao" />
+            </li>
+        </ul>
+        <div class="more">
+            <a href="#">
+                <span class="-ap icon-th-menu"></span>
+            </a>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="pull-right">
+                <div class="info-row  marb0">
+                    <div class="key fw6 w60">Kỳ HĐ</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select v-model="kyHoaDon" class="form-control">
+                                <option
+                                    v-for="item in listKyHoaDonGetter"
+                                    :value="item.ID"
+                                    >{{item.ID}}</option
+                                >
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="thongTinTimKiem.checkDonVi"
+                                    class="check"
+                                    title="Check chọn để Lọc dữ liệu"
+                                />
+                                <span class="name">Đơn vị</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    v-model="thongTinTimKiem.selectedDonVi"
+                                    :disabled="!thongTinTimKiem.checkDonVi"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listDonVi"
+                                        :value="item.DONVI_ID"
+                                        >{{item.TEN_DV}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    :disabled="!thongTinTimKiem.checkDonVi"
+                                    :options="listDonVi"
+                                    v-model="thongTinTimKiem.selectedDonVi"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Mã TT
+                        </div>
+                        <div class="value">
+                            <input
+                                ref="maTT"
+                                type="text"
+                                v-model="thongTinTimKiem.maTT"
+                                class="form-control highlight"
+                                v-on:keyup.enter="getCongNo()"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="thongTinTimKiem.checkHTTT"
+                                    class="check"
+                                />
+                                <span class="name">Hình thức TT</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    v-model="thongTinTimKiem.selectedHTTT"
+                                    :disabled="!thongTinTimKiem.checkHTTT"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listHTTTGetter"
+                                        :value="item.HTTT_ID"
+                                        >{{item.HTTT}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    :disabled="!thongTinTimKiem.checkHTTT"
+                                    :options="listHTTT"
+                                    v-model="thongTinTimKiem.selectedHTTT"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="thongTinTimKiem.checkNhomKH"
+                                    class="check"
+                                />
+                                <span class="name">Nhóm KH</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select
+                                    v-model="thongTinTimKiem.selectedNhomKH"
+                                    :disabled="!thongTinTimKiem.checkNhomKH"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in thongTinTimKiem.listNhomKH"
+                                        :value="item.id"
+                                        >{{item.name}}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="thongTinTimKiem.checkNVQL"
+                                    class="check"
+                                />
+                                <span class="name">Nhân viên QL</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    :disabled="!thongTinTimKiem.checkNVQL"
+                                    v-model="thongTinTimKiem.selectedNVQL"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listNVQuanLyGetter"
+                                        :value="item.NHANVIEN_ID"
+                                        >{{item.TEN_NV}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    :disabled="!thongTinTimKiem.checkNVQL"
+                                    :options="listNVQL"
+                                    v-model="thongTinTimKiem.selectedNVQL"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="thongTinTimKiem.checkNVTC"
+                                    class="check"
+                                />
+                                <span class="name">NVTC</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    v-model="thongTinTimKiem.selectedNVTC"
+                                    :disabled="!thongTinTimKiem.checkNVTC"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listNVThuCuocGetter"
+                                        :value="item.TUYENTHU_ID"
+                                        >{{item.GHEPTUYEN}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    :disabled="!thongTinTimKiem.checkNVTC"
+                                    :options="listNVTC"
+                                    v-model="thongTinTimKiem.selectedNVTC"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    type="checkbox"
+                                    v-model="thongTinTimKiem.checkPhanLoaiKH"
+                                    :disabled="!thongTinTimKiem.checkNhomKH"
+                                    class="check"
+                                />
+                                <span
+                                    :class="{disabled:!thongTinTimKiem.checkNhomKH}"
+                                    class="name"
+                                    >Phân loại KH</span
+                                >
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    :disabled="!thongTinTimKiem.checkPhanLoaiKH"
+                                    v-model="thongTinTimKiem.selectedPhanLoaiKH"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listPLKHGetter"
+                                        :value="item.PHANLOAIKH_ID"
+                                        >{{item.MA_PLKH}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    :disabled="!thongTinTimKiem.checkPhanLoaiKH"
+                                    :options="listPLKH"
+                                    v-model="thongTinTimKiem.selectedPhanLoaiKH"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input
+                                    :disabled="!thongTinTimKiem.checkNhomKH"
+                                    v-model="thongTinTimKiem.checkLoaiKhachHang"
+                                    type="checkbox"
+                                    class="check"
+                                />
+                                <span
+                                    :class="{disabled:!thongTinTimKiem.checkNhomKH}"
+                                    class="name"
+                                    >Loại KH</span
+                                >
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <!-- <select
+                                    v-model="thongTinTimKiem.selectedLoaiKhachHang"
+                                    :disabled="!thongTinTimKiem.checkLoaiKhachHang"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listLoaiKHGetter"
+                                        :value="item.LOAIKH_ID"
+                                        >{{item.TEN_LOAIKH}}</option
+                                    >
+                                </select> -->
+                                <select2
+                                    :disabled="!thongTinTimKiem.checkLoaiKhachHang"
+                                    :options="listLoaiKH"
+                                    v-model="thongTinTimKiem.selectedLoaiKhachHang"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin xác nhận</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            Ngày gửi
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    v-model="thongTinCapNhat.ngayGui"
+                                    :max="config.dateConfig.max"
+                                    :format="config.dateConfig.format"
+                                    :showClearButton="false"
+                                    :value="config.dateConfig.value"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Kết quả
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select
+                                    v-model="thongTinCapNhat.selectedKetQua"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in thongTinCapNhat.listKetQua"
+                                        :value="item.id"
+                                        >{{item.name}}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Lý do
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select
+                                    v-model="thongTinCapNhat.selectedLyDo"
+                                    :disabled="!thongTinCapNhat.checkLyDo"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listLyDoGetter"
+                                        :value="item.LYDOKXN_ID"
+                                        >{{item.LYDO_KXN}}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            Ngày xác thực KH
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    v-model="thongTinCapNhat.ngayXacThucKH"
+                                    :max="config.dateConfig.max"
+                                    :format="config.dateConfig.format"
+                                    :showClearButton="false"
+                                    :value="config.dateConfig.value"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Ngày thu hồi thư
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    v-model="thongTinCapNhat.ngayThuHoiThu"
+                                    :max="config.dateConfig.max"
+                                    :format="config.dateConfig.format"
+                                    :enabled="thongTinCapNhat.checkNgayThuHoiThu"
+                                    :showClearButton="false"
+                                    :value="config.dateConfig.value"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Số dư
+                        </div>
+                        <div class="value">
+                            <!-- <input
+                type="number"
+                v-model="thongTinCapNhat.soDu"
+                class="form-control tright"
+                :disabled="!thongTinCapNhat.checkSoDu"
+              /> -->
+                            <vue-numeric
+                                :min="0"
+                                class="form-control tright"
+                                currency=""
+                                separator=","
+                                v-model="thongTinCapNhat.soDu"
+                                :disabled="!thongTinCapNhat.checkSoDu"
+                            ></vue-numeric>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Nguyên nhân
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select
+                                    v-model="thongTinCapNhat.selectedNguyenNhan"
+                                    :disabled="!thongTinCapNhat.checkNguyenNhan"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listNguyenNhanGetter"
+                                        :value="item.NGUYENNHANXN_ID"
+                                        >{{item.NGUYENNHAN_XN}}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">Danh sách công nợ</div>
+                <div class="pull-right red">
+                    Số lượng: {{listCongNoGetter.length}}
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="table-content">
+                <DataGrid
+                    ref="grid"
+                    :columns="fieldDsCongNo"
+                    :showFilter="true"
+                    :dataSource="listCongNoGetter"
+                    dataKeyField="GIAOPHIEU_ID"
+                    @selectedRowChanged="onCongNoRowChange"
+                    @selectedItemsChanged="onCongNoChange"
+                    :showColumnCheckbox="true"
+                    :allowPaging="true"
+                    :totalRecords="listCongNoGetter.length"
+                    :enablePagingServer="false"
+                ></DataGrid>
+            </div>
+        </div>
+    </div>
+</div>

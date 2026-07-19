@@ -1,0 +1,185 @@
+<div>
+  <!-- Thông tin kiểm kê -->
+  <div class="row">
+    <div class="col-12">
+      <div class="legend-title">Thông tin kiểm kê, quản lý tài sản</div>
+    </div>
+    <div class="col-6">
+      <div class="info-row">
+        <div class="key w150">Mã dự án</div>
+        <div class="value">
+          <input type="text" class="form-control" v-model="currentItem.ma_da" :disabled="!controls.ma_da.enabled" />
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Thẻ tài sản</div>
+        <div class="value">
+          <input
+            type="text"
+            class="form-control"
+            v-model="currentItem.so_the_ts"
+            :disabled="!controls.so_the_ts.enabled"
+          />
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">ID chi tiết tài sản</div>
+        <div class="value">
+          <input
+            type="number"
+            class="form-control"
+            v-model="currentItem.taisan_id"
+            :disabled="!controls.taisan_id.enabled"
+          />
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Mã vật tư</div>
+        <div class="value">
+          <input type="text" class="form-control" v-model="currentItem.ma_vtu" :disabled="!controls.ma_vtu.enabled" />
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="info-row">
+        <div class="key w150">Tên dự án</div>
+        <div class="value">
+          <input type="text" class="form-control" v-model="currentItem.ten_da" :disabled="!controls.ten_da.enabled" />
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Ngày dự kiến khấu hao</div>
+        <div class="value">
+          <div class="date-picker">
+            <ejs-datepicker
+              ref="ngay_kh_picker"
+              v-model="currentItem.ngay_kh"
+              :enabled="controls.ngay_kh.enabled"
+              :allowEdit="true"
+              format="dd/MM/yyyy"
+            >
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Hạn bảo hành</div>
+        <div class="value">
+          <div class="date-picker">
+            <ejs-datepicker
+             ref="ngay_baohanh_picker"
+              v-model="currentItem.ngay_baohanh"
+              :enabled="controls.ngay_baohanh.enabled"
+              :allowEdit="true"
+              format="dd/MM/yyyy"
+            >
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Ngày lắp đặt</div>
+        <div class="value">
+          <div class="date-picker">
+            <ejs-datepicker
+              ref="ngay_lapdat_picker"
+              v-model="currentItem.ngay_lapdat"
+              :enabled="controls.ngay_lapdat.enabled"
+              :allowEdit="true"
+              format="dd/MM/yyyy"
+            >
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Ngày sử dụng</div>
+        <div class="value">
+          <div class="date-picker">
+            <ejs-datepicker
+              ref="ngay_sudung_picker"
+              v-model="currentItem.ngay_sudung"
+              :enabled="controls.ngay_sudung.enabled"
+              :allowEdit="true"
+              format="dd/MM/yyyy"
+            >
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thông tin quản lý -->
+  <div class="row">
+    <div class="col-12">
+      <div class="legend-title">Thông tin quản lý</div>
+    </div>
+    <div class="col-6">
+      <div class="info-row">
+        <div class="key w150">Đơn vị quản lý</div>
+        <div class="value">
+          <TreeSelector
+            v-model="currentItem.donviqly_id"
+            :dataSource="danhMuc.donViQuanLyList"
+            textField="TEN"
+            valueField="ID"
+            type="donvi"
+            :disabled="!controls.select_donviqly_id.enabled"
+            placeholder="-- Chọn đơn vị quản lý --"
+            title="Chọn đơn vị quản lý"
+          />
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key w150">Phòng/Tổ quản lý</div>
+        <div class="value">
+          <TreeSelector
+            v-model="currentItem.phongbanqly_id"
+            :dataSource="danhMuc.phongBanQuanLyList"
+            :parentId="currentItem.donviqly_id"
+            :parentField="'DONVI_CHA_ID'"
+            :requireParentId="true"
+            type="phongban"
+            textField="TEN"
+            valueField="ID"
+            :disabled="!controls.select_phongbanqly_id.enabled"
+            placeholder="-- Chọn phòng/tổ quản lý --"
+            title="Chọn phòng/tổ quản lý"
+            parentRequiredMessage="Vui lòng chọn đơn vị quản lý trước"
+            
+          />
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="info-row">
+        <div class="key w150">Cá nhân quản lý</div>
+        <div class="value">
+          <CaNhanQuanLySelector
+            :key="canhanQuanLySelectorKey"
+            :dataSource="danhMuc.nguoiQuanLyList"
+            :role="danhMuc.nhiemVuList"
+            :value="currentItem.nguoiqly_id"
+            :disabled="!controls.select_nguoiqly_id.enabled"
+            @input="onNguoiQuanLyChange"
+          />
+        </div>
+      </div>
+      <!-- <div class="info-row">
+        <div class="key w150">Email / SDT</div>
+        <div class="value">
+          <SelectExt
+            :dataSource="[]"
+            dataTextField="TEN"
+            dataValueField="ID"
+            v-model="currentItem.email_sdt"
+            :disabled="!controls.email_sdt.enabled"
+          />
+        </div>
+      </div> -->
+    </div>
+  </div>
+</div>
+<!-- @input="onDonViQuanLyChange" -->
+<!-- @input="onPhongBanQuanLyChange" -->

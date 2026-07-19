@@ -1,0 +1,389 @@
+<div>
+  <vue-bread-crumb :header="header" />
+  <vue-nav>
+    <ul class="list">
+      <li @click="clickButton('nhapmoi')" :class="this.button.nhapmoi ? 'active' : 'non-active'">
+        <a> <span class="icon one-file-plus"></span>Nhập mới </a>
+      </li>
+      <li @click="clickButton('capnhat')" :class="this.button.capnhat ? 'active' : 'non-active'">
+        <a> <span class="icon one-reload1"></span>Cập nhật</a>
+      </li>
+
+      <li v-if="this.button.khoaphieu" @click="clickButton('khoaphieu')" :class="this.button.khoaphieu ? 'active' : 'non-active'">
+        <a> <span class="icon one-file-lock"></span>Khóa phiếu</a>
+      </li>
+
+      <li v-if="this.button.sendmail" @click="clickButton('sendmail')" :class="this.button.sendmail ? 'active' : 'non-active'">
+        <a> <span class="icon one-file-lock"></span>Gửi mail</a>
+      </li>
+    </ul>
+  </vue-nav>
+
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin tra cứu</div>
+      <div class="box-form">
+        <div class="row">
+          <div class="col-sm-9 col-12">
+            <div class="info-row">
+              <div class="key w100">Mã giao dịch</div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click.prevent="btnLayMaGD">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" ref="maGDRef" v-model="txtMaGD" v-on:keyup="keymonitor" class="form-control highlight" />
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">Mẫu số:</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="ddlMauSo" :options="options.mauso">
+                    <option disabled value="0">Select one</option>
+                  </SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">Kiểu điều chỉnh</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="ddlKieuDieuChinh" :options="this.options.kieudieuchinh" :disabled="disabled_KieuDieuChinh" @change="changeKieuDieuChinh">
+                    <option disabled value="0">Select one</option>
+                  </SelectExt>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <div class="info-row">
+              <div class="key w120">Thao tác</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="vthaotac" :options="this.options.thaotac">
+                    <option disabled value="0">Select one</option>
+                  </SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w120">Ký hiệu (Serial No):</div>
+              <div class="value">
+                <div class="select-custom">
+                  <SelectExt v-model="ddlKyHieu" :options="options.kyhieu">
+                    <option disabled value="0">Select one</option>
+                  </SelectExt>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w120">Số hoá đơn:</div>
+              <div class="value">
+                <input type="number" v-model="txtSoHoaDon" class="form-control" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend-title mart20">Thông tin hoá đơn</div>
+      <div class="box-form">
+        <div class="row">
+          <div class="col-sm-9 col-12">
+            <p>Tên hoá đơn: {{ lblTenHoaDon }}</p>
+            <p>Mã số thuế: {{ lblMaSoThue }}</p>
+            <p>Tên đơn vị: {{ lblTenDonVi }}</p>
+            <p>Địa chỉ: {{ lblDiaChi }}</p>
+            <div class="info-row">
+              <div class="key" style="width: 270px">Tên khách hàng (Customer's name) <span class="red">(*)</span></div>
+              <div class="value">
+                <input type="text" ref="tenKHRef" v-model="txtTenKhachHang" class="form-control" :disabled="disabledTenKH" />
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key" style="width: 270px">Địa chỉ:</div>
+              <div class="value">
+                <input type="text" v-model="txtDiaChi" class="form-control" :disabled="disabledDiaChi" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-8 col-12">
+                <div class="info-row">
+                  <div class="key" style="width: 270px">
+                    Hình thức TT (Kind of Payment)
+                    <span class="red">(*)</span>
+                  </div>
+                  <div class="value">
+                    <input type="text" v-model="txtHinhThucThanhToan" class="form-control" :disabled="disabledHTTT" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4 col-12">
+                <div class="info-row">
+                  <div class="key">Mã số: {{ lblMaSo }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key" style="width: 270px">Biên bản đính kèm:</div>
+                  <div class="value">
+                    <div class="input-more-button -right">
+                      <label id="btnFile" class="btn" for="upload-file" style="pointer-events: block">
+                        <span class="-ap icon-more_horiz"></span>
+                        <input type="file" ref="files" class="hidden" id="upload-file" @change="importFile" />
+                      </label>
+                      <input type="text" class="form-control" v-model="txtBienBanDinhKem" :disabled="disabledBienBanDinhKem" />
+                    </div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="key" style="width: 270px">Ghi chú hoá đơn:</div>
+                  <div class="value">
+                    <div class="input-number-custom">
+                      <textarea rows="3" type="text" v-model="txtGhiCHuHoaDon" :disabled="disabledGhiCHuHoaDon" class="form-control"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3 col-12">
+            <p>Mẫu số: <span class="red">(*)</span> {{ lblMauSo }}</p>
+            <p>Ký hiệu (Serial No) <span class="red">(*)</span> {{ lblKyHieu }}</p>
+            <p>Số (No): {{ lblSo_No }}</p>
+            <p>&nbsp;</p>
+            <div class="info-row">
+              <div class="key w100">Mã số thuế</div>
+              <div class="value">
+                <input type="text" v-model="txtMaSoThue" class="form-control" :disabled="disabledMST" />
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">Số điện thoại</div>
+              <div class="value">
+                <input type="text" v-model="txtSoDienThoai" class="form-control" :disabled="disabledSDT" />
+              </div>
+            </div>
+            <div class="info-row marb10">
+              <div class="key w100">Tháng hoá đơn: {{ lblThangHoaDon }}</div>
+              <div class="value"></div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">Email</div>
+              <div class="value">
+                <input type="text" v-model="txtEmail" :disabled="disabledEmail" class="form-control" />
+              </div>
+            </div>
+
+            
+            <div class="info-row" :style="!visibleNganHang ? 'display: none' : ''">
+              <div class="key w100">Ngân hàng</div>
+              <div class="value">
+                <div class="select-custom" ref="nganHangRef">
+                  <SelectExt
+                      dataValueField="NGANHANG_ID"
+                      dataTextField="TEN_NH"
+                      v-model.number="cboBank.value"
+                      :settings="{ dropdownParent: $refs['nganHangRef'] }"
+                      :dataSource="cboBank.options"
+                  />
+              </div>
+              </div>
+            </div>
+            <div class="info-row" :style="!visibleSoTaiKhoan ? 'display: none' : ''">
+              <div class="key w100">Số TK</div>
+              <div class="value">
+                <input type="text" v-model="txtSoTaiKhoan" :disabled="disabledSoTaiKhoan" class="form-control" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend-title mart20">Thông tin dịch vụ</div>
+      <div class="box-form">
+        <div class="table-content">
+          <ejs-grid
+            ref="grid_danhsacha"
+            :load="load"
+            :allowResizing="true"
+            :actionComplete="onActionComplete"
+            width="100%"
+            :dataSource="this.grid_danhsach"
+            locale="vi-VN"
+            :allowSorting="true"
+            :allowFiltering="true"
+            :allowPaging="true"
+            :pageSettings="{
+                pageSize: 10,
+                pageSizes: [10, 50, 100, 200],
+              }"
+            :gridLines="1"
+            :editSettings="{ allowEditing: true, mode: 'Normal' }"
+            :commandClick="commandClick"
+          >
+            <e-columns>
+              <e-column headerTextAlign="center" textAlign="left" field="Commands" headerText="Xóa" width="80" :commands="commands"></e-column>
+              <e-column headerTextAlign="center" textAlign="center" field="STT" headerText="STT" allowSorting="true" allowFiltering="true" width="80" :allowEditing="false"></e-column>
+              <e-column headerTextAlign="center" textAlign="left" field="ProdName" headerText="Dịch vụ sử dụng" allowSorting="true" allowFiltering="true"></e-column>
+              <e-column headerTextAlign="center" textAlign="left" field="ProdUnit" headerText="Đơn vị tính" allowSorting="true" allowFiltering="true" width="120"></e-column>
+              <e-column headerTextAlign="center" textAlign="right" field="ProdQuantity" headerText="Số lượng" format="N" editType="numericedit" allowSorting="true" allowFiltering="true" width="120"></e-column>
+              <e-column headerTextAlign="center" textAlign="right" field="ProdPrice" headerText="Đơn giá" type="Number" format="N" editType="numericedit" allowSorting="true" allowFiltering="true"></e-column>
+              <e-column type="Number" format="N" headerTextAlign="center" textAlign="right" field="Total" editType="numericedit" headerText="Thành tiền (Trước thuế)" allowSorting="true" allowFiltering="true" :allowEditing="false" v-if="this.showgrid.Total"></e-column>
+
+              <e-column type="Number" format="N" headerTextAlign="center" textAlign="right" field="VATRate" headerText="VAT" editType="numericedit" allowSorting="true" allowFiltering="true" width="120" v-if="this.showgrid.Vat"></e-column>
+
+              <e-column type="Number" format="N" headerTextAlign="center" textAlign="right" field="VATAmount" headerText="Tiền thuế" editType="numericedit" allowSorting="true" allowFiltering="true" :allowEditing="true" v-if="this.showgrid.VATAmount"></e-column>
+
+              <e-column type="Number" format="N" headerTextAlign="center" textAlign="right" field="Amount" headerText="Thành tiền" editType="numericedit" allowSorting="true" allowFiltering="true" :allowEditing="false" v-if="this.showgrid.Amount"></e-column>
+              <e-column
+                type="Number"
+                format="N"
+                headerTextAlign="center"
+                textAlign="right"
+                field="Amount"
+                editType="numericedit"
+                headerText="Thành tiền (Sau thuế)"
+                allowSorting="true"
+                allowFiltering="true"
+                :allowEditing="false"
+                v-if="this.showgrid.Amount_sauthue"
+                :customAttributes="{ class: 'customcss' }"
+              ></e-column>
+            </e-columns>
+          </ejs-grid>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">
+              Tổng tiền chịu thuế 10% :
+            </div>
+            <div class="value">
+              <!-- <input type="text" v-model="txtTongTienChiuThue10" :disabled="true" class="form-control"> -->
+              <vue-numeric class="form-control red tright" style="width: 100%" separator="," v-model="txtTongTienChiuThue10" :disabled="disabledTongTienChiuThue10" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">
+              Tổng tiền chịu thuế 5% :
+            </div>
+            <div class="value">
+              <!-- <input type="text" v-model="txtTongTienChiuThue5" :disabled="true" class="form-control"> -->
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongTienChiuThue5" :disabled="disabledTongTienChiuThue5" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">
+              Tổng tiền chịu thuế 0% :
+            </div>
+            <div class="value">
+              <!-- <input type="text" v-model="txtTongTienChiuThue0" :disabled="true" class="form-control"> -->
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongTienChiuThue0" :disabled="disabledTongTienChiuThue0" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">Cộng tiền dịch vụ:</div>
+            <div class="value">
+              <vue-numeric class="form-control red tright" separator="," v-model="txtCongTienDV" :disabled="disabledCongTienDV" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">Tổng tiền thuế 10%:</div>
+            <div class="value">
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongTienThue10" :disabled="disabledTongTienThue10" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">Tổng tiền thuế 5%:</div>
+            <div class="value">
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongTienThue5" :disabled="disabledTongTienThue5" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">Tổng tiền không thuế:</div>
+            <div class="value">
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongTienKhongThue" :disabled="disabledTongTienKhongThue" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">Tiền thuế GTGT:</div>
+            <div class="value">
+              <!-- <input type="text" v-model="txtTienTHueGTGT" class="form-control red tright" value="0" :disabled="disabledTienThueGTGT"> -->
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTienTHueGTGT" :disabled="disabledTienThueGTGT" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 290px">
+              Thẻ mở rộng (Dùng cho các tỉnh có thẻ extra) :
+            </div>
+            <div class="value">
+              <input type="text" v-model="txtTheMoRong" class="form-control" :disabled="disabledTheMoRong" />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">
+              Tổng tiền không chịu thuế:
+            </div>
+            <div class="value">
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongTienKhongChiuThue" :disabled="disabledTongTienChiuKhongThue" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3 col-12">
+          <div class="info-row">
+            <div class="key" style="width: 170px">
+              Tổng cộng tiền thanh toán:
+            </div>
+            <div class="value">
+              <!-- <input type="text" v-model="txtTongCongTienThanhToan" class="form-control red tright" value="0" :disabled="disabledTongCongTienThanhToan"> -->
+              <vue-numeric class="form-control red tright" separator="," v-model="txtTongCongTienThanhToan" :disabled="disabledTongCongTienThanhToan" placeholder="0" output-type="Number"></vue-numeric>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="key" style="width: 290px">Số tiền viết bằng chữ</div>
+        <div class="value">
+          <input type="text" v-model="txtTienVietBangChu" :disabled="disabledTienVietBangChu" class="form-control" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <PopupHDDT ref="popup_HDDT" @chapnhan="acceptHDDT" />
+  <PopupTraCuuHDDT ref="popup_TraCuuHDDT" @chapnhan="accep_TraCuutHDDT" :vma_gd="this.vma_gd" :vtt="this.vtt" />
+
+  <popup-hieu-chinh-hddt ref="popupHieuChinhHDDTRef" :html="this.html" />
+</div>

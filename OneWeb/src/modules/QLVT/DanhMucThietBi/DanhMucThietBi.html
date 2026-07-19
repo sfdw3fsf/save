@@ -1,0 +1,317 @@
+<ejs-dialog class="popup-content" ref="popupdanhMucThietBi" showCloseIcon=true :visible='false' :allowDragging='true'
+  :target='dialog.target' :width='dialog.width' :header='"DANH MỤC THIẾT BỊ"'
+  :animationSettings='dialog.animationSettings' :open="dialogOpen" :close="closePopup">
+  <div class="modal-content popup-box">
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <a href="#" @click.prevent="SetButton(1)" :class="{disabled: !tsbtnNhapMoi}">
+            <span class="icon one-file-plus"></span>Nhập mới
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="GhiLai" :class="{disabled: !tsbtnGhiLai}">
+            <span class="icon one-save"></span>Ghi lại
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="SetButton(2)" :class="{disabled: !tsbtnHuyBo}">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Hủy
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="onClickDelete" :class="{disabled: !tsbtnXoa}">
+            <span class="icon one-trash"></span>Xóa
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">
+              <div class="pull-left">Thông tin danh mục thiết bị</div>
+              <div class="pull-right">
+                <div class="list-checks">
+                  <div class="item">
+                    <div class="red">Tổng tiền: {{tongTien}}</div>
+                  </div>
+                  <div class="item">
+                    <div class="check-action normal">
+                      <input type="checkbox" class="check" v-model="chk_CaiDatMD">
+                      <span class="name">Cài đặt mặc định</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Nhóm Tbi<span class="required"> *</span></div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <!-- <b-form-select v-model="nhomTBSelected" class="form-control" :options="listNhomTB">
+                      </b-form-select> -->
+                      <SelectExt v-model="nhomTBSelected" :dataSource="listNhomTB" dataTextField="text"
+                        dataValueField="value" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Đơn vị tính</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <b-form-select v-model="donViTinhSelected" class="form-control" :options="listDTV">
+                      </b-form-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Thiết bị <span class="required"> *</span></div>
+                  <div class="value">
+                    <input v-model="thietBiSelected" type="text" class="form-control">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Mã Tbi</div>
+                  <div class="value">
+                    <input ref="txtMA_TBI" v-model="txtMA_TBI_Selected" type="text" class="form-control">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Dịch vụ VT<span class="required"> *</span></div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <!-- <b-form-select v-model="dichVuVTSelected" class="form-control" :options="listDichVuVT">
+                      </b-form-select> -->
+                      <SelectExt v-model="dichVuVTSelected" :dataSource="listDichVuVT" dataTextField="text"
+                        dataValueField="value" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Loại phí</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <b-form-select v-model="loaiPhiSelected" class="form-control" :options="listLoaiPhi">
+                      </b-form-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Tiền</div>
+                  <div class="value">
+                    <!-- <input ref="tien" type="text" v-model="txtTIEN_Selected" class="tright form-control" value="0"> -->
+                    <input type="number" ref="tien" :value="txtTIEN_Selected | roundup"
+                      @input="$event => this.txtTIEN_Selected = roundUp($event.target.value)"
+                      class="form-control tright"
+                      @keyup="VATChanged()" @change="VATChanged()">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Vat</div>
+                  <div class="value">
+                    <!-- <input type="text" v-model="txtVAT_Selected" class="tright form-control" value="0"> -->
+                    <input type="number" ref="vat" :value="txtVAT_Selected | roundup"
+                      @input="$event => this.txtVAT_Selected = roundUp($event.target.value)"
+                      class="form-control tright">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Tiền khuyến mại</div>
+                  <div class="value">
+                    <!-- <input type="text" v-model="txtTienKM_Selected" class="tright form-control" value="0"> -->
+                    <input type="number" ref="tienKM" :value="txtTienKM_Selected | roundup"
+                      @input="$event => this.txtTienKM_Selected = roundUp($event.target.value)"
+                      class="form-control tright">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Vat KM</div>
+                  <div class="value">
+                    <!-- <input type="text" v-model="txtVatKm_Selected" class="tright form-control" value="0"> -->
+                    <input type="number" ref="VATKm" :value="txtVatKm_Selected | roundup"
+                      @input="$event => this.txtVatKm_Selected = roundUp($event.target.value)"
+                      class="form-control tright">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Ghi chú</div>
+                  <div class="value">
+                    <input ref="ghiChuText" type="text" v-model="ghiChu" class=" form-control" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Tỷ lệ VAT</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <b-form-select v-model="tyLeVatSelected" class="form-control" :options="listTyLeVat" @change="VATChanged">
+                      </b-form-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Block đầu</div>
+                  <div class="value">
+                    <input ref="txtBlockDau" type="text" v-model="blockDau_Selected" class="tright form-control"
+                      value="0">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Giá block tiếp</div>
+                  <div class="value">
+                    <input ref="txtBlockTiep" type="text" v-model="giaBlockTiep_Selected" class="tright form-control"
+                      value="0">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Block tiếp</div>
+                  <div class="value">
+                    <input ref="txtGiaBlockTiep" type="text" v-model="blockTiep_Selected" class="tright form-control"
+                      value="0">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w110">Vat block tiếp</div>
+                  <div class="value">
+                    <input ref="txtBlockTiep" type="text" v-model="vatBlockTiep_Selected" class="tright form-control"
+                      value="0">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                      <div class="key w110">Khoản mục TT<span class="required"> *</span></div>
+                      <div class="value">
+                        <div class="select-custom">
+                          <SelectExt v-model="khoanMucTtId_value" :dataSource="listKhoanMucTT" dataTextField="text"
+                          dataValueField="value" />
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="box-move-select-table">
+            <div class="box-col box-form">
+              <div class="legend-title">Loại thuê bao đã gán</div>
+              <div class="table-content" style="height: 240px;">
+                <DataGrid v-bind:columns="[
+                  {fieldName: 'LOAIHINH_TB', headerText: 'Loại thuê bao', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'dichVuVTSelected', headerText: 'Dịch vụ VT', allowFiltering: true, allowSorting: false}
+                  ]" v-bind:dataSource="listLoaiHinhTB_1" :showFilter="true"
+                  @selectedRowChanged="gridlistLoaiHinhTB_1_selectedRowChanged" :showColumnCheckbox="true"
+                  @selectedItemsChanged="gridlistLoaiHinhTB_1_selectedData_checkbox" dataKeyField="LOAITB_ID"
+                  :defaultColumnCheckboxChecked="false" :allowPaging="true" :enablePagingServer="false">
+                </DataGrid>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn" href="#" @click.prevent="angleRight()">
+                <span class="fa fa-angle-right"></span>
+              </button>
+              <button class="btn" @click="angleDoubleRight()">
+                <span class="fa fa-angle-double-right"></span>
+              </button>
+              <button class="btn" href="#" @click.prevent="angleLeft()">
+                <span class="fa fa-angle-left"></span>
+              </button>
+              <button class="btn" @click="angleDoubleLeft()">
+                <span class="fa fa-angle-double-left"></span>
+              </button>
+            </div>
+            <div class="box-col box-form">
+              <div class="legend-title">Loại thuê bao chưa gán</div>
+              <div class="table-content" style="height: 240px;">
+                <DataGrid v-bind:columns="[
+                  {fieldName: 'LOAIHINH_TB', headerText: 'Loại thuê bao', allowFiltering: true, allowSorting: false}
+                  ]" v-bind:dataSource="listLoaiHinhTB_0" :showFilter="true"
+                  @selectedRowChanged="gridlistLoaiHinhTB_0_selectedRowChanged" :showColumnCheckbox="true"
+                  @selectedItemsChanged="gridlistLoaiHinhTB_0_selectedData_checkbox" dataKeyField="LOAITB_ID"
+                  :defaultColumnCheckboxChecked="false" :allowPaging="true" :enablePagingServer="false"
+                  ref="ref_listLoaiHinhTB_0"
+                  >
+                </DataGrid>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="box-form">
+            <div class="legend-title">
+              <div class="pull-left">Danh sách thiết bị</div>
+              <div class="pull-right normal">
+                <div class="check-action red">
+                  <input type="checkbox" class="check" v-model="chkSeri_MD">
+                  <span class="name">Mặc định phải nhập seri khi cấp vật tư</span>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="table-content" style="height: 620px;">
+              <DataGrid v-bind:columns="[
+                  {fieldName: 'maTbi', headerText: 'Mã thiết bị', allowFiltering: true, allowSorting: false},
+                  {fieldName: 'loaiTbi', headerText: 'Tên thiết bị', allowFiltering: true},
+                  {fieldName: 'tien', headerText: 'Tiền', allowFiltering: true, cellCssClass: 'text-right'},
+                  {fieldName: 'vat', headerText: 'Vat', allowFiltering: true, cellCssClass: 'text-right'},
+                  {fieldName: 'tienKm', headerText: 'Tiền KM', allowFiltering: true, cellCssClass: 'text-right'}
+              ]" v-bind:dataSource="listLoaiThietBi" :showFilter="true"
+                @selectedRowChanged="gridDSThietBi_selectedRowChanged" :showColumnCheckbox="false" dataKeyField="maTbi"
+                ref="listLTB" :allowPaging="true" :enablePagingServer="false">
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

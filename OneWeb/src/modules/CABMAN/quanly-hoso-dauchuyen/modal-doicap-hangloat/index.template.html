@@ -1,0 +1,116 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @hidden="onModalHidden"
+    @shown="onModalShown">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">Đấu nối thuê bao vào tuyến cáp hàng loạt</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+        <div class="popup-body">
+            <div class="row">
+                <div class="col-sm-8 col-12">
+                    <div class="box-form" style="height: 690px;">
+                        <div class="legend-title">Danh sách thuê bao chờ đấu nối</div>
+                        <div class="table-content">
+                            <DataGrid
+                                ref="grid-thuebao"
+                                v-bind:columns="[
+                                    {headerText: 'Thông tin thuê bao', textAlign: 'Center', columns: columnThueBao },
+                                    {headerText: '', allowFiltering: false, width: '50', textAlign: 'Center', clipMode: 'Ellipsis', headerTemplate: getHeaderTemplateChon(this), template: getColumnTemplateChon(this) },
+                                    {headerText: 'Thông tin cáp mới', textAlign: 'Center', columns: columnCap },
+                                ]"        
+                                v-bind:dataSource="dsThueBao"
+                                :showFilter="true"
+                                :allowPaging="true"
+                                :enablePagingServer="false"
+                                @queryCellInfo="onQueryCellInfo"></DataGrid>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Chọn kết cuối, vị trí đấu nối thuê bao</div>
+                        <div class="title-bg-main">
+                            <span class="title">Kết cuối</span>
+                        </div>
+                        <div class="select-custom">
+                            <input type="text" readonly class="form-control" placeholder="[Chọn kết cuối]" :value="kyHieuKc" @click="showModalChonKetCuoi = !showModalChonKetCuoi" />
+                        </div>
+                        <div class="title-bg-main mart10">
+                            <div class="pull-left">
+                                Các vị trí còn rỗi
+                            </div>
+                            <div class="pull-right">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="checkAllViTri">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-7 col-12">
+                                <div class="btn fullw btn-second normal nocorner marb5" style="height: 40px;" @click="onClickBtnGan">
+                                    <div class="info-row mar0">
+                                        <div class="key pad0 w20">
+                                            <span class="fa f20 fa-angle-left"></span>
+                                        </div>
+                                        <div class="value center" style="vertical-align: middle;">
+                                            Gán cho thuê bao
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="btn fullw btn-second normal nocorner marb5" style="height: 40px;" @click="onClickBtnHuyGan">
+                                    <div class="info-row mar0">
+                                        <div class="key pad0 w20">
+                                            <span class="fa f20 fa-angle-right"></span>
+                                        </div>
+                                        <div class="value center" style="vertical-align: middle;">
+                                            Hủy gán
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-form" style="height: 386px;margin-bottom: 0px;padding-bottom: 0px;">
+                                    <p class="text-desc"><span class="red"> Bước 1:</span> Tìm kiếm và chọn ra 1 kết cuối cần nhập thuê bao vào</p>
+                                    <p class="text-desc"><span class="red"> Bước 2:</span> Click nút <span class="fw6 text">[Gán cho thuê bao]</span> để ánh xạ các vị trí kết cuối rỗi ở cột phải vào danh sách thuê bao bên cột trái.
+                                    Ánh xạ theo cơ chế 1 thuê bao - 1 vị trí và theo thứ tự từ trên xuống dưới. <span class="fw6 text">Lặp lại Bước 1, 2</span> cho tới khi ánh xạ hết các
+                                    thuê bao.</p>
+                                    <p class="text-desc"><span class="red"> Bước 3:</span> Bước 3: Click nút <span class="fw6 text">[Thực thi]</span> phía bên dưới để xác nhận tiến hành cập nhật vào cơ sở dữ liệu.</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 col-12">
+                                <div class="box-form" style="height: 475px; overflow-y: scroll;">
+                                    <div v-for="viTri in dsViTriRoi" class="check-action" style="width:100%">
+                                        <input type="checkbox" class="check" :value="viTri.ID" :disabled="!viTri.ENABLED" v-model="dsViTriIdDuocChon">
+                                        <span class="name">{{viTri.MOTA}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="group-buttons -bottom center">
+                <button class="btn btn-main" style="min-width: 130px;" :disabled="!enabledBtnThucThi" @click="onClickBtnThucThi">Thực thi</button>
+                <button class="btn btn-second" style="min-width: 130px;" @click="$bvModal.hide(modalId)">Huỷ bỏ</button>
+            </div>
+        </div>
+    </div>
+    <ModalChonKetCuoi 
+        :choPhepDoiTramTbi="true" 
+        :modalShow="showModalChonKetCuoi" 
+        @closeModal="closeModalChonKetCuoi" 
+        @selected="onSelectKetCuoi"/>
+</b-modal>

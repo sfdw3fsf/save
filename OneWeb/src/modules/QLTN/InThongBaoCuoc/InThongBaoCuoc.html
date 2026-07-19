@@ -1,0 +1,156 @@
+
+    <div class="main-wrapper">
+
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="javascript:void(0)"  @click="onTaoBanKe">
+                        <span class="icon one-file-plus-1"></span>Tạo bản kê
+                    </a>
+                </li>
+                <li >
+                    <a href="javascript:void(0)" :class="{'disabled-btn': isDisableView}" @click="onXemKetQua">
+                        <span class="icon one-view-result"></span>Xem kết quả
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)"  :class="{'disabled-btn': isDisablePrint}">
+                        <span class="icon one-print"></span> In trực tiếp
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="onXuatPDF"  :class="{'disabled-btn': isDisableExport}">
+                        <span class="icon one-pdf-download"></span> Xuất Pdf
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" @click="onImportFile" >
+                        <span class="icon one-download"></span> Import file
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)">
+                        <span class="icon one-export"></span> Thoát
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="page-content">
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="box-form" style="height: 1095px;overflow: auto;">
+                        <div class="tree-plus tree-icon">
+                            <ul class="">
+                                <li class="haschild open" v-for="item in inv_version" :key="item.VER_ID">
+                                    <a href="javascript:void(0)">{{item.VER_NAME}}</a>
+                                    <ul>
+                                        <li v-for="i in item_child(item.VER_ID)" :key="i.INV_ID"  @click="click_leaves(i.VER_ID,i.INV_ID)"  v-bind:class="{ active: tree_leaves == i.INV_ID }" ><a href="javascript:void(0)">{{i.INV_NAME}}</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <input type="file" @change="onChangeFile" ref="fileInput" accept=".xlsx, .xls" id="upload"
+                    style="display: none" />
+
+                </div>
+                <div class="col-sm-9 col-12">
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách đối tượng</div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div v-for="(con,i) in inv_condition" :key="i">
+                                    <div class="info-row">
+                                        <div class="key w150" v-if="con.C_TYPE<4">
+                                            {{con.C_LABEL}}
+                                        </div>
+
+                                        <div class="value" v-if="con.C_TYPE===1 || con.C_TYPE===0" >
+                                            <div class="input-icon-right">
+                                                <ejs-datepicker class="form-control bg-none bor0 fw6 text h24"
+                                                    @change="change_Date(con.C_ID,$event)"
+                                                    :value="con.C_ID===1 ? date.monthVal : date.dateVal"
+                                                    :format="con.C_ID===1?'MM/yyyy':date.dateFormat"
+                                                    >
+                                              </ejs-datepicker>
+
+                                            </div>
+                                        </div>
+                                        <div class="value"  v-if="con.C_TYPE===2 && con.REPLACE_STRING==='MAKH_C'" >
+                                            <input type="text" class="form-control"
+                                                v-model="dsMaTT"
+                                                @change="chang_Text(con.C_ID,$event)">
+                                        </div>
+                                        <div class="value"  v-else-if="con.C_TYPE===2" >
+                                            <input type="text" class="form-control"
+                                                @change="chang_Text(con.C_ID,$event)">
+                                        </div>
+
+
+
+                                        <div class="select-custom" v-if="con.C_TYPE===3">
+                                            <select class="form-control bg-none h35 bor1" @change="change_Combo(con.C_ID,$event)" >
+                                              <option v-for="item in con.DATA_FIELD" :value="item.TT">
+                                                {{item.TEN}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="check-action" v-if="con.C_TYPE===5">
+                                            <input type="checkbox" class="check" v-model="con_14">
+                                            <span class="name">{{con.C_LABEL}}</span>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="title-bg-main" v-if="inv_orders.length>0"><span class="title">Chọn cách sắp</span></div>
+
+                                <div class="list-check-box" v-for="item in inv_orders">
+                                    <div class="item marb10">
+                                        <div class="check-action">
+                                            <input type="radio" name="chkOrder" class="check" @click="order_id=item.ORDER_ID">
+                                            <span class="name">{{item.DESCRIPTION}}</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-7 col-12">
+                                <div class="box-form" v-for="(con,i) in inv_condition" v-if="con.C_TYPE===4" :key="i">
+                                    <div class="title-bg-main">
+                                        <span class="title">{{con.C_LABEL}}</span>
+                                    </div>
+                                    <div class="table-content" style="height:172px;">
+                                        <table class="table-result">
+                                            <tbody>
+                                                <tr v-for="item in con.DATA_FIELD">
+                                                    <td class="w20 center" v-for="(giatri,key,index) in item" v-if="index<1">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check" @click="click_Checked(con.C_ID,giatri)">
+                                                            <span class="name"></span>
+                                                        </div>
+                                                    </td>
+                                                    <td v-for="(giatri,key,index) in item" v-if="index>0"> {{giatri}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+</div>
+

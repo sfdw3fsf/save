@@ -1,0 +1,2 @@
+import LookUpCrossSellDivisionInfo from "./LookUpCrossSellDivisionInfo"
+export default LookUpCrossSellDivisionInfo

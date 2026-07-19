@@ -1,0 +1,177 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnNhapMoi.enabled" @click="btnNewClick">
+          <span class="icon one-file-plus"></span>Nhập mới
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnGhiLai.enabled" @click="btnSaveClick">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnCancelClick" :disabled="!buttons.btnHuyBo.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnSua.enabled" @click="btnEditClick">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" :disabled="!buttons.btnXoa.enabled" @click="btnDeleteClick">
+          <span class="icon one-trash"></span>Xóa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnImportExcel_Click">
+          <span class="icon one-download"></span>Import
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="btnExportExcel_Click">
+          <span class="icon one-upload"></span>Export
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <!-- Form thông tin mặt sàn -->
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin loại thiết bị/hệ thống</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">ID loại thiết bị/hệ thống <span class="red">*</span></div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.id"
+                    :disabled="!controls.txtTen.enabled"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Hiệu lực</div>
+                <div class="value padt4">
+                  <div class="check-action">
+                    <input
+                      type="checkbox"
+                      class="check"
+                      v-model="currentItem.hieu_luc"
+                      :true-value="1"
+                      :false-value="0"
+                      :disabled="!controls.checkBoxHieuLuc.enabled"
+                    />
+                    <span class="name">{{ getHieuLucText(currentItem.hieu_luc) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Mảng thiết bị/hệ thống <span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="listMangThietBi"
+                    dataTextField="mang_thiet_bi_ten"
+                    dataValueField="mang_thiet_bi_id"
+                    v-model="currentItem.mang_thiet_bi_id"
+                    :disabled="!buttons.btnGhiLai.enabled"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Tên loại thiết bị/hệ thống <span class="red">*</span></div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.ten"
+                    @blur="checkTenLoaiThietBiBlur"
+                    :disabled="!controls.txtTen.enabled"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <small v-if="tenExists" class="text-danger">
+            Tên loại thiết bị/hệ thống đã tồn tại!
+          </small>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Ghi chú</div>
+                <div class="value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="currentItem.ghi_chu"
+                    :disabled="!controls.txtGhiChu.enabled"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid danh sách loại thiết bị hệ thống -->
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách loại thiết bị hệ thống</div>
+          </div>
+          <div class="table-content">
+            <DataGrid
+              v-bind:columns="[
+                  {fieldName: 'id', headerText: 'ID', textAlign: 'Left', allowFiltering: true },
+                  { fieldName: 'mang_thiet_bi_ten', headerText: 'Mảng thiết bị,hệ thống', textAlign: 'Left', allowFiltering: true },
+                  { fieldName: 'ten', headerText: 'Tên loại thiết bị,hệ thống', textAlign: 'Left', allowFiltering: true },
+                  { fieldName: 'hieu_luc_text', headerText: 'Hiệu lực', textAlign: 'Left', allowFiltering: true },
+                  { fieldName: 'ghi_chu', headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true }
+                ]"
+              :dataSource="listLoaiThietBiHeThong"
+              :showFilter="true"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="true"
+              :allowExcelExport="true"
+              @rowSelected="onSelectRowChanged"
+              @selectedItemsChanged="onSelectRowCheckbox"
+              dataKeyField="id"
+              ref="grdItems"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ModalImportExcel
+    ref="modalImportExcel"
+    :title="importConfig.title"
+    :tableColumns="importConfig.tableColumns"
+    :templateFileName="importConfig.templateFileName"
+    :processExcelData="processLoaiThietBiHeThongExcelData"
+    :validationRules="importConfig.validationRules"
+    :checkDataResult="importConfig.checkDataResult"
+    @check-data="handleCheckData"
+  />
+</div>

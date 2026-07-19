@@ -1,0 +1,465 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <!-- <li>
+                <b-link href="javascript:void(0)" @click="onAddNew" :disabled="!buttons.btnAddNew.enabled">
+                    <span class="icon one-file-plus"></span>Nhập mới
+                </b-link>
+            </li> -->
+      <li>
+        <b-link href="javascript:void(0)" @click="onSave" :disabled="!buttons.btnSave.enabled">
+          <span class="icon one-save"></span>Ghi lại
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onEdit"
+          :disabled="!buttons.btnEdit.enabled || formData.trangThaiCapPhatId === 2">
+          <span class="icon nc-icon-glyph ui-1_edit-72"></span>Sửa
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onCancel" :disabled="!buttons.btnCancel.enabled">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+        </b-link>
+      </li>
+      <li>
+        <!-- <b-link href="javascript:void(0)" @click="ShowPopup_CapPhatIP" :disabled="!buttons.btnCapPhatIP.enabled"> -->
+        <b-link href="javascript:void(0)" @click="ShowPopup_CapPhatIP" :disabled="formData.trangThaiCapPhatId !== 1">
+          <span class="icon one-book"></span>Yêu cấu cấp IP Address 
+        </b-link>
+      </li>
+      <li>
+        <b-link href="javascript:void(0)" @click="onXacNhan"
+          :disabled="!buttons.btnXacNhan.enabled || !buttons.btnEdit.enabled || formData.trangThaiCapPhatId === 2">
+          <span class="icon one-edit"></span>Xác nhận cấp phát
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin chung</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Số phiếu<span class="red">*</span></div>
+                <div class="value">
+                  <input @click="showPhieuCapPhatDetail()" type="text" class="form-control" readonly
+                    v-model="formData.soPhieu" style="color:#0176FF;" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Tính giá hạ tầng</div>
+                    <div class="value padt4">
+                      <div class="check-action">
+                        <input type="checkbox" class="check" v-model="formData.tinhGiaHaTang" :true-value="1"
+                          :false-value="0" :disabled="!thongTinChungControls.checkTinhGia.enabled" /><span
+                          class="name"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="value" style="text-align: left;">
+                    <input ref="fileUpload" type="file" @change="onFileChanged" multiple class="hidden"
+                      accept="image/*" />
+                    <a href="#" @click="chooseFiles" :class="buttons.btnAddImage"
+                      :style="!controls.chkHieuLuc.enabled ? 'pointer-events: none;': ''">
+                      <span class="icon one-book" style="display: block; font-weight: 300;
+                                        padding-top: 8px;">
+                        File đính kèm
+                      </span>
+                    </a>
+                    <div :class="buttons.imgAvatar" @click="chooseFiles">
+                      <img :src="imageItem" style="max-width: 25px; max-height: 25px;" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Tên máy ảo<span class="red">*</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="formData.tenMayAo"
+                    :disabled="!thongTinChungControls.txtTen.enabled" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Trạng thái cấp phát<span class="red">*</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" disabled v-model="formData.trangThaiCapPhat" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Hạ tầng ảo hóa<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt :dataSource="dsHaTangAoHoa" dataTextField="TEN" dataValueField="ID"
+                    v-model="formData.haTangAoHoaID" :disabled="!thongTinChungControls.selectHTAoHoa.enabled" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Hệ điều hành<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt :dataSource="dsHeDieuHanh" dataTextField="TEN" dataValueField="ID"
+                    v-model="formData.heDieuHanhID" :disabled="!thongTinChungControls.selectHDH.enabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Hạ tầng IDG<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt :dataSource="dsHaTangIDG" dataTextField="TEN" dataValueField="HATANGIDG_ID"
+                    v-model="formData.haTangIDG" :disabled="!thongTinChungControls.selectIDG.enabled" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Phân loại hạ tầng<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt :dataSource="dsPhanLoaiHaTang" dataTextField="TEN" dataValueField="ID"
+                    v-model="formData.phanLoaiHaTangID" :disabled="!thongTinChungControls.selectPhanLoaiHT.enabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Vai trò<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt :dataSource="dsVaiTro" dataTextField="TEN" dataValueField="ID" v-model="formData.vaiTroId"
+                    :disabled="!thongTinChungControls.selectVaiTro.enabled" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Trạng thái máy ảo<span class="red">*</span></div>
+                <div class="value">
+                  <SelectExt :dataSource="dsTrangThaiMayAo" dataTextField="TEN" dataValueField="ID"
+                    v-model="formData.trangThaiMayAoID" :disabled="!thongTinChungControls.selectTTMayAo.enabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Số card mạng (IP)<span class="red">*</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="formData.network_card"
+                    :disabled="!thongTinChungControls.txtCardMang.enabled" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Trạng thái hoạt động<span class="red">*</span></div>
+                <div class="value">
+                  <select2 :options="dsTrangThaiHoatDong" v-model="formData.trangThaiHoatDongID"
+                    :disabled="!thongTinChungControls.selectTTHD.enabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">IP Address<span class="red">*</span></div>
+                <div class="value">
+                  <input type="text" class="form-control" disabled v-model="formData.ip_address_ten" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Ngày tạo<span class="red">*</span></div>
+                    <div class="value">
+                      <ejs-datepicker ref="refChonNgay" class="form-control bg-none bor0 fw6 text"
+                        :format="'dd/MM/yyyy'" :showClearButton="false" v-model="formData.ngayTao"
+                        :readonly="!thongTinChungControls.dateNgayTao.enabled" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Ngày hết hạn<span class="red">*</span></div>
+                    <div class="value">
+                      <ejs-datepicker ref="refChonNgay" class="form-control bg-none bor0 fw6 text"
+                        :format="'dd/MM/yyyy'" :showClearButton="false" v-model="formData.ngayHetHan"
+                        :readonly="!thongTinChungControls.dateNgayHetHan.enabled" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Nguồn yêu cầu<span class="red">*</span></div>
+                    <div class="value">
+                      <select2 :disabled="true" :options="dsMguonYeuCau" v-model="formData.nguonYeuCauID" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Phiếu yêu cầu<span class="red">*</span></div>
+                    <div class="value">
+                      <input type="text" class="form-control" disabled v-model="formData.phieuYeuCau" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="row">
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Người cập nhật<span class="red">*</span></div>
+                    <div class="value">
+                      <input type="text" class="form-control" disabled v-model="formData.nguoiCapNhat" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                    <div class="key w150">Ngày cập nhật<span class="red">*</span></div>
+                    <div class="value">
+                      <ejs-datepicker ref="refChonNgay" class="form-control bg-none bor0 fw6 text"
+                        :format="'dd/MM/yyyy'" :showClearButton="false" :disabled="true"
+                        v-model="formData.ngayCapNhat" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w150">Khách hàng</div>
+            <div class="value">
+              <input type="text" class="form-control" disabled v-model="formData.khachHang" />
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w150">Ghi chú</div>
+            <div class="value">
+              <input type="text" class="form-control" disabled v-model="formData.ghiChu"
+                :disabled="!thongTinChungControls.txtGhiChu.enabled" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Thông tin quản lý -->
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title">Thông tin quản lý</div>
+        </div>
+        <!-- Đơn vị quản lý - Cá nhân quản lý -->
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Đơn vị quản lý <span class="red">*</span></div>
+              <div class="value">
+                <input type="text" class="form-control" disabled v-model="formData.donViQL" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Cụm dịch vụ</div>
+              <div class="value">
+                <SelectExt :dataSource="dsCumDichVu" dataTextField="TEN" dataValueField="ID"
+                  v-model="formData.cumDichVu" :disabled="true" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Phòng/Tổ quản lý  -->
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Phòng/Tổ quản lý</div>
+              <div class="value">
+                <SelectExt :dataSource="dsPhongToQL" dataTextField="TEN_DV" dataValueField="DONVI_ID"
+                  v-model="formData.phongToQL" :disabled="!thongTinQuanLyControls.selectPhong.enabled" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Sản phẩm dịch vụ</div>
+              <div class="value">
+                <SelectExt :dataSource="dsSPDV" dataTextField="TEN" dataValueField="ID" :disabled="true"
+                  v-model="formData.sanPhamDichVu" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- cá nhân quản lý  -->
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Cá nhân quản lý</div>
+              <div class="value">
+                <SelectExt :dataSource="dsNhanVien" dataTextField="TEN_NV" dataValueField="NHANVIEN_ID"
+                  v-model="formData.nguoiQL" :disabled="!thongTinQuanLyControls.selectCaNhan.enabled" />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w150">Đơn vị chủ quản</div>
+              <div class="value">
+                <input type="text" class="form-control" readonly v-model="formData.donViChuQuan" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end  Thông tin quản lý -->
+    </div>
+    <!-- Danh sách TAB  -->
+    <div class="row">
+      <div class="">
+        <div class="nav tabs tab-over">
+          <a href="#tab1" data-toggle="tab" :class="{active: currentTab===1}">Năng lực tính toán </a>
+          <a href="#tab2" data-toggle="tab" :class="{active: currentTab===2}">Năng lực lưu trữ</a>
+        </div>
+
+        <div class="tab-content">
+          <!-- tab Năng lực tính toán -->
+          <div class="tab-pane" id="tab1" :class="{active: currentTab===1}">
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">vCPU<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.vCPU" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">vRAM<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.vRAM" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">vGPU<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.vGPU" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- tab Năng lực lưu trữ -->
+          <div class="tab-pane" id="tab2" :class="{active: currentTab===2}">
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">IOPS<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.IOPS" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">Throughput<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.Throughput" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">SSD<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.SSD" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w150">HDD<span class="red">*</span></div>
+                  <div class="value">
+                    <input type="text" class="form-control" disabled v-model="formData.HDD" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danh sách ZONE -->
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách phiếu cấp phát máy ảo</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <DataGrid ref="grdItems" :allowPaging="true" :enablePagingServer="false" v-bind:columns="fieldsDS"
+                v-bind:dataSource="dataSource" @rowSelected="grdItems_RowSelected"
+                @rowDeselected="grdItems_RowDeselected">
+                >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ejs-dialog :enableResize="true" :allowDragging="true" :visible="false" :isModal="true" ref="popupCapIPAddress"
+    :header='"Cấp phát IP Address"' showCloseIcon="true" width="95%" height="800" :target='".main-wrapper"'>
+    <CapPhatIP ref="ref_capphat_ip" :p_auto="true" :p_capphat_mayao_id="formData.id" :p_so_phieu="formData.soPhieu"
+      :p_phieu_yeucau="formData.phieuYeuCau" :p_so_card_ip="formData.soCardIP" :p_donvi_cap="donViChuQuanData"
+      :p_hdtb_id="formData.hdtb_id" :p_capphat_id="formData.capphat_id" @xacnhanIP="xacnhanIPHandler">
+    </CapPhatIP>
+  </ejs-dialog>
+  <ejs-dialog :enableResize="true" :allowDragging="true" :visible="false" :isModal="true" ref="popupPhieuCapPhat"
+    :header='"CẤP PHÁT TÀI NGUYÊN"' showCloseIcon="true" width="95%" height="800" :target='".main-wrapper"'>
+    <CapPhatTaiNguyen ref="ref_capphat_tainguyen">
+    </CapPhatTaiNguyen>
+  </ejs-dialog>
+</div>

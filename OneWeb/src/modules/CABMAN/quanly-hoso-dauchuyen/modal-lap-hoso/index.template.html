@@ -1,0 +1,421 @@
+<b-modal 
+    :id="modalId" 
+    :key="modalKey"
+    size="xl" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box lap-hoso-dauchuyen">
+        <div class="popup-header">
+            <div class="title">{{title}}</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="onClickBtnNapLai">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-refresh"></span>Nạp lại
+                    </a>
+                </li>
+                <li @click="onClickBtnGhiLai">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li @click="onClickBtnDongBo">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-sync1"></span>Đồng bộ trạng thái
+                    </a>
+                </li>
+                <li @click="onClickBtnHoanThien">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-check"></span>Hoàn thiện
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <!--Thông tin hồ sơ-->
+            <div class="box-form">
+                <div class="legend-title">Thông tin hồ sơ</div>
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Mã hồ sơ</div>
+                            <div class="value">
+                                <input type="text" v-model="maHoSo" readonly class="form-control highlight">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Tên hồ sơ <bss-required-marker /></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.tenHoSo.$error">
+                                    <input type="text" 
+                                        ref="ref-ten-hoso" 
+                                        class="form-control" 
+                                        maxlength="200" 
+                                        v-model.trim="$v.tenHoSo.$model" 
+                                        :disabled="isReadonly"/>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Loại hồ sơ <bss-required-marker /></div>
+                            <div class="value" ref="ref-select-loai-hoso">
+                                <bss-error-marker :has-error="$v.loaiHoSoId.$error">
+                                    <SelectExt
+                                        :disabled="!isAdding"
+                                        :settings="{dropdownParent: $refs['ref-select-loai-hoso']}"
+                                        v-model="$v.loaiHoSoId.$model" 
+                                        :dataSource="dsLoaiHoSo" 
+                                        dataValueField="LOAIHSCC_ID" 
+                                        dataTextField="LOAI_HS_CC"/>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w70">Hình thức <bss-required-marker /></div>
+                            <div class="value" ref="ref-select-kieu-cc">
+                                <bss-error-marker :has-error="$v.kieuCatChuyenId.$error">
+                                    <SelectExt
+                                        :disabled="!isAdding"
+                                        :settings="{dropdownParent: $refs['ref-select-kieu-cc']}"	
+                                        v-model="$v.kieuCatChuyenId.$model"
+                                        :dataSource="dsKieuCatChuyen" 
+                                        dataValueField="KIEUCC_ID" 
+                                        dataTextField="TEN_KIEU"/>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Người đăng ký</div>
+                            <div class="value">
+                                <input type="text" readonly class="form-control" v-model="tenNguoiDangKy">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Ngày bắt đầu <bss-required-marker /></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.ngayBatDau.$error">
+                                    <ejs-datetimepicker
+                                        ref="ref-ngay-batdau"
+                                        :style="{'padding-top': '7px'}"
+                                        :showClearButton="false"
+                                        :enabled="!isReadonly"
+                                        class="form-control bg-none bor0 fw6 text h24"
+                                        placeholder="" 
+                                        v-model="$v.ngayBatDau.$model"
+                                        format="dd/MM/yyyy HH:mm:ss"></ejs-datetimepicker>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Ngày kết thúc <bss-required-marker /></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.ngayKetThuc.$error">
+                                    <ejs-datetimepicker
+                                        ref="ref-ngay-ketthuc"
+                                        :style="{'padding-top': '7px'}"
+                                        :showClearButton="false"
+                                        :enabled="!isReadonly"
+                                        class="form-control bg-none bor0 fw6 text h24"
+                                        placeholder="" 
+                                        v-model="$v.ngayKetThuc.$model"
+                                        format="dd/MM/yyyy HH:mm:ss"></ejs-datetimepicker>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Trung tâm VT <bss-required-marker /></div>
+                            <div class="value" ref="ref-select-ttvt">
+                                <bss-error-marker :has-error="$v.ttvtId.$error">
+                                    <SelectExt
+                                        :disabled="!isAdding"
+                                        :settings="{dropdownParent: $refs['ref-select-ttvt']}"
+                                        v-model="$v.ttvtId.$model" 
+                                        :dataSource="dsTtvt" 
+                                        dataValueField="DONVI_ID" 
+                                        dataTextField="TEN_DV"/>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Vệ tinh <bss-required-marker v-show="loaiHoSoId!=5"/></div>
+                            <div class="value">
+                                <bss-error-marker :has-error="$v.veTinhId.$error">
+                                    <treeselect
+                                        ref="ref-vetinh"
+                                        :disabled="!isAdding"
+                                        v-model="$v.veTinhId.$model"
+                                        :multiple="false"
+                                        :flat="true"
+                                        :options="dsVeTinh"
+                                        :searchable="true"
+                                        :clearable="false"
+                                        :disableFuzzyMatching="true"
+                                        noOptionsText="Không có dữ liệu"
+                                        noResultsText="Không có dữ liệu"
+                                        placeholder="">
+                                        <label slot="option-label" slot-scope="{ node, labelClassName }" :class="labelClassName">
+                                            <span :title="node.label">{{node.label}}</span>
+                                        </label>
+                                    </treeselect>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Trạng thái <bss-required-marker /></div>
+                            <div class="value" ref="ref-select-trangthai">
+                                <bss-error-marker :has-error="$v.trangThaiId.$error">
+                                    <SelectExt 	
+                                        :settings="{dropdownParent: $refs['ref-select-trangthai']}"
+                                        v-model="$v.trangThaiId.$model" 
+                                        :dataSource="dsTrangThaiCatChuyen" 
+                                        dataValueField="TTCC_ID" 
+                                        :disabled="true"
+                                        dataTextField="TRANGTHAI_CC"/>
+                                </bss-error-marker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="check-action mart7">
+                            <input type="checkbox" class="check" v-model="chkChuyen119" :disabled="!isAdding">
+                            <span class="name">Chuyển 119</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Chọn thuê bao-->
+            <div class="box-form" v-show="loaiHoSoId!=5" style="position: relative;">
+                <div class="legend-title">Chọn thuê bao</div>
+                <div class="row">
+                    <div class="col-sm-8 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Tìm thuê bao</div>
+                            <div class="value">
+                                <div class="row" style="margin: 0 -2px !important;">
+                                    <div class="col-sm-4 col-12" ref="ref-select-dichvu">
+                                        <SelectExt 	
+                                            :settings="{dropdownParent: $refs['ref-select-dichvu']}"
+                                            v-model="giaTriTimThueBao.dichVuId" 
+                                            :dataSource="dsDichVuVt" 
+                                            dataTextField="TEN_DVVT"
+                                            dataValueField="DICHVUVT_ID"/>
+                                    </div>
+                                    <div class="col-sm-8 col-12">
+                                        <input 
+                                            type="text" 
+                                            class="form-control italic highlight" 
+                                            v-on:keyup.enter="onClickBtnTimThueBao" 
+                                            v-model="giaTriTimThueBao.maThueBao"
+                                            placeholder="Nhập số máy/account">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <button class="btn btn-main" :disabled="disablePanel" @click="onClickBtnTimThueBao">
+                            <span class="nc-icon-glyph ui-1_check-circle-08 f20 inline vcenter lh20"></span> Xác nhận
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Nhập từ file</div>
+                            <div class="value">
+                                <div class="input-more-button -right">
+                                    <button class="btn" @click="chooseFile">
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                    <input type="text" class="form-control" :value="fileName">
+                                    <b-form-file  
+                                        id="lap-hoso-dauchuyen-input-file-upload" 
+                                        v-model="fileExcel" 
+                                        ref="ref-file-upload" 
+                                        @change="onFileChange" 
+                                        accept=".xls, .xlsx" 
+                                        class="-ap icon-more_horiz" 
+                                        v-show="false"></b-form-file>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="list-checks">
+                            <div class="item">
+                                <button class="btn btn-main" :disabled="disablePanel || !fileName" @click="onClickBtnDangKyTheoFile">
+                                    <span class="nc-icon-glyph ui-1_check-circle-08 f20 inline vcenter lh20"></span> Xác nhận
+                                </button>
+                            </div>
+                            <div class="item">
+                                <a href="javascript:void(0)" class="link underline" @click="onClickBtnTaiFileMau">Tải về file mẫu</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="group-buttons mart10">
+                    <button class="btn btn-main" :disabled="disablePanel" v-b-modal.id-modal-chon-thuebao-theocap>Chọn thuê bao theo cáp</button>
+                </div>
+                <div class="disable-panel" v-show="disablePanel"></div>
+            </div>
+            <!--Danh sách thuê bao đã chọn-->
+            <div class="box-form"  v-show="loaiHoSoId!=5" style="position: relative;" >
+                <div v-show="disablePanel" class="disable-panel"></div>
+                <div class="legend-title">Danh sách thuê bao đã chọn</div>
+                <div class="group-buttons mart0 marb10" :style="{opacity: disablePanel ? 0.8 : 1}">
+                    <div class="pull-left">
+                        <button class="btn btn-main" @click="onClickBtnChuyenVeTinh" v-show="showButton.chuyenVeTinh" :disabled="disableButton.chuyenVeTinh">Chuyển khác vệ tinh</button>
+                        <button class="btn btn-main" @click="onClickBtnXacNhanThayDay" v-show="showButton.thayDay" :disabled="disableButton.thayDay">Thay dây</button>
+                        <button class="btn btn-main" @click="onClickBtnXoaDsDangKyCatChuyen" :disabled="disableButton.xoaDangKyHangLoat">Loại khỏi danh sách</button>
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-main" @click="onClickBtnDoiCapHangLoat" v-show="showButton.nhapCapHangLoat" :disabled="disableButton.nhapCapHangLoat">Đổi cáp hàng loạt</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content">
+                    <DataGrid v-bind:columns="[
+                            {fieldName: '', headerText: '', textAlign: 'Center', allowFiltering: false, width: '70', headerTemplate: getHeaderTemplateChon(this), template: getColumnTemplateChon(this) },
+                            {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, width: '130' },
+                            {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, width: '130' },
+                            {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', allowFiltering: true, width: '130' },
+                            {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, width: '130' },
+                            {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái thuê bao', allowFiltering: true, width: '130' },
+                            {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ lắp đặt', allowFiltering: true, width: '130' },
+                            {fieldName: 'KYHIEU_KC', headerText: 'Kết cuối', allowFiltering: true, width: '130' },
+                            {fieldName: 'VITRI_KC', headerText: 'Vị trí', allowFiltering: true, width: '130' },
+                            {fieldName: 'KYHIEU_CAPGOC', headerText: 'Cáp gốc', allowFiltering: true, width: '130' },
+                            {fieldName: 'DOI_CAPGOC', headerText: 'Đôi gốc', allowFiltering: true, width: '130' },
+                            {fieldName: 'TRANGTHAI_CC', headerText: 'Trạng thái đấu chuyển', allowFiltering: true, width: '130' },
+                            {fieldName: '', headerText: 'Chức năng', textAlign: 'Center', allowFiltering: false, width: '170', freeze: 'Right', clipMode: 'Ellipsis', template: getColumnTemplateChucNang(this) },
+                        ]"
+                        v-bind:dataSource="dsThueBaoDangKy" 
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        @queryCellInfo="onQueryCellInfo"></DataGrid>
+                </div>
+            </div>
+            <div class="box-form"  v-show="loaiHoSoId==5" style="position: relative;" >
+                <div class="legend-title">Nhập loại thiết bị và số lượng cần bảo dưỡng</div>
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Nhóm thiết bị</div>
+                            <div class="value">
+                                <SelectExt
+                                    :disabled="disablePanel"
+                                    v-model="giaTriThemPTM.nhomTbiId" 
+                                    :dataSource="giaTriThemPTM.dsNhomTbi" 
+                                    dataValueField="NHOMTBI_ID" 
+                                    dataTextField="NHOM_TBI"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Loại thiết bị</div>
+                            <div class="value">
+                                <SelectExt
+                                    :disabled="disablePanel"
+                                    v-model="giaTriThemPTM.loaiTbId" 
+                                    :dataSource="giaTriThemPTM.dsLoaiTbi" 
+                                    dataValueField="LOAITBI_ID" 
+                                    dataTextField="LOAI_TBI"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Số lượng</div>
+                            <div class="value">
+                                <input type="number" class="form-control" :disabled="disablePanel" v-model="giaTriThemPTM.soLuong"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <button class="btn btn-main" @click="onClickBtnThemPTM" :disabled="disablePanel">
+                            <span class="one-file-plus ui-1_check-circle-08 f20 inline vcenter lh20"></span> Thêm HS PTM
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                
+                <div class="table-content">
+                    <DataGrid 
+                        v-bind:columns="[
+                            {fieldName: 'TEN_NHOM', headerText: 'Nhóm thiết bị', allowFiltering: false},
+                            {fieldName: 'TEN_LOAI', headerText: 'Loại thiết bị', allowFiltering: false},
+                            {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: false},
+                            {fieldName: '', headerText: 'Chức năng', freeze: 'Right', allowFiltering: false, allowSorting: false, template: getColumnTemplateChucNangPTM(this) }
+                        ]" 
+                        v-bind:dataSource="giaTriThemPTM.dsHoSoPTM" 
+                        :enable-paging-server="false" >
+                    </DataGrid>
+                </div>
+                <div class="disable-panel" v-show="disablePanel"></div>
+            </div>
+        </div>
+    </div>
+    <ModalChonThueBaoTheoCap modal-id="id-modal-chon-thuebao-theocap" @change="onChangeDangKyTbaoTheoCap" :parent="this"/>
+    <ModalChonThueBao modal-id="id-modal-chon-thuebao" :data="giaTriTimThueBao" @select='onSelectThueBao' />
+    <ModalNhapDoDaiDayThueBao modal-id="id-modal-nhap-dodai-day-thuebao" :do-dai-cu="cuLy" @ok="okCapNhatDoDaiDayThueBao"/>
+    <ModalThayDoiThongTinCap ref="ref-thaydoi-thongtin-cap" @change="onChangeThongTinCap" />
+    <ModalDangKyDauChuyenTheoFile modal-id="id-modal-dangky-dauchuyen-theo-file" :file="fileExcel" :parent="this" @change="onChangeDangKyTbaoTheoFile"/>
+    <ModalChonTramTbi modal-id="id-modal-chon-tramtbi" :val-ttvt-id="ttvtId" @select="onSelectTramTbi"/>
+    <ModalDoiCapHangLoat modal-id="id-modal-doicap-hangloat" :ds-thue-bao-dau-noi="dsThueBaoNhapCapHangLoat" @change="onChangeDauNoiThueBao"/>
+    <b-modal id="modal-xacnhan-xoa-dkcc" centered title="Thông báo" size="sm" @ok="okXoaThueBaoDangKy">        
+        <span>Loại bỏ thuê bao đang chọn khỏi danh sách đấu chuyển?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal id="modal-xacnhan-xoa-ds-dkcc" centered title="Thông báo" size="sm" @ok="okXoaDsThueBaoDangKy">        
+        <span>Loại bỏ các thuê bao đang chọn khỏi danh sách đấu chuyển?</span>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal id="modal-xacnhan-xoa-ptm" centered title="Thông báo" size="sm" @ok="okXoaHoSoPTM">        
+        <span>Xóa hồ sơ phần tử mạng?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+</b-modal>

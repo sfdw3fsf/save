@@ -1,0 +1,483 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li :class="{'disabled-btn': isViewOnly}" v-if="phieuThiCongDetail.TRANGTHAI_ID == 21">
+        <b-link href="javascript:void(0)" @click="onSave"> <span class="icon one-save"></span>Ghi lại </b-link>
+      </li>
+       <li :class="{'disabled-btn': isViewOnly}" v-if="phieuThiCongDetail.TRANGTHAI_ID == 21">
+        <b-link href="javascript:void(0)" @click="onChuyenThucHien">
+          <span class="icon one-file-arrow-right"></span>Chuyển người thực hiện
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': isViewOnly}" v-if="phieuThiCongDetail.TRANGTHAI_ID == 22 || phieuThiCongDetail.TRANGTHAI_ID == 81">
+        <b-link href="javascript:void(0)" @click="onChuyenXuLy">
+          <span class="icon one-file-arrow-right"></span>Chuyển xử lý
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': isViewOnly}" v-if="phieuThiCongDetail.TRANGTHAI_ID == 22">
+        <b-link href="javascript:void(0)" @click="onTraPhieu">
+          <span class="icon one-file-back"></span>Trả phiếu
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': isViewOnly}" v-if="phieuThiCongDetail.TRANGTHAI_ID == 22">
+        <b-link href="javascript:void(0)" @click="onHoanThanh">
+          <span class="icon one-file-check"></span>Hoàn thành
+        </b-link>
+      </li>
+      <li :class="{'disabled-btn': isViewOnly}" v-if="phieuThiCongDetail.TRANGTHAI_ID == 81">
+        <b-link href="javascript:void(0)" @click="onXacNhanThucHien">
+          <span class="icon one-file-check"></span>Xác nhận thực hiện
+        </b-link>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content ">
+      <ThongTinCongViec :phieuThiCongId="phieutc" v-if="phieutc" ref="thongTinCongViec"></ThongTinCongViec>
+    <div class="row">
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span>Danh sách thi công hệ thống thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}</span>
+            <div>
+              <b-link
+                v-if="(phieuThiCongDetail.LOAICV_ID == 50) && !isViewOnly"
+                href="javascript:void(0)"
+                @click="onAddHeThongThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="(thiCongHeThongSelected && phieuThiCongDetail.TRANGTHAI_ID != 21) || (phieuThiCongDetail.TRANGTHAI_ID == 21 && isKhachHang)"
+              >
+                <span class="fa fa-plus"></span> Thêm hệ thống thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+              <b-link
+                v-if="!isViewOnly"
+                href="javascript:void(0)"
+                @click="onChonHeThongThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="(thiCongHeThongSelected && phieuThiCongDetail.TRANGTHAI_ID != 21) || (phieuThiCongDetail.TRANGTHAI_ID == 21 && isKhachHang)"
+              >
+                <span class="fa fa-check"></span> Chọn hệ thống thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <DataGrid
+              v-if="isKhachHang && phieuThiCongDetail.LOAICV_ID == 50 && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_KH', headerText: 'Khách hàng', textAlign: 'Left', width: 180},
+                                {fieldName: 'MA_TB', headerText: 'Mã thuê bao', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemLapDat(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="isKhachHang && phieuThiCongDetail.LOAICV_ID == 23 && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_KH', headerText: 'Khách hàng', textAlign: 'Left', width: 180},
+                                {fieldName: 'MA_TB', headerText: 'Mã thuê bao', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemThaoDo(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="isKhachHang && phieuThiCongDetail.LOAICV_ID == 52 && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_KH', headerText: 'Khách hàng', textAlign: 'Left', width: 180},
+                                {fieldName: 'MA_TB', headerText: 'Mã thuê bao', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemThayDoi(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="isKhachHang && isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_KH', headerText: 'Khách hàng', textAlign: 'Left', width: 180},
+                                {fieldName: 'MA_TB', headerText: 'Mã thuê bao', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemView(this)},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="!isKhachHang && phieuThiCongDetail.LOAICV_ID == 50 && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'DONVI_QL', headerText: 'Đơn vị quản lý', textAlign: 'Left', width: 180},
+                                {fieldName: 'NHANVIEN_QL', headerText: 'Nhân viên quản lý', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemLapDat(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="!isKhachHang && phieuThiCongDetail.LOAICV_ID == 23 && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'DONVI_QL', headerText: 'Đơn vị quản lý', textAlign: 'Left', width: 180},
+                                {fieldName: 'NHANVIEN_QL', headerText: 'Nhân viên quản lý', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemThaoDo(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="!isKhachHang && phieuThiCongDetail.LOAICV_ID == 52 && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'DONVI_QL', headerText: 'Đơn vị quản lý', textAlign: 'Left', width: 180},
+                                {fieldName: 'NHANVIEN_QL', headerText: 'Nhân viên quản lý', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemThayDoi(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="!isKhachHang && isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="listThiCongHeThongThietBiKhachHang"
+              v-bind:columns="[
+                                {fieldName: 'HETHONGTBI_ID', headerText: 'ID Hệ thống', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN', headerText: 'Tên hệ thống', textAlign: 'Left', width: 250},
+                                {fieldName: 'IDC', headerText: 'IDC', textAlign: 'Left', width: 120},
+                                {fieldName: 'DONVI_QL', headerText: 'Đơn vị quản lý', textAlign: 'Left', width: 180},
+                                {fieldName: 'NHANVIEN_QL', headerText: 'Nhân viên quản lý', textAlign: 'Left', width: 150},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnSystemView(this)},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectedRowChanged="onSelectThiCongHeThongThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box-form">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span> Danh sách thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}</span>
+            <div>
+              <b-link
+                v-if="(phieuThiCongDetail.LOAICV_ID == 50) && !isViewOnly"
+                href="javascript:void(0)"
+                @click="onAddThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="!thiCongHeThongSelected || thietBiKhachHangSelected || (phieuThiCongDetail.TRANGTHAI_ID == 21 && isKhachHang) || phieuThiCongDetail.TRANGTHAI_ID != 21 && !(phieuThiCongDetail.TRANGTHAI_ID == 81 && isKhachHang)"
+              >
+                <span class="fa fa-plus"></span> Thêm thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+              <b-link
+                v-if="!isViewOnly"
+                href="javascript:void(0)"
+                @click="onChonThietBiKH"
+                class="btn btn-sm btn-primary"
+                :disabled="!thiCongHeThongSelected || thietBiKhachHangSelected || (phieuThiCongDetail.TRANGTHAI_ID == 21 && isKhachHang) || phieuThiCongDetail.TRANGTHAI_ID != 21 && !(phieuThiCongDetail.TRANGTHAI_ID == 81 && isKhachHang)"
+              >
+                <span class="fa fa-check"></span> Chọn thiết bị {{isKhachHang ? 'khách hàng' : 'IDC'}}
+              </b-link>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <DataGrid
+              v-if="phieuThiCongDetail.LOAICV_ID == 50 && isKhachHang && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceLapDat(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="phieuThiCongDetail.LOAICV_ID == 50 && !isKhachHang && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceLapDat(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="phieuThiCongDetail.LOAICV_ID == 23 && isKhachHang && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceThaoDo(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="phieuThiCongDetail.LOAICV_ID == 23 && !isKhachHang && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceThaoDo(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="phieuThiCongDetail.LOAICV_ID == 52 && isKhachHang && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceThayDoi(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="phieuThiCongDetail.LOAICV_ID == 52 && !isKhachHang && !isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceThayDoi(this), visible: !AnCotThaoTac},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+            <DataGrid
+              v-if="isViewOnly"
+              ref="grdItems"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="dsThietBiKhachHang"
+              :childGrid="childGrid"
+              v-bind:columns="[
+                                {fieldName: 'THIETBI_ID', headerText: 'ID Thiết bị', textAlign: 'Left', width: 120},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left'},
+                                {fieldName: 'SERIAL_NUMBER', headerText: 'Serial', textAlign: 'Left'},
+                                {fieldName: 'CS_DINHDANH', headerText: 'CS Thiết kế', textAlign: 'Left'},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 120},
+                                {fieldName: 'MATSAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 120},
+                                {fieldName: 'PHONG', headerText: 'Phòng/Zone', textAlign: 'Left'},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 120},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left'},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: acctionColumnDeviceView(this)},
+                                ]"
+              :enabledSelectFirstRow="true"
+              @selectRowChanged="onSelectThietBiKhachHang"
+              @detailDataBound="onDetailDataBound"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ModalChuyenXuly modalID="ModalChuyenXuly" ref="ModalChuyenXuly" @saved="chuyenXylySuccess"> </ModalChuyenXuly>
+  <ModalTraPhieu modalID="ModalTraPhieu" ref="ModalTraPhieu" @saved="traPhieuSuccess"> </ModalTraPhieu>
+  <ModalChonHeThong
+    @chon-he-thong-thiet-bi-kh="chonHeThongThietBiKH"
+    ref="ModalChonHeThong"
+    :isKhachHang="isKhachHang"
+  />
+  <ModalChonThietBi
+    @chon-thiet-bi="chonThietBi"
+    ref="ModalChonThietBi"
+    :isKhachHang="isKhachHang"
+    :heThongTbi="thiCongHeThongSelected"
+  />
+  <ModalChiTietHeThongIDCKhachHang
+    :isKhachHang="isKhachHang"
+    :phieuThiCongDetail="phieuThiCongDetail"
+    ref="ModalChiTietHeThongIDCKhachHang"
+    @refreshData="onRefreshDataHeThongThietBiKhachHang"
+    @themMoiHeThongSuccess="chonHeThongThietBiKH"
+  />
+  <ModalChiTietThietBiIDCKhachHang
+    :isKhachHang="isKhachHang"
+    :modalID="'ModalChiTietThietBiIDCKhachHang'"
+    :heThongTbi="thiCongHeThongSelected"
+    :phieutc="phieutc"
+    :phieuThiCongDetail="phieuThiCongDetail"
+    ref="ModalChiTietThietBiIDCKhachHang"
+    @themMoiThietBiSuccess="onThemMoiThietBiSuccess"
+    @reloadDataDevice="loadDsThietBiKhachHang"
+  ></ModalChiTietThietBiIDCKhachHang>
+</div>

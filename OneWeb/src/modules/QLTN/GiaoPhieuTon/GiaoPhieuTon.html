@@ -1,0 +1,165 @@
+<div >
+    
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onUpdate" title="Giao phiếu điều hành thi công">
+                    <span class="icon one-file-arrow-right1"></span> Giao phiếu
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onHistory" title="Lượt đã giao">
+                    <span class="icon one-luotgiao"></span> Lượt đã giao
+                </a>
+                <PopupLuotGiao :input="luotGiao_Input" @select="onSelectLuotGiao" ref="dlgLuotGiao" />
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onRefresh" title="Xóa danh sách">
+                    <span class="icon one-file-remove"></span> Xóa danh sách
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onExcelExport" title="Xuất Excel">
+                    <span class="icon one-xlsx-import"></span> Xuất Excel
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="grid-stack-box-ver" style="height: 100%;">
+            <div class="box-col box-form" style="overflow: auto;" id="boxTop">
+                <div class="legend-title">Thông tin tìm kiếm</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Giao cho</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <app-combobox 
+                                        :columns="[
+                                            { fieldName: 'NHANVIEN_ID', headerText: 'Mã nhân viên', width: 50 },
+                                            { fieldName: 'TEN_HIENTHI', headerText: 'Tên nhân viên' }
+                                        ]"
+                                        @selectedChanged="nhanVienGiao_selectedChanged" 
+                                        :dataSource="params.nhanVien_Options"
+                                        :allowPaging="false" 
+                                        :enablePagingServer="false"
+                                        :gridPanelDataHeight="'200px'"
+                                        textField="TEN_NV"
+                                        valueField="NHANVIEN_ID"
+                                    >
+                                    </app-combobox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Kỳ hóa đơn</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker :placeholder="'Chọn kỳ hóa đơn'"
+                                        v-model="params.kyHoaDonSelected"
+                                        :value="params.KCValue"
+                                        :max="params.max_kyhoadon"
+                                        :start="'Year'"
+                                        :depth="'Year'"
+                                        :format="'MM/y'"
+                                        :change="onKyHoaDonChange"
+                                        :showClearButton="false"
+                                        :allowEdit="false"
+                                        :disabled="true"
+                                    >
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                Chu kỳ
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <b-form-select
+                                        id="id-chuky-no"
+                                        v-model="params.chuKySelected"
+                                        :options="params.chuKy"
+                                        value-field="CHUKY"
+                                        text-field="CHUKY"
+                                        @change = "onChuKyNoChange()"
+                                        class="form-control"
+                                        :disabled="true">
+                                    </b-form-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Mã thanh toán</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.maTT" ref="maTT" @keyup.enter="onSearch">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Ngày giao</div>
+                            <div class="value">
+                                <ejs-datepicker
+                                    v-model="params.ngayGiao"
+                                    :value="params.today"
+                                    :format="'dd/MM/y'"
+                                    :showClearButton="false"
+                                >
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="check-action mart7">
+                            <input type="checkbox" checked="" class="check" v-model="params.layToanBo" @change="onGetAll">
+                            <span class="name">Lấy toàn bộ danh sách hóa đơn tồn trong tháng</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-col box-form" id="boxBottom">
+                <div class="legend-title">Danh sách phiếu tồn</div>
+                <DataGrid v-bind:columns="[
+                        {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MATB_DD', headerText: 'Thuê bao đại diện', allowFiltering: true, allowSorting: false, width: 130},
+                        {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false, width: 150},
+                        {fieldName: 'SO_SERI', headerText: 'Số seri', allowFiltering: true, allowSorting: false, width: 80, cssClass: 'text-right'},
+                        {fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-red', format: 'N0', type: 'number'},
+                        {fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-red', format: 'N0', type: 'number'},
+                        {fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, width: 70, cssClass: 'text-right'},
+                        {fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, width: 100, cssClass: 'text-right'},
+                        {fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-right'},
+                        {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting: false, width: 150},
+                        {fieldName: 'TENTUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, width: 100},
+                        {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, width: 100}
+                    ]"
+                        v-bind:dataSource="phieuTon_grid.items"
+                        dataKeyField="MA_TT"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :allowExcelExport="true"
+                        :showColumnCheckbox="true"
+                        :aggregates="aggregatesColumns"
+                        :defaultColumnCheckboxChecked="true"
+                        ref="phieuTonGrid"
+                        @selectedItemsChanged="onPhieuTonChecked"
+                        :key="phieuTon_grid.key"
+                >
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+</div>

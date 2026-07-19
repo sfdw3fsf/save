@@ -1,0 +1,2 @@
+import SurveyConcentrateCustomer from './SurveyConcentrateCustomer.vue'
+export default SurveyConcentrateCustomer

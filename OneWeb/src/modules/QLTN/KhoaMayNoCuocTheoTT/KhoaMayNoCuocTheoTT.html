@@ -1,0 +1,186 @@
+<div >
+
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="onChuyenDS" title="Chuyển danh sách thuê bao sang danh sách tạo phiếu khóa mở">
+                    <span class="icon one-file-back-1"></span>Chuyển DS
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onTaoPhieu" title="Tạo thông tin để giao phiếu">
+                    <span class="icon one-file-plus-1"></span>Tạo phiếu
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onCancel" title="Hủy">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+        </ul>
+
+    </div>
+    <div class="page-content">
+        <div class="grid-stack-box">
+            <div class="box-col box-form" id="boxLeft" style="width: 50%;">
+                <div class="legend-title">Thông tin yêu cầu</div>
+                <div class="row">
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Kiểu YC</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" class="form-control" v-model="params.kieuYC_Selected">
+                                        <option v-for="item in params.kieuYC_Options" :value="item.id">{{ item.text }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w80">{{ params.chieuKhoaMo_Title }}</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" class="form-control" v-model="params.chieuKhoaMo_Selected">
+                                        <option v-for="item in params.chieuKhoaMo_Options" :value="item.id">{{ item.text }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Chọn file</div>
+                    <div class="value">
+                        <div class="input-more-button">
+                            <label for="upload" class="btn">
+                                <span class="-ap icon-more_horiz" title="Đọc file danh sách mã thanh toán cần khóa/mở"></span>
+                                <input ref="fileInput" type="file" id="upload" style="display: none" @change="onChangeFile"
+                                    accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                            </label>
+                            <input type="text" class="form-control" v-model="params.filePath" @change="onInputText($event.target.value)" @keyup.enter="onSearch(1)" readonly>
+                        </div>
+                    </div>
+                    <PopupDanhSachLoi :input="dsLoi_Items" ref="dlgDanhSachLoi"/>
+                </div>
+                <div class="row">
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.maTT_Checked">
+                                    <span class="name">{{ params.maTT_Title }}</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-more-button">
+                                    <button class="btn" title="Tìm kiếm thông tin thanh toán" @click="showTraCuuDanhBa">
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                    <input type="text" class="form-control highlight" v-model="params.maTT" @keyup.enter="onSearch(2)" ref="maTT">
+                                    <PopupTraCuuDanhBa ref="dlgTraCuuDanhBa" @accept="acceptDanhBa"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w80" v-b-tooltip.hover title="Mã đại diện">Mã ĐD</div>
+                            <div class="value">
+                                <input type="text" class="form-control font-weight-bold" v-model="params.maTB_DD" :disabled="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-col box-form" id="boxRight" style="width: 50%;">
+                <div class="legend-title">Thông tin thanh toán</div>
+                <div class="info-row">
+                    <div class="key w80">Tên TT</div>
+                    <div class="value">
+                        <input type="text" class="form-control font-weight-bold" v-model="params.tenTT" readonly>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">Địa chỉ TT</div>
+                    <div class="value">
+                        <input type="text" class="form-control font-weight-bold" v-model="params.diaChiTT" readonly>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w80">{{ params.lyDoKhoa_Title }}</div>
+                    <div class="value">
+                        <input type="text" class="form-control font-weight-bold text" v-model="params.lyDoKhoa" ref="lyDo" :class="{'is-invalid': $v.params.lyDoKhoa.$error }">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="row">
+                    <div class="col-sm-3 col-12">
+                        Danh sách khóa mở
+                    </div>
+                    <div class="col-sm-5 red tleft col-12">
+                        {{ params.tongTT_Title }}
+                    </div>
+                    <div class="col-sm-4 red tleft col-12">
+                        Tổng số thuê bao
+                    </div>
+                </div>
+            </div>
+            <div class="grid-stack-box">
+                <ejs-splitter id='nested-splitter' width='100%' height='100%' :created="onCreate">
+                    <e-panes>
+                        <e-pane content ='#leftPane' size ='50%'></e-pane>
+                        <e-pane content ='#rightPane' size ='50%'></e-pane>
+                    </e-panes>
+                </ejs-splitter>
+
+                <div class="box-col" id="leftPane">
+                    <DataGrid v-bind:columns="[
+                        {fieldName: 'CHON', headerText: '', allowFiltering: false, allowSorting: false, width: 40, template: checkboxColumnTTTemplate , cssClass: 'text-center', headerTemplate:colCheckboxAllMaTT},
+                        {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MATB_DD', headerText: 'Mã TB ĐD', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, width: 250},
+                        {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'text-danger'},
+                        {fieldName: 'LYDO_KHOA', headerText: 'Lý do khóa', allowFiltering: true, allowSorting: false, width: 120}
+                    ]"
+                        v-bind:dataSource="thanhToan_grid.items"
+                        dataKeyField="MA_TT"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :aggregates="TTaggregatesColumns"
+                        ref="thanhToanGrid"
+                        @rowSelected="onTTSelected"
+                        @queryCellInfo="onTTQueryCellInfo"
+                    >
+                    </DataGrid>
+                </div>
+                <div class="box-col" id="rightPane">
+                    <DataGrid v-bind:columns="[
+                        {fieldName: 'CHON', headerText: '', allowFiltering: false, allowSorting: false, width: 40, template: checkboxColumnTBTemplate , cssClass: 'text-center', headerTemplate:colCheckboxAllMaTB},
+                        {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, allowSorting: false, width: 150},
+                        {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái TB', allowFiltering: true, allowSorting: false, width: 120, cssClass: 'trangthai-col'},
+                        {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: false, width: 120},
+                        {fieldName: 'LYDO_KHOA', headerText: 'Lý do khóa', allowFiltering: true, allowSorting: false, width: 120}
+                    ]"
+                        v-bind:dataSource="thueBao_grid.items"
+                        dataKeyField="MA_TB"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :aggregates="TBaggregatesColumns"
+                        ref="thueBaoGrid"
+                        @queryCellInfo="onTBQueryCellInfo"
+                    >
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,268 @@
+<div >
+    <div class="list-actions-top">
+        <ul class="list">
+            <li v-on:click="btnTimKiem()">
+                <a>
+                    <span class="icon one-search"></span>Tìm kiếm 
+                </a>
+            </li>
+            <li v-on:click="btnLamMoi()">
+                <a>
+                    <span class="icon nc-icon-glyph arrows-1_refresh-68"></span>Làm mới
+                </a>
+            </li>
+            <li v-if="visible.btnNhanDK" v-on:click="btnNhanDK()">
+                <a>
+                    <span class="icon nc-icon-glyph ui-1_circle-add"></span>Nhận ĐK 
+                </a>
+            </li>
+            <li v-on:click="btnKhongDuyet()" v-if="visible.btnKhongDuyet">
+                <a>
+                    <span class="icon nc-icon-glyph ui-1_circle-delete"></span>Không duyệt
+                </a>
+            </li>
+            <li v-on:click="btnHuy()" v-if="visible.btnHuy">
+                <a>
+                    <span class="icon nc-icon-glyph ui-1_circle-delete"></span>{{txt_btn_huy}}
+                </a>
+            </li>
+            <li v-if="visible.btnTraPhieu" v-on:click="btnTraPhieu()">
+                <a>
+                    <span class="icon one-file-back"></span>Trả phiếu
+                </a>
+            </li>
+            <li v-on:click="btnInPhieu()">
+                <a >
+                    <span class="icon one-print"></span>In phiếu
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                Thông tin tìm kiếm nhu cầu đăng ký
+            </div>
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkBox.isTuThang"
+                                    @change="checkTuThang($event)">
+                                <span class="name">Tháng ĐK từ</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control" @change="onChangeTuThang($event)" :enabled="checkBox.isTuThang"
+                                    :format="dateConfig.formatMonth" v-model="params.p_tu_thang">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Trạng thái
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select name="" id="" class="form-control" @change="onChangeTrangThai($event)" 
+                                    v-model="params.p_trang_thai">
+                                    <option v-for="TTDangKy in DSTrangThaiDangKy" v-bind:value="TTDangKy.ttdkid">
+                                        {{TTDangKy.trangThaiDK}}</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkBox.isTuNgay"
+                                    @change="checkTuNgay($event)">
+                                <span class="name">Ngày YC từ</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right" >
+                                <ejs-datepicker class="form-control" @change="onChangeTuNgay($event)" :enabled="checkBox.isTuNgay"
+                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatDay"
+                                    v-model="params.p_tu_ngay">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkBox.isDenThang"
+                                    @change="checkDenThang($event)">
+                                <span class="name">Tháng ĐK đến</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control" @change="onChangeDenThang($event)" :enabled="checkBox.isDenThang"
+                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatMonth"
+                                    v-model="params.p_den_thang">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkBox.isDonVi"
+                                    @change="checkDonVi($event)">
+                                <span class="name">Đơn vị</span>
+                            </div>
+                        </div>
+                        <div class="value" style="position: relative;">                            
+                            <div class="select-custom" >
+                                <input type="text" ref="ql-taisan-select-duan" :class="{ disabledDiv: !checkBox.isDonVi }" class="form-control" :disabled="!checkBox.isDonVi" :value="params.p_don_vi != -1 ? (params.p_don_vi + ' - ' + params.p_ten_don_vi).trim()  : '...Chọn đơn vị...'  "  />
+                                <!-- <input type="hidden" :value="params.p_don_vi" /> -->
+                            </div>
+                            <div ref="ql-taisan-dropdown-select-duan" style="z-index: 999999; background-color: white; border: 1px solid #ddd; padding: 5px; width: 100%;" :style="{display: showTableDuAn}">
+                                <div style="height: 300px; overflow: auto; border: 1px solid #ddd; margin-bottom: 5px;">
+                                    <DataGrid3 ref="tbDonVi" class="table-result table-gachle" v-bind:columns="[
+                                        {fieldName: 'DONVI_ID', headerText: 'Đơn vị ID', allowFiltering: true },
+                                        {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true},                                
+                                        ]" v-bind:dataSource="this.DSDonViDangKy" :showFilter="true" dataKeyField="DONVI_ID"
+                                        @selectedRowChanged="onChangeDonVi" >
+                                    </DataGrid3>
+                                </div>
+                            </div>                                      
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkBox.isDenNgay"
+                                    @change="checkDenNgay($event)">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control" @change="onChangeDenNgay($event)" :enabled="checkBox.isDenNgay"
+                                    :placeholder="dateConfig.waterMark" :format="dateConfig.formatDay"
+                                    v-model="params.p_den_ngay">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                Danh sách nhu cầu đăng ký
+            </div>
+            <div class="table-content">
+                <DataGrid ref="tbThongTinTimKiem" class="table-result table-gachle" v-bind:columns="[
+                    {fieldName: '', headerText: '', allowSorting:false , allowFiltering:false, textAlign:'Center',  width: 40, headerTemplate:CheckboxAllDangKy ,template:CheckboxDangKy},
+                    {fieldName: 'SO_CV', headerText: 'Số công văn', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'TEN_TG', headerText: 'Thời gian ĐK', allowFiltering: true, allowSorting: true}, 
+                    {fieldName: 'MA_CT', headerText: 'Dự án', allowFiltering: true, allowSorting: true}, 
+                    {fieldName: 'NGAY_DK', headerText: 'Ngày yêu cầu', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'DOT', headerText: 'Đợt', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'CONLAI', headerText: 'Số tháng ĐK', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'TEN_DV', headerText: 'Đơn vị ĐK', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'SODANGKY', headerText: 'SL Đăng ký', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'NHOM', headerText: 'Nhóm', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'NGAYDUYET', headerText: 'Ngày duyệt', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'NGUOI_CN', headerText: 'Người duyệt', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'TEN_KHO', headerText: 'Kho đăng ký', allowFiltering: true, allowSorting: true },
+                    {fieldName: 'DANGKY_ID', headerText:'', visible:false, isPrimaryKey:true}
+                    ]" 
+                    v-bind:dataSource="this.DSNhuCauDangKy" 
+                    :showFilter="true" 
+                    dataKeyField="DANGKY_ID"
+                    @selectedRowChanged="gridviewThongTin_FocusedRowChanged" 
+                    :showColumnCheckbox="false"                   
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    >
+                </DataGrid>
+
+            </div>
+
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                Danh sách chi tiết vật tư đăng ký
+            </div>
+            <div class="table-content">
+                <DataGrid ref="tbChiTietVatTu" class="table-result table-gachle" v-bind:columns="[
+                    {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, allowSorting: true}, 
+                    {fieldName: 'MUCDICH', headerText: 'Mục đích', allowFiltering: true, allowSorting: true}, 
+                    {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true, allowSorting: true},
+                    {fieldName: 'SL_TON_DK', headerText: 'SL Tồn ĐK', allowFiltering: true, allowSorting: true , type:'number', format:'N1'},
+                    {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: true , type:'number', format:'N1'},
+                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},                    
+                    ]" 
+                    v-bind:dataSource="this.DSChiTietVatTu" 
+                    :showFilter="true"
+                    dataKeyField="DANGKY_ID"
+                    @selectedRowChanged=""
+                    :aggregates="PTAggregatesColumns"
+                    :allowPaging="true"
+                    :enablePagingServer="false">
+                </DataGrid>
+            </div>
+
+        </div>
+    </div>
+
+    <b-modal 
+        no-close-on-backdrop
+        hide-footer 
+        hide-header 
+        hide-header-close 
+        class="modal" 
+        id="popupNoiDungTra">
+        
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">Trả phiếu</div>
+                    <div class="close -ap icon-close"  @click="$bvModal.hide('popupNoiDungTra')" data-dismiss="modal">
+                    </div>
+                </div>
+                <div class="list-actions-top">
+                    <ul class="list">
+                        <li>
+                            <a  @click="onClickXacNhan()">
+                                <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="popup-body">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Nhập nội dung trả phiếu
+                        </div>
+                        <div class="value">
+                            <textarea class="form-control" v-model="params.p_nd_tra" value="params.p_nd_tra" style="height: 100px;resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    </b-modal>
+</div>

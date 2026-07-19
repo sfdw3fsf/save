@@ -1,0 +1,220 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" v-on:click.prevent="doSearch"><span class="icon one-file-plus"></span>Lấy DS</a>
+      </li>
+        <li>
+            <a href="#" v-on:click.prevent="doInsert">
+                <span class="icon one-save"></span>Ghi lại
+            </a>
+        </li>
+        <li>
+            <a href="#" v-on:click.prevent="doFinish" :class="{ disabled: results.length === 0 }">
+                <span class="icon ui-1_check-circle-08 nc-icon-glyph"></span>Hoàn thành
+            </a>
+        </li>
+        <li>
+            <a href="#" v-on:click.prevent="exportExcel">
+                <span class="icon one-download"></span>Xuất file
+            </a>
+        </li>
+    </ul>
+  </div>
+
+  <!-- -->
+  <div class="page-content">
+    <div class="box-form">
+      <div class="pull-right w120">
+        <app-ky-cuoc :isTextBold="true"></app-ky-cuoc>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="box-form">
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="legend-title">Thông tin yêu cầu</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Số máy/Acc</div>
+                            <div class="value">
+                              <input v-model="params.p_somay_acc" autofocus ref="p_somay_acc" type="text" class="form-control bold highlight">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Dịch vụ</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                  <select2
+                                    :options = "params.p_dichvu_options"
+                                    v-model = "params.p_dichvu"
+                                    :disabled="true"
+                                  />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Kiểu YC</div>
+                    <div class="value">
+                        <div class="select-custom">
+                          <ejs-dropdownlist @change="onKieuYCOnChange" :filtering='onFilteringKieuYC' :allowFiltering="true" :dataSource='params.p_kieuyc_options' :fields="config.fieldsKieuYC" v-model = "params.p_kieuyc" :placeholder="'Chọn kiểu yêu cầu'"></ejs-dropdownlist>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Tên TB</div>
+                    <div class="value">
+                      <input v-model="params.p_ten_tb" type="text" class="form-control bold" :disabled="true">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Yêu cầu<span class="required">*</span></div>
+                    <div class="value">
+                      <b-form-textarea
+                        v-model="params.p_yeucau"
+                        rows="3"
+                        style="height: 80px;resize: vertical;"
+                        max-rows="6"></b-form-textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                <div class="">
+                                  <b-form-checkbox
+                                    v-model="params.p_chk_tungay"
+                                    class="check"
+                                    value="1"
+                                    unchecked-value="0"
+                                  >
+                                  <span class="name">Từ ngày</span>
+                                  </b-form-checkbox>
+                                </div>
+                            </div>
+                            <div class="value">
+                              <ejs-datepicker
+                                v-model="p_tungay"
+                                :value="config.dateConfig.value"
+                                :max="config.dateConfig.max"
+                                :format="config.dateConfig.format"
+                                :enabled="f_tungay_enabled"
+                                :allowEdit=false
+                                :showClearButton=false
+                                >
+                              </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                <div class="">
+                                  <b-form-checkbox
+                                    v-model="params.p_chk_denngay"
+                                    class="check"
+                                    value="1"
+                                    unchecked-value="0"
+                                  >
+                                    <span class="name">Đến ngày</span>
+                                  </b-form-checkbox>
+                                </div>
+                            </div>
+                            <div class="value">
+                              <ejs-datepicker
+                                v-model="p_denngay"
+                                :value="config.dateConfig.value"
+                                :max="config.dateConfig.max"
+                                :format="config.dateConfig.format"
+                                :enabled="f_denngay_enabled"
+                                :allowEdit=false
+                                :showClearButton=false
+                                >
+                              </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="legend-title">Thông tin xác nhận</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w120">
+                                <div class="">
+                                  <b-form-checkbox
+                                    v-model="params.p_chk_ngaythuchien"
+                                    class="check"
+                                    value="1"
+                                    unchecked-value="0"
+                                  >
+                                  <span class="name">Ngày thực hiện</span>
+                                  </b-form-checkbox>
+                                </div>
+                            </div>
+                            <div class="value">
+                              <ejs-datepicker
+                                v-model="p_ngaythuchien"
+                                :value="config.dateConfig.value"
+                                :max="config.dateConfig.max"
+                                :format="config.dateConfig.format"
+                                :enabled="f_ngaythuchien_enabled"
+                                :allowEdit=false
+                                :showClearButton=false
+                                >
+                              </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key vtop padt7 w120">Xác nhận<span class="required">*</span></div>
+                    <div class="value">
+                      <b-form-textarea
+                        v-model="params.p_xacnhan"
+                        rows="3"
+                        style="height: 200px;resize: vertical;"
+                        max-rows="6"></b-form-textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách thuê bao</div>
+      <div class="table-content">
+        <DataGrid
+          ref:gridDSThueBao
+          v-bind:columns="[
+            {fieldName: 'DICHVUVT_ID', visible: false},
+            {fieldName: 'THUEBAO_ID', visible: false},
+            {fieldName: 'YEUCAU_ID', visible: false, isPrimaryKey: true},
+            {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true},
+            {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', allowFiltering: true},
+            {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true},
+            {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true},
+            {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', allowFiltering: true},
+            {fieldName: 'NGUOI_YC', headerText: 'Người yêu cầu', allowFiltering: true},
+            {fieldName: 'TEN_DVVT', headerText: 'Đơn vị YC', allowFiltering: true},
+            ]"
+          v-bind:dataSource="results"
+          :showFilter="true"
+          :allowPaging="true"
+          :totalRecords="pageinfo.totalElement"
+          :pageSize="pageinfo.pageSize"
+          :pageIndex="pageinfo.page"
+          @selectedRowChanged="selectedRowChanged"
+          @pageChanged="pageChanged"
+          ref="gridDSYeuCau"
+          >
+        </DataGrid>
+      </div>
+    </div>
+  </div>
+</div>

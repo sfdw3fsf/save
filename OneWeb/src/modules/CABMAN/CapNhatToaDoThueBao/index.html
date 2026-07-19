@@ -1,0 +1,201 @@
+<div class="">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li @click="traCuuThueBao">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-search"></span>Tra cứu
+                </a>
+            </li>
+            <li @click="showReport">
+                <a href="javascript:void(0)" :class="{'disable-btn-capnhat-toado-tb': isDisableBtnInLyLich}">
+                    <span class="icon one-print "></span>In lý lịch
+                </a>
+            </li>
+            <li @click="lichSuCapNhat" class="is-invalid">
+                <a href="javascript:void(0)">
+                    <span class="icon one-phone-history"></span>Lịch sử cập nhật toạ độ thuê bao
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">Tìm kiếm thuê bao</div>
+                <div class="pull-right">
+                    <div class="list-checks normal">
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" v-model="loaiTimKiem" name="loaiTimKiem" value="0" class="check">
+                                <span class="name">Danh bạ</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="check-action">
+                                <input type="radio" v-model="loaiTimKiem" name="loaiTimKiem" value="1" class="check">
+                                <span class="name">Hợp đồng</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-9 col-12">
+                    <div class="info-row">
+                        <div class="key w120">Số máy/Account <span class="red">*</span></div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="simpleButton1_Click">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input ref="maTbInp" type="text" class="form-control highlight" v-model.trim="ma_tb" @keyup.enter="traCuuThueBao">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w50">Tọa độ</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="toaDo" disabled>
+                        </div>
+                        <div class="value w30 nowrap">
+                            <button class="btn btn-second pad4 lh20" @click="showPopupToaDo">
+                                <span class="f20 nc-icon-outline location_map-pin"></span>
+                            </button>
+                            <button class="btn btn-second pad4" @click="modalConfirm =! modalConfirm">
+                                <span class="one-save f20 lh20"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Bản đồ (VNPT MAPS)</div>
+            <div class="bss-1830-mapcanvas sitemap-chart-canvas">
+                <BanDoVNPT menuMapId="mapVNPT" ref="mapVNPTCapNhatToaDo" :center="center" :polylines="getPolylines" :markers="getMarkers" @dblclickMap="dblclickMap" :zoomDefault="zoomDefault" :mapTypeId="mapTypeId">
+                </BanDoVNPT>
+                <!-- <div class="search-box">
+                    <div class="input-more-button -right">
+                        <button class="btn" @click="isShowDiaChi = !isShowDiaChi">
+                            <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <div class="input-icon-left">
+                            <input type="text" class="form-control" placeholder="Gõ vào đây địa chỉ hoặc toạ độ để di chuyển bản đồ" v-model.trim="query" @keyup.enter="timKiem">
+                            <span class="icon nc-icon-outline ui-1_zoom"></span>
+                        </div>
+
+                    </div>
+                </div> -->
+                <div class="maptype">
+                    <a href="javascript:void(0)" @click="changetypeMap">
+                        <img src="./image3.png" alt="">
+                        <span class="text-m">Bản đồ</span>
+                    </a>
+                </div>
+                <div class="list-info" v-if="showThongSoKyThuat" style="top: 200px;">
+                    <div class="head" style="text-align: center;">Thông số kỹ thuật của thuê bao </div>
+                    <div class="body">
+                        <!-- <p><span class="fw6">Thuê bao:</span> {{ ttThueBao ? ttThueBao.TEN_TB : null }}</p> -->
+                        <p v-for="(tskt, index) in tsktThueBao">
+                            <span class="fw6">{{tskt.TEN_TRUONG}}:</span> <span v-html="tskt.GIATRI"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="zoom-actions-bottom">
+                    <a href="#" class="btn btn-main">
+                        <span class="icon -ap icon-plus3"></span>
+                    </a>
+                    <a href="#" class="btn btn-main">
+                        <span class="icon -ap icon-minus3"></span>
+                    </a>
+
+                </div>
+                <!-- <div class="slide-box">
+                    <div class="slider-inner">
+                        <div class="lines">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="sslider">
+                            <span class="bar" style="height: 20%;">
+                                <span class="drag"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="input-number-custom">
+                        <input type="number" class="form-control tright" value="100">
+                    </div>
+                </div> -->
+            </div>
+            <div class="map-footer pad10 mart10" style="background: #F5F5F5;border-radius: 2px;">
+                <div class="row">
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row marb0">
+                            <div class="key w40">
+                                Vĩ độ
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" :value="viDo_LD">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row marb0">
+                            <div class="key w50">
+                                Kinh độ
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control" :value="kinhDo_LD">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-ChonThueBao" title="Chọn thuê bao" hide-footer size="xl" modal-class="bss-modal" @ok="chonThueBao">
+        <template #default="{ ok }">
+          <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                  <button class="btn btn-link" @click="ok()"><span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận</button>
+                </li>
+            </ul>
+        </div>
+        <ModalChonThueBao :dataSource="dsThueBao" @selectedRowChanged="ModalChonThueBao_selectedRowChanged"></ModalChonThueBao>
+        </template>
+    </b-modal>
+    <ModalLichSuToaDo :modalShow="modalShowLichSuThueBao" @closeModal="modalShowLichSuThueBao =! modalShowLichSuThueBao" :lsThueBao="lsThueBao" />
+    <b-modal
+        v-model="modalConfirm"
+        size="sm"
+        @ok="capNhatToaDoThueBao"
+    >
+        Cập nhật tọa độ thuê bao vào danh bạ?
+    </b-modal>
+    <ToaDo :modalId="popupToaDo" :markers="getMarkers" @xacnhan="getToaDo" :toaDo="toaDo"/>
+    <InLyLichDayMay :modalShow="modalShowInLyLich"
+        @closeModal="closeModalInLyLich"
+        :thongTinTBTraCuu="thongTinTBTraCuu"
+        :thongTinGianDo="thongTinGianDo"
+        :thongTinBaoHong="thongTinBaoHong"
+        :doRenderPDF="doRenderPDF"
+        :showPanelReport="showPanelReport"
+        :soMay="ma_tb"
+        :loaiTimKiem="loaiTimKiem"
+        @traCuu="traCuu"
+    />
+    <ModalChonDiaChi v-if="isShowDiaChi" :isShow="isShowDiaChi" :chiTietDiaChi="getChiTietDiaChi" :diaChi="query" @closeModalDiaChi="closeModalDiaChi" />
+    <b-modal id="popupComponents" size="xl"
+    hide-footer
+    hide-header
+    hide-header-close
+    body-class="modal-body p-0 capnhat-toado-thuebao">
+        <SearchAccount ref="modalSearchAccount" isPopup="true" @form-close="popupClosed" @acceptChangeCTV="popupClosed" @acceptChangeNGT="popupClosed"></SearchAccount>
+    </b-modal>
+</div>

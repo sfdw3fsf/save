@@ -1,0 +1,499 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header" />
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-for="item in actions" :key="item.id" @click="onActionClick(item)"
+          :class="{disabled: !item.active}" v-show="item.visible">
+        <a style="cursor: pointer;" :class="{disabled_color: !item.active}">
+          <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+        </a>
+      </li>
+    </ul>
+    <div class="more dropdown">
+      <a href="#" data-toggle="dropdown">
+        <span class="icon -ap  icon-dots-three-vertical"></span>
+      </a>
+      <div class="dropdown-menu ovauto">
+        <a style="cursor: pointer" v-for="item in actionsDropdown" :key="item.id" @click="onActionClick(item)"
+           :class="{disabled: !item.active}" v-show="item.visible">
+          <span class="icon" :class="item.icon_class"></span> {{ item.name }}
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin thuê bao</div>
+
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Dịch vụ</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select2 :options="listbox.cboDichVuVT.list" v-model="listbox.cboDichVuVT.value"
+                             v-on:change="cboDichVuVT_SelectedValueChanged">
+                    </select2>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Quy trình</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select2 :options="listbox.cboQuyTrinh.list" v-model="listbox.cboQuyTrinh.value"
+                             v-on:change="cboQuyTrinh_SelectedValueChanged">
+                    </select2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Mã GD <span class="red">(*)</span></div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="showPopupSearchContract">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <input type="text" ref="txtMaGD" class="form-control highlight bold" v-model="formProps.txtMaGD"
+                           v-on:keyup.enter="txtMaGD_KeyPress" :disabled="disabledBox.txtMaGD">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Số máy/Acc <span class="red">(*)</span></div>
+                <div class="value">
+                  <input type="text" ref="txtMaTB" class="form-control highlight bold" v-model="formProps.txtMaTB"
+                         v-on:keyup.enter="txtMaTB_KeyPress" :disabled="disabledBox.txtMaTB">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">Tên thuê bao</div>
+                <div class="value">
+                  <input type="text" ref="txtTenTB" class="form-control bold" v-model="formProps.txtTenTB"
+                         :disabled="disabledBox.txtTenTB">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w110">
+                  <div class="check-action text-main">
+                    <input type="checkbox" ref="chkNgayHT" class="check" :disabled="chkNgayHT.disabled"
+                           v-model="chkNgayHT.checked">
+                    <span class="name">Ngày YC HT</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker ref="dtpNgayBG" format="DD/MM/YYYY hh:mm A" type="datetime"
+                                   v-model="formProps.dtpNgayYCHT" :disabled="!chkNgayHT.checked"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w110">Địa chỉ lắp đặt</div>
+            <div class="value">
+              <input type="text" ref="txtDiaChiLD" :disabled="disabledBox.txtDiaChiLD" class="form-control bold"
+                     v-model="formProps.txtDiaChiLD">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="legend-title mart20">Thông tin hoàn công</div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Ngày GV</div>
+                <div class="value w20 padt7">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" ref="chkNgayGV" v-model="chkNgayGV.checked"
+                           :disabled="chkNgayGV.disabled">
+                    <span class="name"></span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker ref="dtpNgayGV" format="DD/MM/YYYY hh:mm A" type="datetime"
+                                   v-model="formProps.dtpNgayGV" :disabled="!chkNgayGV.checked"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Ngày HT</div>
+                <div class="value w20 padt7">
+                  <div class="check-action">
+                    <input type="checkbox" ref="chkNgayBG" class="check" :disabled="chkNgayBG.disabled"
+                           v-model="chkNgayBG.checked">
+                    <span class="name"></span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <k-date-picker ref="dtpNgayBG" format="DD/MM/YYYY hh:mm A" type="datetime"
+                                   v-model="formProps.dtpNgayBG" :disabled="!chkNgayBG.checked"/>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Host LĐ</div>
+
+                <div class="value">
+                  <input type="text" ref="txtHostLD" class="form-control" v-model="formProps.txtHostLD"
+                         :disabled="disabledBox.txtHostLD">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Nhân viên GV</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select2 :options="listbox.cboNguoiGV.list" v-model="listbox.cboNguoiGV.value">
+                    </select2>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Trạm T.bị</div>
+                <div class="value">
+                  <input type="text" ref="txtTramTB" class="form-control" :disabled="disabledBox.txtTramTB"
+                         v-model="formProps.txtTramTB">
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w90">Host vật lý</div>
+                <div class="value">
+                  <input type="text" ref="txtHostVL" class="form-control" :disabled="disabledBox.txtHostVL"
+                         v-model="formProps.txtHostVL">
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nội dung giao</div>
+            <div class="value">
+              <input type="text" ref="txtNDGiao" class="form-control" :disabled="disabledBox.txtNDGiao"
+                     v-model="formProps.txtNDGiao">
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nội dung trả</div>
+            <div class="value">
+              <input type="text" ref="txtThongTinTra" class="form-control" :disabled="disabledBox.txtThongTinTra"
+                     v-model="formProps.txtThongTinTra">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Nhóm KQ</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 :options="listbox.cboNhomKQ.list" v-model="listbox.cboNhomKQ.value"></Select2>
+                    <!-- <ComboboxGrid :valueField="DmNhomKQ.valueField" :textField="DmNhomKQ.textField"
+                                  v-model="DmNhomKQ.selectNhomKQ" :value="DmNhomKQ.selectNhomKQ"
+                                  :columns="DmNhomKQ.headers"
+                                  :panelDataHeight="DmNhomKQ.panelDataHeight" :enabledSelectFirstRow="true"
+                                  :dataSource="DmNhomKQ.data">
+                    </ComboboxGrid> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Kết quả</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <Select2 :options="listbox.cboKetQuaXL.list" v-model="listbox.cboKetQuaXL.value"></Select2>
+                    <!-- <ComboboxGrid :valueField="DmKetQuaXL.valueField" :textField="DmKetQuaXL.textField"
+                                  v-model="DmKetQuaXL.selectKQXL" :value="DmKetQuaXL.selectKQXL"
+                                  :columns="DmKetQuaXL.headers"
+                                  :panelDataHeight="DmKetQuaXL.panelDataHeight" :enabledSelectFirstRow="true"
+                                  :dataSource="DmKetQuaXL.data">
+                    </ComboboxGrid> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Nội dung TH</div>
+            <div class="value">
+              <div class="input-more-button">
+                <button class="btn" @click="btnNDTH_Click">
+                  <span class="nc-icon-glyph ui-1_edit-76 f16"></span>
+                </button>
+                <input type="text" class="form-control" ref="txtNoiDungTH" :disabled="disabledBox.txtNoiDungTH"
+                       v-model="formProps.txtNoiDungTH" id="txtNoiDungTH" style="color: #800000">
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Ghi chú</div>
+            <div class="value">
+              <textarea name="" ref="txtGhiChu" :disabled="disabledBox.txtGhiChu" class="form-control"
+                        style="height:40px; resize:none" id="" cols="30" rows="10"
+                        v-model="formProps.txtGhiChu"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="box-form" style="height: 380px; overflow: scroll;">
+            <div class="legend-title">
+              <div class="pull-left">
+                <a @click="showPanelNV = !showPanelNV"><span :class="showPanelNV ? 'icon fa fa-angle-up' : 'icon fa fa-angle-down' "></span> Nhân viên</a>
+              </div>
+              <div class="pull-right">
+                <div class="red">
+                  <span class="name">{{ formProps.lblLienHe }}</span>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div :style="!showPanelNV ? 'display:none' : ''">
+              <div class="table-content" style="height:125px;" >
+                <DataGrid
+                  v-bind:columns="dgvNhanVien.header"
+                  v-bind:dataSource="dgvNhanVien.list"
+                  :enable-paging-server="false"
+                  :allowPaging="true"
+                  :showFilter="true"
+                ></DataGrid>
+              </div>
+            </div>
+
+            <div class="legend-title mart20">
+              <a @click="showPanelTBi = !showPanelTBi"><span :class="showPanelTBi ? 'icon fa fa-angle-up' : 'icon fa fa-angle-down' "></span> {{ formProps.lblThietBi }}</a>
+            </div>
+            <div :style="!showPanelTBi ? 'display:none' : ''">
+              <div class="table-content" style="height:125px;">
+                <DataGrid
+                  v-bind:columns="dgvDS_ThietBi.header"
+                  v-bind:dataSource="dgvDS_ThietBi.list"
+                  :enable-paging-server="false"
+                  :allowPaging="true"
+                  :showFilter="true"
+                ></DataGrid>
+              </div>
+            </div>
+
+            <div class="legend-title mart20">
+              <a @click="showPanelLydo = !showPanelLydo"><span :class="showPanelLydo ? 'icon fa fa-angle-up' : 'icon fa fa-angle-down' "></span> Danh sách lý do huỷ</a>
+            </div>
+            <div :style="!showPanelLydo ? 'display:none' : ''">
+              <div class="list-checks marb10">
+                <div class="item">
+                  <button class="btn btn-second" @click="btnLyDoHuy_Click">Lý do</button>
+                </div>
+                <div class="item red fw6">
+                  Click nút Lý do để bổ sung thêm các lý do huỷ mới cho thuê bao
+                </div>
+              </div>
+              <div class="table-content" style="height:125px;">
+                <DataGrid
+                  v-bind:columns="gridVLyDoHuyHDTB.headers"
+                  v-bind:dataSource="gridVLyDoHuyHDTB.data"
+                  :enable-paging-server="false"
+                  :allowPaging="true"
+                  :showFilter="true"
+                ></DataGrid>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="box-form padt5">
+      <div class="legend-title">
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="mart7">Danh sách thuê bao chấm dứt sử dụng</div>
+          </div>
+          <div class="col-sm-2">
+            <div class="list-checks mart7">
+              <div class="item red vcenter">
+                <div class="check-action">
+                  <input type="radio" class="check" name="loai_phieu" value="0" v-model="phieu_moi" @change="rdoPhieuMoi_CheckedChanged">
+                  <span class="name">Phiếu mới</span>
+                </div>
+              </div>
+              <div class="item red vcenter">
+                <div class="check-action">
+                  <input type="radio" class="check" name="loai_phieu" value="1" v-model="phieu_moi" @change="rdoPhieuMoi_CheckedChanged">
+                  <span class="name">Phiếu trả lại</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="item vcenter mart7">
+              <div class="info-row">
+                <div class="key w90">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="chkTimKiem.checked"
+                           v-on:change="chkTimKiem_CheckedChanged">
+                    <span class="name">Tìm kiếm</span>
+                  </div>
+                </div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select2 :options="listbox.cboLoaiDVTK.list" v-model="listbox.cboLoaiDVTK.value"
+                             :disabled="!chkTimKiem.checked">
+                    </select2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="item vcenter mart7">
+              <div class="info-row">
+                <div class="key w60">
+                  Đơn vị
+                </div>
+                <div class="value">
+                  <div class="select-custom">
+                    <ComboboxGrid :valueField="DmDViTimKiem.valueField" :textField="DmDViTimKiem.textField"
+                                  v-model="DmDViTimKiem.selectDViTimKiem" :value="DmDViTimKiem.selectDViTimKiem"
+                                  :columns="DmDViTimKiem.headers"
+                                  :panelDataHeight="DmDViTimKiem.panelDataHeight" :enabledSelectFirstRow="false"
+                                  :dataSource="DmDViTimKiem.data" v-bind:class="{ disabled: !chkTimKiem.checked}">
+                    </ComboboxGrid>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+    </div>
+    <DataGrid
+      ref="dsphieu"
+      v-bind:columns="gview_DanhSach.header"
+      v-bind:dataSource="gview_DanhSach.list"
+      :enable-paging-server="false"
+      :allowPaging="true"
+      :showFilter="true"
+      :showColumnCheckbox="true"
+      :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+      @selectedRowChanged="gview_DanhSach_FocusedRowChanged"
+      @selectedItemsChanged="onSelectedItemsChanged"
+      :enabledSelectFirstRow="false"
+      @actionComplete="gview_DanhSach_actionComplete"
+      @queryCellInfo="gview_DanhSach_queryCellInfo"
+    >
+    </DataGrid>
+  </div>
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="giaophieunhanvien"
+              :header='"Giao phiếu nhân viên"' showCloseIcon=true target=".main-wrapper" width='60%' height="800">
+    <GiaoPhieuNV @giaoviec_success="giaoviec_success()" ref="formgiaphieu"
+                 :phieu_id="gpnv_phieu_id" :nguoigv_id="gpnv_nguoigv_id" :ma_tb="gpnv_ma_tb" :hdtb_id="gpnv_hdtb_id"
+                 :huonggiao_id="gpnv_huonggiao_id" :ngaygiao="gpnv_ngaygiao" :dsphieuGV="gpnv_dsphieuGV"/>
+  </ejs-dialog>
+
+  <VatTuThueBao ref="popupVatTuThueBao" :input-data="modelVatTu"/>
+
+  <ExportDataModal ref="exportDataModal" :data="gview_DanhSach.list"></ExportDataModal>
+
+  <!-- <b-modal
+    v-model="showModalTraphieu"
+    modal-class="traphieu"
+    header-class="popup-header"
+    content-class="traphieu-content"
+    body-class="none-padding traphieu-body"
+    size="xl"
+    title="Trả phiếu"
+    hide-footer
+  >
+    <traphieu :ngaytra="modelTraPhieu.ngaytra" :ngaygiao="modelTraPhieu.ngaygiao"
+              :ma_gd="modelTraPhieu.maGd" :nhanvien_id="modelTraPhieu.nhanvienId"
+              :ma_tb="modelTraPhieu.ma_tb" :kieu="modelTraPhieu.kieugoiId"
+              :loaihd_id="modelTraPhieu.loaihdId" :dichvuvt_id="modelTraPhieu.dichvuvtId" />
+  </b-modal> -->
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="popupFrmTraPhieuTC" :header='"Trả phiếu"' 
+                showCloseIcon=true target=".main-wrapper" width='80%' height="800">
+      <frmTraPhieuTC @traphieu_success="traphieu_success" ref="frmTraPhieuTC" />
+  </ejs-dialog>
+
+  <ChuyenTo ref="popupChuyenTo" @closeChuyenTo="closeChuyenTo"></ChuyenTo>
+
+  <DuAnHDTB ref="popupDuAnHDTB" :vhdtb_id="hdtb_id"/>
+
+  <ThongTinHenKhachHangModal ref="thongTinHenKhachHangModal" :hdkh_id="hdkh_id" :quyenduoc_hen="quyenduoc_hen"/>
+
+  <DoKiemModal ref="doKiem" :hdtb_id="hdtb_id"/>
+
+  <TCThongTinNo ref="popupTCThongTinNo"/>
+
+  <!-- <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract"
+                       :loai_hd_id="4" :dichvu_id="this.dichvuvt_id"
+                       :ngay_yc="''" :ngay_kt="''"
+                       :trangthai_hd="1"/> -->
+
+  <ejs-dialog :enableResize='true' :visible="false" ref="popupFrmTraCuuHopDong"
+        :header='"Tra cứu hợp đồng, phụ lục"' showCloseIcon=true width="80%" target="#app .main-wrapper" height="800">
+      <SearchContractModal ref="searchContractModal" :loaihd_id="4" :kieu="1" :tthd_id="tthd_id"
+          @accept="acceptSearchContract"/>
+  </ejs-dialog>
+
+  <CapVatTuTB ref="popupVatTuTB" :input-data="modelCapVatTu"/>
+  <TraCuuThongSoKTModal ref="traCuuThongSoKTModal" :hdtb_id="this.hdtb_id" :dichvuvt_id="this.dichvuvt_id"
+                        :ma_tb="this.formProps.txtMaTB" :kieu="1" :thuebao_id="this.thuebao_id"/>
+
+  <ThayDoiLyDoHuy ref="popupThayDoiLyDoHuy" :input-data="modelThayDoiLyDoHuy" @success="CapNhatLyDoHuyThanhCong"/>
+
+  <InBienBan ref="popupInBB" :params="modelIn"/>
+
+  <DangNhapIVAN ref="ppDangNhapIVAN" @logINSuccess="logInIVAN_success" />
+
+  <CreateIssue ref="dialogCreateIssue"/>
+
+  <GiaoPhieuNet ref="popupGiaoPhieuNet" />
+  
+  <ejs-dialog
+      :isModal="true"
+      :enableResize="true"
+      :resizeHandles="['All']"
+      :visible="false"
+      ref="GiaoPhieuView"
+      :header='"Giao phiếu điều hành thi công"'
+      showCloseIcon="true"
+      target=".main-wrapper"
+      width="90%"
+      allowDragging="true"
+      :animationSettings="animationSettings"
+      @close="GiaoPhieuView_OnClose"
+    >
+      <div>
+        <GiaoPhieuView v-if="giaoPhieuViewDialog.isVisiable" type="modal"  v-bind="giaoPhieuViewDialog.input" @onGiaoPhieuSuccessListener="giaophieu_success" />
+      </div>
+    </ejs-dialog>
+</div>

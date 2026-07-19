@@ -1,0 +1,306 @@
+<div>
+  <input id="gachno_upload_excel" ref="gachno_upload_excel" @change="uploadFile" type="file" hidden>
+  <app-tim-nhan-vien-thu-cuoc 
+    ref="refTimNVThuCuoc"
+    :vnvtc="params.p_ma_nvtc"
+    :vdonvi="params.p_donviqlno_id"
+    :vquan_id="0"
+    :vphuong_id="0"
+    :vpho_id="0"
+    :vkt_kylai="true"
+    @chonNVTC="chonNVTCHandler"
+    ></app-tim-nhan-vien-thu-cuoc>
+  <app-tim-thanh-toan ref="refTimThanhToan" @searchThanhToan="searchThanhToanHandler"></app-tim-thanh-toan>
+  <div class="list-actions-top">
+      <ul class="list">
+          <li>
+              <a href="#" v-on:click.prevent="getDanhSach" title="Lấy lại danh sách đã lưu">
+                  <span class="icon one-file-attach1"></span> Lấy DS (F5)
+              </a>
+          </li>
+          <li>
+              <a href="#" v-on:click.prevent="doSave" title="Lưu danh sách đang thực hiện">
+                  <span class="icon one-file-save"></span> Lưu DS
+              </a>
+          </li>
+          <li>
+              <a href="#"v-on:click.prevent="doGachNo">
+                  <span class="icon one-gachno"></span> Gạch nợ
+              </a>
+          </li>
+          <li>
+              <a href="#" v-on:click.prevent="doCancel" title="Hủy thao tác">
+                  <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Huỷ
+              </a>
+          </li>
+          <li>
+              <a href="#"v-on:click.prevent="doDSPhieuThu" title="Danh sách lượt phiếu thu hóa đơn">
+                  <span class="icon one-file-reload"></span> Lượt thu (F6)
+              </a>
+          </li>
+          <li>
+              <a href="#" v-on:click.prevent="doReadFile" title="Cấu trúc file gồm 1 trường MA_TT, không có dòng tiêu đề">
+                  <span class="icon one-book"></span>Đọc file (F7)
+              </a>
+          </li>
+          <li>
+              <a href="#"v-on:click.prevent="exportFile">
+                  <span class="icon one-download"></span> Xuất file
+              </a>
+          </li>
+          <li>
+              <a href="#"v-on:click.prevent="exportExcel">
+                  <span class="icon one-xlsx"></span> Xuất Excel
+              </a>
+          </li>
+      </ul>
+  </div>
+  <div class="page-content">
+      <div class="box-form padt8 padb8">
+          <div class="pull-right w120">
+            <app-ky-cuoc :isDisabled=true  @chukycuocChange="chukycuocChangeHandler"></app-ky-cuoc>
+          </div>
+          <div class="clearfix"></div>
+      </div>
+      <div class="box-form">
+          <div class="legend-title">Thông tin thanh toán</div>
+          <div class="row">
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w70">
+                          Đại lý
+                      </div>
+                      <div class="value">
+                          <div class="input-more-button">
+                              <button class="btn" @click="popupTimNVThuCuoc">
+                                  <span class="-ap icon-more_horiz"></span>
+                              </button>
+                              <div class="select-custom">
+                                <ejs-dropdownlist :change="onChangeNVTC" :filtering='onFilteringNVTC' :allowFiltering="true" :dataSource='params.p_nvtc_options' :fields="config.fieldsNVTC" v-model = "params.p_nvtc" :placeholder="'Chọn đại lý'"></ejs-dropdownlist>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w70">
+                          Loại tiền
+                      </div>
+                      <div class="value">
+                          <div class="select-custom">
+                            <ejs-dropdownlist :filtering='onFilteringLoaiTien' :allowFiltering="true" :dataSource='params.p_loaitien_options' :fields="config.fieldsLoaiTien" v-model = "params.p_loaitien" :placeholder="'Chọn loại tiền'"></ejs-dropdownlist>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-sm-6 col-12">
+                  <div class="row">
+                      <div class="col-sm-4 col-12">
+                          <div class="info-row">
+                              <div class="key w70">
+                                  Lượt TT
+                              </div>
+                              <div class="value">
+                                  <div class="select-custom">
+                                    <ejs-dropdownlist :filtering='onFilteringLuotTT' :allowFiltering="true" :dataSource='params.p_luottt_options' :fields="config.fieldsLuotTT" v-model = "params.p_luottt" :placeholder="'Chọn lượt TT'"></ejs-dropdownlist>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-8 col-12">
+                          <div class="info-row">
+                              <div class="key w70">
+                                  Lượt giao
+                              </div>
+                              <div class="value">
+                                  <div class="vattu_box">
+                                    <div class="input-group">
+                                        <div class="li input-text">
+                                            <div class="select-custom">
+                                                <input ref="luotgiao" readonly v-model="params.luotgiao.text" id="root" placeholder="Chọn lượt giao"
+                                                    class="form-control bg-none" @click="onChangeCustomDropDown('#luotgiao-pd')">
+                                                </input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="vattu_table" id="luotgiao-pd" :class="{ displayNone: hideTable }">
+                                        <DataGrid2
+                                            v-bind:columns="[
+                                            {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false},
+                                            {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true, allowSorting: false},
+                                            {fieldName: 'SOLUONG_GBC', headerText: 'Giấy báo', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0'},
+                                            {fieldName: 'SOLUONG_HD', headerText: 'HĐ giao', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0'},
+                                            {fieldName: 'TONGTIEN_HD', headerText: 'Tiền HĐ giao', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0'},
+                                            {fieldName: 'TRA_HD', headerText: 'Trả hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0'},
+                                            {fieldName: 'TRA_TB', headerText: 'Trả trọn bộ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0'},
+                                            {fieldName: 'DS_DOT', headerText: 'Đợt giao', allowFiltering: true, allowSorting: false},
+                                            {fieldName: 'DS_TUYEN', headerText: 'Tuyến đường', allowFiltering: true, allowSorting: false}
+                                            ]"
+                                            v-bind:dataSource="params.p_luotgiao_options" :showFilter="false" :showColumnCheckbox="false"
+                                            dataKeyField="GIAOPHIEU_ID" :defaultColumnCheckboxChecked="false" :selectedRow="-1"
+                                            @selectedRowChanged="onChangeLuotGiao"
+                                            ref="tableNvt">
+                                        </DataGrid2>
+                                        <div class="p-2">
+                                            <button type="button" @click="onChangeCustomDropDown('#luotgiao-pd')" class="btn btn-secondary btn-sm"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-4 col-12">
+                          <div class="info-row">
+                              <div class="key w70">
+                                  Dịch vụ
+                              </div>
+                              <div class="value">
+                                  <div class="select-custom">
+                                    <ejs-dropdownlist :change="onChangeDichVu" :filtering='onFilteringDichVu' :allowFiltering="true" :dataSource='params.p_dichvu_options' :fields="config.fieldsDichVu" popupWidth='400' v-model = "params.p_dichvu" :placeholder="'Chọn dịch vụ'"></ejs-dropdownlist>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-8 col-12">
+                          <div class="info-row">
+                              <div class="key w70">
+                                  Tìm kiếm
+                              </div>
+                              <div class="value">
+                                  <input type="text" class="form-control highlight" v-model="params.p_timkiem" @keyup.enter="doSearch" >
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="info-row">
+                      <div class="key w70">
+                          Ghi chú
+                      </div>
+                      <div class="value">
+                          <input type="text" class="form-control" v-model="params.p_ghichu">
+                      </div>
+                  </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w70">
+                          Thủ quỹ
+                      </div>
+                      <div class="value">
+                          <div class="select-custom">
+                            <ejs-dropdownlist :filtering='onFilteringThuQuy' :allowFiltering="true" :dataSource='params.p_thuquy_options' :fields="config.fieldsThuQuy" v-model = "params.p_thuquy" :placeholder="'Chọn thủ quỹ'"></ejs-dropdownlist>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-4 col-12">
+                          <div class="info-row">
+                              <div class="key w70">
+                                  Ngày TT
+                              </div>
+                              <div class="value">
+                                <ejs-datepicker
+                                  v-model="p_ngay_ttoan"
+                                  :value="config.dateConfig.value"
+                                  :format="config.dateConfig.format"
+                                  :allowEdit=false
+                                  :showClearButton=false
+                                  >
+                                </ejs-datepicker>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-8 col-12">
+                          <div class="info-row">
+                              <div class="key w90">
+                                  Hình thức TT
+                              </div>
+                              <div class="value">
+                                  <div class="select-custom">
+                                    <ejs-dropdownlist :filtering='onFilteringHTTT' :allowFiltering="true" :dataSource='params.p_httt_options' :fields="config.fieldsHTTT" v-model = "params.p_httt" :placeholder="'Chọn HTTT'"></ejs-dropdownlist>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-4 col-12">
+                          <div class="info-row">
+                              <div class="key w70">
+                                  Chứng từ
+                              </div>
+                              <div class="value">
+                                  <input type="text" class="form-control" v-model="params.p_chungtu">
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-8 col-12">
+                          <div class="list-note mart7">
+                              <div class="inline">
+                                  Số lượng : <span class="red">0</span>
+                              </div>
+                              <div class="inline marl10">
+                                  Thời gian : <span class="red"> 0</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="box-form">
+          <div class="legend-title">
+              Danh sách hoá đơn
+          </div>
+          <div class="table-content">
+            <DataGrid
+              v-bind:columns="[{fieldName: 'CHECKED', visible: false, headerText: '', allowFiltering: false, displayAsCheckBox: true, width: 40},
+              {fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, isPrimaryKey: true, width: 130},
+              {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, width: 120},
+              {fieldName: 'MA_LT', headerText: 'Số ảo', allowFiltering: true, width: 100},
+              {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, width: 100},
+              {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true},
+              {fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, width: 100},
+              {fieldName: 'QUYEN', headerText: 'Quyển', allowFiltering: true, width: 100},
+              {fieldName: 'SO_SERI', headerText: 'Số seri', allowFiltering: true, width: 100},
+              {fieldName: 'TIENSETRA', headerText: 'Tiền trả', allowFiltering: true, type:'number', format: this.format, width: 100},
+              {fieldName: 'CONNO', headerText: 'Còn nợ', allowFiltering: true, type:'number', format: this.format, width: 100},
+              {fieldName: 'TIEN_HD', headerText: 'Tiền HĐ', allowFiltering: true, type:'number', format: this.format, width: 100},
+              {fieldName: 'TIENHD_DK', headerText: 'Tiền ĐK', allowFiltering: true, type:'number', format: this.format, width: 100},
+              {fieldName: 'TIENHD_PS', headerText: 'Tiền PS', allowFiltering: true, type:'number', format: this.format, width: 100},
+              {fieldName: 'DA_TRA', headerText: 'Đã trả', allowFiltering: true, type:'number', format: this.format, width: 100},
+              {fieldName: 'MAIN_GHEP', headerText: 'Mã ghép', allowFiltering: true},
+              {fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true},
+              {fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true},
+              {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true},
+              {fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, width: 100},
+              {fieldName: 'THANHTOAN_ID', visible: false, headerText: '', allowFiltering: false},
+              ]"
+              v-bind:dataSource="results"
+              :showColumnCheckbox="true"
+              :enablePagingServer="false"
+              :showFilter="true"
+              :allowPaging="true"
+              :totalRecords="pageinfo.totalElement"
+              :pageSize="pageinfo.maxSize"
+              :pageIndex="pageinfo.page"
+              :allowExcelExport="true"
+              :selectionSettings="selectionOptions"
+              @dataBound="dataBound"
+              @selectedRowChanged="RowChanged"
+              @actionComplete="actionComplete"
+              ref="gridDSHoaDon"
+              >
+            </DataGrid>
+          </div>
+      </div>
+  </div>
+</div>

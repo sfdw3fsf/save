@@ -1,0 +1,2 @@
+import AssignAttributeTypeToSuppliesType from './AssignAttributeTypeToSuppliesType.vue'
+export default AssignAttributeTypeToSuppliesType

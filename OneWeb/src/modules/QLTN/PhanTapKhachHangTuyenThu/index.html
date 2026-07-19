@@ -1,0 +1,308 @@
+
+<div>
+
+    <div class="page-content">
+        <!-- <div class="main-title">{{title}}</div> -->
+
+        <div class="box-form" >
+            <div class="row">
+                <div class="col-sm-2 col-12">
+                    <div class="box-form" >
+                        <div class="tree-plus tree-icon" style="overflow:scroll; height:840px;">
+                            <ul class="">
+                                <li class="haschild"
+                                    v-for="item in item_child('0')"
+                                    :key="item.ID"
+                                    v-bind:class="{ open: showLeave(item.ID) }"
+
+                                    >
+                                    <a href="javascript:void(0)"  @click="click_leaves(item.ID,item.TEN_CHA)" >{{item.TEN_KV}}</a>
+
+                                    <ul>
+                                        <li v-for="item1 in item_child(item.ID)" :key="item1.ID"
+                                            class="haschild"
+                                            v-bind:class="{ open: showLeave(item1.ID) }"
+                                            >
+                                            <a href="javascript:void(0)" @click="click_leaves(item1.ID,item1.TEN_CHA)">{{item1.TEN_KV}}</a>
+                                            <ul>
+                                                <li v-for="item2 in item_child(item1.ID)" :key="item2.ID"
+                                                    v-bind:class="{ active: tree_note===item2.ID }"
+                                                >
+                                                <a href="javascript:void(0)" @click="click_leaves(item2.ID,item2.TEN_CHA)">{{item2.TEN_KV}}</a>
+
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+
+
+
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-10 col-12" >
+
+                        <div class="box-form">
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+
+                                    <div class="legend-title">Nhóm loại nhân viên</div>
+                                    <div class="select-custom">
+
+                                        <!-- <select class="form-control bg-none h35 bor1" v-model="nhomLoaiNV_ID">
+                                            <option v-for="item in nhomLoaiNV" :value="item.NHOMLNV_ID">
+                                            {{item.NHOM_LNV}}</option>
+                                        </select> -->
+                                        <SelectExt v-model.trim="nhomLoaiNV_ID" :dataSource="nhomLoaiNV" dataTextField="NHOM_LNV"
+                                            dataValueField="NHOMLNV_ID" placeholder="Chọn"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+
+                                    <div class="legend-title">Loại nhân viên</div>
+                                    <div class="select-custom">
+
+                                        <!-- <select class="form-control bg-none h35 bor1" v-model="loaiNVID">
+                                            <option v-for="item in dsLoaiNV" :value="item.LOAINV_ID">
+                                            {{item.TEN}}</option>
+                                        </select> -->
+                                        <SelectExt v-model.trim="loaiNVID" :dataSource="dsLoaiNV" dataTextField="TEN"
+                                            dataValueField="LOAINV_ID" placeholder="Chọn"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-3 col-12" >
+                                <div class="box-form">
+                                    <div class="legend-title">Danh sách tuyến thu</div>
+                                        <DataGrid3
+                                                :panelDataHeight="'600'"
+                                                ref="dsNV"
+                                                v-bind:dataSource="dsNVGioiThieu"
+                                                v-bind:columns="GRID_COLUMS[9]"
+                                                :showFilter="true"
+                                                :enabledSelectFirstRow="false"
+                                                :enablePagingServer="true"
+                                                @selectedItemsChanged="selectedItemsNhanVien"
+                                                ></DataGrid3>
+                                        <!-- <input :value="totalHoaDonCu" type="text" class="form-control" style="width: 15vh;" disabled> -->
+                                    </div>
+
+                            </div>
+                        <div class="col-sm-9 col-12" >
+
+
+                            <div class="nav tab-over tabs">
+                                <a href="javascript:void(0)"  v-bind:class="{active: nodeID===1}" >Thông tin loại khách hàng</a>
+                                <a href="javascript:void(0)"  v-bind:class="{active: nodeID===2}">Thông tin ngành nghề hoạt động</a>
+                                <a href="javascript:void(0)"  v-bind:class="{active: false}">Thông tin địa bàn quản lý</a>
+                                <a href="javascript:void(0)"  v-bind:class="{active: nodeID===4}">Thông tin doanh thu</a>
+                                <a href="javascript:void(0)"  v-bind:class="{active: nodeID===5}">Thông tin điểm tín nhiệm</a>
+
+                            </div>
+                            <div class="tab-content">
+                        <div class="box-move-select-table" v-if="nodeID===1||nodeID===2">
+                            <div class="box-col box-form" >
+                            <div class="legend-title" v-if="nodeID===1">Loại khách hàng chưa gán</div>
+                            <div class="legend-title" v-if="nodeID===2">Loại ngành nghề chưa gán</div>
+                            <DataGrid3
+                                    :panelDataHeight="'600'"
+                                    ref="dsChuaGan"
+                                    v-bind:dataSource="dsChuaGan"
+                                    v-bind:columns="GRID_COLUMS[nodeID]"
+                                    :showFilter="true"
+                                    :showColumnCheckbox="true"
+                                    :enabledSelectFirstRow="false"
+
+                                    @selectedItemsChanged="selectedItemsChuaGan"
+                                    :enablePagingServer="true"
+                                    ></DataGrid3>
+                            <!-- <input :value="totalHoaDonCu" type="text" class="form-control" style="width: 15vh;" disabled> -->
+                            </div>
+
+                            <div class="actions">
+                            <button class="btn" @click="btn_DaGan">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+
+                            <button class="btn" @click="btn_ChuaGan">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+
+                            </div>
+                            <div class="box-col box-form">
+                                <div class="legend-title" v-if="nodeID===1">Loại khách hàng đã gán</div>
+                                <div class="legend-title" v-if="nodeID===2">Loại ngành nghề đã gán</div>
+                            <DataGrid3
+                            ref="dsDaGan"
+                            v-bind:dataSource="dsDaGan"
+                            v-bind:columns="GRID_COLUMS[nodeID]"
+                            :showFilter="true"
+                            :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                            :panelDataHeight="'600'"
+                                @selectedItemsChanged="selectedItemsDaGan"
+                                :enablePagingServer="true"
+                            ></DataGrid3>
+                            <!-- <input :value="totalHoaDonMoi" type="text" class="form-control" style="width: 15vh;" disabled> -->
+                            </div>
+                        </div>
+                            <!-- --------------------------------------- -->
+                        <div class="box-move-select-table" v-if="nodeID===3">
+
+                                    <div class="col-sm-3 col-12">
+                                        <div class="box-form">
+                                            <div class="legend-title" >Danh sách khu vực</div>
+
+
+                                                <div class="tree-plus tree-icon" style="overflow:scroll; height:680px;">
+                                                    <ul class="">
+                                                        <li class="haschild"
+                                                            v-for="item in khuvuc_child(21)"
+                                                            :key="item.KHUVUC_ID"
+                                                            v-bind:class="{ open: showLeaveKV(item.KHUVUC_ID) }"
+
+                                                            >
+                                                            <a href="javascript:void(0)" @click="click_leaves_KV(item.KHUVUC_ID,item.KHUVUC_CHA_ID)" >{{item.TEN_KV}}</a>
+
+                                                            <ul>
+                                                                <li v-for="item1 in khuvuc_child(item.KHUVUC_ID)" :key="item1.KHUVUC_ID"
+                                                                    class="haschild"
+                                                                    v-bind:class="{ open: showLeaveKV(item1.KHUVUC_ID) }"
+                                                                    >
+                                                                    <a href="javascript:void(0)" @click="click_leaves_KV(item1.KHUVUC_ID,item1.KHUVUC_CHA_ID)">{{item1.TEN_KV}}</a>
+                                                                    <ul>
+                                                                        <li v-for="item2 in khuvuc_child(item1.KHUVUC_ID)" :key="item2.KHUVUC_ID"
+                                                                        v-bind:class="{ active: tree_note_KV===item2.KHUVUC_ID }"
+                                                                        >
+                                                                        <a href="javascript:void(0)" @click="click_leaves_KV(item2.KHUVUC_ID,item2.KHUVUC_CHA_ID)">{{item2.TEN_KV}}</a>
+
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+
+
+
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-9 col-12">
+                                        <div class="box-move-select-table" >
+                                            <div class="box-col box-form">
+                                                <div class="legend-title" >khu vực chưa gán</div>
+                                                <DataGrid3
+                                                        :panelDataHeight="'600'"
+                                                        ref="dsChuaGan"
+                                                        v-bind:dataSource="dsChuaGan"
+                                                        v-bind:columns="GRID_COLUMS[nodeID]"
+                                                        :showFilter="true"
+                                                        :showColumnCheckbox="true"
+                                                        :enabledSelectFirstRow="false"
+                                                        @selectedItemsChanged="selectedItemsChuaGan"
+                                                        ></DataGrid3>
+                                            <!-- <input :value="totalHoaDonCu" type="text" class="form-control" style="width: 15vh;" disabled> -->
+                                                </div>
+                                                    <div class="actions">
+                                                    <button class="btn" @click="btn_DaGan">
+                                                        <span class="fa fa-angle-right"></span>
+                                                    </button>
+
+                                                    <button class="btn" @click="btn_ChuaGan">
+                                                        <span class="fa fa-angle-left"></span>
+                                                    </button>
+                                                </div>
+                                            <div class="box-col box-form">
+                                                <div class="legend-title">Khu vực đã gán</div>
+                                                    <DataGrid3
+                                                    :panelDataHeight="'600'"
+                                                    ref="dsDaGan"
+                                                    v-bind:dataSource="dsDaGan"
+                                                    v-bind:columns="GRID_COLUMS[nodeID]"
+                                                    :showFilter="true"
+                                                    :showColumnCheckbox="true"
+                                                    :enabledSelectFirstRow="false"
+                                                    @selectedItemsChanged="selectedItemsDaGan"
+                                                    ></DataGrid3>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <!-- <input :value="totalHoaDonMoi" type="text" class="form-control" style="width: 15vh;" disabled> -->
+
+                        </div>
+                            <!-- -------------------------------- -->
+                        <div class="box-move-select-table" v-if="nodeID===4||nodeID===5">
+                            <div class="box-col box-form">
+                            <div class="legend-title" v-if="nodeID===4">Doanh thu chưa gán</div>
+                            <div class="legend-title" v-if="nodeID===5">Điểm tín nhiệm chưa gán</div>
+
+                            <div class="info-row">
+                                <div class="key w100" v-if="nodeID===4">Doanh thu từ</div>
+                                <div class="key w150" v-if="nodeID===5">Điểm tín nhiệm từ</div>
+                                <div class="value">
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    v-model="giatri_tu"
+                                />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w100" v-if="nodeID===4">Doanh thu đến</div>
+                                <div class="key w150" v-if="nodeID===5">Điểm tín nhiệm đến</div>
+                                <div class="value">
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    v-model="giatri_den"
+                                />
+                                </div>
+                            </div>
+                            <!-- <input :value="totalHoaDonCu" type="text" class="form-control" style="width: 15vh;" disabled> -->
+                            </div>
+                            <div class="actions">
+                            <button class="btn" @click="btn_DaGan">
+                                <span class="fa fa-angle-right"></span>
+                            </button>
+
+                            <button class="btn" @click="btn_ChuaGan">
+                                <span class="fa fa-angle-left"></span>
+                            </button>
+
+                            </div>
+                            <div class="box-col box-form">
+                                <div class="legend-title" v-if="nodeID===4">Doanh thu đã gán</div>
+                                <div class="legend-title" v-if="nodeID===5">Điểm tín nhiệm đã gán</div>
+                            <DataGrid3
+                            ref="dsDaGan"
+                            v-bind:dataSource="dsDaGan"
+                            v-bind:columns="GRID_COLUMS[nodeID]"
+                            :showFilter="true"
+                            :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                                @selectedItemsChanged="selectedItemsDaGan"
+                                :enablePagingServer="true"
+                            ></DataGrid3>
+                            <!-- <input :value="totalHoaDonMoi" type="text" class="form-control" style="width: 15vh;" disabled> -->
+                            </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

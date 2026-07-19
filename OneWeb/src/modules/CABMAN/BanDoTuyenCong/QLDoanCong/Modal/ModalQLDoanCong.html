@@ -1,0 +1,578 @@
+<b-modal
+    :id="modalId"
+    size="lg"
+    :data="data"
+    no-close-on-backdrop
+    hide-footer
+    hide-header
+    hide-header-close
+    @shown="focusMyElement"
+    @hidden="resetModal"
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span>  Quản lý đoạn cống
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a class="btn" @click="ghiLai()" :class="{'disabled': !btnGhiLai_Enable}" title="Ghi lại">
+                        <span class="icon one-save"></span> Ghi lại
+                    </a>
+                </li>
+                <li>
+                  <a v-b-modal.popupTreoCap class="btn" :class="disabledClass">
+                     <span class="icon nc-icon-glyph ui-1_circle-add"></span> Treo cáp</a>
+              </li>
+              <li>
+                  <a v-b-modal.popupAnhChup class="btn" :class="disabledClass">
+                      <span class="icon -ap icon-image"></span> Ảnh chụp</a>
+              </li>
+          </ul>
+          <ModalTreocap modalId="popupTreoCap"  :dataCot="dataSelected.cot_id"/>
+          <ModalNVQLDoanCong :doiTuong="doiTuongNVQLDoanCong" :id="idPopupNVQLDoanCong" :modalShow="modalNVQLDoanCongShow" @closeModal="closeModalNVQLDoanCong"/>
+          <ModalChonDiaChi modalId="popupDiaChi" :data="this.dataSelected" :isStrictMode="true" @xacnhan="getDiaChi"/>
+          <ModalAnhChup modalId="popupAnhChup" :data="dataSend"/>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form tab-content">
+                <div class="table-content">
+                  <table class="table-result table-gachle tree-grid-2">
+                    <tbody>
+                    <tr class="highlight3 fw6 tree-open" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.phanloai++"></div> Phân loại
+                      </td>
+                    </tr>
+                    <tr v-show="category.phanloai%2==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Loại cống <span style="color: red">*</span>
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="select-custom">
+                          <SelectExt v-model="dataSelected.loaiCongId"
+                                     :settings="{dropdownParent: $refs['dsLoaiCong']}"
+                                     :dataSource="dsLoaiCong"
+                                     dataTextField="LOAI_CONG"
+                                     dataValueField="LOAICONG_ID"/>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.dinhdanh ++"></div> Định danh
+                      </td>
+                    </tr>
+                    <tr v-show="category.dinhdanh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Đoạn cống ID
+                      </td>
+                      <td colspan="2">
+                        <input type="text" v-model="dataSelected.doanCongId" class="form-control bg-none h24 bor0"   disabled='true'>
+                      </td>
+                    </tr>
+                    <tr v-show="category.dinhdanh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Mã đoạn cống
+                      </td>
+                      <td class="fw6" colspan="2">
+                        <input type="text" v-model="dataSelected.maDoanCong" class="form-control bg-none h24 bor0">
+                      </td>
+                    </tr>
+                    <tr v-show="category.dinhdanh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Ký hiệu <span style="color: red">*</span>
+                      </td>
+                      <td class="fw6" colspan="2">
+                        <input type="text" ref="kyHieu" v-model="dataSelected.kyHieu" :class="{ 'is-invalid': $v.dataSelected.kyHieu.$error }" class="form-control">
+                      </td>
+                    </tr>
+                    <tr v-show="category.dinhdanh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Tên đoạn cống <span style="color: red">*</span>
+                      </td>
+                      <td class="fw6" colspan="2">
+                        <input type="text" ref="tenDoanCong" v-model="dataSelected.tenDoanCong" :class="{ 'is-invalid': $v.dataSelected.tenDoanCong.$error }" class="form-control">
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.boTri ++"></div> Bố trí ống cống
+                      </td>
+                    </tr>
+                    <tr v-show="category.boTri %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Số dòng mặt cắt
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" v-model="dataSelected.soDongMatCat" class="form-control bor0 bg-none text">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.boTri %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Số cột mặt cắt
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" v-model="dataSelected.soCotMatCat" class="form-control bor0 bg-none text">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.boTri %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Mặt cắt
+                      </td>
+                      <td colspan="2">
+                        <input type="text" v-model="dataSelected.matCat" class="form-control bg-none h24 bor0"   disabled='true'>
+                      </td>
+                    </tr>
+                    <tr v-show="category.boTri %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Số ống cống
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" class="form-control bor0 bg-none text"  v-model="dataSelected.soOngCong" disabled='true'>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.dactinh ++"></div> Đặc tính
+                      </td>
+                    </tr>
+                    <tr v-show="category.dactinh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Đ.kính ống cống mặc định(mm)
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" class="form-control bor0 bg-none text" v-model="dataSelected.duongKinhOngCong">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.dactinh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Chiều dài(m)
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" class="form-control bor0 bg-none text" v-model="dataSelected.chieuDai">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.dactinh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Độ sâu
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" class="form-control bor0 bg-none text" v-model="dataSelected.doSau">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.dactinh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Trạng thái sử dụng <span style="color: red">*</span>
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="select-custom">
+                          <SelectExt
+                            v-model.trim="dataSelected.trangThaiSuDungId"
+                            :settings="{dropdownParent: $refs['dsTTSD']}"
+                            :dataSource="dsTTSD"
+                            dataTextField="TRANGTHAI_SD"
+                            dataValueField="TTSD_ID"/>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.dactinh %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Số cáp đi qua
+                      </td>
+                      <td class="padt0 padb0" colspan="2">
+                        <div class="input-number-custom h24">
+                          <input type="number" class="form-control bor0 bg-none text" v-model="dataSelected.soCapDiQua" disabled="true">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.ketNoiA ++"></div> Kết nối bể A
+                      </td>
+                    </tr>
+                    <tr v-show="category.ketNoiA %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Bể cáp A <span style="color: red">*</span>
+                      </td>
+                      <td class="fw6" colspan="2">
+                        <input type="text" v-model="dataSelected.beCapA" class="form-control bg-none h24 bor0"   disabled='true'>
+                      </td>
+                    </tr>
+                    <tr v-show="category.ketNoiA %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Hướng bể A
+                      </td>
+                      <td class="fw6 padt0 padb0" colspan="2">
+                        <div class="select-custom" ref="dsHuongBeA">
+                          <SelectExt
+                            v-model.trim="dataSelected.huongBeA"
+                            :settings="{dropdownParent: $refs['dsHuongBeA']}"
+                            :dataSource="dsHuongBeA"
+                            dataTextField="TEN_HUONG"
+                            dataValueField="HUONG"/>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.ketNoiB ++"></div>Kết nối bể B
+                      </td>
+                    </tr>
+                    <tr v-show="category.ketNoiB %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Bể cáp B <span style="color: red">*</span>
+                      </td>
+                      <td class="fw6" colspan="2">
+                        <input type="text" v-model="dataSelected.beCapB" class="form-control bg-none h24 bor0"   disabled='true'>
+                      </td>
+                    </tr>
+                    <tr v-show="category.ketNoiB %2 ==0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Hướng bể B
+                      </td>
+                      <td class="fw6 padt0 padb0" colspan="2">
+                        <div class="select-custom" ref="dsHuongBeB">
+                          <SelectExt
+                            v-model.trim="dataSelected.huongBeB"
+                            :settings="{dropdownParent: $refs['dsHuongBeB']}"
+                            :dataSource="dsHuongBeB"
+                            dataTextField="TEN_HUONG"
+                            dataValueField="HUONG"/>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.ngaythang ++"></div>Ngày lắp đặt & sử dụng
+                      </td>
+                    </tr>
+                    <tr v-show="category.ngaythang %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Ngày lắp đặt
+                      </td>
+                      <td class="fw6  padt0 padb0" colspan="2">
+                        <div class="select-custom">
+                          <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :value="dateVal" :format="dateFormat" v-model="dataSelected.ngayLapDat"></ejs-datepicker>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr v-show="category.ngaythang %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Ngày sử dụng
+                      </td>
+                      <td class="fw6  padt0 padb0" colspan="2">
+                        <div class="select-custom">
+                          <ejs-datepicker class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark" :value="dateVal" :format="dateFormat" v-model="dataSelected.ngaySuDung"></ejs-datepicker>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.lienket ++"></div>Liên kết
+                      </td>
+                    </tr>
+                    <tr v-show="category.lienket %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Tuyến cống bể <span style="color: red">*</span>
+                      </td>
+                      <td class="fw6" colspan="2">
+                        <input type="text"  disabled='true' class="form-control bg-none h24 bor0" v-model="dataSelected.tuyenCongBeId">
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.kiemke ++"></div>Kiểm kê tài sản
+                      </td>
+                    </tr>
+                    <tr v-show="category.kiemke %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="">
+                        Mã dự án
+                      </td>
+                      <td class="  padt0 padb0">
+                        <div class="select-custom" ref="du-an">
+                          <SelectExt
+                            v-model.trim="dataSelected.duAnId"
+                            :settings="{dropdownParent: $refs['du-an']}"
+                            :dataSource="dsDuAn"
+                            dataTextField="MA_CT"
+                            dataValueField="DUAN_ID"/>
+                        </div>
+                      </td>
+                      <td style="text-align: right; width: 5px;">
+                        <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaMaDA()">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+
+                      </td>
+                    </tr>
+                    <tr v-show="category.kiemke %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Mã tài sản
+                      </td>
+                      <td class=" padt0 padb0">
+                        <div class="select-custom" ref="tai-san">
+                          <SelectExt
+                            v-model.trim="dataSelected.taiSanId"
+                            :settings="{dropdownParent: $refs['tai-san']}"
+                            :dataSource="dsTaiSan"
+                            dataTextField="MA_TS"
+                            dataValueField="TAISAN_ID"/>
+                        </div>
+                      </td>
+                      <td style="text-align: right; width: 5px;">
+                        <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="xoaMaTS()">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+
+                      </td>
+                    </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.chuquan ++"></div>Quản lý
+                      </td>
+                    </tr>
+                    <tr v-show="category.chuquan %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td class="fw6">
+                        Chủ quản
+                      </td>
+                      <td class="fw6  padt0 padb0" colspan="2">
+                        <div class="select-custom" ref="chu-quan">
+                          <SelectExt
+                            v-model.trim="dataSelected.chuQuanId"
+                            :settings="{dropdownParent: $refs['chu-quan']}"
+                            :dataSource="dsChuQuan"
+                            dataTextField="TENCHUQUAN"
+                            dataValueField="CHUQUAN_ID"/>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.chuquan %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Đơn vị quản lý <span style="color: red">*</span>
+                      </td>
+                      <td colspan="2">
+                        <div class="select-custom">
+                          <select class="form-control bg-none bor0 fw6 text h24" v-model="dataSelected.donViQlId">
+                            <option :value="donviql.id">{{donviql.name}}</option>
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-show="category.dinhdanh %2 ==0">
+                      <td class="tree-first w30 bg-white last">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w20">
+                        <span class=""></span>
+                      </td>
+                      <td>Nhân viên quản lý</td>
+                      <td class="padt0 padb0">
+                        <input type="text" v-model="dataSelected.ds_nhanvien_ql" class="form-control bg-none h24 bor0" disabled="true" />
+                      </td>
+                      <td style="text-align: right; width: 5px">
+                        <button class="btn btn-main pad4 w-auto lh14 h-auto" @click="showNVQLDoanCong">
+                          <span class="-ap icon-more_horiz"></span>
+                        </button>
+                      </td>
+                  </tr>
+                    <tr class="highlight3 tree-open fw6" style="background: #99D7F8 !important;">
+                      <td colspan="5">
+                        <div class="tree-arrow normal" @click="category.khac ++"></div>Khác
+                      </td>
+                    </tr>
+                    <tr v-show="category.khac %2 == 0">
+                      <td class="tree-first w16 bg-white">
+                        <div class="tree-line"></div>
+                        <div class="tree-indent"></div>
+                      </td>
+                      <td class="w16">
+                      </td>
+                      <td>
+                        Ghi chú
+                      </td>
+                      <td colspan="2">
+                        <input type="text" class="form-control bg-none h24 bor0" v-model="dataSelected.ghiChu">
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</b-modal>

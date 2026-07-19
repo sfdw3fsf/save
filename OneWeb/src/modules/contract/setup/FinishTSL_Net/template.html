@@ -1,0 +1,586 @@
+<div class="main-warpper" @click="hideDropdownMenu">
+    <div>
+        <breadcrumb />
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a @click="loadDataDSThueBao">
+                        <span class="icon one-reload1"></span> Lấy TT
+                    </a>
+                </li>
+                <li>
+                    <a :class="controls.btnCapNhat.enabled?'':'disabled'" @click="btnCapNhat_Click">
+                        <span class="icon fa fa-floppy-o"></span> Cập nhật
+                    </a>
+                </li>
+                <li>
+                    <a :class="controls.btnGiaoViec.enabled?'':'disabled'" @click="btnGiaoViec_Click">
+                        <span class="icon one-file-edit2"></span> Giao việc
+                    </a>
+                </li>
+                <li>
+                    <a :class="controls.btnGiaoPhieu.enabled?'':'disabled'" @click="tsbtnGiaoPhieu_Click">
+                        <span class="icon one-file-arrow-right1"></span> Giao phiếu
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <span class="icon one-file-arrow-right1"></span> Giao P/H
+                    </a>
+                </li>
+                <li style="position: static;" class="dropdown" @click="xuatPhieuShow = !xuatPhieuShow">
+                    <!-- class="dropdown" @click="xuatPhieuShow = !xuatPhieuShow"  -->
+                    <a href="javascript:;" ref="xuatphieu">
+                        <span class="icon one-print"></span>Xuất phiếu
+                        <svg width="16" height="16" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </a>
+                    <ul v-show="xuatPhieuShow" class="ui-xuat-phieu">
+                        <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"><a href="javascript:;"
+                                @click.prevent="btnPhieuTC_Click" style="color: #007bff; text-decoration: none"> <span
+                                    class="icon one-print"></span>Phiếu thi công</a>
+                        </li>
+                        <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"><a href="javascript:;"
+                                @click.prevent="btnBienBanNT_Click" style="color: #007bff;text-decoration: none"><span
+                                    class="icon one-print"></span>In phiếu</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a :class="controls.btnHoanThanh.enabled?'':'disabled'" @click="btnHoanThanh_click">
+                        <span class="icon fa fa-check-circle"></span> Hoàn thành
+                    </a>
+                </li>
+                <li>
+                    <a @click="uploadFileNT_showDialog">
+                        <span class="icon fa fa-cloud-upload"></span> Upload File N/T
+                    </a>
+                </li>
+                <li>
+                    <a @click="btnDownload_click">
+                        <span class="icon fa fa fa-cloud-download"></span> Download File N/T
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;" :class="controls.btnHuy_HC.enabled?'':'disabled'" @click="btnHuy_HC_Click">
+                        <span class="dropdown-icon -ap one-cancel"></span> Huỷ hoàn công
+                    </a>
+                </li>
+                <li>
+                    <a @click="excelExport">
+                        <span class="dropdown-icon one-excel"></span>
+                        Xuất file
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <span class="dropdown-icon fa fa-file-o"></span>
+                        Nhập mới TT
+                    </a>
+                </li>
+            </ul>
+            <div class="more dropdown bachambacham">
+                <a href="#" @click.prevent="setDisplayDropDownMenu" style="text-decoration: none;">
+                    <span ref="mainWrap" class="icon -ap  icon-dots-three-vertical"></span>
+                </a>
+                <div v-if="isDisplayMenu" class="dropdown-menu ovauto d-block" style="max-height: 300px;">
+                    <a href="javascript:;" :class="controls.btnHuy_HC.enabled?'':'disabled'" @click="btnHuy_HC_Click">
+                        <span class="dropdown-icon -ap one-cancel"></span> Huỷ hoàn công
+                    </a>
+                    <a @click="excelExport">
+                        <span class="dropdown-icon one-excel"></span>
+                        Xuất file
+                    </a>
+                    <a>
+                        <span class="dropdown-icon fa fa-file-o"></span>
+                        Nhập mới TT
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="row">
+                <div class="col-lg-5 col-12">
+                    <div class="info-row">
+                        <div class="key w70 nowrap">NV tiếp thị</div>
+                        <div class="value">
+                            <input type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w70 nowrap">Kiểu HĐ</div>
+                        <div class="value">
+                            <select2 v-model="params.kieuHD" :options="params.dsKieuHD_options" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-12">
+                    <div class="info-row">
+                        <div class="key w70 nowrap">Kênh thu</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <Select2 v-model="params.kenhThu" :options="params.dsKenhThu_options" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-12">
+                    <div class="info-row">
+                        <div class="key w70 nowrap">Tổng tiền</div>
+                        <div class="value">
+                            <input type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        Thông tin khách hàng
+                        <div class="pull-right red">
+                            <div class="check-action normal">
+                                <input ref="chkHen" :checked="isHenLD" disabled type="checkbox" class="check">
+                                <span class="name">Hẹn LĐ</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Loại HĐ/PL</div>
+                                <div class="value">
+                                    <select2 disabled v-model="params.loaiHD" @change="cboLoaiHDChange"
+                                        :options="params.dsLoaiHD_options" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Quy trình</div>
+                                <div class="value">
+                                    <select2 disabled :options="quyTrinh_options" v-model="clientInfo.quyTrinh" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Mã giao dịch</div>
+                                <div class="value">
+                                    <input type="text" v-model="params.maGD" @keypress="enterMaGD" @paste="enterMaGD"
+                                        class="form-control highlight text-black font-weight-bold" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Account</div>
+                                <div class="value">
+                                    <input type="text" v-model="clientInfo.maTB"
+                                        class="form-control highlight text-black font-weight-bold" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Kiểu lắp đặt</div>
+                                <div class="value">
+                                    <input type="text" v-model="clientInfo.tenKieuLD" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Tên thuê bao</div>
+                                <div class="value">
+                                    <input type="text" v-model="clientInfo.tenTB" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w82 nowrap">Địa chỉ TB</div>
+                        <div class="value">
+                            <input type="text" :title="clientInfo.diaChiTB" style="cursor: pointer;"
+                                v-model="clientInfo.diaChiTB" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w82 nowrap">Địa chỉ đầu</div>
+                        <div class="value">
+                            <input type="text" readonly v-model="clientInfo.dcDau" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w82 nowrap">Địa chỉ cuối</div>
+                        <div class="value">
+                            <input type="text" readonly v-model="clientInfo.dcCuoi" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Loại hình</div>
+                                <div class="value">
+                                    <select2 :options="loaiHinh_options" v-model="clientInfo.loaiHinh" disabled />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Tốc độ kênh</div>
+                                <div class="value">
+                                    <select2 :options="tocDoKenh_options" disabled v-model="clientInfo.tocDoKenh" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">Chủ quản</div>
+                                <div class="value">
+                                    <select2 :options="dsChuQuan" disabled v-model="clientInfo.chuQuan" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w82 nowrap">
+                                    <div class="check-action normal">
+                                        <input ref="chkDoiTac" type="checkbox" disabled :checked="clientInfo.isDoiTac"
+                                            class="check">
+                                        <span class="name">Đối tác</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <select2 :options="dsDoiTac_options" disabled v-model="clientInfo.doiTac" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="box-form">
+                    <div class="info-row marb0">
+                        <div class="legend-title">Thông tin giao việc</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w60 nowrap">Ngày GV</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input ref="chkHen" type="checkbox" :checked="gvInfo.dtpNgayGiao?true:false"
+                                            class="check">
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <!-- <date-picker input-class="form-control" :format="datetimeFormat" :value-type="'format'" v-model="gvInfo.dtpNgayGiao"></date-picker> -->
+                                    <ejs-datepicker :format="datetimeFormat" :enabled="false"
+                                        v-model="gvInfo.dtpNgayGiao" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w60 nowrap">Ngày HT</div>
+                                <div class="value w20 padt7">
+                                    <div class="check-action">
+                                        <input type="checkbox" :disabled="!controls.chkNgayHT.enabled"
+                                            :checked="controls.chkNgayHT.checked" class="check">
+                                        <span class="name"></span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <ejs-datepicker :format="datetimeFormat" :enabled="controls.dtpNgayHT.enabled"
+                                        v-model="gvInfo.dtpNgayHT" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w86 nowrap">
+                                    Người GV
+                                </div>
+                                <div class="value">
+                                    <select2 :options="dsNguoiGV" v-model="gvInfo.nguoiGV" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w86 nowrap">
+                                    Nhân viên YC
+                                </div>
+                                <div class="value">
+                                    <input type="text" :title="gvInfo.nvYC" v-model="gvInfo.nvYC"
+                                        class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w86 nowrap">
+                                    Lý do trả
+                                </div>
+                                <div class="value">
+                                    <input type="text" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w86 nowrap">
+                                    Nội dung trả
+                                </div>
+                                <div class="value">
+                                    <input type="text" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="row">
+                                <div class="col-10" style="padding-left: 7px;">
+                                    <div class="info-row">
+                                        <div class="key w86 nowrap">
+                                            Nội dung TH
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" v-model="gvInfo.ndTH" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn-capnhatnd" @click="capNhatNDTH">
+                                        <div class="icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+                                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                xmlns:svgjs="http://svgjs.com/svgjs" width="20" height="20" x="0" y="0"
+                                                viewBox="0 0 511.5 511.5" style="enable-background:new 0 0 512 512"
+                                                xml:space="preserve" class="">
+                                                <g>
+                                                    <path fill="#e3edf6"
+                                                        d="M47.5 503.75h360c-22.091 0-40-17.909-40-40v-456H7.5v456c0 22.091 17.909 40 40 40z"
+                                                        data-original="#e3edf6" class=""></path>
+                                                    <path fill="#c5d9ec"
+                                                        d="M407.5 503.75c22.091 0 40-17.909 40-40v-60h-80v60c0 22.091 17.909 40 40 40z"
+                                                        data-original="#c5d9ec"></path>
+                                                    <path fill="#f88fa4"
+                                                        d="M196.642 339.323 182.5 381.75l42.427-14.142 191.579-191.579-28.284-28.285z"
+                                                        data-original="#f88fa4"></path>
+                                                    <path fill="#e3edf6"
+                                                        d="m434.183 137.138-7.071-7.071c-5.858-5.858-15.355-5.858-21.213 0l-17.678 17.677 28.284 28.284 17.678-17.678c5.858-5.857 5.858-15.354 0-21.212z"
+                                                        data-original="#e3edf6" class=""></path>
+                                                    <g fill="#ffe4c2">
+                                                        <path
+                                                            d="m300.04 235.92-51.25 8.54-8 40-1.53 21.07c-1.35 18.55-16.8 32.81-35.26 32.81-.4 0-.81-.01-1.21-.02l-7-57.86 10-71 55-26 89.04 2.67zM511.5 217.46H409.79l-23.76-10.96-57.6 57.6 16.36 16.36-22 28-25 9-39.43 1.25c-6.57.21-12.46 3.01-16.71 7.4s-6.86 10.37-6.86 16.94c0 13.85 11.55 24.92 25.39 24.32l44.61-1.91 50-14 50-28H511.5z"
+                                                            fill="#ffe4c2" data-original="#ffe4c2" class=""></path>
+                                                    </g>
+                                                    <g fill="#fff">
+                                                        <path
+                                                            d="M293.5 456.25h15v15h-15zM323.5 456.25h15v15h-15zM133.5 380.25h15v15h-15z"
+                                                            fill="#ffffff" data-original="#ffffff"></path>
+                                                    </g>
+                                                    <path
+                                                        d="M375 372.75h-15v91c0 12.564 4.912 23.996 12.906 32.5H77.5v15h330c26.191 0 47.5-21.309 47.5-47.5v-67.5h-80zm65 38.5v52.5c0 17.921-14.58 32.5-32.5 32.5s-32.5-14.579-32.5-32.5v-52.5zM15 15.25h133.643v-15H0v196.357h15z"
+                                                        fill="#000000" data-original="#000000" class=""></path>
+                                                    <path
+                                                        d="M15.883 471.25H277.5v-15H15V211.607H0V463.75c0 26.191 21.309 47.5 47.5 47.5h15v-15h-15c-15.339 0-28.221-10.685-31.617-25zM360 131.75h15V.25H163.643v15H360zM52.5 80.25h50v15h-50zM222.5 80.25h50v15h-50zM117.5 80.25h90v15h-90z"
+                                                        fill="#000000" data-original="#000000" class=""></path>
+                                                    <path
+                                                        d="M287.5 80.25h35v15h-35zM52.5 130.25h35v15h-35zM102.5 130.25h50v15h-50zM272.5 130.25h50v15h-50zM167.5 130.25h90v15h-90zM127.5 180.25h35v15h-35zM52.5 180.25h60v15h-60zM102.5 230.25h60v15h-60zM52.5 230.25h35v15h-35zM127.5 280.25h35v15h-35zM52.5 280.25h60v15h-60zM52.5 330.25h35v15h-35zM102.5 330.25h60v15h-60zM52.5 380.25h66v15h-66zM454.367 315.96H511.5v15h-57.133zM411.437 209.96l-12.493-5.763 40.543-40.543c4.25-4.25 6.59-9.9 6.59-15.91s-2.341-11.66-6.59-15.91l-7.071-7.071c-8.772-8.771-23.047-8.771-31.819 0l-53.773 53.773-87.609-2.627-60.286 28.499-10.701 75.978 6.124 50.622-4.264 4.264-19.445 58.337 58.336-19.445 8.136-8.135c5.719 5.485 13.467 8.866 21.994 8.866.464 0 .93-.01 1.394-.03l45.476-1.947 51.697-14.475 49.073-27.481h32.62v-15h-36.534l-50.927 28.519-48.303 13.525-43.749 1.873c-9.611.41-17.564-7.29-17.564-16.827a16.77 16.77 0 0 1 4.749-11.723 16.756 16.756 0 0 1 11.559-5.121l40.616-1.287 28.143-10.132 27.441-34.926-15.759-15.759 48.6-48.601 20.504 9.458H511.5v-15H411.437zm-.234-74.59c2.925-2.923 7.683-2.924 10.606 0l7.071 7.071c1.417 1.416 2.197 3.3 2.197 5.303s-.78 3.887-2.197 5.303l-12.375 12.375-17.677-17.677zM220.875 361.052l-26.517 8.84 8.026-24.079.222.005c.46.011.933.021 1.393.021 8.667 0 16.791-2.637 23.592-7.156a31.716 31.716 0 0 0 1.307 14.345zm12.469-77.603-1.563 21.537c-.922 12.665-10.352 22.934-22.404 25.326l-6.022-49.778 9.299-66.022 49.714-23.501 69.886 2.096-35.809 35.809-53.992 8.998zm44.851-36.285-27.872 27.872 4.806-24.029zm40.028 54.969-21.857 7.868-3.331.106 35.398-35.398 6.349 6.35zm-47.097 8.668-13.006.413a31.751 31.751 0 0 0-12.817 3.142 42.5 42.5 0 0 0 1.437-8.283l.489-6.73 140.992-140.992 17.677 17.677z"
+                                                        fill="#000000" data-original="#000000" class=""></path>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w86 nowrap">
+                                    N.Dung giao
+                                </div>
+                                <div class="value">
+                                    <input type="text" v-model="gvInfo.ndGiao" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-content mt-1" style="height: 150px; border: 1px #c1c1c1 solid;
+                    border-radius: 2px;">
+                        <DataGrid2 class="table-result table-gachle" :columns="[
+                        {fieldName: 'ten_nv', headerText: 'Tên nhân viên',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'so_dt', headerText: 'Số điện thoại',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'nhiemvu', headerText: 'Nhiệm vụ',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ghichu', headerText: 'Ghi chú',allowFiltering: true,allowSorting: true,},
+                        ]" :dataSource="tbNhanvien_data" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-9 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        Danh sách thuê bao
+                        <div class="pull-right">
+                            <div class="list-checks">
+                                <div class="item red">
+                                    <div class="check-action">
+                                        <input ref="rdoPhieuMoi" v-model="params.loai_id" :value="0" type="radio"
+                                            name="phieu" class="check">
+                                        <span class="name">Phiếu mới</span>
+                                    </div>
+                                </div>
+                                <div class="item red">
+                                    <div class="check-action">
+                                        <input ref="rdoPhieuTra" v-model="params.loai_id" :value="1" type="radio"
+                                            name="phieu" class="check">
+                                        <span class="name">Phiếu trả lại</span>
+                                    </div>
+                                </div>
+                                <div class="item red">
+                                    <div class="check-action">
+                                        <input type="radio" v-model="params.loai_id" :value="2" name="phieu"
+                                            class="check">
+                                        <span class="name">Phiếu đã hoàn thành</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-content mt-1 mb-3" style="height: 530px;">
+                        <DataGrid class="table-result table-gachle" :columns="[
+                        {fieldName: 'ma_tb', headerText: 'Số máy/Acc',freeze: 'Left',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ma_lt', headerText: 'Số ảo',freeze: 'Left',allowFiltering: true,allowSorting: true, width: 150},
+                        {fieldName: 'ma_gd', headerText: 'Mã GD',freeze: 'Left',allowFiltering: true,allowSorting: true, width: 150},
+                        {fieldName: 'ten_tb', headerText: 'Tên thuê bao',allowFiltering: true,allowSorting: true, width: 250},
+                        {fieldName: 'loai_hd', headerText: 'Loại HĐ',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'huonggiao', headerText: 'Hướng giao',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'tentinh', headerText: 'Tỉnh',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'diachi_dau', headerText: 'Địa chỉ LĐ đầu',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'diachi_cuoi', headerText: 'Địa chỉ LĐ cuối',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ngay_yc', headerText: 'Ngày YC',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ngaygiao', headerText: 'Ngày giao',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'dv_hen', headerText: 'Đơn vị hẹn',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'hen_tu', headerText: 'Hẹn từ',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'hen_den', headerText: 'Hẹn đến',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'goi_kt', headerText: 'Gói KT',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'chitieu_tg', headerText: 'Chỉ tiêu TG',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'thoigian_ck', headerText: 'Thời gian cam kết',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'gio_conlai', headerText: 'Giờ còn lại',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'gio_conlai', headerText: 'Giờ còn lại',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'donvi_giao', headerText: 'Đơn vị giao',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'trangthai_in', headerText: 'Trạng thái in',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'trangthai_hd', headerText: 'Trạng thái',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ngay_bg', headerText: 'Ngày BG',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ngay_kh', headerText: 'Ngày KH',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'lydoton', headerText: 'Lý do tồn',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ghichu_tt', headerText: 'Ghi chú tồn',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'ghichu', headerText: 'Ghi chú',allowFiltering: true,allowSorting: true,},
+                        {fieldName: 'file_nt', headerText: 'File NT',allowFiltering: true,allowSorting: true,},
+                        ]" :dataSource="tbDanhSachThueBao_data" :showFilter="true" :enabledSelectFirstRow="true"
+                            dataKeyField="" ref="dgvHDTB" :allowExcelExport="true"
+                            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :allowPaging="true"
+                            @rowSelected="tbDanhSachThueBao_rowSelected" :enablePagingServer="false" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        Thông số kỹ thuật
+                    </div>
+                    <div class="value">
+                        <div style="height: 545px; overflow-y: scroll;" class="form-control" v-html="ttKyThuat" readonly
+                            rows="12">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="nav tab-over tabs">
+                <a href="#tab1" data-toggle="tab" class=" minw0 active">Chi tiết điều hành thi công</a>
+                <a href="#tab2" data-toggle="tab" class="minw0">Tiến trình thi công</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active fullh" id="tab1">
+                    <div class="box-form">
+                            <DataGrid refs="dsPhieuCon" class="table-result table-gachle" :columns="[
+                            {fieldName: 'huonggiao', headerText: '',allowFiltering: true,isGroupedColumn: true,allowSorting: true},
+                            {fieldName: 'dvg', headerText: 'Đơn vị giao',allowFiltering: true,allowSorting: true,width: 900},
+                            {fieldName: 'ngay_giao', headerText: 'Ngày giao',allowFiltering: true,allowSorting: true, width: 150},
+                            {fieldName: 'nv_giao', headerText: 'Người giao',allowFiltering: true,allowSorting: true, width: 150},
+                            {fieldName: 'nd_giao', headerText: 'Nội dung giao',allowFiltering: true,allowSorting: true, width: 250},
+                            {fieldName: 'dvn', headerText: 'Đơn vị nhận',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'ngay_tra', headerText: 'Ngày trả',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'nd_tra', headerText: 'Nội dung trả',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'lydotra', headerText: 'Lý do trả',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'ngay_th', headerText: 'Ngày CN',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'nguoi_cn', headerText: 'Người CN',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'so_dt', headerText: 'Điện thoại liên hệ',allowFiltering: true,allowSorting: true,},
+                            {fieldName: 'trangthai_ph', headerText: 'Trạng thái phiếu',allowFiltering: true,allowSorting: true,},
+                            ]" :dataSource="tbChiTietDHTC_data" :showFilter="true" :enabledSelectFirstRow="false"
+                            panelDataHeight="150px"    dataKeyField="" :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :allowPaging="true"
+                                @rowSelected="" :enablePagingServer="false" />
+                        
+                    </div>
+                </div>
+                <div class="tab-pane fullh" id="tab2">
+                    <div class="box-form">
+                        <DataGrid class="table-result table-gachle" :columns="tbTTTC_columns" :dataSource="tbTTTC_data"
+                        :showFilter="true" :enabledSelectFirstRow="true" dataKeyField=""
+                        panelDataHeight="150px"
+                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" :allowPaging="true" @rowSelected=""
+                        :enablePagingServer="false" />
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <input type="file" style="display: none;" multiple accept=".doc,.docx,.xls,.xlsx,.pdf" ref="uploadFileNT" @change="uploadFileNT_OnChange" />
+    <ejs-dialog :enableResize='true' :isModal="true" :allowDragging="true" :visible="false" ref="generalDialog"
+        :header="state.modalTitle" :position="position" showCloseIcon=true target=".main-wrapper" :closeOnEscape="true"
+        width="90%" height="800" v-on="dialogEvts"> <!--:overlayClick="overlayClick" -->
+        <div>
+            <component :is="dialogComponent" ref="generalComponent" :data="popupComponentData"
+                v-bind="popupComponentAttr" :isPopup="true" v-on="popupComponentEvts"></component>
+        </div>
+    </ejs-dialog>
+    <ejs-dialog :isModal="true" :enableResize="true" :resizeHandles="['All']" :visible="false" ref="GiaoPhieuView"
+        :header='"Giao phiếu điều hành thi công"' showCloseIcon="true" target=".main-wrapper" width="90%"
+        allowDragging="true" :animationSettings="animationSettings" @close="GiaoPhieuView_OnClose">
+        <div>
+            <GiaoPhieuView v-if="giaoPhieuViewDialog.isVisiable" type="modal" v-bind="giaoPhieuViewDialog.input"
+                @onGiaoPhieuSuccessListener="giaophieu_success" />
+        </div>
+    </ejs-dialog>
+    <InBienBan ref="popupInBB" :params="modelIn" />
+    <DownloadFileNghiemThu   ref="DownloadFileNghiemThu" :phanvung_id="phanvung_id" :hdtb_id="state.hdtb_id" />
+</div>

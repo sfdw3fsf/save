@@ -1,0 +1,610 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a @click="tsbtnNhapMoi_Click" v-bind:class="{disabled: !tsbtnNhapMoi}" :disabled="tsbtnNhapMoi">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li>
+                    <a @click="tsbtnGhiLai_Click" v-bind:class="{disabled: !tsbtnGhiLai}" :disabled="tsbtnGhiLai">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li>
+                    <a @click="tsbtnHuyBo_Click" v-bind:class="{disabled: !tsbtnHuyBo}" :disabled="tsbtnHuyBo">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                    </a>
+                </li>
+                <li>
+                    <a @click="tsbtnXoa_Click" v-bind:class="{disabled: !tsbtnXoa}" :disabled="tsbtnXoa">
+                        <span class="icon one-trash"></span>Xóa HĐ
+                    </a>
+                </li>
+                <li>
+                    <a @click="btnThanhToan_OnClick">
+                        <span class="icon nc-icon-glyph shopping_credit-card"></span>Thanh toán
+                    </a>
+                </li>
+                <li>
+                    <a ref="tsbtnVatTuMoi" @click="tsbtnVatTu_Click">
+                        <span class="icon one-vt"></span>Vật tư
+                    </a>
+                </li>
+                <li>
+                    <a @click="HoanThienHS" v-bind:class="{disabled: !tsbtnHoanThienHS}" :disabled="tsbtnHoanThienHS">
+                        <span class="icon one-file-check"></span>Hoàn thiện
+                    </a>
+                </li>
+                <li @click="Nhapfile">
+                    <a title="Nhập file Excely">
+                        <span class="icon   one-book"></span> Nhập file Excel
+                    </a>
+                    <PopupNhapFileExcelVattuThuebao />
+                </li>
+            </ul>
+        </div>
+    </vue-nav>
+    <div class="page-content">
+        <h5>{{labelFunctionTitle}}</h5>
+        <div class="box-form">
+            <div class="legend-title">Thông tin phiếu yêu cầu</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Mã giao dịch</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="showPopupSearchContract">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control " ref="MaGD" v-model="txtMaGD"
+                                            v-on:keyup.enter="txtMaGD_KeyPress">
+                                        <ejs-dialog :enableResize="true" :visible="false" ref="popupFrmTraCuuHopDong"
+                                            :header="'Tra cứu hợp đồng, phụ lục'" showCloseIcon=true width="80%"
+                                            target="#app .main-wrapper" height="800">
+                                            <search-contract ref="searchContractRef" :loaihd_id="13" :dichvuvt_id="0"
+                                                :ngay_yc="txtNgayYC" :tthd_id="1" :kieu="1"
+                                                @accept="acceptSearchContract" />
+                                        </ejs-dialog>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <vue-date type="date" :labelWidth="'90'" v-model="txtNgayYC"
+                                            label="Ngày yêu cầu" :format="dateFormat" :value-type="'format'"
+                                            v-bind:class="{disabled: !dtpNgayYeuCau}" :disabled="dtpNgayYeuCau">
+                                        </vue-date>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Mã hợp đồng</div>
+                                <div class="value">
+                                    <input type="text" ref="MaHD" class="form-control bg-white" :readonly="true"
+                                        v-model="txtMaHD">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="value">
+                                    <div class="input-icon-right">
+                                        <vue-date type="date" :labelWidth="'90'" v-model="txtNgayLapHD"
+                                            label="Ngày lập HĐ" :format="dateFormat" :value-type="'format'"
+                                            v-bind:class="{disabled: !dtpNgayLapHD}" :disabled="dtpNgayLapHD">
+                                        </vue-date>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key ">Dịch vụ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt id="cbb_Dichvu" v-model.trim="dataSelected.dichvuvt_id"
+                                            :settings="{dropdownParent: $refs['dsDichvu']}"
+                                            :dataSource="options.lstDSDichvu" dataTextField="TEN_DVVT"
+                                            dataValueField="DICHVUVT_ID" @change="onChangeDichvu($event)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại hình</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt id="cbb_Loaihinh" v-model.trim="dataSelected.loaitb_id"
+                                            :settings="{dropdownParent: $refs['dsLoaihinh']}"
+                                            :dataSource="options.lstLoaiHinhTB" dataTextField="NAME" dataValueField="ID"
+                                            @change="onChangeLoaihinh($event)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:5px !important">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key">Kiểu yêu cầu</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt id="cbb_KieuYC" v-model.trim="dataSelected.kieuld_id"
+                                            :settings="{dropdownParent: $refs['dsKieuLD']}"
+                                            :dataSource="options.lstKieuYC" dataTextField="ten_kieuld"
+                                            dataValueField="kieuld_id" @change="onChangeKieuLD($event)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div  class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key">Thay thế HĐ/BH</div>
+                                <div class="value">
+                                    <div class="input-more-button dropdown">
+                                        <button class="btn btn-primary" v-bind:data-toggle="showTTHD"
+                                            @click="Kiemtrathaythe_Popup">
+                                            <span style="color:white; margin: 0;" class="-ap icon-search"></span>
+                                        </button>
+                                        <div class="dropdown">
+                                            <div id="move" class="dropdown-menu pad10 resizeable">
+                                                <div class="resizeable-ltr">
+                                                    <div class="info-row">
+                                                        <div class="value padt7">
+                                                            <div class="list-checks">
+                                                                <div class="item">
+                                                                    <span class="name" style="font-weight: bold;">Thay thế</span>
+                                                                </div>
+                                                                <div class="item">
+                                                                    <div class="check-action">
+                                                                        <input type="radio" class="check" value="HD"
+                                                                            v-model="checkHD"
+                                                                            @change="changeCKHD($event)">
+                                                                        <span class="name">Hợp đồng</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item">
+                                                                    <div class="check-action">
+                                                                        <input type="radio" class="check" value="BH"
+                                                                            v-model="checkBH"
+                                                                            @change="changeCKBH($event)">
+                                                                        <span class="name">Báo hỏng</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item">
+                                                                    <div class="check-action">
+                                                                        <input type="radio" class="check" value="TB"
+                                                                            v-model="checkTB"
+                                                                            @change="changeCKTB($event)">
+                                                                        <span class="name">Thuê bao</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item">
+                                                                    <div class="list-actions-top">
+                                                                        <ul class="list">
+                                                                            <li v-if="accept">
+                                                                                <a href="#" @click.prevent="chapNhan">
+                                                                                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận
+                                                                                </a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a href="#" @click.prevent="thoat">
+                                                                                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Thoát
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <DataGrid v-if="grvHD" v-bind:columns="collumnsHD"
+                                                        v-bind:dataSource="options.dsHD_BH" :showFilter="true"
+                                                        ref="DSHD" :allowPaging="true" :enablePagingServer="false"
+                                                        :enabledSelectFirstRow="false" :enableVirtualization="true"
+                                                        :commands="[
+                                                                {name: 'Sửa', cssClass: 'pad3 mar5 lh14 icon -ap icon-plus btn-primary btn-plus', iconCss: 'fa fa-times', width: 100},
+                                                            ]"
+                                                        :commandColumn="{headerText: 'Chọn', cellCssClass: 'w50 center', width: 100, firstColumn: true, show: true}"
+                                                        @commandClicked="gridDsHD_BHCommand"
+                                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                                        panelDataHeight="200">
+                                                    </DataGrid>
+                                                    <DataGrid v-if="grvBH" v-bind:columns="collumnsBH"
+                                                        v-bind:dataSource="options.dsHD_BH" :showFilter="true"
+                                                        ref="DSBH" :allowPaging="true" :enablePagingServer="false"
+                                                        :enabledSelectFirstRow="false" :enableVirtualization="true"
+                                                        :commands="[
+                                                                {name: 'Sửa', cssClass: 'pad3 mar5 lh14 icon -ap icon-plus btn-primary btn-plus', iconCss: 'fa fa-times', width: 100},
+                                                            ]"
+                                                        :commandColumn="{headerText: 'Chọn', cellCssClass: 'w50 center', width: 100, firstColumn: true, show: true}"
+                                                        @commandClicked="gridDsHD_BHCommand"
+                                                        :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                                                        panelDataHeight="200">
+                                                    </DataGrid>
+                                                    <div v-if="grvTB" class="table-content">
+                                                            <DataGrid v-bind:columns="[
+                                                            {
+                                                                fieldName: 'chon',
+                                                                headerText: 'Chọn',
+                                                                freeze: 'left',
+                                                                allowFiltering: false,
+                                                                allowSorting: false,
+                                                                width: 80,
+                                                                textAlign: 'Center',
+                                                                template: cbDangKyTemplate(this)
+                                                            },
+                                                            {
+                                                                fieldName: 'ma_tt',
+                                                                headerText: 'Mã TT',
+                                                                freeze: 'left',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'ma_tb',
+                                                                headerText: 'Số máy/Acc',
+                                                                freeze: 'left',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'ten_tb',
+                                                                headerText: 'Tên thuê bao',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'diachi_tb',
+                                                                headerText: 'Địa chỉ thuê bao',
+                                                                allowFiltering: true,
+                                                                allowSorting: false,
+                                                                cssClass: 'font-weight-bold'
+                                                            },
+                                                            {
+                                                                fieldName: 'diachi_ld',
+                                                                headerText: 'Địa chỉ lắp đặt',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'loaihinh_tb',
+                                                                headerText: 'Loại hình',
+                                                                allowFiltering: true,
+                                                                allowSorting: false,
+                                                                width: 100
+                                                            },
+                                                            {
+                                                                fieldName: 'ngay_sd',
+                                                                headerText: 'Ngày SD',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'trangthai_tb',
+                                                                headerText: 'Trạng thái',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'doanhthu',
+                                                                headerText: 'Doanh thu',
+                                                                allowFiltering: true,
+                                                                allowSorting: false,
+                                                                type: 'number',
+                                                                format:'N0'
+                                                            },
+                                                            {
+                                                                fieldName: 'goi_dk',
+                                                                headerText: 'Gói nâng cấp',
+                                                                clipMode: 'Clip',
+                                                                allowFiltering: false,
+                                                                allowSorting: false,
+                                                                template: cbGoiNangCapTemplate(this)
+                                                            },
+                                                            {
+                                                                fieldName: 'tengoi_ht',
+                                                                headerText: 'Gói hiện tại',
+                                                                allowFiltering: true,
+                                                                allowSorting: false
+                                                            },
+                                                            {
+                                                                fieldName: 'doanhthu_dk',
+                                                                headerText: 'Doanh thu dự kiến',
+                                                                allowFiltering: true,
+                                                                allowSorting: false,
+                                                                type: 'number',
+                                                                format:'N0',
+                                                                template: txtDoanhThuDkTemplate(this)
+                                                            }
+                                                        ]" v-bind:dataSource="options.dsTB" :showFilter="true" :allowPaging="true"
+                                                            dataKeyField="ma_tb" :enablePagingServer="false"
+                                                            ref="gridCTThueBao" :showColumnCheckbox="false" panelDataHeight="290" >
+                                                        </DataGrid>
+                                                    </div>
+                                                    
+                                                    <div class="value">
+                                                        <div class="input-more-button">
+                                                            <button class="btn btn-primary" @click="CloseDropDown">
+                                                                <span style="color:white" class="-ap icon-close"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <div v-if="txtMAGD_TT != '' ">
+                                        <div class="input-more-button dropdown">
+                                            <button class="btn btn-primary" @click="GoHD_Click">
+                                                <span style="color:white" class="-ap icon-close"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <!-- <ul v-if="grvTB" name="" class="form-control listview" style="height: 110px;width: 150px;resize: none; overflow: scroll;">
+                                        <li :value="thueBao.thuebao_id" v-for="thueBao in data_thuebao">{{thueBao.MA_TB}} - Doanh thu:( {{thueBao.DOANHTHU}}, {{thueBao.TENGOI_HT}}) - Dự kiến: ({{thueBao.DOANHTHU_DK}}, {{thueBao.GOI_DK}})</li>
+                                    </ul> -->
+                                    <input v-if="!grvTB" type="text" class="form-control highlight" v-model="txtMAGD_TT">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="grvTB" class="col-sm-12 col-12">
+                    <div class="legend-title">Danh sách thuê bao</div>
+                    <ul name="" class="form-control listview" style="height:150px;resize: none; overflow: scroll;">
+                        <li :value="thueBao.thuebao_id" v-for="thueBao in data_thuebao">{{thueBao.MA_TB}} - Doanh thu:( {{thueBao.DOANHTHU}}, {{thueBao.TENGOI_HT}}) - Dự kiến: ({{thueBao.DOANHTHU_DK}}, {{thueBao.TEN_GOI}})</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="grid-stack-box">
+            <div class="box-col" id="boxLeft" style="width: calc(50% - 8px);">
+                <div class="box-form" style ="height: 250px;">
+                <div class="legend-title">Thông tin thuê bao</div>
+                <div class="row">
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Số máy/Acc</div>
+                            <div class="value">
+                                <div class="input-more-button">
+                                    <button @click="showPopupSearchAccount" class="btn">
+                                        <span class="-ap icon-more_horiz"></span>
+                                    </button>
+                                    <SearchAccountModal ref="searchAccountModal" @form-close="acceptSearchAccount" />
+                                    <input type="text" class="form-control highlight" v-model="txtMaTB" ref="MaTB"
+                                        v-on:keyup.enter="txtMaTB_KeyPress" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Số ảo</div>
+                            <div class="value">
+                                <input type="text" class="form-control highlight" :readonly="true" v-model="txtSoAo">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Tên thuê bao</div>
+                            <div class="value">
+                                <input type="text" ref="TenTB" class="form-control bg-white" :readonly="true"
+                                    v-model="txtTenTB">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Loại thiết bị</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <SelectExt id="cbb_LoaiTBDC" v-model.trim="dataSelected.thietbidc_id"
+                                        :settings="{dropdownParent: $refs['dsLoaiTBDC']}"
+                                        :dataSource="options.lstLoaiTBDC" dataTextField="ten_tbi"
+                                        dataValueField="thietbidc_id" @change="onChangeLoaiTB($event)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Địa chỉ TB</div>
+                    <div class="value">
+                        <input type="text" class="form-control bg-white" :readonly="true" v-model="txtDiaChiTB">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Địa chỉ LĐ</div>
+                    <div class="value">
+                        <input type="text" class="form-control bg-white" :readonly="true" v-model="txtDiaChiLD">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-7 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Ghi chú</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="txtGhiChu">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Serial STB</div>
+                            <div class="value">
+                                <input type="text" class="form-control bg-white" :readonly="true" v-model="txtSerilUMP">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="box-form" style ="height: 200px;">
+                    <ejs-tab id="tab_default">
+                        <div class="e-tab-header">
+                            <div>{{headerText0.text}}</div>
+                            <!-- <div>{{headerText1.text}}</div> -->
+                        </div>
+                        <div class="e-content">
+                            <!-- tab 1 -->
+                            <div>
+                                <div class="mt-3">
+                                    <b-row>
+                                        <div class="col-sm-12 col-12 mb-3">
+                                            <div class="info-row">
+                                                <div class="value">
+                                                    <div class="input-more-button">
+                                                        <button class="btn" @click="btnLayThietBi_Click">
+                                                            <span class="-ap icon-more_horiz"></span>
+                                                        </button>
+                                                        <div id='container'>
+                                                            <ejs-listbox :dataSource='TBI.txtareaTBI' height='100px' locale="vi-VN"></ejs-listbox>
+                                                        </div>
+                                                        <!-- <textarea type="text" class="form-control" v-model="TBI.txtareaTBI"></textarea> -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </b-row>
+                                </div>
+                            </div>
+                        </div>
+                    </ejs-tab>
+                    <!-- <ejs-tab id='element'>
+                        <e-tabitems>
+                            <e-tabitem :header='headerText0' :content="content0" :selectedItem="selected"></e-tabitem>
+                            <e-tabitem :header='headerText1' :content="content1"></e-tabitem>
+                            
+                        </e-tabitems>
+                    </ejs-tab> -->
+                </div>
+            </div>
+            <div class="gutter gutter-horizontal" style="width: 16px;"></div>
+            <div class="box-col" id="boxRight" style="width: calc(50% - 8px);">
+                <div class="box-form" style ="height: 250px;">
+                    <div class="legend-title">Thông tin khách hàng</div>
+                    <div class="info-row">
+                        <div class="key">Mã khách hàng</div>
+                        <div class="value">
+                            <input type="text" ref="MaKH" class="form-control bg-white" :readonly="true"
+                                v-model="txtMaKH">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Tên khách hàng</div>
+                        <div class="value">
+                            <input type="text" ref="TenKH" class="form-control bg-white" :readonly="true"
+                                v-model="txtTenKH">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key">Địa chỉ KH</div>
+                        <div class="value">
+                            <input type="text" class="form-control bg-white" :readonly="true" v-model="txtDiaChiKH">
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form" style ="height: 200px;">
+                    <div class="legend-title">Chi tiết tiền theo khoản mục</div>
+                    <div class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key">Tổng tiền</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="showPopupTienKM">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control red tright bg-white" :readonly="true"
+                                            ref="TongVAT" v-model="txtTongTien">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Tổng VAT</div>
+                                <div class="value">
+                                    <input type="text" class="form-control red tright bg-white" :readonly="true"
+                                        v-model="txtTongVAT">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách phiếu thay thế vật tư</div>
+            <DataGrid v-bind:columns="collumnsPhieu" v-bind:dataSource="options.dsPhieu" :showFilter="true"
+                ref="DSPhieu" :allowPaging="true" :enablePagingServer="false" :enabledSelectFirstRow="true"
+                :enableVirtualization="false" @rowSelected="dgrList_SelectionChanged"
+                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }" panelDataHeight="250">
+            </DataGrid>
+        </div>
+    </div>
+    <b-modal
+            ref="popupBuyDevices"
+            id="frmCTMuaTBI"
+            size="xl"
+            hide-header
+            
+            hide-footer
+            body-class="p-0"
+        >
+            <div class="modal-content popup-box">
+                <ModalBuyDevices :dulieu="dataDevice" @form-close="closeFormDevice"/>
+            </div>
+        </b-modal>
+        <b-modal ref="popupChooseDevices" id="frmChonTbi" size="xl" hide-header hide-footer body-class="p-0">
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">
+                        <span class="icon one-notepad"></span> Chọn thiết bị
+                    </div>
+                    <div class="close -ap icon-close" data-dismiss="modal" @click="hideModalChooseDevice"></div>
+                </div>
+                <ModalChooseDevices :dulieu="dataDevice" @form-close="closeFormChooseDevice" />
+            </div>
+        </b-modal>
+        <!-- TIEN KM -->
+        <b-modal ref="popupTienKM" id="frmCT_TienKM" size="xl" hide-header hide-footer body-class="p-0">
+            <div class="modal-content popup-box">
+                <ModalTienKM :dulieu="dataTienKM" @form-close="closeFormTienKM" :isPopup="true"/>
+            </div>
+        </b-modal>
+    <b-modal id="popup-ChiTietTienKM" size="xl" hide-footer hide-header hide-header-close body-class="modal-body p-0">
+        <ChiTietTienKM @acceptTienKM="acceptTienKM($event)" :tien="tongtien" :vat="tongvat" :tong="tong" />
+    </b-modal>
+    <ChiTietTienTheoKhoanMucModal ref="chiTietTienTheoKhoanMucModal" 
+        :loaihd_id="13" 
+        :ds_tien_caidat="options.ds_tien_khoanmuc"
+        @accept="acceptTienKM1"
+     />
+    <CapVatTuTB ref="popupVatTuThueBao" :inputData="modelVatTu" />
+</div>

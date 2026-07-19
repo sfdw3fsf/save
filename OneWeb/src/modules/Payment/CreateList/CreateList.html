@@ -1,0 +1,222 @@
+<div class="main-wrapper">
+    <div class="breadcrumb-top">
+        <div class="main-title">tạo bảng kê</div>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ
+                </a></li>
+            <li class="breadcrumb-item"><a href="javascript:void(0)">Thanh toán</a></li>
+            <li class="breadcrumb-item active">Tạo bảng kê</li>
+        </ul>
+    </div>
+    <ActionTop :actions="actions" @onActionClick="onActionClick" />
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin bảng kê</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Mã BK</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="showDialogshoObjTaoBangKe">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" class="form-control" v-model="txtMaSo">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <vue-date v-model="dtpNgayTao" format="DD/MM/YYYY" :labelWidth="'90'" label="Date created"></vue-date>
+                            </div>
+                        </div>
+                    </div>
+                    <vue-select @input="cboDaiVTChanged" v-model="cboDaiVT.selectedValue" :labelWidth="'90'"
+                        :options="cboDaiVT.data" labelField="NAME" valueField="ID" label="Trung tâm VT" :disable="kiemTraThongTinNguoiDung"></vue-select>
+                    <vue-select v-model="cboTramVT.selectedValue" :labelWidth="'90'" :options="cboTramVT.data"
+                        labelField="ten_dv" valueField="donvi_id" label="Tổ VT" @input="cboTramVTChanged"></vue-select>
+
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="row">
+                        <div class="col-sm-8 col-12">
+                            <vue-select v-model="cboNguoiNop.selectedValue" :labelWidth="'90'"
+                                :options="cboNguoiNop.data" labelField="ten_nv" valueField="nhanvien_id"
+                                label="Người nộp"></vue-select>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <vue-date v-model="dtpDenNgay" format="DD/MM/YYYY" :labelWidth="'90'" label="Ngày HT"></vue-date>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Tổng cộng</div>
+                        <div class="value">
+                            <input type="text" class="form-control" readonly :value="formatTien">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Bằng chữ</div>
+                        <div class="value">
+                            <input type="text" class="form-control highlight" readonly :value="txtTienBangChu">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-move-select-table">
+            <div class="box-col box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách hợp đồng đã gán</div>
+                    <div class="pull-right red">
+                        Tổng số: {{lblTongHD_DG}}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content" style="height: 200px;">
+                    <DataGrid v-bind:columns="DSHDDaGan.headers" v-bind:dataSource="DSHDDaGan.data"
+                        :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                        @selectedItemsChanged="dSHDDaGan_selectedItemsChanged" @rowDeselected="DSHDDaGan_RowDeSelected"
+                        ref="DSHDDaGan">
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="actions w50">
+                <button class="btn" @click="moveRight">
+                    <span class="fa fa-angle-right"></span>
+                </button>
+                <button class="btn" @click="moveRightAll">
+                    <span class="fa fa-angle-double-right"></span>
+                </button>
+                <button class="btn" @click="moveLeft">
+                    <span class="fa fa-angle-left"></span>
+                </button>
+                <button class="btn" @click="moveLeftAll">
+                    <span class="fa fa-angle-double-left"></span>
+                </button>
+            </div>
+            <div class="box-col box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách hợp đồng chưa gán</div>
+                    <div class="pull-right red">
+                        Tổng số: {{lblTongHD_CG}}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content" style="height: 200px;">
+                    <DataGrid v-bind:columns="DSHDDaGan.headers" v-bind:dataSource="DSHDChuaGan.data"
+                        :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                        @selectedItemsChanged="dSHDChuaGan_selectedItemsChanged"
+                        @rowDeselected="DSHDChuaGan_RowDeSelected" ref="DSHDDaGan">
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+        <div class="box-move-select-table">
+            <div class="box-col box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách thuê bao đã gán</div>
+                    <div class="pull-right red">
+                        Tổng số: {{lblTongTB_DG}}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content" style="height: 200px;">
+                    <DataGrid v-bind:columns="DSTbDaGan.headers" v-bind:dataSource="DSTbDaGan.data"
+                        :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                        @selectedItemsChanged="dSTBDaGan_selectedItemsChanged" @rowDeselected="DSTBDaGan_RowDeSelected">
+                    </DataGrid>
+                </div>
+            </div>
+            <div class="actions w50">
+                <button class="btn" @click="moveRightTB">
+                    <span class="fa fa-angle-right"></span>
+                </button>
+                <button class="btn" @click="moveRightAllTB">
+                    <span class="fa fa-angle-double-right"></span>
+                </button>
+                <button class="btn" @click="moveLeftTB">
+                    <span class="fa fa-angle-left"></span>
+                </button>
+                <button class="btn" @click="moveLeftAllTB">
+                    <span class="fa fa-angle-double-left"></span>
+                </button>
+            </div>
+            <div class="box-col box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách thuê bao chưa gán</div>
+                    <div class="pull-right red">
+                        Tổng số: {{lblTongTB_CG}}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content" style="height: 200px;">
+                    <DataGrid v-bind:columns="DSTbChuaGan.headers" v-bind:dataSource="DSTbChuaGan.data"
+                        @selectedItemsChanged="dSTBChuaGan_selectedItemsChanged"
+                        @rowDeselected="DSTBChuaGan_RowDeSelected" :enable-paging-server="false" :allowPaging="true"
+                        :showFilter="true">
+                    </DataGrid>
+                </div>
+
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách bảng kê</div>
+            <div class="table-content">
+                <DataGrid v-bind:columns="DSBangKe.headers" v-bind:dataSource="DSBangKe.data"
+                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                    @selectedItemsChanged="dSBangKeSelectionChange">
+                </DataGrid>
+            </div>
+        </div>
+    </div>
+    <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="dialogObjTaoBangKe" showCloseIcon=true
+        width='80%' target='#app .main-wrapper' header="Chọn ngày tạo bảng kê">
+        <div class="list-actions-top">
+            <ul class="list">
+
+                <li>
+                    <a href="#" @click="btnChapNhanClick">
+                        <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Chấp nhận
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Điều kiện tìm kiếm</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w60">Từ ngày</div>
+                            <div class="value">
+                                <date-picker :format="dateFormat" :value-type="dateFormat"
+                                    :time-title-format="dateFormat" v-model="vtungay" :type="typeFormat">
+                                </date-picker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w60">Đến ngày</div>
+                            <div class="value">
+                                <date-picker :format="dateFormat" :value-type="dateFormat"
+                                    :time-title-format="dateFormat" v-model="vdenngay" :type="typeFormat">
+                                </date-picker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ejs-dialog>
+
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+</div>

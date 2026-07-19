@@ -1,0 +1,137 @@
+import moment from "moment"
+export default {
+    actions: [
+        {
+          id: 'tracuu',
+          name: 'Tra cứu',
+          active: true,
+          icon_class: 'one-search',
+          visible: true
+        },
+        {
+          id: 'dongbo',
+          name: 'Đồng bộ TT',
+          active: true,
+          icon_class: 'one-sync1',
+          visible: true
+        }
+      ],     
+      searchDate: {        
+        ngay_tn: moment(new Date()).add(-1, 'days').format('DD/MM/yyyy HH:mm:ss'),
+        den_ngay: moment(new Date()).format('DD/MM/yyyy HH:mm:ss'),
+        ckb_ngay_tn:false,        
+        dateconfig: {
+            altFormat: "d/m/Y H:i:S",
+            altInput: true,
+            dateFormat: "d/m/Y H:i:S",
+            allowInput: true,
+        },
+    },
+    loai_hd:0,
+    btnLabel:"Tạm dừng", 
+    ma_tb:"",
+    dichvuvt_id:0,
+    gvDanhSach: {
+        tableCollumns: [
+            {
+                fieldName: "MA_TB",
+                headerText: "Số máy/Acc",
+                allowSorting: false,
+                allowFiltering: true,
+                width: "100",
+                textAlign: 'left',
+                autoFit: "true",
+            },
+            {
+                fieldName: "LOAIHINH_TB",
+                headerText: "Loại hình TB",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "TEN_TB",
+                headerText: "Tên TB",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "DIACHI_TB",
+                headerText: "Địa chỉ TB",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "TENPHONG",
+                headerText: "Phòng bán hàng",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "NGAY_TN",
+                headerText: "Ngày TN",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "NGUOI_KN",
+                headerText: "Người KN",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "SO_DT",
+                headerText: "Điện thoại LH",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "ND_KHIEUNAI",
+                headerText: "ND Khiếu nại",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "NOIDUNG_GQ",
+                headerText: "ND Giải quyết",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "TENTO",
+                headerText: "Tổ quản lý",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+            {
+                fieldName: "TRAMVT",
+                headerText: "Trạm VT",
+                allowFiltering: true,
+                width: "100",
+                autoFit: "true",
+                textAlign: 'left',
+            },
+        ],
+        tableData:[],
+    },
+    
+}

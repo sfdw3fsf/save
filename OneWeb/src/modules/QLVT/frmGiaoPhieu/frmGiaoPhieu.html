@@ -1,0 +1,296 @@
+<ejs-dialog
+    :enableResize="true"
+    :allowDragging="true"
+    :visible="false"
+    ref="dialogGiaoPhieu"
+    :animationSettings="animationSettings"
+    showCloseIcon="true"
+    width="80%"
+    height="80%"
+    :target="target"
+    :open="dialogOpened"
+    :close="closeDialog"
+    header='<div class="main-title">Giao phiếu quản lý vật tư</div>'
+>
+    <div class="modal-content popup-box">
+        <div class="list-actions-top">
+            <ul class="list">
+                <li :class="{disabled: !enabledComponent.tsbtnTimKiem}">
+                    <a class="pointer" @click="tsbtnTimKiem">
+                        <span class="icon one-search"></span>Tìm kiếm
+                    </a>
+                </li>
+                <li :class="{disabled: !enabledComponent.tsbtnGiaoPhieu}">
+                    <a class="pointer" @click="tsbtnGiaoPhieu">
+                        <span class="icon one-file-arrow-right1"></span>Giao
+                        phiếu
+                    </a>
+                </li>
+                <li :class="{disabled: !enabledComponent.tsbtnHuyGiao}">
+                    <a class="pointer" @click="tsbtnHuyGiao">
+                        <span class="icon one-cancel"></span>Hủy giao
+                    </a>
+                </li>
+                <!-- <li>
+                    <a class="pointer">
+                        <span class="icon one-print"></span>In danh sách
+                    </a>
+                </li>
+                <li>
+                    <a class="pointer">
+                        <span class="icon one-file-check"></span>Cập nhật ĐV
+                    </a>
+                </li>
+                <li>
+                    <a class="pointer">
+                        <span class="icon one-download"></span>Xuất Excel
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+        <div class="popup-body mart10">
+            <div class="box-form">
+                <div class="legend-title">Thông tin tìm kiếm</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w110">Trạng thái phiếu</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <ComboboxGrid
+                                        :columns='[
+                                        {
+                                            fieldName: "TRANGTHAI_ID",
+                                            headerText: "Trạng thái ID"
+                                        },
+                                        {
+                                            fieldName: "TRANGTHAI",
+                                            headerText: "Trạng thái"
+                                        }
+                                        ]'
+                                        @selectedChanged="cboTrangThaiChanged"
+                                        :dataSource="cboTrangThai"
+                                        textField="TRANGTHAI"
+                                        valueField="TRANGTHAI_ID"
+                                    ></ComboboxGrid> -->
+                                    <ejs-dropdownlist
+                                        class="form-control"
+                                        locale="vi"
+                                        v-model="gParams.cboTrangThai"
+                                        :dataSource="cboTrangThai"
+                                        :fields="{value:'TRANGTHAI_ID', text: 'TRANGTHAI'}"
+                                        :allowFiltering="true"
+                                        @change="cboTrangThaiChanged"
+                                    >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend-title mart20">Thông tin giao phiếu</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Hướng giao</div>
+                            <div class="value">
+                                <div class="select-custom">                                  
+                                    <ejs-dropdownlist
+                                        class="form-control"
+                                        locale="vi"
+                                        v-model="gParams.cboHuongGiao"
+                                        :dataSource="cboHuongGiao"
+                                        :fields="{value:'huongGiaoId', text: 'huongGiao'}"
+                                        :allowFiltering="true"
+                                        @change="cboHuongGiaoChanged"
+                                    >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Mã OTP</div>
+                            <div class="value">
+                                <div class="input-more-button -right">
+                                    <button class="btn" @click="btnLayLaiOTP">
+                                        <span
+                                            class="-ap icon one-email "
+                                        ></span>
+                                    </button>
+                                    <input
+                                        type="text"
+                                        class="form-control highlight"
+                                        value=""
+                                        v-model="gParams.txtMaOTPChon"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-12">
+                        <div class="info-row">
+                            <div class="key w70">Ngày giao</div>
+                            <div class="value">
+                                <ejs-datepicker
+                                    :placeholder="'Ngày giao'"
+                                    v-model="gParams.dtpNgayGiao"
+                                    format="dd/MM/yyyy HH:mm"
+                                    :allowEdit="true"
+                                    :enabled="false"
+                                    :width="'100%'"
+                                    class="redcolor"
+                                >
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Nội dung giao</div>
+                            <div class="value">
+                                <input
+                                    type="text"
+                                    v-model="gParams.txtNoiDung"
+                                    class="form-control"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Đơn vị XL</div>
+                            <div class="value">
+                                <div class="select-custom">                                    
+                                    <ejs-dropdownlist
+                                        class="form-control"
+                                        locale="vi"
+                                        v-model="gParams.cboDonVi"
+                                        :dataSource="cboDonVi"
+                                        :fields="{value:'DONVI_ID', text: 'TEN_DV'}"
+                                        :allowFiltering="true"
+                                        @change="cboDonViChanged"
+                                    >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Ghi chú</div>
+                            <div class="value">
+                                <input
+                                    type="text"
+                                    v-model="gParams.txtGhiChu"
+                                    class="form-control"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Người XL</div>
+                            <div class="value">
+                                <div class="select-custom">                                    
+
+                                    <select name="" id="" class="form-control" @change="" 
+                                        v-model="gParams.cboNhanVienXL">
+                                        <option v-for="NV in cboNhanVienXL" v-bind:value="NV.NHANVIEN_ID">
+                                            {{NV.TEN_NV}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>               
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    Danh sách phiếu yêu cầu
+                </div>
+                <div class="table-content">
+                    <DataGrid
+                        v-bind:columns="[
+                            { fieldName: field='MA_PHIEU', headerText: 'Mã phiếu' , textAlign: 'center', allowFiltering: true,},                        
+                            { fieldName: field='SOPHIEU', visible: gParams.colSoPhieuCT,headerText: 'Số phiếu' , textAlign: 'center', allowFiltering: true,},                        
+                            { fieldName: field='LOAIPHIEU', headerText: 'Loại phiếu' , textAlign: 'center', allowFiltering: true,},     
+                            { fieldName: field='TINHTRANG_PH', headerText: 'Trạng thái phiếu' , textAlign: 'center', allowFiltering: true,},                      
+                            { fieldName: field='DONVI_NHAN', headerText: 'Đơn vị nhận' , textAlign: 'center', allowFiltering: true, },                        
+                            { fieldName: field='DONVI_GIAO', headerText: 'Đơn vị giao' , textAlign: 'center', allowFiltering: true, },  
+                            { fieldName: field='TINH_GIAO', headerText: 'Tỉnh giao'  , textAlign: 'left', allowFiltering: true, },
+                            { fieldName: field='TINH_NHAN', headerText: 'Tỉnh nhận'  , textAlign: 'left', allowFiltering: true, },                       
+                            { fieldName: field='NGAYGIAO', headerText: 'Ngày giao' , textAlign: 'left', allowFiltering: true, },                        
+                            { fieldName: field='ND_THUCHIEN', headerText: 'Nội dung' , textAlign: 'left', allowFiltering: true, },                        
+                            { fieldName: field='NHANVIEN_GIAO', headerText: 'Nhân viên giao' , textAlign: 'left', allowFiltering: true, },                        
+                            { fieldName: field='TEN_DVQL', headerText: 'Đơn vị QL' , textAlign: 'left', allowFiltering: true, },                        
+                            { fieldName: field='GHICHU', headerText: 'Ghi chú'  , textAlign: 'left', allowFiltering: true, },  
+                                                                   
+                        ]"
+                        ref="gridViewDSPhieu"
+                        :dataSource="gridDSPhieu"
+                        :showFilter="true"
+                        :enablePagingServer="false"
+                        :showColumnCheckbox="gParams.isShowMultiSelect"
+                        :allowPaging="false"
+                        @selectedItemsChanged="gridViewDSPhieuSelectItemChanged"
+                        @selectedRowChanged="gridViewDSPhieuFocusedRowChanged"
+                    >
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal 
+        no-close-on-backdrop
+        hide-footer 
+        hide-header 
+        hide-header-close 
+        class="modal" 
+        id="popupNhapUser">
+        
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">Thông tin đăng nhập ký số</div>
+                    <div class="close -ap icon-close"  @click="$bvModal.hide('popupNhapUser')" data-dismiss="modal">
+                    </div>
+                </div>
+                
+                <div class="popup-body">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Tên đăng nhập
+                        </div>
+                        <div class="value">                           
+                            <input  type="text" class="form-control" v-model="gParams.taikhoan_ks" readonly>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">
+                            Mật khẩu
+                        </div>
+                        <div class="value">                            
+                            <input  type="password" class="form-control" v-model="gParams.matkhau_ks" v-if="!isShowPass">
+                            <input  type="text" class="form-control" v-model="gParams.matkhau_ks" v-else>
+                            <span @click="isShowPass = !isShowPass" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-actions-top">
+                    <ul class="list">
+                        <li>
+                            <a  @click="xacNhanKySoSmartCA">
+                                <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        
+    </b-modal>
+</ejs-dialog>

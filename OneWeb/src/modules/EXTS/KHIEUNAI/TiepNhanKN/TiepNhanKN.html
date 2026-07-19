@@ -1,0 +1,703 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="getTB_KHIEUNAI()">
+                    <span class="icon one-file-attach"></span> Lấy DS
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" ref="tsbtnNhapMoi"  :class="{'disable-btn' : !Button.tsbtnNhapMoi}" @click="tsbtnNhapMoi_Click()">
+                    <span class="icon  one-file-plus"></span> Nhập mới
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" ref="tsbtnGhiLai"  :class="{'disable-btn' : !Button.tsbtnGhiLai}" @click="tsbtnGhiLai_Click()">
+                    <span class="icon  one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" ref="tsbtnHuyBo"  :class="{'disable-btn' : !Button.tsbtnHuyBo}" @click="tsbtnHuyBo_Click()">
+                    <span class="icon  nc-icon-glyph ui-1_circle-remove"></span> Huỷ
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" class="disable-btn">
+                    <span class="icon one-print"></span> In phiếu
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)"  ref="tsbtnXoa"  :class="{'disable-btn' : !Button.tsbtnXoa || dsIdChon.length === 0 || this.DS_TB_KHIEUNAI.length===0}"  @click="tsbtnXoa_Click">
+                    <span class="icon  one-trash"></span> Xoá KN
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnHSKN_Click()" :class="{'disable-btn' : KHIEUNAI.KHIEUNAI_ID === null}">
+                    <span class="icon  nc-icon-glyph files_single-content-02"></span> Hồ sơ
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)"  :class="{'disable-btn' : !Button.tsbtnGiaoPhieu}" @click="tsbtnGiaoPhieu_Click()">
+                    <span class="icon one-file-arrow-right1"></span> Giao phiếu
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" :class="{'disable-btn' : !Button.tsbtnKhoaPhieu || this.DS_TB_KHIEUNAI.length===0}" @click="tsbtnKhoaPhieu_Click">
+                    <span class="icon  one-file-lock"></span> Khoá phiếu
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="tsbtnNhapExcel()">
+                    <span class="icon  one-book"></span> Đọc file
+                </a>
+            </li>
+        </ul>
+    </div>
+    <ModalDocFile :parent="this" modalID="ModalDocFile" ref="ModalDocFile"/>
+    <ModalNhanVienLoi modalID="ModalNhanVienLoi" ref="ModalNhanVienLoi"/>
+    <ModalDonViLoi modalID="ModalDonViLoi" ref="ModalDonViLoi"/>
+    <ModalGiaoPhieuKN ref="ModalGiaoPhieuKN" @change="onChange" @hidden="hide" />
+    <ChenNo ref="refChenNo" :ma_tt="ChenNo.ma_tt" :kyhoadon="ChenNo.kycuoc"></ChenNo>
+    <TraCuuDanhBa ref="ModalTraCuuDanhBa" @hidden="onChonThueBao" />
+    <div class="page-content">
+        <div class="box-form padt8 padb8">
+            <div class="pull-right">
+                <div class="inline">
+                    <div class="info-row marb0">
+                        <div class="key fw6 w80">Kỳ hóa đơn</div>
+                        <div class="value">
+                            <ejs-datepicker
+                            v-model="Kyhoadon"
+                            :enabled="false"
+                            :showClearButton="false"
+                            format="MM/yyyy">
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="inline marl10">
+                    <div class="info-row marb0">
+                        <div class="key fw6 w50">Chu kỳ</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select name="" id="" class="form-control red">
+                                    <option value="">01</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <span :class="{'icon fa fa-angle-up' : !collapseBangTTTB, 'icon fa fa-angle-down' : collapseBangTTTB}" @click="collapseBangTTTB = !collapseBangTTTB"></span>Thông tin thuê bao
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Dịch vụ</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="Selected.DICHVUVT_ID" @change="onChange_DICHVUVT($event)" disabled>
+                                            <option v-for="item in DS_DICHVU_VT" :value="item.DICHVUVT_ID">{{item.TEN_DVVT}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại hình</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="Selected.LOAITB_ID" disabled>
+                                            <option v-for="item in DS_LOAIHINH_TB" :value="item.LOAITB_ID">{{item.LOAIHINH_TB}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Số máy/Acc</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="bntLayMaKh_Click()">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input @click="isCalculatorShow = !isCalculatorShow"  ref="txtMaTB" type="text" v-model.trim="txtMaTB" class="form-control highlight" v-on:keyup.13="txtMaTB_KeyPress()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày tiếp nhận</div>
+                                <div class="value">
+                                    <ejs-datetimepicker
+                                    v-model="dtpNgayTN"
+                                    :style="{'padding-top': '7px'}"
+                                    class="form-control bg-none bor0 fw6 text h24"
+                                    placeholder=""
+                                    :enabled="false"
+                                    :showClearButton="false"
+                                    :showTodayButton="false"
+                                    format="dd/MM/yyyy HH:mm:ss">
+                                    </ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Tên TB</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :value="THUEBAO.TEN_TB" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Loại khách hàng</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="Selected.LOAIKH_ID" disabled>
+                                            <option v-for="item in DS_LOAI_KH" :value="item.LOAIKH_ID">{{item.TEN_LOAIKH}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="row">
+                        <!-- <div class="key w110">Địa chỉ TB</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :value="THUEBAO.DIACHI_TB" disabled>
+                        </div> -->
+
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Địa chỉ TB</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :value="THUEBAO.DIACHI_TB" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Phân loại KH</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :value="THUEBAO.PHANLOAI_KH" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Trạng thái</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :value="THUEBAO.TRANGTHAI_TB" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Đối tượng</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="Selected.DOITUONG_ID" disabled>
+                                            <option v-for="item in DS_DOITUONG" :value="item.DOITUONG_ID">{{item.TEN_DT}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTTB"  class="info-row">
+                        <div class="key w110">Địa chỉ TT</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :value="THUEBAO.DIACHI_TT" disabled>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="info-row">
+                        <div class="key w110">Địa chỉ BC</div>
+                        <div class="value">
+                            <input type="text" class="form-control" :value="THUEBAO.DIACHI_BC" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        <span :class="{'icon fa fa-angle-up' : !collapseBangTTNKN, 'icon fa fa-angle-down' : collapseBangTTNKN}" @click="collapseBangTTNKN = !collapseBangTTNKN"></span>Thông tin người khiếu nại
+                    </div>
+                    <div v-show="!collapseBangTTNKN" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Người KN&nbsp;(<span style="color: red;">*</span>)</div>
+                                <div class="value">
+                                    <bss-error-marker :has-error="$v.KHIEUNAI.NGUOI_KN.$error">
+                                        <input ref="NGUOI_KN" type="text" class="form-control" v-model="$v.KHIEUNAI.NGUOI_KN.$model">
+                                    </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Điện thoại LH&nbsp;(<span style="color: red;">*</span>)</div>
+                                <div class="value">
+                                    <bss-error-marker :has-error="$v.KHIEUNAI.DIENTHOAI_LH.$error">
+                                        <input ref="DIENTHOAI_LH" type="text" class="form-control" v-model.trim="$v.KHIEUNAI.DIENTHOAI_LH.$model">
+                                    </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTNKN" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Chứng minh thư</div>
+                                <div class="value">
+                                    <bss-error-marker :has-error="$v.KHIEUNAI.CMT.$error">
+                                        <input ref="CMT" type="text" class="form-control" v-model.trim="$v.KHIEUNAI.CMT.$model">
+                                    </bss-error-marker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Ngày cấp</div>
+                                <div class="value">
+                                    <ejs-datepicker
+                                    v-model="dtpNgayCapCMT"
+                                    format="dd/MM/yyyy">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTNKN" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Nơi cấp</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" v-model.trim="KHIEUNAI.NOICAP">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Hình thức KN</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <select name="" id="" class="form-control" v-model="Selected.HTKN_ID">
+                                            <option v-for="item in DS_HINHTHUC_KN" :value="item.HTKN_ID">{{item.HINHTHUC_KN}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTNKN" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Địa chỉ liên hệ</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <button class="btn" @click="btnDiaChi_Click">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input ref="DIACHI_LH" type="text" class="form-control"  v-model.trim="KHIEUNAI.DIACHI_LH" :readonly="ReadOnly.txtDiaChi">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Email</div>
+                                <div class="value">
+                                    <input ref="EMAIL" @blur="txtEmail_Leave" type="text" class="form-control" v-model.trim="KHIEUNAI.EMAIL">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTNKN" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Ngày báo nhận</div>
+                                <div class="value">
+                                    <ejs-datetimepicker
+                                        v-model="dtpNgayBN"
+                                        format="dd/MM/yyyy HH:mm">
+                                    </ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Mã KN</div>
+                                <div class="value">
+                                    <input type="text" class="form-control" :value="KHIEUNAI.MA_KN" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTNKN" class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="chkHenTL">
+                                        <span class="name">Hẹn TL từ</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <ejs-datepicker
+                                        v-model="dtpTuNgay"
+                                        :enabled="chkHenTL"
+                                        :showClearButton="false"
+                                        format="dd/MM/yyyy">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Hẹn TL đến</div>
+                                <div class="value">
+                                    <ejs-datepicker
+                                        v-model="dtpDenNgay"
+                                        :enabled="chkHenTL"
+                                        :showClearButton="false"
+                                        format="dd/MM/yyyy">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        <span :class="{'icon fa fa-angle-up' : !collapseBangTTKN, 'icon fa fa-angle-down' : collapseBangTTKN}" @click="collapseBangTTKN = !collapseBangTTKN"></span>
+                        Thông tin khiếu nại <span><a v-show="lnkKhieunai_BS.Visible" href="javascript:void(0)"  @click="lnkKhieunai_BS_LinkClicked">   Bổ sung thông tin (ấn vào để thực hiện)</a></span>
+                    </div>
+                    <div v-show="!collapseBangTTKN"  class="row">
+                        <div class="col-sm-7 col-12">
+                            <div class="info-row">
+                                <div class="key w110">Loại chủ đề KN</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <ejs-dropdownlist
+                                        locale='vi-VN'
+                                        v-model="Selected.LOAI_ID"
+                                        :dataSource='DS_LOAI_KN'
+                                        :allowFiltering='true'
+                                        :fields="{value:'LOAI_ID', text: 'TEN_LOAI'}" >
+                                        </ejs-dropdownlist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key">Chủ đề KN</div>
+                                <ComboboxGrid id="chu-de-khieu-nai-1" ref="chudekhieunai1"
+                                v-bind:columns="[
+                                {fieldName: 'TENCHUDE', headerText: 'Tên chủ đề', width : 2000 ,allowFiltering: true},
+                                {fieldName: 'TEN_NHOM_CHA', headerText: 'Nhóm CĐ', allowFiltering: true , isGroupedColumn: true},
+                                {fieldName: 'TEN_NHOM', headerText: 'Nhóm CĐ', allowFiltering: true , isGroupedColumn: true}
+                                ]"
+                                v-bind:dataSource="DS_CHUDEKN" textField="TENCHUDE" valueField="CHUDEKN_ID"
+                                v-model="Selected.CHUDEKN_ID"
+                                :value="Selected.CHUDEKN_ID"
+                                :enabledSelectFirstRow="false"
+                                >
+                                </ComboboxGrid>
+                            </div>                           
+                        </div>
+                    </div>
+                    <div v-show="!collapseBangTTKN" class="info-row">
+                        <div class="key w110">Nội dung KN&nbsp;(<span style="color: red;">*</span>)</div>
+                        <div class="value">
+                            <bss-error-marker :has-error="$v.KHIEUNAI.ND_KHIEUNAI.$error">
+                                <textarea ref="ND_KHIEUNAI" name="" class="form-control" style="height: 171px;resize: none;" id="" cols="30" rows="10" v-model.trim="$v.KHIEUNAI.ND_KHIEUNAI.$model"></textarea>
+                            </bss-error-marker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <span :class="{'icon fa fa-angle-up' : !collapseBangTTTB, 'icon fa fa-angle-down' : collapseBangTTTB}" @click="collapseBangTTTB = !collapseBangTTTB"></span>Thông tin chi tiết nợ
+                    </div>
+                    <div v-show="!collapseBangTTTB" class="table-content" style="height: 250px;">
+                        <DataGrid id="gridDS_CT_NO" ref="gridDS_CT_NO"
+                v-bind:columns="
+                [
+                    {fieldName: 'TENKHOANMUC', width : 200 , headerText: 'Tên khoản mục', allowFiltering: true},
+                    {fieldName: 'TONGNO', width : 150 , headerText: 'Tổng nợ', allowFiltering: true},
+                    {fieldName: 'NO_DK', width : 120 , headerText: 'Cộng nợ ĐK', allowFiltering: true},
+                    {fieldName: 'NO_PS', width : 120 , headerText: 'Cộng nợ PS', allowFiltering: true},
+                    {fieldName: 'CON_NO', width : 100 , headerText: 'Còn nợ', allowFiltering: true},
+                    {fieldName: 'TONG_TRA', width : 100 , headerText: 'Tổng đã trả', allowFiltering: true},
+                    {fieldName: 'DIEU_CHINH', width : 100 , headerText: 'Đã điều chỉnh', allowFiltering: true}
+                ]"
+                v-bind:dataSource="DS_CHITIETNO_THEO_KHOANMUC"  :showFilter="true"  :allowResizing="true" :allowSorting="true"
+                :enable-paging-server="false"
+                :allowPaging="false">
+                </DataGrid>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="legend-title">
+                        <span :class="{'icon fa fa-angle-up' : !collapseBangTTNKN, 'icon fa fa-angle-down' : collapseBangTTNKN}" @click="collapseBangTTNKN = !collapseBangTTNKN"></span>Lịch sử khiếu nại
+                    </div>
+                        <DataGrid v-show="!collapseBangTTNKN" id="grid1" ref="grid1"
+                            v-bind:columns="
+                            [
+                                {fieldName: 'TENCHUDE', width : 200 , headerText: 'Chủ đề khiếu nại', allowFiltering: true},
+                                {fieldName: 'NGAY_TN', width : 150 , headerText: 'Ngày tiếp nhận', allowFiltering: true},
+                                {fieldName: 'ND_KHIEUNAI', width : 120 , headerText: 'Nội dung KN', allowFiltering: true},
+                                {fieldName: 'NHANVIEN_TN', width : 120 , headerText: 'Người tiếp nhận', allowFiltering: true},
+                                {fieldName: 'NGAY_GQ', width : 100 , headerText: 'Ngày giải quyết', allowFiltering: true},
+                                {fieldName: 'NHANVIEN_GQ', width : 100 , headerText: 'Người giải quyết', allowFiltering: true},
+                                {fieldName: 'MA_KN', width : 250 , headerText: 'Mã khiếu nại', allowFiltering: true},
+                                {fieldName: 'TRANGTHAI_KN', width : 250 , headerText: 'Trạng thái KN', allowFiltering: true}
+                            ]"
+                            v-bind:dataSource="DS_KHIEUNAI_HT" :showFilter="true"  :allowResizing="true" :allowSorting="false"
+                            :enable-paging-server="false"
+                            panelDataHeight="150px"
+                            :allowPaging="false">
+                        </DataGrid>
+                </div>
+                <div class="box-form">
+                    <div class="info-row marb0">
+                        <div class="value padl0">
+                            <div class="legend-title mart6">
+                                <div class="pull-left">
+                                    <span :class="{'icon fa fa-angle-up' : !collapseBangTTKN, 'icon fa fa-angle-down' : collapseBangTTKN}" @click="collapseBangTTKN = !collapseBangTTKN"></span>Kết quả xử lý
+                                </div>
+                                <section v-show="!collapseBangTTKN">
+                                    <div class="pull-right">
+                                        <div class="list-checks">
+                                            <div class="item">
+                                                <div class="check-action">
+                                                    <input type="radio" class="check" v-model="optXuLy" value="1">
+                                                    <span class="name">Xử lý được</span>
+                                                </div>
+                                            </div>
+                                            <div class="item">
+                                                <div class="check-action">
+                                                    <input type="radio" class="check" v-model="optXuLy" value="0">
+                                                    <span class="name">Không xử lý được</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div v-show="!collapseBangTTKN" class="value w30 nowrap">
+                            <button class="btn btn-main" @click="btnChenNo_Click()" :disabled="THUEBAO.MA_TT===null">
+                                <span class="-ap icon-plus3"></span> Chèn nợ
+                            </button>
+                        </div>
+
+                    </div>
+                    <div v-show="!collapseBangTTKN">
+                        <template v-if="optXuLy==='0'">
+                            <div class="grid-stack-box">
+                                <div class="box-col" >
+                                    <div class="info-row">
+                                        <div class="key">Lý do</div>
+                                        <div class="value">
+                                            <textarea ref="txtLyDo" v-model.trim="KHIEUNAI.LYDO_TON" name="" class="form-control" style="height: 200px;resize: none;" id="" cols="120" rows="20"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-if="optXuLy==='1'">
+                            <div class="grid-stack-box">
+                                <Split style="height: 210px;">
+                                    <SplitArea :size="60" :minSize="30">
+                                        <div class="info-row">
+                                            <div class="key">Người XL&nbsp;(<span style="color: red;">*</span>)</div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="Selected.NHANVIEN_ID">
+                                                        <option v-for="item in DS_NHANVIEN" :value="item.NHANVIEN_ID">{{item.TEN_NV}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="key">Ngày XL&nbsp;(<span style="color: red;">*</span>)</div>
+                                            <div class="value">
+                                                <ejs-datepicker
+                                                    v-model="dtpNgayXL"
+                                                    readonly="true"
+                                                    :value="dtpNgayXL"
+                                                    :format="'dd/MM/yyyy'">
+                                                </ejs-datepicker>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key">Nguyên nhân lỗi(<span style="color: red;">*</span>)</div>
+                                            <div class="value">
+                                                <div class="input-more-button">
+                                                    <button class="btn" @click="btnNhanVienLoi_Click" :disabled="DS_KQ_LOI_KN.length===0">
+                                                        <span class="-ap icon-more_horiz"></span>
+                                                    </button>
+                                                    <div class="select-custom">                                                  
+                                                        <select name="" id="" class="form-control" v-model="Selected.KETQUAKN_ID">
+                                                            <option v-for="item in DS_KQ_LOI_KN" :value="item.KETQUAKN_ID">{{item.NOIDUNG}}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key">Mức độ hài lòng</div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="Selected.HAILONG">
+                                                            <option v-for="item in DS_MD_HAILONG" :value="item.ID">{{item.NAME}}</option>
+                                                        </select>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key">Hình thức trả lời</div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="Selected.HTTL_ID">
+                                                        <option v-for="item in DS_HINHTHUC_TL" :value="item.HTTL_ID">{{item.HINHTHUC_TL}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key">Phương án XL&nbsp;(<span style="color: red;">*</span>)</div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="Selected.PAXL_ID">
+                                                        <option v-for="item in DS_PAXL" :value="item.PAXL_ID">{{item.PHUONGAN_XLKN}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key">Nội dung trả lời(<span style="color: red;">*</span>)</div>
+                                            <div class="value">
+                                                <textarea ref="txtNoiDungXL" v-model.trim="KHIEUNAI.NOIDUNG_GQ" name="" class="form-control" style="height: 50px;resize: none;" id="" cols="30" rows="10"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </SplitArea>
+                                    <SplitArea :size="60" :minSize="30">
+                                        <div class="grid-ext calutekn">
+
+                                                <ejs-grid
+                                                    ref="gridGC"
+                                                    height="400px"
+                                                    :rowTemplate='rowTemplate'
+                                                    :dataSource='dsGiamCuocAll'
+                                                    :allowPaging='false'
+                                                    :allowSorting='false'
+                                                    :allowFiltering='false'
+                                                    :allowKeyboard="false" locale="vi-VN" clipMode="EllipsisWithTooltip"
+                                                >
+                                                <e-columns>
+                                                    <e-column
+                                                        field="THANG_GC" headerText="Tháng GC"
+                                                        width=130 headerTextAlign="Center">
+                                                    </e-column>
+                                                    <e-column
+                                                        field="KY_GC" headerText="Kỳ giảm"
+                                                        width=130 headerTextAlign="Center">
+                                                    </e-column>
+                                                    <e-column
+                                                        field="TIEN" headerText="Tiền GC"
+                                                        width=150 headerTextAlign="Center">
+                                                    </e-column>
+                                                    <e-column
+                                                        field="TIEN_GC" headerText="Tiền"
+                                                        width=150 headerTextAlign="Center">
+                                                    </e-column>
+                                                    <e-column
+                                                        field="THUE" headerText="Thuế"
+                                                        width=150 headerTextAlign="Center">
+                                                    </e-column>
+                                                    <e-column
+                                                        headerText="Xóa" width=80 headerTextAlign="Center" textAlign="Center">
+                                                    </e-column>
+                                                </e-columns>
+                                                </ejs-grid>
+
+                                        </div>
+                                    </SplitArea>
+   
+                                </Split>
+                            </div>
+    
+                       
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <span :class="{'icon fa fa-angle-up' : !collapseBangDSKN, 'icon fa fa-angle-down' : collapseBangDSKN}" @click="collapseBangDSKN = !collapseBangDSKN"></span>Danh sách khiếu nại
+            </div>
+            <div v-show="!collapseBangDSKN" class="table-content">
+                <DataGrid3 id="gridDS_TB_KHIEUNAI" ref="gridDS_TB_KHIEUNAI" 
+                v-bind:columns="
+                [
+                    {fieldName: '', headerText: '', visible: true,  headerAlign: 'Center', textAlign: 'Center', allowFiltering: false, width: '50', headerTemplate: getHeaderTemplateChonNhieu(this),  template: getColumnTemplateChonNhieu(this)},
+                    {fieldName: 'MA_KN', width : 200 , headerText: 'Mã khiếu nại', allowFiltering: true },
+                    {fieldName: 'MA_TB', width : 150 , headerText: 'Số máy/Acc', allowFiltering: true },
+                    {fieldName: 'LOAIPHIEU', width : 120 , headerText: 'Loại phiếu', allowFiltering: true},
+                    {fieldName: 'NGUOI_KN', width : 150 , headerText: 'Người khiếu nại', allowFiltering: true},
+                    {fieldName: 'TENCHUDE', width : 150 , headerText: 'Tên chủ đề', allowFiltering: true},
+                    {fieldName: 'MA_TT', width : 150 , headerText: 'Mã thanh toán', allowFiltering: true},
+                    {fieldName: 'MA_KH', width : 150 , headerText: 'Mã khách hàng', allowFiltering: true},
+                    {fieldName: 'DIENTHOAI_LH', width : 150 , headerText: 'Điện thoại LH', allowFiltering: true},
+                    {fieldName: 'TEN_NV', width : 250 , headerText: 'Người tiếp nhận', allowFiltering: true},
+                    {fieldName: 'NGAY_TN', width : 200 , textAlign: 'Center', headerText: 'Ngày tiếp nhận', allowFiltering: true},
+                    {fieldName: 'EMAIL', width : 250 , headerText: 'Email', allowFiltering: true},
+                    {fieldName: 'NOIDUNG_GQ', width : 250 , headerText: 'Nội dung trả lời', allowFiltering: true},
+                    {fieldName: 'KHIEUNAI_ID', visible: false, isPrimaryKey: true }
+
+                ]"
+                v-bind:dataSource="DS_TB_KHIEUNAI"
+                :showFilter="true"
+                :enable-paging-server="false"
+                :enabledSelectFirstRow="true"
+                :showColumnCheckbox="false"
+                :selectionSettings="{type: 'Multiple', mode: 'Cell', cellSelectionMode: 'Box'}"
+                @cellSelected="gridDS_TB_KHIEUNAI_OnCellSelectedChange"
+                @rowClicked="gridDS_TB_KHIEUNAI_rowClicked"
+                @rowSelected="gridDS_TB_rowSelected"
+                @queryCellInfo="gridDS_TB_KHIEUNAI_onQueryCellInfo"
+                :allowPaging="true">
+                </DataGrid3>
+            </div>
+            <DiaChiModal ref="diaChiModal" :data="dataDiaChi" @accept="onAcceptDiaChi"/>
+            <frmHoSoKhieuNai ref="frmHoSoKhieuNai" />
+            <FormTraCuuTB :dsThueBao="dsThueBao" ref="formTraCuuTB"/>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1 @@
+Chứa các hàm mixin dùng chung cho các components

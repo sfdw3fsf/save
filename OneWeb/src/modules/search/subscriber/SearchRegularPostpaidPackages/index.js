@@ -1,0 +1,3 @@
+import SearchRegularPostpaidPackages from './SearchRegularPostpaidPackages'
+
+export default SearchRegularPostpaidPackages

@@ -1,0 +1,194 @@
+<div>
+  <div class="box-gridstack-ver fullh">
+    <div class="box-col box-form marb0" id="boxTop">
+        <div class="legend-title">Danh sách cáp gốc</div>
+        <div class="info-row">
+            <div class="key w60">Nhóm</div>
+            <div class="value">
+                <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="nhomlc_id" @change="getDsCap()">
+                        <option v-for="nhom in ds_nhom" :key="nhom.ID" :value="nhom.ID">{{nhom.TEN}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <ModalChonDSKetCuoiExt modalID="modalChonKC" ref="ModalChonDSKetCuoiExt"/>
+        <ModalQLKetCuoiExt modalID="modalQLKetCuoi" ref="ModalQLKetCuoiExt"/>
+        <ModalQLCapExt modalID="modalQLCap" ref="ModalQLCap"/>
+        <QuanLyCapReNhanh id="popupQuanLyCapReNhanhLeft" :midspanObject="getMidspanObject" @napGD="napGD"></QuanLyCapReNhanh>
+        <QuanLyTramThietBi
+        id="popupTramThietBiGianDo2"
+        :tramTb_id="tramTb_id"
+        @isOk="QuanLyTramThietBiIsOk"
+        >
+        </QuanLyTramThietBi>
+
+        <div class="info-row">
+            <div class="key w60">TTVT</div>
+            <div class="value">
+                <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="selectedTTVT">
+                        <option v-for="ttvt in ds_ttvt" :value="{ DONVI_ID : ttvt.DONVI_ID, TEN_DV : ttvt.TEN_DV }">{{ttvt.TEN_DV}}</option>
+                    </select>
+                    <!-- <ejs-dropdownlist
+                    locale='vi-VN'
+                    v-model="selectedTTVT.DONVI_ID"
+                    :dataSource='ds_ttvt'
+                    :allowFiltering='true'
+                    :fields="{value:'DONVI_ID', text: 'TEN_DV'}" >
+                    </ejs-dropdownlist> -->
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w60">Tổ</div>
+            <div class="value">
+                <div class="select-custom">
+                    <select name="" id="" class="form-control" v-model="selectedTOKT">
+                        <option v-for="tokt in ds_tokt" :value="{ DONVI_ID : tokt.DONVI_ID, TEN_DV : tokt.TEN_DV }">{{tokt.TEN_DV}}</option>
+                    </select>
+                    <!-- <ejs-dropdownlist
+                    locale='vi-VN'
+                    v-model="selectedTOKT.DONVI_ID"
+                    :dataSource='ds_tokt'
+                    :allowFiltering='true'
+                    :fields="{value:'DONVI_ID', text: 'TEN_DV'}" >
+                    </ejs-dropdownlist> -->
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="key w60">Tổng đài</div>
+            <div class="value">
+                <div class="input-more-button -right">
+                    <button :disabled="selectedTRAM.DONVI_ID===null" class="btn" @click="cboTRAMButtonClick()">
+                        <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <div class="select-custom">
+                        <!-- <select name="" id="" class="form-control" v-model="selectedTRAM">
+                            <option v-for="tram in ds_tram" :value="{DONVI_ID : tram.DONVI_ID, TEN_DV : tram.TEN_DV }">{{tram.TEN_DV}}</option>
+                        </select> -->
+                        <ejs-dropdownlist
+                        locale='vi-VN'
+                        v-model="selectedTRAMid"
+                        :dataSource='ds_tram'
+                        :allowFiltering='true'
+                        :filtering='filtering'
+                        :fields="{value:'DONVI_ID', text: 'TEN_DV'}" >
+                        </ejs-dropdownlist>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="table-content" style="height: calc(100% - 230px);">
+            <DataGrid ref="grid1" :allowResizing='true' @rowSelected="grid1_rowSelected" @recordDoubleClick= 'onDoubleClick' v-bind:columns="[
+            {fieldName: 'CAP_ID', width : 70, headerText: 'ID', allowFiltering: true},
+            {fieldName: 'KYHIEU', width : 150, headerText: 'Ký hiệu cáp gốc', allowFiltering: true},
+            {fieldName: 'TEN_CAP', headerText: 'Tên cáp gốc', allowFiltering: true},
+            {fieldName: 'KYHIEU_KC_GOC', headerText: 'Ký hiệu kết cuối gốc', allowFiltering: true},
+            {fieldName: 'DIACHI_KC_GOC', headerText: 'Địa chỉ kết cuối gốc', allowFiltering: true}
+            ]" v-bind:dataSource="ds_cap" :showFilter="true"
+          :allowPaging="false"></DataGrid>
+        </div>
+    </div>
+    <template v-if="tabPageIndex===0">
+        <div class="box-col box-form padt5 marb0" id="boxBottom">
+            <template v-if="showGridKCCNC">
+                <div class="legend-title">
+                    <div class="pull-left mart7">{{getSoKetCuoiChuaDauCap}}</div>
+                    <div class="pull-right">
+                        <button class="btn btn-main pad5 lh16" @click="showGridKCCNC=false">
+                            <span class="-ap icon-close"></span>
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content" style="height: calc(100% - 90px);">
+                    <DataGrid id="grid2" ref="grid2"
+                            v-bind:columns="
+                            [
+                                {fieldName: 'KYHIEU_D', headerText: 'Ký hiệu cáp gốc', width : 120 , allowFiltering: true}
+                            ]"
+                            :commands=
+                            "[
+                                {name: 'TAO_CAP', cssClass: 'btn btn-main one-taocap f15', title : 'Tạo cáp tới kết cuối'},
+                                {name: 'SUA_KETCUOI', cssClass: 'btn btn-main one-chuyencap f15' , title : 'Sửa thông tin kết cuối'},
+                                {name: 'LOAIBO_KETCUOI', cssClass: 'btn btn-main one-giaiphong f15', title : 'Loại kết cuối ra khỏi danh sách'},
+                                {name: 'XOA_KETCUOI', cssClass: 'btn btn-main one-trash f15', title : 'Xóa kết cuối'}
+                            ]"
+                            :commandColumn="{headerText: '', width: 200, firstColumn: false, show: true}"
+                        v-bind:dataSource="ds_ketcuoi_cnc" :showFilter="true"
+                        :contextMenuItems="contextMenuItems"
+                        @contextMenuClick='contextMenuClick'
+                        @commandClicked="grid2_onCommandClicked"
+                        :allowPaging="false">
+                    </DataGrid>
+                </div>
+                <div class="info-row mart10">
+                    <div class="value padl0">
+                        <button class="btn btn-main fullw" @click="ChonKCChuaNoiCap">
+                            <span class="one-search"></span> Tìm kết cuối chưa nối cáp
+                        </button>
+                    </div>
+                    <div class="value  w40">
+                        <button class="btn btn-main fullw" @click="Help">
+                            <span class="">?</span>
+                        </button>
+                    </div>
+                </div>
+            </template>
+            <template v-if="!showGridKCCNC">
+                <div class="info-row mart10">
+                    <div class="value padl0">
+                        <button class="btn btn-main fullw" @click="showGridKCCNC=true">
+                            {{getSoKetCuoiChuaDauCap}}
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+    <template v-else>
+        <div class="box-col box-form padt5 marb0" id="boxBottom">
+            <template v-if="showGridKCCTD">
+                <div class="legend-title">
+                    <div class="pull-left mart7">{{getSoKetCuoiChuaCoToaDo}}</div>
+                    <div class="pull-right">
+                        <button class="btn btn-main pad5 lh16" @click="showGridKCCTD=false">
+                            <span class="-ap icon-close"></span>
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="table-content" style="height: calc(100% - 90px);">
+                    <DataGrid id="grid3" ref="grid3"
+                    v-bind:columns="
+                    [
+                        {fieldName: 'KYHIEU', width : 120 , headerText: 'Ký hiệu cáp gốc', allowFiltering: true}
+                    ]"
+                    :commands=
+                            "[
+                                {name: 'SUA_KETCUOI', cssClass: 'btn btn-main -ap icon-more_horiz' , title : 'Sửa thông tin kết cuối'},
+                                {name: 'GHIM_KETCUOI', cssClass: 'btn btn-main -ap icon-chevron-thin-right' , title : 'Chọn và ghim lên bản đồ'},
+                            ]"
+                            :commandColumn="{headerText: '', width: 100, firstColumn: false, show: true}"
+                    v-bind:dataSource="getDSKetCuoiChuaCoToaDo" :showFilter="true"
+                    @commandClicked="grid3_onCommandClicked"
+                    :allowPaging="false">
+                    </DataGrid>
+                </div>
+            </template>
+            <template v-if="!showGridKCCTD">
+                <div class="info-row mart10">
+                    <div class="value padl0">
+                        <button class="btn btn-main fullw" @click="showGridKCCTD=true">
+                            {{getSoKetCuoiChuaCoToaDo}}
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+  </div>
+</div>

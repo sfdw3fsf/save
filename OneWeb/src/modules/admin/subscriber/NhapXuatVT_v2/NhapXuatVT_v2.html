@@ -1,0 +1,694 @@
+<div id="nhapxuatvt_v2">
+  <div id="nhapxuatvt_v2_content">
+    <div class="list-actions-top">
+      <ul class="list">
+        <li @click="btnTimKiem_Click">
+          <a> <span class="icon one-file-attach"></span>Lấy TT </a>
+        </li>
+        <li v-if="tsbtnNhapMoi.visible" @click="tsbtnNhapMoi_Click" :class="{'disabledInput': !tsbtnNhapMoi.enabled}">
+          <a> <span class="icon one-file-plus"></span>Nhập mới </a>
+        </li>
+        <li v-if="tsbtnGhiLai.visible" @click="tsbtnGhiLai_Click" :class="{'disabledInput': !tsbtnGhiLai.enabled}">
+          <a> <span class="icon one-save"></span>Ghi lại </a>
+        </li>
+        <li v-if="tsbtnUpPXK.visible" @click="tsbtnUpPXK_Click" :class="{'disabledInput': !tsbtnUpPXK.enabled}">
+          <a> <span class="icon one-save"></span>Cập nhật SL </a>
+        </li>
+        <li v-if="tsbtnXoa.visible" @click="tsbtnXoa_Click" :class="{'disabledInput': !tsbtnXoa.enabled}">
+          <a> <span class="icon one-trash"></span>Xóa </a>
+        </li>
+        <li v-if="tsbtnThemVT.visible" @click="tsbtnThemVT_Click" :class="{'disabledInput': !tsbtnThemVT.enabled}">
+          <a> <span class="icon nc-icon-glyph ui-1_circle-add"></span>Chọn VT </a>
+        </li>
+        <li v-if="tsbtnTraLai.visible" @click="tsbtnTraLai_Click">
+          <a> <span class="icon one-file-back"></span>Trả phiếu </a>
+        </li>
+        <li v-if="tsbtnHuyBo.visible" @click="tsbtnHuyBo_Click" :class="{'disabledInput': !tsbtnHuyBo.enabled}"> 
+          <a> <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Hủy </a>
+        </li>
+        <li v-if="tstbtnDonHang.visible" @click="tstbtnDonHang_Click" :class="{'disabledInput': !tstbtnDonHang.enabled}">
+          <a> <span class="icon nc-icon-glyph ui-1_circle-add"></span>Đơn hàng </a>
+        </li>
+        <li v-if="tsbtnGiaoPhieu.visible" @click="tsbtnGiaoPhieu_Click">
+          <a> <span class="icon  one-file-edit2"></span> Giao phiếu </a>
+        </li>
+        <li id="btn_serial" @click="contextMenuOnClicked('cmenu_serial')" ref="btn_serial">
+          <a href="#"> <span class="icon one-file-download"></span>Serial </a>
+          <ejs-contextmenu id="cmenu_serial" target="#btn_serial" :items="btnSerialMenus" :select="contextMenuSelected"></ejs-contextmenu>
+        </li>
+        <li @click="tsbtnDongBo_Click" v-if="tsbtnDongBo.visible" :class="{'disabledInput': !tsbtnDongBo.enabled}">
+          <a> <span class="icon  one-sync1"></span> Đồng bộ KT </a>
+        </li>
+        <li @click="tsbtnDongBoIMS_Click">
+          <a> <span class="icon  one-sync1"></span> Đồng bộ IMS </a>
+        </li>
+        <li @click="tsbtnDongBoQLTS_Click" v-if="tsbtnDongBoQLTS.visible" :class="{'disabledInput': !tsbtnDongBoQLTS.enabled}">
+          <a> <span class="icon  one-sync1"></span> Đồng bộ CCDC </a>
+        </li>
+        <li @click="tsbtnCopyCT_Click" v-if="tsbtnCopyCT.visible" :class="{'disabledInput': !tsbtnCopyCT.enabled}">
+          <a> <span class="dropdown-icon nc-icon-glyph files_single-copy-04"></span> CopyCT </a>
+        </li>
+      </ul>
+      <div id="btn_menu_more" class="more dropdown" @click="contextMenuOnClicked('cmenu_more')" ref="btn_menu_more">
+        <a href="javascript:void(0);"><span class="icon -ap icon-dots-three-vertical"></span></a>
+      </div>
+      <ejs-contextmenu id="cmenu_more" target="#btn_menu_more" :items="calculateMoreMenu" :select="contextMenuSelected" :beforeItemRender="onBeforeMoreItemRender" />
+      <b-form-file id="fileVTExcel" v-model="arrayImportFile.filexcel" ref="fileVTExcel" @change="VTExcelExcuted" accept=".xls, .xlsx" class="-ap icon-more_horiz hidden" plain></b-form-file>
+    </div>
+    <div id="nhapxuatvt_v2_main" class="page-content py-1">
+      <Split>
+        <SplitArea :size="50">
+          <div class="box-form">
+            <div class="legend-title mart8">Thông tin chứng từ</div>
+            <div class="row">
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Số phiếu
+                  </div>
+                  <div class="value">
+                    <input :disabled="!txtSoPhieu.enabled" type="text" class="form-control" v-model="txtSoPhieu.value" readonly />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w90">Ngày ký</div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <vue-date v-model="dtpNgayKy.value" format="DD/MM/YYYY" type="datetime" />
+                      <button class="btn right-action" @click="dtpNgayKy_ButtonClick('2')">
+                        <span class="-nc-icon-outline one-save"></span>
+                      </button>
+                      <button class="btn right-action" @click="dtpNgayKy_ButtonClick('ALL')">
+                        <span class="-nc-icon-outline one-save1"></span>
+                      </button>
+                      <div class="right-action">
+                        <input type="checkbox" v-model="ckbSendSMS.value" class="check" />
+                        <span class="checkbox-name">SMS</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại CT<span style="color: red;"> *</span></div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt ref="cboLoaiChungTu" :disabled="!cboLoaiChungTu.enabled" v-model="cboLoaiChungTu.value" :dataSource="cboLoaiChungTu.list" dataTextField="loaiCt" dataValueField="loaiCtId" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w90">Ngày YC<span style="color: red;"> *</span></div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <d-date-picker :disabled="dtpNgayDK.enabled" v-model="dtpNgayDK.value" value-type="DD/MM/YYYY HH:mm:ss" format="DD/MM/YYYY HH:mm:ss" type="date" />
+                      <button class="btn right-action" @click="dtpNgayDK_ButtonClick('Save')">
+                        <span class="-nc-icon-outline one-save"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w90">Kiểu phiếu <span style="color: red;">*</span></div>
+                  <div class="value">
+                    <SelectExt ref="cboKieuPhieu" :disabled="!cboKieuPhieu.enabled" v-model="cboKieuPhieu.value" :dataSource="cboKieuPhieu.list" dataTextField="mucDich" dataValueField="mucDichId" @select="cboKieuPhieu_EditValueChanged" />
+                  </div>
+                  <div class="value w30 nowrap">
+                    <button class="btn btn-second" @click="btnTiepNhanPhieu_Click"><span class="icon one-key normal"></span> Tiếp nhận CT</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w90">Mục đích <span style="color: red;">*</span></div>
+                  <div class="value">
+                    <SelectExt ref="cboMucDich" v-model="cboMucDich.value" :dataSource="cboMucDich.list" dataTextField="mucDich" dataValueField="mucDichId" @select="cboMucDich_EditValueChanged" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Phiếu đề nghị
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <input type="text" class="form-control" v-model="txtPhieuDeNghi.value" readonly />
+                      <button class="btn right-action" @click="txtPhieuDeNghi_ButtonClick('0')">
+                        <span class="-ap icon-add"></span>
+                      </button>
+                      <button class="btn right-action" @click="txtPhieuDeNghi_ButtonClick('-1')">
+                        <span class="-ap icon-close"></span>
+                      </button>
+                      <button class="btn right-action" @click="txtPhieuDeNghi_ButtonClick('1')">
+                        <span class="-ap icon-search"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-5 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Nghiệp vụ
+                  </div>
+                  <div class="value">
+                    <SelectExt ref="cboNghiepVu" v-model="cboNghiepVu.value" :dataSource="cboNghiepVu.list" dataTextField="mucDich" dataValueField="mucDichId" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-7 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Mã DA
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <input type="text" class="form-control" v-model="cboMa_PDA.value" @click="cboMa_PDA_DoubleClick" readonly />
+                      <button class="btn right-action" @click="cboMa_PDA_DoubleClick">
+                        <span class="-ap icon-chevron-down2"></span>
+                      </button>
+                      <button class="btn right-action" @click="cboMa_PDA_ButtonClick('1')">
+                        <span class="-ap icon-close"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="ckbTuKho.value" />
+                      <span class="name">Từ kho <span style="color: red;">*</span></span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <SelectExt ref="cboTuKho" :disabled="!cboTuKho.enabled" v-model="cboTuKho.value" :dataSource="cboTuKho.list" dataTextField="tenKho" dataValueField="khoId" />
+                      <button class="btn right-action" @click="cboTuKho_ButtonClick('BH')">
+                        <span class="-ap icon-more_horiz"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="ckbDenKho.value" />
+                      <span class="name">Đến kho <span style="color: red;">*</span></span>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt ref="cboDenKho" :disabled="!cboDenKho.enabled" v-model="cboDenKho.value" :dataSource="cboDenKho.list" dataTextField="tenKho" dataValueField="khoId" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Ngày xuất
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <d-date-picker v-model="dtpNgayGuiTT.value" value-type="DD/MM/YYYY HH:mm:ss" format="DD/MM/YYYY HH:mm:ss" type="date" />
+                      <button class="btn right-action" @click="dtpNgayGuiTT_ButtonClick('2')">
+                        <span class="-nc-icon-outline one-save"></span>
+                      </button>
+                      <button class="btn right-action" @click="dtpNgayGuiTT_ButtonClick('ALL')">
+                        <span class="-nc-icon-outline one-save1"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Ngày nhận
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <d-date-picker v-model="dtpNgayNhanTT.value" value-type="DD/MM/YYYY HH:mm:ss" format="DD/MM/YYYY HH:mm:ss" type="date" />
+                      <button class="btn right-action" @click="dtpNgayNhanTT_ButtonClick('2')">
+                        <span class="-nc-icon-outline one-save"></span>
+                      </button>
+                      <button class="btn right-action" @click="dtpNgayNhanTT_ButtonClick('ALL')">
+                        <span class="-nc-icon-outline one-save1"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Lệnh văn bản
+                  </div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="txtLenhVanBan.value" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Ngày văn bản
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <vue-date v-model="dtpNgayVanBan.value" format="DD/MM/YYYY HH:mm:ss" type="datetime" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Công trình
+                  </div>
+                  <div class="value">
+                    <ComboboxGrid ref="cboCongTrinh" v-bind:columns="cboCongTrinh.header" v-bind:dataSource="cboCongTrinh.list" v-model.trim="cboCongTrinh.value" textField="TEN_CT" valueField="CONGTRINH_ID" :gridStyle="{left: 100}" :allowPaging="true" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Ngày chuyển
+                  </div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <vue-date v-model="dtpNgayChuyenKT.value" format="DD/MM/YYYY HH:mm:ss" type="datetime" />
+                      <button class="btn right-action" @click="dtpNgayChuyenKT_ButtonClick('2')">
+                        <span class="-nc-icon-outline one-save"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    Nội dung
+                  </div>
+                  <div class="value">
+                    <textarea v-on:dblclick="openSaveNoiDung()" ref="txtNoiDung" cols="30" rows="2" class="form-control" style="resize: vertical;" v-model="txtNoiDung.value"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    <div class="input-more-button">
+                      <button class="btn" @click="chooseFile">
+                        <span class="-ap icon-more_horiz"></span>
+                        
+                        <b-form-file v-show="false" ref="ref-choose-file" multiple @change="onChangeFile" accept=".docx, .doc, .pdf|"></b-form-file>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="value">
+                    <div id="textarea" class="form-control" style="height: 60px;resize: vertical; overflow: scroll;">
+                      <div class="text-area-content mb-2" v-for="item in grcFileCV.list">
+                        <div class="row">
+                          <div class="col-sm-8 col-12">
+                            <b>{{item.nameFile}}</b>
+                          </div>
+                          <div class="col-sm-4 col-12" style="text-align: right;">
+                            <a @click.prevent="downloadFile(item)" class="btn btn-success btn-sm">
+                              <span class="-ap icon-download"></span>
+                            </a>
+                            <a @click.prevent="onClickDeleteFile(item)" class="btn btn-danger btn-sm">
+                              <span class="-ap icon-trash"></span>
+                            </a>
+                            <a @click.prevent="onClickViewFile(item)" class="btn btn-primary btn-sm">
+                              <span class="-ap icon-search"></span>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SplitArea>
+        <SplitArea :size="50">
+          <div class="box-form">
+            <div class="legend-title">
+              <span class="title pull-left mart7">
+                Danh sách các phiếu chứng từ
+              </span>
+              <div class="pull-right">
+                <button class="btn btn-second pad5" @click="vbtnRefresh_MouseClick">
+                  <span class="one-reload f16"></span>
+                </button>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="row" style="padding-bottom: 15px;">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">Ngày YC từ<span style="color: red;"> *</span></div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <vue-date :disabled="!dtpTuNgay.enabled" v-model="dtpTuNgay.value" format="DD/MM/YYYY" type="datetime" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w100">Đến ngày<span style="color: red;"> *</span></div>
+                  <div class="value">
+                    <div class="value-actions">
+                      <vue-date :disabled="!dtpDenNgay.enabled" v-model="dtpDenNgay.value" format="DD/MM/YYYY" type="datetime" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12 item">
+                <div class="check-action">
+                  <input type="checkbox" class="check" v-model="chkAll_Phieu.value" />
+                  <span class="name">Xem tất cả phiếu</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12 item">
+                <div class="check-action">
+                  <input type="checkbox" class="check" v-model="ckb_nd.value" />
+                  <span class="name">Lọc theo người dùng</span>
+                </div>
+              </div>
+            </div>
+            <!-- :editSettings="{ allowEditing: true , mode:'Batch'}" -->
+            <!-- :selectionSettings="{enableToggle: false, checkboxOnly: false, checkboxMode: 'ResetOnRowClick'}" -->
+            <!-- :totalRecords="gridChungTu.length" -->
+            <DDataGrid
+              ref="gridChungTu"
+              panelDataHeight="285px"
+              v-bind:columns="gridChungTu.header"
+              v-bind:dataSource="gridChungTu.list"
+              :enabledSelectFirstRow="false"
+              :showFilter="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="true"
+              :selectionSettings="{enableToggle: false, checkboxOnly: false, persistSelection: true, checkboxMode: 'ResetOnRowClick' }"
+              :allowPaging="true"
+              :allowExcelExport="true"
+              :pageSize="gridChungTu.maxSize"
+              :pageIndex="gridChungTu.page"
+              :contextMenuItems="gridChungTu.contextMenuItems"
+              @contextMenuClick="gridChungTuContextMenuClick"
+              @contextMenuOpen="gridChungTuContextMenuOpen"
+              @cellSaved="editGridChungTu"
+              @rowSelected="gridviewChungTu_FocusedRowChanged"
+              @actionBegin="gridChungTuActionBegin"
+              @actionComplete="gridChungTuActionComplete"
+            />
+            <!-- @selectedItemsChanged="gridChungTuSelectedItemsChanged" -->
+            <!-- @rowSelected="gridviewChungTu_FocusedRowChanged" -->
+            <!-- @dataBound="gridChungTuDataSourceChanged" -->
+            <!-- @selectedRowChanged="gridviewChungTu_FocusedRowChanged" -->
+          </div>
+        </SplitArea>
+      </Split>
+      <div class="box-form">
+        <div class="legend-title">
+          Danh sách vật tư
+        </div>
+        <div class="box-move-select-table">
+          <div class="box-col" :style="{width: ThongTinHDDA.visible ? `calc(75% - 50px)` : `100%`}">
+            <!-- @description: datnt1 -> ejs-grid bị bug gì đó, chọn tab xong mất scroll, ở đây gọi refreshColumns lại để lấy lại scroll-->
+            <div class="nav tabs tab-over">
+              <a href="#tab-vat-tu" data-toggle="tab" v-show="xTabTongHop.visible">DS Vật tư</a>
+              <a href="#tab-noi-dung" data-toggle="tab" class="active" @click="$refs.gridVatTu.grid.refreshColumns()">Nội dung</a>
+              <a href="#tab-ds-thiet-bi" data-toggle="tab" @click="$refs.gridThietBi.grid.refreshColumns()">Danh sách thiết bị</a>
+            </div>
+            <div class="tab-content">
+              <div class="tab-pane" v-show="xTabTongHop.visible" id="tab-vat-tu">
+                <DataGrid3 v-bind:columns="gridVTGroup.header" v-bind:dataSource="gridVTGroup.list" ref="gridViewVTGroup" :showColumnCheckbox="false" :showFilter="true" :editSettings="{ allowEditing: true , mode:'Batch'}" :allowPaging="true" :enablePagingServer="false"> </DataGrid3>
+              </div>
+              <div class="tab-pane active" id="tab-noi-dung">
+                <div class="top marb5">
+                  <div class="row">
+                    <div class="col-sm-8 col-12">
+                      <div class="group-buttons mart0">
+                        <button class="btn btn-second padt3 padb3" @click="btnXuatExcelVT_Click"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Xuất excel</button>
+                        <button class="btn btn-second padt3 padb3" @click="btnTaoTbi_Click" :enabled="btnTaoTbi.enabled"><span class="nc-icon-glyph ui-2_square-add-11 f16 normal inline vcenter lh14 marr5"></span>Tạo thiết bị</button>
+                        <button class="btn btn-second padt3 padb3" @click="btnSeri_ChiaSL_Click" :disabled="!btnSeri_ChiaSL.enabled"><span class="one-file-attach1 f20 normal inline vcenter lh14 marr5"></span> Lấy DS Seri</button>
+                        <button class="btn btn-second padt3 padb3" @click="btnChonTamUng_Click"><span class="one-file-attach1 f20 normal inline vcenter lh14 marr5"></span> Chọn thiết bị</button>
+                        <!-- <button class="btn btn-second padt3 padb3" @click="tsbtnChonCTCT_Click"><span class="one-file-check f20 normal inline vcenter lh14 marr5"></span> Chọn chi tiết</button> -->
+                        <button class="btn btn-second padt3 padb3" @click="btnNhapExDG_Click" v-if="layoutMauDG.visible"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Nhập phân bổ ĐG</button>
+                        <b-form-file v-show="false" ref="ref-exdg-file" @change="btnNhapExDG_OnChange" accept=".xls, .xlsx"></b-form-file>
+                        <button class="btn btn-second padt3 padb3" @click="btnMauDG_Click" v-if="layoutNhapExDG.visible"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Mẫu phân bổ ĐG</button>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                      <div class="info-row">
+                        <div class="value w30 nowrap tright">
+                          <button class="btn w32 btn-second pad4" @click="btnEditLKMK_Click">
+                            <span class="one-check lh20"></span>
+                          </button>
+                          <button class="btn btn-second padt3 padb3" @click="btnXoaHetVT_Click"><span class="nc-icon-glyph ui-1_simple-remove"></span> Xóa hết</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <DataGrid
+                  ref="gridVatTu"
+                  :columns="gridVatTu.header"
+                  :dataSource="gridVatTu.list"
+                  :selectionSettings="{ checkboxOnly: true }"
+                  :editSettings="{ allowEditing: true , mode:'Batch'}"
+                  :showColumnCheckbox="true"
+                  :enabledSelectFirstRow="false"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  :allowExcelExport="true"
+                  :pageSize="8"
+                  :pageIndex="gridChungTu.page"
+                  :totalRecords="gridVatTu.list.length"
+                  @selectedItemsChanged="gridVatTuSelectedItemsChanged"
+                  @selectedRowChanged="selected_gridVatTuRow"
+                  @cellSaved="gridViewVatTu_ValidateRow"
+                  @dataBound="gridVatTuDataBound"
+                  :aggregates="gridThietBiAggregates" 
+                />
+                
+              </div>
+              <div class="tab-pane" id="tab-ds-thiet-bi">
+                <div class="top marb5">
+                  <div class="row">
+                    <div class="col-sm-5 col-12">
+                      <div class="group-buttons mart0">
+                        <label style="display:none;" for="uploadExcelTbi" class="btn">
+                          <input ref="fileInputExcelTbi" type="file" id="uploadExcelTbi" style="display: none" @change="UploadExcelTbi" accept=".xls, .xlsx" @click="$refs.fileInputExcelTbi.value = null" />
+                        </label>
+                        <button class="btn btn-second padt3 padb3" @click="btnExcelTbi_Click"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Nhập từ excel</button>
+                        <button class="btn btn-second padt3 padb3" @click="txtExcelTbiMau_Click"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> File excel mẫu</button>
+                        <button class="btn btn-second padt3 padb3" @click="simpleButton2_Click"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Xuất excel</button>
+                        <button class="btn btn-second padt3 padb3" @click="btnXuatTonTbi_Click"><span class="one-xlsx-import f20 normal inline vcenter lh14 marr5"></span> Xuất excel Tbi Tồn kho</button>
+                      </div>
+                    </div>
+                    <div class="col-sm-5 col-12 row">
+                      <div class="col-sm-6">
+                        <div class="vattu_box">
+                          <div class="input-group">
+                            <div class="li input-text">
+                              <div class="select-custom">
+                                <input value="Lấy danh sách seri theo vật tư" :disabled="cboVatTu.enabled" class="form-control" @click="openFrmLaySerial" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="info-row col-sm-6">
+                        <div class="key w90">
+                          Serial
+                        </div>
+                        <div class="value">
+                          <input ref="txtQuetSerial" type="text" class="form-control" v-model="txtQuetSerial.value" @keyup.enter="txtQuetSerial_KeyPress" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                      <div class="info-row">
+                        <div class="value w30 nowrap tright">
+                          <button class="btn btn-second padt3 padb3" @click="btnDoiSoatVT_Click"><span class="one-file-check"></span> Đối soát</button>
+                          <button class="btn btn-second padt3 padb3" @click="simpleButton1_Click"><span class="nc-icon-glyph ui-1_simple-remove"></span> Xóa hết</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <DataGrid
+                  ref="gridThietBi"
+                  :columns="gridThietBi.header"
+                  :dataSource="gridThietBi.list"
+                  dataKeyField="THIETBI_ID"
+                  :showColumnCheckbox="false"
+                  :showFilter="true"
+                  :editSettings="{ allowEditing: true , mode:'Batch'}"
+                  @cellSaved="editGridThietBi"
+                  :allowPaging="true"
+                  :enablePagingServer="false"
+                  :enabledSelectFirstRow="false"
+                />
+                <!-- :selectionSettings="{ cellSelectionMode: 'Box', type: 'Multiple', mode: 'Cell' }" -->
+                <!-- :aggregates="gridThietBiAggregates"  -->
+              </div>
+            </div>
+          </div>
+          <div class="actions" v-if="ThongTinHDDA.visible">
+            <button class="btn" @click="btnGo_Click">
+              <span class="-ap icon-chevron-thin-right"></span>
+            </button>
+            <button class="btn" @click="btnGan_Click">
+              <span class="-ap icon-chevron-thin-left"></span>
+            </button>
+          </div>
+          <div class="box-col box-form" v-if="ThongTinHDDA.visible" :style="{width: ThongTinHDDA.visible ? `35%` : ``}">
+            <div class="title-bg-main">
+              <div class="pull-left title">
+                Thông tin hơp đồng dự án
+              </div>
+              <div class="pull-right">
+                <a href="#" class="btn btn-main pad3 lh14">
+                  <span class="nc-icon-outline arrows-1_refresh-69"></span>
+                </a>
+                <a href="#" class="btn btn-main pad3 lh14" @click="ThongTinHDDA.visible=!ThongTinHDDA.visible">
+                  <span class="-ap icon-close"></span>
+                </a>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">
+                Hợp đồng
+              </div>
+              <div class="value">
+                <ComboboxGrid ref="cboHopDong" v-bind:columns="cboHopDong.header" v-bind:dataSource="cboHopDong.list" v-model.trim="cboHopDong.value" textField="maHd" valueField="hdmsId" :gridStyle="{right: 0}"> </ComboboxGrid>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">
+                <div class="check-action">
+                  <input v-model="ckbDuAn.value" type="checkbox" class="check" />
+                  <span class="name">Dự án</span>
+                </div>
+              </div>
+              <div class="value">
+                <SelectExt ref="cbo_DuAn" v-model="cbo_DuAn.value" :dataSource="cbo_DuAn.list" dataTextField="MA_CT" dataValueField="DUAN_ID" />
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">
+                Ghi chú
+              </div>
+              <div class="value">
+                <textarea class="form-control" v-model="txtGhiChuHD.value" style="height: 200px;"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <InBienBan ref="popupInBB" :params="InBienBan.input"/>
+  <frmNhapCap ref="frmNhapCap"></frmNhapCap>
+  <ChonVatTuCTCT ref="frmChonVatTuCTCT" class=""></ChonVatTuCTCT>
+  <QLTS ref="frmQLTS"></QLTS>
+  <frmGiaoPhieu ref="frmGiaoPhieu" />
+  <frmGanSeri_Tbi ref="GanSeri_Tbi" />
+  <ejs-dialog
+    ref="ejsDialog"
+    :visible="false"
+    :isModal="true"
+    target="#nhapxuatvt_v2"
+    :enableResize="ejsDialog.config.enableResize"
+    :resizeHandles="['All']"
+    :header="ejsDialog.header"
+    showCloseIcon="true"
+    :width="ejsDialog.config.width"
+    :height="ejsDialog.config.height"
+    :minHeight="ejsDialog.config.minHeight"
+    :allowDragging="ejsDialog.config.allowDragging"
+    :position="ejsDialog.config.position"
+    :animationSettings="ejsDialog.config.animationSettings"
+    @beforeOpen="ejsDialogBeforeOpen"
+    @beforeClose="ejsDialogBeforeClose"
+  >
+    <div v-if="ejsDialog.name" :key="uuidv4()" style="overflow-y:scroll;">
+      <frmChungTu_TBao v-if="ejsDialog.name == 'frmChungTu_TBao'" ref="frmChungTu_TBao" v-bind="frmChungTu_TBao.input" />
+      <frmDonHangTT v-else-if="ejsDialog.name == 'frmDonHangTT'" ref="frmDonHangTT" v-bind="frmDonHangTT.input" @onBtnXacNhanClicked="frmDonHangtt_onBtnXacNhanClicked" />
+      <frmDSVatTu v-else-if="ejsDialog.name == 'frmDSVatTu'" ref="frmDSVatTu" v-bind="frmDSVatTu.input" @onBtnHoanThanhClicked="frmDSVatTu_onBtnHoanThanhClicked" />
+      <frmMa_PDA v-else-if="ejsDialog.name == 'frmMa_PDA'" ref="frmMa_PDA_view" v-bind="frmMa_PDA.input" @grcMa_PDA_onDuAnClicked="grcMa_PDA_onDuAnClicked" @onBtnXacNhanClickedListener="grcMa_PDA_onBtnXacNhanClickedListener" @gridBienBanIMS_OnChonBBBG="gridBienBanIMS_OnChonBBBG" @btnCapNhatVattu_ThuHoi_Click="btnCapNhatVattu_ThuHoi_Click"/>
+      <frmChonTBi_CT v-else-if="ejsDialog.name == 'frmChonTBi_CT'" ref="frmChonTBi_CT" v-bind="frmChonTBi_CT.input" @closed="frmChonTBi_CT_onBtnHoanCongClicked" />
+      <frmNhapDieuChinh v-else-if="ejsDialog.name == 'frmNhapDieuChinh'" ref="frmNhapDieuChinh" v-bind="frmNhapDieuChinh.input" @onBtnXacNhanClicked="frmNhapDieuChinh_onBtnXacNhanClicked" />
+      <frmExcelNghiepVu v-else-if="ejsDialog.name == 'frmExcelNghiepVu'" ref="frmExcelNghiepVu" @afterXacNhan="frmExcelNghiepVu_afterXacNhan" />
+      <frmGanSeri_v2 v-else-if="ejsDialog.name == 'frmGanSeri_v2'" ref="frmGanSeri_v2" v-bind="frmGanSeri_v2.input" @onBtnXacNhanClicked="frmGanSeri_v2_onBtnXacNhanClicked" />
+      <frmTaoSerial v-else-if="ejsDialog.name == 'frmTaoSerial'" ref="frmTaoSerial" v-bind="frmTaoSerial.input" />
+      <frmLaySerial v-else-if="ejsDialog.name == 'frmLaySerial'" ref="frmLaySerial" v-bind="frmLaySerial.input" @onBtnLaySerialClicked="frmLaySerial_onBtnLaySerialClicked" />
+      <frmGanSeri v-else-if="ejsDialog.name == 'frmGanSeri'" ref="frmGanSeri" v-bind="frmGanSeri.input" @onBtnGhiLaiClicked="frmGanSeri_onBtnGhiLaiClicked" />
+      <frmLoaiKhoMaKho v-else-if="ejsDialog.name == 'frmLoaiKhoMaKho'" ref="frmLoaiKhoMaKho" v-bind="frmLoaiKhoMaKho.input" @onBtnXacNhanOnClicked="frmLoaiKhoMaKho_onBtnXacNhanOnClicked" />
+      <frmSuaCT v-else-if="ejsDialog.name == 'frmSuaCT'" ref="frmSuaCT" v-bind="frmSuaCT.input" @onSaveForm="XacNhan_frmSuaCT" />
+      <frmNhapText v-else-if="ejsDialog.name == 'frmNhapText'" ref="frmNhapText" v-bind="frmNhapText.input" @onBtnHuyClicked="$refs.ejsDialog.hide()" @onBtnXacNhanClicked="frmNhapText_onBtnXacNhanClicked" />
+      <frmNhapText_v2 v-else-if="ejsDialog.name == 'frmNhapText_v2'" ref="frmNhapText_v2" v-bind="frmNhapText_v2.input" @onBtnHuyClicked="$refs.ejsDialog.hide()" @onBtnXacNhanClicked="frmNhapText_v2_onBtnXacNhanClicked"/>
+      <frmVatTuTrongKho v-else-if="ejsDialog.name == 'frmVatTuTrongKho'" ref="frmVatTuTrongKho" v-bind="frmVatTuTrongKho.input" @onBtnXacNhanClicked="frmVatTuTrongKho_onBtnXacNhanClicked" />
+      <frmVatTuTrongKhoV2 v-else-if="ejsDialog.name == 'frmVatTuTrongKhoV2'" ref="frmVatTuTrongKhoV2" v-bind="frmVatTuTrongKhoV2.input" @onBtnXacNhanClicked="frmVatTuTrongKhoV2_onBtnXacNhanClicked" />
+      <frmDoiSoat v-else-if="ejsDialog.name == 'frmDoiSoat'" ref="frmDoiSoat" v-bind="frmDoiSoat.input" />
+      <frmTraCuuTTDongBo v-else-if="ejsDialog.name == 'frmTraCuuTTDongBo'" ref="frmTraCuuTTDongBo" v-bind="frmTraCuuTTDongBo.input" />
+      <frmXemMauIn v-else-if="ejsDialog.name == 'frmXemMauIn'" ref="frmXemMauIn" v-bind="frmXemMauIn.input" />
+    </div>
+  </ejs-dialog>
+  <!-- <b-modal 
+        no-close-on-backdrop
+        hide-footer 
+        hide-header 
+        hide-header-close 
+        class="modal" 
+        id="popupTenNguoiNhan">
+        
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">Tên người nhận</div>
+                    <div class="close -ap icon-close"  @click="$bvModal.hide('popupTenNguoiNhan')" data-dismiss="modal">
+                    </div>
+                </div>
+                <div class="list-actions-top">
+                    <ul class="list">
+                        <li>
+                            <a  @click="onClickXacNhanInPhieu()">
+                                <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="popup-body">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Nhập tên người nhận
+                        </div>
+                        <div class="value">
+                            <textarea class="form-control" v-model="tenNguoiNhan" value="tenNguoiNhan" style="height: 100px;resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    </b-modal> -->
+</div>

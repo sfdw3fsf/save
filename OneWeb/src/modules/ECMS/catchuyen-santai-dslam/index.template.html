@@ -1,0 +1,246 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="/#/ecms/catchuyen-santai-dslam" @click="nhatMoi" :class="{'disabled': !isDisableBtnNhapMoi}" >
+          <span class="icon one-file-plus"></span> Nhập mới
+        </a>
+      </li>
+      <li>
+        <a href="/#/ecms/catchuyen-santai-dslam" @click="capNhatAction" :class="{'disabled': !isDisableBtnCapNhat}"  >
+          <span class="icon one-calendar-sync"></span> Cập nhật
+        </a>
+      </li>
+      <li>
+        <a href="/#/ecms/catchuyen-santai-dslam" @click="xoaCC" :class="{'disabled': !isDisableBtnXoa}" >
+          <span class="icon  one-trash"></span> Xóa
+        </a>
+      </li>
+      <li>
+        <a href="/#/ecms/catchuyen-santai-dslam" @click="hoanThienView" :class="{'disabled': !isDisableBtnHoanThien}" >
+          <span class="icon  ui-1_check-circle-08 nc-icon-glyph"></span> Hoàn thiện
+        </a>
+      </li>
+      <li>
+        <a href="/#/ecms/catchuyen-santai-dslam" :class="{'disabled': isDisableBtn}" @click="xuatExcel()" >
+            <span class="icon one-xlsx"></span>Xuất Visa
+        </a>
+      </li>
+    </ul>
+    <div class="more">
+      <a href="#">
+        <span class="nc-icon-glyph ui-2_menu-bold"></span>
+      </a>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="box-form">
+          <div class="legend-title">Thông tin DSLAM</div>
+          <div class="info-row">
+            <div class="key w90">Bras <span style="color: red">*</span></div>
+            <div class="value">
+              <bss-error-marker :has-error="$v.cboBras.$error">
+                <div class="select-custom" ref="cboBR">
+                    <SelectExt
+                        v-model.trim="$v.cboBras.$model"
+                        :settings="{dropdownParent: $refs['cboBR']}" 
+                        :dataSource="dsBras"
+                        dataTextField="TENBRAS"
+                        :disabled="!enableCBO"
+                        @change="layDsDslamWBras()"
+                        dataValueField="BRAS_ID"/>
+                </div>     
+            </bss-error-marker> 
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Dslam <span style="color: red">*</span></div>
+            <div class="value">
+              <bss-error-marker :has-error="$v.cboDslam.$error">
+                <div class="select-custom" ref="cboDlam">
+                    <SelectExt
+                        v-model.trim="$v.cboDslam.$model"
+                        :settings="{dropdownParent: $refs['cboDlam']}" 
+                        :dataSource="dsDlslamWBras"
+                        dataTextField="TENDSLAM"
+                        :disabled="!enableCBO"
+                        @change="layDsDslamVDC()"
+                        dataValueField="DSLAM_ID"/>
+                </div>     
+            </bss-error-marker> 
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="key w90">Dslam vdc <span style="color: red">*</span></div>
+            <div class="value">
+              <bss-error-marker :has-error="$v.cboDslamVDC.$error">
+                <div class="select-custom" ref="cboDVDC">
+                    <SelectExt
+                        v-model.trim="$v.cboDslamVDC.$model"
+                        :settings="{dropdownParent: $refs['cboDVDC']}" 
+                        :dataSource="dsDslamVDC"
+                        dataTextField="TENDSLAM"
+                        dataValueField="DSLAM_ID"/>
+                </div>     
+            </bss-error-marker> 
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="box-form">
+          <div class="legend-title">Thông tin cắt chuyển</div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w110">Kiểu cắt chuyển</div>
+                <div class="value">
+                  <div class="select-custom">
+                    <select name="" id="cboKieuCC" class="form-control" v-model="cboKieuCC" :class="{'form-control':ok, 'is-invalid':isError}" ref="cboKieu">
+                      <option value="0">Cắt chuyển sang một Bras khác</option>
+                      <option value="1">Cắt chuyển sang một Slot khác (Cùng Bras)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="check-action">
+                <div class="check-action">
+                  <input type="checkbox" class="check" v-model="chkDSHoanThien" @change="onChangeCbxHoanThien()">
+                  <span class="name">Danh sách cắt chuyển đã hoàn thiện</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w110">Bras mới <span style="color: red">*</span></div>
+                <div class="value">
+                  <bss-error-marker :has-error="$v.cboBrasNew.$error">
+                    <div class="select-custom" ref="cboBNew">
+                        <SelectExt
+                            v-model.trim="$v.cboBrasNew.$model"
+                            :settings="{dropdownParent: $refs['cboBNew']}" 
+                            @change="onChangBrasNew()"
+                            :dataSource="dsBras"
+                            dataTextField="TENBRAS"
+                            dataValueField="BRAS_ID"/>
+                    </div>     
+                </bss-error-marker> 
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w90">Slot Bras</div>
+                <div class="value">
+                  <bss-error-marker :has-error="$v.cboSlotBras.$error">
+                    <div class="select-custom" ref="cboSBras">
+                        <SelectExt
+                            v-model.trim="$v.cboSlotBras.$model"
+                            :settings="{dropdownParent: $refs['cboSBras']}" 
+                            @change="onChangeToPortBras()"
+                            :dataSource="dsSlot"
+                            dataTextField="SLOT"
+                            dataValueField="CARDBRAS_ID"/>
+                    </div>     
+                </bss-error-marker> 
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-7 col-12">
+              <div class="info-row">
+                <div class="key w110">Dslam vdc mới <span style="color: red">*</span></div>
+                <div class="value">
+                  <bss-error-marker :has-error="$v.cboDslamNew.$error">
+                    <div class="select-custom" ref="cboDNew">
+                        <SelectExt
+                            v-model.trim="$v.cboDslamNew.$model"
+                            :settings="{dropdownParent: $refs['cboDNew']}" 
+                            :dataSource="dsDslamNew"
+                            dataTextField="TENDSLAM"
+                            dataValueField="DSLAM_ID"/>
+                    </div>     
+                </bss-error-marker> 
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5 col-12">
+              <div class="info-row">
+                <div class="key w90">Port Bras</div>
+                <div class="value">
+                  <bss-error-marker :has-error="$v.cboPortBras.$error">
+                    <div class="select-custom" ref="cboPBras">
+                        <SelectExt
+                            v-model.trim="$v.cboPortBras.$model"
+                            :settings="{dropdownParent: $refs['cboPBras']}" 
+                            :dataSource="dsPort"
+                            dataTextField="VITRI"
+                            dataValueField="PORTBRAS_ID"/>
+                    </div>     
+                </bss-error-marker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách cắt chuyển, san tải</div>
+      <DataGrid ref="grid1"  v-bind:columns="[
+            {fieldName: 'DSLAM', headerText: 'Dslam', allowFiltering: true, allowSorting: true, width: 100},
+            {fieldName: 'DSLAM_VDC_CU', headerText: 'Dslam VDC cũ', allowFiltering: true},
+            {fieldName: 'DSLAM_VDC_MOI', headerText: 'Dslam VDC mới', allowFiltering: true},
+            {fieldName: 'BRAS_CU', headerText: 'Bras cũ', allowFiltering: true, width: 100},
+            {fieldName: 'BRAS_MOI', headerText: 'Bras mới', allowFiltering: true},
+            {fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true},
+            {fieldName: 'NGAY_CN', headerText: 'Ngày CN', allowFiltering: true},
+            ]"
+                v-bind:dataSource="dsCatChuyen"
+                :showFilter="true"
+                :allowPaging = true
+                :enablePagingServer = false
+                @selectedRowChanged="grid1_selectedRowChanged"></DataGrid>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách thuê bao</div>
+      <DataGrid ref="grid2" v-bind:columns="[
+            {fieldName: 'MA_TB', headerText: 'Số máy/ACC', allowFiltering: true, allowSorting: true, width: 150},
+            {fieldName: 'MA_LT', headerText: 'Mã LT', allowFiltering: true, width: 150},
+            {fieldName: 'DICHVU_VT', headerText: 'Dịch vụ', allowFiltering: true},
+            {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true},
+            {fieldName: 'SYSTEM', headerText: 'System', allowFiltering: true, width: 120},
+            {fieldName: 'RACK', headerText: 'Rack', allowFiltering: true, width: 120},
+            {fieldName: 'SHELF', headerText: 'Shelf', allowFiltering: true, width: 120},
+            {fieldName: 'SLOT', headerText: 'Slot', allowFiltering: true, width: 120},
+            {fieldName: 'PORT', headerText: 'Port', allowFiltering: true, width: 120},
+            {fieldName: 'VPI', headerText: 'Vpi', allowFiltering: true, width: 120},
+            {fieldName: 'VCI', headerText: 'Vci', allowFiltering: true, width: 120},
+            {fieldName: 'SELFID01', headerText: 'SelfID01', allowFiltering: true, width: 120},
+            {fieldName: 'SELFID02', headerText: 'SelfID02', allowFiltering: true, width: 120},
+            {fieldName: 'SELFID03', headerText: 'SelfID03', allowFiltering: true, width: 120},
+            {fieldName: 'SELFID04', headerText: 'SelfID04', allowFiltering: true, width: 120},
+            ]"
+                v-bind:dataSource="dsThueBao"
+                :allowPaging = true
+                :enablePagingServer = false
+                :showFilter="true">
+                </DataGrid>
+    </div>
+  </div>
+  <!-- Modal -->
+  <b-modal v-model="modalXoa" title="" size="sm" hide-footer>
+    <span>Bạn chắc chắn xóa thông tin cắt chuyển này?</span>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="modalXoa =! modalXoa">Hủy</button>
+      <button type="button" class="btn btn-primary" @click="xacNhanXoa">Đồng ý</button>
+    </div>
+  </b-modal>
+</div>

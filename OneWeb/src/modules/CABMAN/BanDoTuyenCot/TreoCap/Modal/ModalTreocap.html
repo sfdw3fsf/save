@@ -1,0 +1,207 @@
+<b-modal 
+    :id="modalId" 
+    size="xl" 
+    :dataCot="dataCot"
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    @shown="focusMyElement"
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span> Treo cáp
+            </div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+
+                    <div class="list-actions-top">
+                        <ul class="list">
+                            <li>
+                                <a  @click="capNhat()" >
+                                    <span class="icon one-save"></span> Ghi lại
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="popup-body">
+                        <div class="box-form">
+                            <div class="legend-title">
+                                Thông tin cột
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w60">Tên cột</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="tenCot" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Địa chỉ</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="diaChi" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w120">
+                                            <span class="name">Số cáp trên cột</span>
+                                        </div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" value="0" v-model="slCap" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="box-form">
+                            <div class="legend-title">
+                                Tìm kiếm cáp
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w140">Trung tâm viễn thông</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="treocap-ttvt">
+                                                <SelectExt v-model.trim="dataSelected.TTVT" 
+                                                :settings="{dropdownParent: $refs['treocap-ttvt']}"  
+                                                :dataSource="dsTTVT" dataTextField="TEN_DV"
+                                                dataValueField="DONVI_ID" @change="onChangeTTVT($event)"/>
+                                          </div>                                       
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="key w140">Tổ kỹ thuật</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="treocap-toql">
+                                                <SelectExt v-model.trim="dataSelected.ToQL" 
+                                                  :settings="{dropdownParent: $refs['treocap-toql']}"  
+                                                  :dataSource="dsToQL" dataTextField="TEN_DV"
+                                                  dataValueField="DONVI_ID" @change="onChangeToQL($event)"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <div class="info-row">
+                                        <div class="key w70">Tổng đài</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="treocap-tongdai">
+                                                <SelectExt v-model.trim="dataSelected.TongDai" 
+                                                  :settings="{dropdownParent: $refs['treocap-tongdai']}"  
+                                                  :dataSource="dsTongDai" dataTextField="TEN_DV"
+                                                  dataValueField="DONVI_ID" @change="onChangeTongDai($event)"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="key w70">Nhóm</div>
+                                        <div class="value">
+                                            <div class="select-custom" ref="treocap-nhom">
+                                                <SelectExt v-model.trim="dataSelected.NhomCap" 
+                                                  :settings="{dropdownParent: $refs['treocap-nhom']}"  
+                                                  :dataSource="dsNhomCap" dataTextField="loai_cap"
+                                                   dataValueField="loai_cap"
+                                                   @change="onChangeNhomCap($event)"/>
+                                            </div> 
+                                                <!-- <div class="select-custom">
+                                                    <ejs-combobox id='cboNhomCap'  v-model="dataSelected.NhomCap" :dataSource='dsNhomCap' :fields='fieldsCap' @change="onChangeNhomCap()"></ejs-combobox>
+                                                </div> -->
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                        <div class="box-move-select-table">
+                            <div class="box-col box-form">
+                                <div class="legend-title">Danh sách cáp đã treo</div>
+                                <div class="info-row">
+                                    <div class="key w140">Chọn cáp theo ký hiệu</div>
+                                    <div class="value">
+                                        <div  class="input-more-button -right">
+                                            <button class="btn">
+                                                <span class="one-search"></span>
+                                            </button>
+                                            <div  v-click-outside="closeEvent">
+                                             <input type="text" class="form-control highlight" placeholder="Nhập kí hiệu cáp cần tra cứu"
+                                             v-model.trim="txtQuery" v-on:keydown="timkiem($event)" list="exampleList"  v-on:mousedown="search_mousedown">
+                                             <div class="list-group highlight" v-show="showGoiNhac"  ref="goi_nhac_drop"
+                                            style="max-height: 150px;width:90%;overflow: scroll; position: absolute; z-index: 80;">
+                                             <b-list-group id="exampleList" class="item" v-for="(item,index) in dsCap" :key="index">
+                                             <b-list-group-item href="javascript:void(0)" @click="selectCap(item,index)" :class="{ 'active' : isSelected(index) }">
+                                                    {{item.TEN_CAP}}
+                                             </b-list-group-item>
+                                           </b-list-group> 
+                                        </div>
+                                    </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-content">
+                                    <DataGrid v-bind:columns="[
+                   
+                        {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                        {fieldName: 'TEN_CAP', headerText: 'Tên cáp', allowFiltering: true},                  
+                        ]"
+                            v-bind:dataSource="dsCapDaTreo" :showColumnCheckbox="true"
+                             dataKeyField="CAP_ID"
+                             @selectedItemsChanged="selectDaTreo_selectedItemsChanged" 
+                             :showFilter="true" 
+                             @selectedRowChanged="gridDaTreo_selectedRowChanged"></DataGrid>  
+                                </div>              
+                            </div>
+                            <div class="actions">
+                                <button class="btn" @click="goCap()">
+                                    <span class="-ap icon-chevron-thin-right"></span>
+                                </button>
+                                <button class="btn" @click="treoCap()">
+                                    <span class="-ap icon-chevron-thin-left"></span>
+                                </button>
+                            </div>
+                            <div class="box-col box-form">
+                                <div class="legend-title">Danh sách cáp chưa treo</div>
+                                <div class="info-row">
+                                    <div class="key w60">Cáp gốc</div>
+                                    <div class="value">
+                                        <div class="select-custom" ref="treocap-capgoc">
+                                            <SelectExt v-model.trim="dataSelected.CapGoc" 
+                                              :settings="{dropdownParent: $refs['treocap-capgoc']}"  
+                                              :dataSource="dsCapGoc" dataTextField="TEN_CAP"
+                                              dataValueField="CAP_ID" @change="onChangeCapGoc($event)"/>
+                                        </div>     
+                                    </div>
+                                </div>
+                                <div class="table-content">
+                                    <DataGrid v-bind:columns="[
+                                  
+                                    {fieldName: 'KYHIEU', headerText: 'Ký hiệu', allowFiltering: true},
+                                    {fieldName: 'TEN_CAP', headerText: 'Tên cáp', allowFiltering: true},                  
+                                    ]"
+                                        v-bind:dataSource="dsCapChuaTreo" :showColumnCheckbox="true"
+                                         dataKeyField="CAP_ID"
+                                          @selectedItemsChanged="selectChuaTreo_selectedItemsChanged" 
+                                         :showFilter="true"
+                                          @selectedRowChanged="gridChuaTreo_selectedRowChanged"></DataGrid> 
+                                    </div>   
+                            </div>
+                        </div>
+                        
+                    </div>
+           
+    </div>
+</b-modal>
+           

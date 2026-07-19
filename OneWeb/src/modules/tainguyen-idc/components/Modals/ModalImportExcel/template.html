@@ -1,0 +1,95 @@
+<b-modal
+  ref="popupImportExcel"
+  size="xl"
+  hide-header
+  hide-header-close
+  hide-footer
+  body-class="p-0"
+  centered
+  no-close-on-backdrop
+  @show="handleShowModal"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span></span> {{ title || 'Import dữ liệu' }}
+      </div>
+      <div
+        class="close -ap icon-close cursor-pointer"
+        data-dismiss="modal"
+        @click="hideModal"
+      ></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li @click="downloadTemplate">
+          <a href="javascript:void(0)">
+            <span class="icon one-upload"></span> Tải file mẫu
+          </a>
+        </li>
+        <li @click="saveData" :class="{ 'disabled': shouldDisableSaveButton }">
+          <a href="javascript:void(0)" :class="{ 'disabled-link': shouldDisableSaveButton }">
+            <span class="icon one-save"></span> Ghi lại
+          </a>
+        </li>
+        <li @click="checkData" :class="{ 'disabled': hasValidationErrors || !hasDataToImport }">
+          <a href="javascript:void(0)" :class="{ 'disabled-link': hasValidationErrors || !hasDataToImport }">
+            <span class="icon one-check"></span> Kiểm tra
+          </a>
+        </li>
+        <li @click="exportValidationErrorsFile" :class="{ 'disabled': !hasValidationErrors || !hasDataToImport}">
+          <a href="javascript:void(0)" :class="{ 'disabled-link': !hasValidationErrors || !hasDataToImport }">
+            <span class="icon one-download"></span> Xuất file lỗi
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="box-form">
+        <div class="info-row ps-3">
+          <div class="key">File đính kèm <span class="red">(*)</span></div>
+          <div class="value">
+            <a @click="importFromExcel" href="javascript:void(0)">
+              <span class="icon fa fa-cloud-upload" style="display: block; font-weight: 300; padding-top: 8px;">
+                <span class="text-chossen-file">{{ filePath || 'Chọn file Excel' }}</span>
+              </span>
+            </a>
+            <input 
+              type="file"
+              ref="fileInput"
+              @change="onFileChange"
+              class="hidden"
+              accept=".xls,.xlsx"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div class="box-form">
+        <div class="legend-title">
+          Dữ liệu import 
+          <span v-if="importData.length > 0">({{ importData.length }} dòng)</span>
+          <span v-else>(Chưa có dữ liệu)</span>
+        </div>
+        <div class="table-content">
+          <DataGrid
+            ref="importPreviewGrid"
+            :columns="finalGridColumns"
+            :dataSource="importData"
+            :showFilter="true"
+            :allowSorting="true"
+            :allowResizing="true"
+            :allowPaging="true"
+            :enablePagingServer="false"
+            :pageSize="10"
+            :width="'100%'"
+            :panelDataHeight="dynamicGridHeight"
+            :allowTextWrap="true"
+            :allowExcelExport="false"
+            @dataBound="handleImportGridBound"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</b-modal>

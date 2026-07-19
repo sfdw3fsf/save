@@ -1,0 +1,259 @@
+<b-modal :id="modalId" :size="ThamSoMD_DiaDanhMoi ? 'xl' : 'lg'" :data="data" :isStrictMode="isStrictMode"
+    no-close-on-backdrop hide-footer hide-header hide-header-close @shown="focusMyElement" @hidden="onModalHidden"
+    body-class="modal-body p-0">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">
+                <span class="icon one-notepad"></span> Chọn địa chỉ
+            </div>
+            <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide(modalId)">
+            </div>
+        </div>
+
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="info-row">
+                            <div class="key w100"></div>
+                            <div class="value" style="color:blue">{{diachi.daydiachi}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12" :class="ThamSoMD_DiaDanhMoi != 1 ? 'col-sm-6' : 'col-sm-5'">
+                        <div class="info-row">
+                            <div class="key w100">Tỉnh/TP</div>
+                            <div class="value">
+                                <select2 v-model="diachi.tinh_id" :options="dsTinh.map((e) => ({
+                                          id: e.TINH_ID,
+                                          text: e.TENTINH
+                                      }))" @change="onChangeTinh()"></select2>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100" :style="{ color: ThamSoMD_DiaDanhMoi == 1 ? '#b4b4b4' : '#000000' }">Quận/Huyện</div>
+                            <div class="value">
+                                <select2 v-model="diachi.quan_id"
+                                    :options="dsQuan.map(e => ({ id: e.QUAN_ID, text: e.TEN_QUAN }))"
+                                    :disabled="!isEnabledQuan" @change="onChangeQuan()"></select2>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="key w100">Phường/Xã</div>
+                            <div class="value">
+                                <select2 v-model="diachi.phuong_id"
+                                    :options="dsPhuong.map(e => ({ id: e.PHUONG_ID, text: e.TEN_PHUONG }))"
+                                    @change="onChangePhuong()"></select2>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="key w100">Số nhà</div>
+                            <div class="value">
+                                <input type="text" v-model.trim="diachi.so_nha" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" :class="ThamSoMD_DiaDanhMoi != 1 ? 'col-sm-6' : 'col-sm-5'">
+                        <div class="info-row">
+                            <div class="key w100">Đường/Phố</div>
+                            <div class="value padt7 w20">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="isPho">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <select2 v-model="diachi.pho_id"
+                                    :options="dsPho.map(e => ({ id: e.PHO_ID, text: e.TEN_PHO }))" :disabled="!isPho"
+                                    @change="onChangePho()"></select2>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">Ngõ/Ấp</div>
+                            <div class="value padt7 w20">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="isAp">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <select2 v-model="diachi.ap_id"
+                                    :options="dsAp.map(e => ({ id: e.PHO_ID, text: e.TEN_PHO }))" :disabled="!isAp"
+                                    @change="onChangeAp()"></select2>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">Khu</div>
+                            <div class="value padt7 w20">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="isKhu">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <select2 v-model="diachi.khu_id"
+                                    :options="dsKhu.map(e => ({ id: e.PHO_ID, text: e.TEN_PHO }))" :disabled="!isKhu"
+                                    @change="onChangeKhu()"></select2>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w100">Đặc điểm</div>
+                            <div class="value padt7 w20">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="isDacDiem"
+                                        :disabled="!isPho && (!dsDacDiem||dsDacDiem.length<=0)">
+                                    <span class="name"></span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <select2 v-model="diachi.dacdiem_id" class="custom-select2"
+                                    :options="dsDacDiem.map(e => ({ id: e.DACDIEM_ID, text: e.DACDIEM }))"
+                                    :disabled="!isDacDiem"></select2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12" v-if="ThamSoMD_DiaDanhMoi == 1" style="display: flex; flex-direction: column;">
+                        <div class="info-row" style="margin-top:8px">
+                            <label for="" style="color:blue;"> {{txtTenMoRong.pho}}</label>
+                        </div>
+                        <div class="info-row" style="margin-top:10px">
+                            <label for="" style="color:blue;"> {{txtTenMoRong.ap}}</label>
+                        </div>
+                        <div class="info-row" style="margin-top:13px">
+                            <label for="" style="color:blue;"> {{txtTenMoRong.khu}}</label>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="showThongTinLoaiNha">
+                    <div class="legend-title mart10">Thông tin loại nhà khách hàng</div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Nhóm loại nhà</div>
+                                <div class="value">
+                                    <select2 v-model="diachi.nhomln_id"
+                                        :options="dsNhomLN.map(e => ({ id: e.nhomln_id, text: e.nhom_ln }))"
+                                        @change="NhomLoaiNha_Changed()"></select2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Số tầng</div>
+                                <div class="value">
+                                    <input type="number" v-model.trim="diachi.sotang" class="form-control"
+                                        @change="getLoaiNha()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Diện tích</div>
+                                <div class="value">
+                                    <input type="number" v-model.trim="diachi.dientich" class="form-control"
+                                        @change="getLoaiNha()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Số phòng</div>
+                                <div class="value">
+                                    <input type="number" v-model.trim="diachi.sophong" class="form-control"
+                                        @change="getLoaiNha()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="info-row">
+                                <div class="key w100">Tên loại nhà</div>
+                                <div class="value">
+                                    <select2 v-model="diachi.loainha_id"
+                                        :options="dsLoaiNha.map(e => ({ id: e.loainha_id, text: e.ten_loainha }))"
+                                        :disabled="!diachi.sophong || !diachi.dientich || !diachi.sotang || !diachi.nhomln_id">
+                                    </select2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="isEnableThongTinThem">
+                    <div class="legend-title mart10">Thông tin thêm</div>
+                    <div class="row">
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Block(lô/tòa)</div>
+                                <div class="value">
+                                    <input type="text" v-model.trim="diachi.block" :disabled="!isEnableThongTinThem"
+                                        class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Tầng/lầu</div>
+                                <div class="value">
+                                    <input type="text" v-model.trim="diachi.tang" :disabled="!isEnableThongTinThem"
+                                        class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <div class="info-row">
+                                <div class="key w150">Số căn hộ/sạp/phòng</div>
+                                <div class="value">
+                                    <input type="text" v-model.trim="diachi.phong" :disabled="!isEnableThongTinThem"
+                                        class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-12">
+                            <div class="info-row">
+                                <div class="key w100">Mô tả thêm</div>
+                                <div class="value">
+                                    <input type="text" v-model.trim="diachi.mota" :disabled="!isEnableThongTinThem"
+                                        class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Địa chỉ</div>
+                            <div class="value">
+                                <textarea name="" v-model="thaydoiDiaChi" class="form-control"
+                                    style="height: 100px;resize: none;" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="group-buttons -bottom center">
+                <button class="btn btn-second nocorner" style="width: 120px;" v-b-modal.ModalChonToaDo>
+                    <span class="icon nc-icon-glyph location_map-pin"></span> Vị trí
+                </button>
+                <button class="btn btn-second nocorner" style="width: 120px;" @click="chapnhan()">
+                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Chấp nhận
+                </button>
+                <button class="btn btn-second nocorner" style="width: 120px;" @click="$bvModal.hide(modalId)">
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Thoát
+                </button>
+            </div>
+        </div>
+        <ModalChonToaDo idModalChonToaDo="ModalChonToaDo" @XacNhanToaDo="XacNhanToaDo" :position="getPosition"
+            :diachi="diachi.diachimoi"></ModalChonToaDo>
+
+    </div>
+</b-modal>

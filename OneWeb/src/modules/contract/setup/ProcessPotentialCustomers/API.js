@@ -1,0 +1,31 @@
+export default {
+    getDSDichVu: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_DICHVU_VT'),
+    getLoaiHinhTB: async (axios,id) =>axios.get('/web-thicong/danhmuc/lay_ds_loaihinh_thuebao_dichvu?dichVuVtId='+id),
+    getDoiTuong: async (axios, data) => axios.post('/web-hopdong/tachnhapthuebao/sp_lay_doituong_tb',data),
+    getQuocTich: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_QUOCTICH'),
+    getNganhNghe: async (axios,data) => axios.post('/web-hopdong/lapdatmoi/lay_ds_nganhnghe',data),
+    post_lay_ds_tieunganh: async (axios, data) => axios.post('/web-hopdong/lapdatmoi/lay_ds_tieunganh',data),
+    getLoaiGiayTo: async (axios) => axios.get('/web-quantri/danhmuc-chung/CSS_LOAI_GT'),
+    getDSKieuLD: async (axios,data) => axios.post('/web-hopdong/khoiphucthanhly/lay_ds_kieu_ld',data),
+    getTTTinh: async (axios) => axios.get('/web-cabman/bando_tuyencot/lay_thongtin_tinh'),
+    kiemtra_makh_matt_magd: async (axios, data) => axios.post('/web-hopdong/hopdong/kiemtra_makh_matt_magd',data),
+    fn_kiemtra_hd_chuahoanthien: async (axios, thuebao_id) => axios.post('/web-ccdv/tiepnhan_yc_ks_lapdat/fn_kiemtra_hd_chuahoanthien',{
+        thuebao_id:thuebao_id
+    }),
+    lay_ds_diachi_theo_hdkh: async (axios, hdkhid) => axios.get('/web-hopdong/hopdong/lay_ds_diachi_theo_hdkh?hdKhId='+hdkhid),
+    lay_ds_hopdong_theo_ma_gd: async (axios, data) => axios.post('/web-hopdong/hopdong/lay_ds_hopdong_theo_ma_gd',data),
+    lay_ds_diachi_theo_dbtbid: async (axios, data) => axios.post('/web-hopdong/khoiphucthanhly/lay_ds_diachi_theo_dbtbid',data),
+    lay_ds_diachi_theo_khachhang: async (axios,khachhangid) => axios.get('/web-hopdong/hopdong/lay_ds_diachi_theo_khachhang?khachHangId='+khachhangid),
+    lay_db_theo_matb: async (axios, data) => axios.post('/web-hopdong/lapdatmoi/lay_db_theo_matb',data),
+    lay_danhba_theo_matb: async (axios, data) => axios.post('/web-hopdong/hopdong/lay_danhba_theo_matb',data),
+    lay_ds_hdtb_tuvan_datmoi: async(axios, data) => axios.post('/web-hopdong/xuly_yc_kh_tiemnang/lay_ds_hdtb_tuvan_datmoi', data),
+    lay_hdkh_theo_hdkhid: async(axios, data) => axios.post('/web-hopdong/xuly_yc_kh_tiemnang/lay_hdkh_theo_hdkhid', data),
+    lay_ds_diachi_theo_hdtb_id: async(axios, data) => axios.post('/web-hopdong/khoiphucthanhly/lay_ds_diachi_theo_hdtb_id', data),
+    lay_ds_huonggiao: async (axios, data) => axios.post('/web-hopdong/khoiphucthanhly/lay_ds_huonggiao', data), 
+    fn_them_hd_xlyc_tuvan: async(axios, data) => axios.post('/web-hopdong/xuly_yc_kh_tiemnang/fn_them_hd_xlyc_tuvan', data),
+    sp_lay_ds_huonggiao_theo_quytrinh: async(axios, data) => axios.post('/web-ccdv/giao_cho_hths/sp_lay_ds_huonggiao_theo_quytrinh', data),
+    huy_yc_tuvan: async(axios, data) => axios.post('/web-hopdong/xuly_yc_kh_tiemnang/huy_yc_tuvan', data),
+    lay_ds_makh_theo_sogt: async(axios, data) => axios.post('/web-hopdong/lapdatmoi/lay_ds_makh_theo_sogt', data),
+    dk_theo_bang_HUONGGIAO: async (axios, data) => axios.get('/web-quantri/quyen/dk_theo_bang/HUONGGIAO/'+data),
+    
+}

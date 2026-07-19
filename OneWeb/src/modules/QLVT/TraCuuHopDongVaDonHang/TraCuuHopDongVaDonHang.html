@@ -1,0 +1,640 @@
+<div >
+   
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="tsbtnTimKiem_Click">
+                    <span class="icon  one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li v-if="visible.tsbtnDongY" :class="{'disabled': !enable.tsbtnDongY}">
+                <a @click="tsbtnDongY_Click">
+                    <span class="fa fa-check"></span> Chấp nhận
+                </a>
+                
+            </li>
+            <li>
+                <a @click="tsbtnHuyBo_Click">
+                    <span class="icon  nc-icon-glyph ui-1_circle-remove"></span> Hủy
+                </a>
+            </li>
+            <li v-if="visible.tsbtnGiaHan" :class="{'disabled': !enable.tsbtnGiaHan}">
+                <a @click="tsbtnGiaHan_Click">
+                    <span class="fa fa-calendar"></span> Gia hạn
+                </a>
+                
+            </li>           
+            <li>
+                <a @click="tsbtnExcelHopDong_Click">
+                    <span class="icon  one-excel"></span> Xuất excel hợp đồng</span>
+                </a>
+            </li>
+            <li>
+                <a @click="tsbtnExcelDonHang_Click">
+                    <span class="icon  one-excel"></span> Xuất excel đơn hàng</span>
+                </a>
+            </li>
+            <frmGiaHanHD ref="frmGiaHanHD"></frmGiaHanHD>
+            <li>
+                <a @click="tsbtnExcelVatTuHopDong_Click">
+                    <span class="icon  one-excel"></span> Xuất excel Vật tư HĐ</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div :class=" isPopup ? 'tracuu-hopdongvadonhang' : 'page-content tracuu-hopdongvadonhang' " >
+        <div class="box-form">
+            <div class="legend-title">
+                <span class="icon fa" :class="showTraCuuHD ? 'fa-angle-down' : 'fa-angle-up'" @click="showTraCuuHD = !showTraCuuHD"></span>
+                <div class="check-action">
+                    <input type="checkbox" class="check" v-model="params.p_ckb_tracuuhopdong" :disabled="readonly.ckbHDTimKiem">
+                    <span class="name">Thông tin tra cứu hợp đồng</span>
+                </div>
+            </div>
+            <div v-show="showTraCuuHD">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">Mã hợp đồng</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.p_ma_hd" :disabled="readonly.txtMaHD" v-on:keyup.enter="tim_theo_ma_hopdong">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_tungay_dk">
+                                    <span class="name">Ngày YC từ</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker 
+                                    class="form-control"
+                                    v-model="params.p_tungay_dk"
+                                    :format="'dd/MM/yyyy'"
+                                    :readonly="!params.p_ckb_tungay_dk">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_trangthai_hd">
+                                    <span class="name">Trạng thái HĐ</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_trangthai_hd"
+                                        :dataSource='DSTrangThaiHD' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'TTHD_ID', text: 'TRANGTHAI_HD'}" 
+                                        :readonly="!params.p_ckb_trangthai_hd"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_denngay_dk">
+                                    <span class="name">Đến ngày</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker 
+                                    class="form-control"
+                                    v-model="params.p_denngay_dk"
+                                    :format="'dd/MM/yyyy'"
+                                    :readonly="!params.p_ckb_denngay_dk">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_kieu_hd">
+                                    <span class="name">Kiểu HĐ</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_kieu_hd"
+                                        :dataSource='DSKieuHD' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'KIEUHD_ID', text: 'KIEU_HD'}" 
+                                        :readonly="!params.p_ckb_kieu_hd"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_giatri_hd" >
+                                    <span class="name">Giá trị HĐ còn lại &lt;=(%)</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <input :disabled="!params.p_ckb_giatri_hd || readonly.spGiaTriHD" type="number" class="form-control" v-model="params.p_giatri_hd" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_mucdich">
+                                    <span class="name">Mục đích</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_mucdich"
+                                        :dataSource='DSMucDichMuaSam' 
+                                        :allowFiltering='true' 
+                                        :itemTemplate='iTemplate'
+                                        :filtering='onFiltering'
+                                        :fields="{value:'MUCDICH_ID', text: 'MUCDICH'}" 
+                                        :readonly="!params.p_ckb_mucdich"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_ncl_lonhon">
+                                    <span class="name">Ngày còn lại &gt;=</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <input :disabled="!params.p_ckb_ncl_lonhon || readonly.spNgay_CL_LonHon" type="number" class="form-control" v-model="params.p_ngay_conlai_lonhon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_kho_nhathau">
+                                    <span class="name">Nhà thầu</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_kho_nhathau"
+                                        :dataSource='DSKhoNhaThau' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'KHO_ID', text: 'TEN_KHO'}" 
+                                        :readonly="!params.p_ckb_kho_nhathau"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_ncl_nhohon">
+                                    <span class="name">Ngày còn lại &lt;=</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <input :disabled="!params.p_ckb_ncl_nhohon || readonly.spNgay_CL_NhoHon" type="number" class="form-control" v-model="params.p_ngay_conlai_nhohon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_donvi_dk" :disabled="readonly.ckbDonVi">
+                                    <span class="name">Đơn vị</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_donvi_dk"
+                                        :dataSource='DSDonVi' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'dviId', text: 'tenDV'}" 
+                                        :readonly="!params.p_ckb_donvi_dk || !enable.cboDviDK"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="list-checks mart7">
+                            <div class="item">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_donhang">
+                                    <span class="name">Chưa có đơn hàng </span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_hd_ao">
+                                    <span class="name">Hợp đồng ảo </span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_hd_dat">
+                                    <span class="name">Đủ điều kiện lập đơn hàng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-title mart10">
+                <span class="icon fa" :class="showTraCuuDH ? 'fa-angle-down' : 'fa-angle-up'" @click="showTraCuuDH = !showTraCuuDH"></span>
+                <div class="check-action">
+                    <input type="checkbox" class="check" v-model="params.p_ckb_tracuudonhang" :disabled="readonly.ckbDH_TimKiem">
+                    <span class="name">Thông tin tra cứu đơn hàng</span>
+                </div>
+            </div>
+            <div v-show="showTraCuuDH">
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">Mã đơn hàng</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="params.p_ma_donhang" :disabled="readonly.txtDonHang" v-on:keyup.enter="tim_theo_ma_donhang">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_ngaynh_tu">
+                                    <span class="name">Ngày NH từ</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker 
+                                    class="form-control"
+                                    v-model="params.p_ngaynh_tu"
+                                    :format="'dd/MM/yyyy'"
+                                    :readonly="!params.p_ckb_ngaynh_tu">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_trangthai_dh">
+                                    <span class="name">Trạng thái ĐH</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_trangthai_dh"
+                                        :dataSource='DSTrangThaiDonHang' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'ttdhid', text: 'trangThaiDH'}" 
+                                        :readonly="!params.p_ckb_trangthai_dh"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_ngaynh_den">
+                                    <span class="name">Đến ngày</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker 
+                                    class="form-control"
+                                    v-model="params.p_ngaynh_den"
+                                    :format="'dd/MM/yyyy'"
+                                    :readonly="!params.p_ckb_ngaynh_den">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_hopdong" :disabled="readonly.ckbHopDong">
+                                    <span class="name">Hợp đồng</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">                                   
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_hopdong"
+                                        :dataSource='DSHopDongDK' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'HDMS_ID', text: 'MA_HD'}" 
+                                        :readonly="!params.p_ckb_hopdong"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_nghiemthu_tu">
+                                    <span class="name">Nghiệm thu từ</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">                                   
+                                    <ejs-datepicker 
+                                    class="form-control"
+                                    v-model="params.p_nghiemthu_tu"
+                                    :format="'dd/MM/yyyy'"
+                                    :readonly="!params.p_ckb_nghiemthu_tu">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_donhangcha">
+                                    <span class="name">Đơn hàng cha</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <select name="" id="" class="form-control">
+                                        <option value=""></option>
+                                    </select> -->
+                                    <ejs-dropdownlist
+                                        class="form-control" 
+                                        locale='vi-VN' 
+                                        v-model="params.p_donhangcha"
+                                        :dataSource='DSDonHangCha' 
+                                        :allowFiltering='true' 
+                                        :fields="{value:'DONHANG_ID', text: 'MA_DH_NEW'}" 
+                                        :readonly="!params.p_ckb_donhangcha"
+                                        >
+                                    </ejs-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key" style="width:170px;">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="params.p_ckb_nghiemthu_den">
+                                    <span class="name">Đến ngày</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <!-- <input type="text" class="form-control" v-model="params.p_ckb_tracuuhopdong">
+                                    <span class="icon one-calendar"></span> -->
+                                    <ejs-datepicker 
+                                    class="form-control"
+                                    v-model="params.p_nghiemthu_den"
+                                    :format="'dd/MM/yyyy'"
+                                    :readonly="!params.p_ckb_nghiemthu_den">
+                                    </ejs-datepicker>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="nav tabs tab-over">
+                <a href="#tabA" data-toggle="tab" class="active">Danh sách hợp đồng</a>
+                <a href="#tabB" data-toggle="tab">Danh sách vật tư của hợp đồng</a>
+                <a href="#tabE" data-toggle="tab">Thành viên tổ thầu</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tabA">
+                    <div class="table-content">                        
+                        <DataGrid
+                            ref="TableHopDong"
+                            v-bind:columns="[
+                            {fieldName: 'MA_HD', headerText: 'Mã HĐ', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'NHATHAU', headerText: 'Nhà thầu', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'MUCDICH', headerText: 'Mục đích', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'TRANGTHAI_HD', headerText: 'Trạng thái', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', textAlign: 'Right', type:'date', format:'dd/MM/yyyy HH:mm:ss', allowFiltering: true},
+                            {fieldName: 'KIEU_HD', headerText: 'Kiểu HĐ', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'NGAY_KY', headerText: 'Ngày ký', textAlign: 'Right',type:'date', format:'dd/MM/yyyy HH:mm:ss', allowFiltering: true},
+                            {fieldName: 'GHICHU', headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'NGAY_HH', headerText: 'Ngày hết hạn', textAlign: 'Right', type:'date', format:'dd/MM/yyyy HH:mm:ss', allowFiltering: true},
+                            {fieldName: 'CONLAI', headerText: 'Ngày còn lại', textAlign: 'Right', allowFiltering: true},
+                            {fieldName: 'DONVI', headerText: 'Đơn vị lập HĐ', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'TIEN_HD', headerText: 'GTHD ban đầu', textAlign: 'Right', format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'TIEN_CONLAI', headerText: 'GTHD còn lại', textAlign: 'Right', format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'TYLE', headerText: 'Tỷ lệ % GTHĐ còn lại', textAlign: 'Right', format: 'N1', type: 'number', allowFiltering: true},
+                            ]"
+                            v-bind:dataSource="GridDanhSachHD"
+                            :enabledSelectFirstRow="!isPopup"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :allowExcelExport="true"
+                            :totalRecords="GridDanhSachHD.length"
+                            :enablePagingServer='false'
+                            :pageSize="grvDanhSachHDPage.maxSize"
+                            :pageIndex="grvDanhSachHDPage.page"
+                            @selectedRowChanged="grvDanhSachHD_FocusedRowChanged"
+                            @pageChanged="grvDanhSachHDPageHandler"
+                          
+                            >
+                            //:enabledSelectFirstRow="!isPopup"
+                        </DataGrid>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tabB">                       
+                        <DataGrid
+                            v-bind:columns="[
+                            {fieldName: 'MA_VT', headerText: 'Mã vật tư', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'TEN_VT', headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'SL_KD', headerText: 'SL Khả dụng', textAlign: 'Right',format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'SOLUONG', headerText: 'SL Đặt', textAlign: 'Right', format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'DVI_TINH', headerText: 'ĐVT', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'DONGIA', headerText: 'Đơn giá', textAlign: 'Right', format: 'N3', type: 'number', allowFiltering: true},
+                            {fieldName: 'TIEN', headerText: 'Thành tiền', textAlign: 'Right', format: 'N3', type: 'number',allowFiltering: true},
+                            {fieldName: 'VAT', headerText: 'VAT', textAlign: 'Right', format: 'N3', type: 'number',allowFiltering: true},
+                            {fieldName: 'GHICHU', headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true},
+                            ]"
+                            v-bind:dataSource="GridDSVatTu_CTHD"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :allowExcelExport="true"
+                            :totalRecords="GridDSVatTu_CTHD.length"
+                            :enablePagingServer='false'
+                            :pageSize="GridDSVatTu_CTHDPage.maxSize"
+                            :pageIndex="GridDSVatTu_CTHDPage.page"
+                            @pageChanged="GridDSVatTu_CTHDPageHandler"
+                            ref="TableVatTuHD"
+                            >
+                        </DataGrid>
+                </div>
+                <div class="tab-pane" id="tabE">
+                    <DataGrid
+                        v-bind:columns="[
+                        {fieldName: 'maNv', headerText: 'Mã NV', textAlign: 'Left', allowFiltering: true, },
+                        {fieldName: 'tenNv', headerText: 'Tên NV', textAlign: 'Left', allowFiltering: true},
+                        {fieldName: 'vaiTro', headerText: 'Vai trò', textAlign: 'Left', allowFiltering: true},
+                        {fieldName: 'tenDv', headerText: 'Đơn vị', textAlign: 'Left', allowFiltering: true, isGroupedColumn: true, visible: 'false'},
+                        ]"
+                        v-bind:dataSource="grcToThau"
+                        ref="grvToThau"
+                        :showFilter="true"
+                        :enabledSelectFirstRow="false"
+                        :allowPaging="true"
+                        :enablePagingServer='false'
+                        >
+                    </DataGrid>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="nav tabs tab-over">
+                <a href="#tabC" data-toggle="tab" class="active">Danh sách đơn hàng</a>
+                <a href="#tabD" data-toggle="tab">Danh sách vật tư của đơn hàng</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tabC">
+                    <div class="table-content">                        
+                       
+                        <DataGrid
+                            v-bind:columns="[
+                            {fieldName: 'TRANGTHAI_DH', headerText: 'Trạng thái', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'MA_DH', headerText: 'Mã đơn hàng', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'NGAY_NH', headerText: 'Ngày nhận hàng', textAlign: 'Right',type:'date', format:'dd/MM/yyyy HH:mm:ss', allowFiltering: true},
+                            {fieldName: 'MA_HD', headerText: 'Mã hợp đồng', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'NGAY_NT', headerText: 'Ngày nghiệm thu', textAlign: 'Right',type:'date', format:'dd/MM/yyyy HH:mm:ss', allowFiltering: true},
+                            {fieldName: 'NHANVIEN_NT', headerText: 'Nhân viên NT', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'GHICHU', headerText: 'Ghi chú', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'TONGTIEN', headerText: 'Thành tiền', textAlign: 'Right', type: 'number',format:'N0', allowFiltering: true},
+                            ]"
+                            v-bind:dataSource="GridDanhSachDonHang"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :allowExcelExport="true"
+                            :totalRecords="GridDanhSachDonHang.length"
+                            :enablePagingServer='false'
+                            :pageSize="GridDanhSachDonHangPage.maxSize"
+                            :pageIndex="GridDanhSachDonHangPage.page"
+                            @rowSelected="grvDS_DonHang_FocusedRowChanged"
+                            @pageChanged="GridDanhSachDonHangPageHandler"
+                            ref="TableDonHang"
+                            >
+                        </DataGrid>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tabD">
+                    <div class="table-content">
+                        
+                        <DataGrid
+                            v-bind:columns="[
+                            {fieldName: 'TEN_VT', headerText: 'Tên vật tư', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'MA_VT', headerText: 'Mã VT', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'DVI_TINH', headerText: 'ĐVT', textAlign: 'Left', allowFiltering: true},
+                            {fieldName: 'SOLUONG', headerText: 'Số lượng', textAlign: 'Right',format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'SL_NT', headerText: 'SL NT', textAlign: 'Right',format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'SL_HONG', headerText: 'SL Hỏng', textAlign: 'Right',format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'SL_CHUAN', headerText: 'SL Đạt', textAlign: 'Right',format: 'N0', type: 'number', allowFiltering: true},
+                            {fieldName: 'DONGIA', headerText: 'Đơn giá', textAlign: 'Right',format: 'N3', type: 'number', allowFiltering: true},
+                            {fieldName: 'TIEN', headerText: 'Thành tiền', textAlign: 'Right',format: 'N3', type: 'number', allowFiltering: true},
+                            {fieldName: 'VAT', headerText: 'VAT', textAlign: 'Right',format: 'N3', type: 'number', allowFiltering: true},
+                            ]"
+                            v-bind:dataSource="GridDS_VT_DonHang"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :allowExcelExport="true"
+                            :totalRecords="GridDS_VT_DonHang.length"
+                            :enablePagingServer='false'
+                            :pageSize="GridDS_VT_DonHangPage.maxSize"
+                            :pageIndex="GridDS_VT_DonHangPage.page"
+                            @pageChanged="GridDS_VT_DonHangPageHandler"
+                            ref="TableVatTuDH"
+                            >
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

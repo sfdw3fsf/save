@@ -1,0 +1,236 @@
+<div>
+    <div class="list-actions-top" style="position: unset;">
+        <ul class="list" style="position: unset;">
+            <li @click="onClickNhapMoi" :class="{ disabled:!isEnabledNhapMoi }">
+                <a>
+                    <span class=" icon one-file-plus"></span>Nhập mới
+                </a>
+            </li>
+            <li @click="CapNhat" :class="{ disabled:!isEnabledGhiLai }">
+                <a>
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li @click="onClickHuyBo">
+                <a>
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Hủy
+                </a>
+            </li>
+            <li @click="onClickXoa" :class="{ disabled:!isEnabledXoa }">
+                <a>
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-col">
+            <div class="tabs nav tab-over">
+                <a href="#tab1" style="min-width: 195px;" :class="{active:!isTab}" @click="changeTab(0)"
+                    data-toggle="tab">Cập nhật chữ ký số </a>
+                <a href="#tab2" style="min-width: 195px;" :class="{active:isTab}" @click="changeTab(1)"
+                    data-toggle="tab">Thiết lập loại phiếu</a>
+            </div>
+            <div class="tab-content">
+                <div id="tab1" class="tab-pane active" v-if="!isTab">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Nhân viên</div>
+                                <div class="value">
+                                    <div class="input-more-button -left">
+                                        <button class="btn" @click="onChonNVXL">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </button>
+                                        <input type="text" v-model.trim="txtTenNV" class="form-control highlight"
+                                            value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Số điện thoại</div>
+                                <div class="value">
+                                    <div class="input-more-button -left">
+                                        <button class="btn">
+                                            <span class="-ap">84</span>
+                                        </button>
+                                        <input type="text" v-model.trim="txtSoDT" class="form-control highlight"
+                                            value="">
+                                    </div>
+                                </div>
+                                <div class="key w10"></div>
+                                <div class="key w90">Tài khoản KS</div>
+                                <div class="value">
+                                    <input type="text" v-model.trim="txtTaiKhoanKS" class="form-control highlight" value="">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Ảnh CKS</div>
+                                <div class="value" v-if="isLink">
+                                    <a @click="onClickXemAnh" class="link underline inline padt7 padb7">Xem ảnh</a>
+                                </div>
+                                <div class="value" v-if="!isLink">
+                                    <label for="upload" class="btn">
+                                        <span class="link underline inline">Chọn ảnh</span>
+                                        <input ref="fileInput" type="file" accept=".png, .jpeg" id="upload"
+                                            style="display: none" @change="changeFile"
+                                            @click="$refs.fileInput.value=null" />
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title mart10">Danh sách chữ ký số</div>
+                            <div class="table-content">
+                                <DataGrid
+                                    v-bind:columns="[
+                                    {fieldName: 'STT' , headerText: 'STT', textAlign: 'Left', allowFiltering: true,width:60},
+                                    {fieldName: 'THAOTAC', headerText: 'Ảnh', allowFiltering: false,width:70,commands:[{type:'Thêm',buttonOption:{type:'Xem ảnh', cssClass: 'btn btn-second button-not-bg lh14 pad4',iconCss: '-ap icon-info'}}],cssClass:'text-center'},
+                                    {fieldName: 'TEN_NV' , headerText: 'Tên nhân viên', textAlign: 'Left', allowFiltering: true,},
+                                    {fieldName: 'SODT_KS' , headerText: 'Số điện thoại', textAlign: 'Left', allowFiltering: true,},
+                                    ]"
+                                    v-bind:dataSource="dsChuKySo" :showFilter="true" :allowPaging="true"
+                                    :showColumnCheckbox='false' :enablePagingServer='false'
+                                    @selectedRowChanged="gridChuKySo_onSelectedRowChanged" @commandClick="onClickXemAnh"
+                                    :enabledSelectFirstRow="true">
+                                </DataGrid>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="legend-title mart10">Danh sách loại phiếu</div>
+                            <div class="table-content">
+                                <DataGrid
+                                    v-bind:columns="[
+                                    {fieldName: 'CHON', headerText: '', allowFiltering: false, allowSorting: false, width: 40, template: checkboxColumnTBTemplate , cssClass: 'text-center'},
+                                    {fieldName: 'STT' , headerText: 'STT', textAlign: 'Left', allowFiltering: true, width: 50,},
+                                    {fieldName: 'LOAIPHIEU_ID', headerText:'Loại phiếu ID', isPrimaryKey:true, width: 50},
+                                    {fieldName: 'LOAIPHIEU' , headerText: 'Loại phiếu', textAlign: 'Left', allowFiltering: true,isPrimaryKey:true},
+                                    ]"
+                                    
+                                    v-bind:dataSource="dsLoaiPhieu" :showFilter="true" :allowPaging="true"
+                                    dataKeyField="LOAIPHIEU_ID"
+                                    :enablePagingServer='false' ref="selectedLoaiPhieu">
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="tab2" class="tab-pane active" v-if="isTab">
+                    <div class="row">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">Loại phiếu</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <b-form-select v-model.trim="txtLoaiPhieu" :options="cboLoaiPhieu"
+                                            text-field="loaiPhieuVt" value-field="loaiPhieuId"
+                                            placeholder="Chọn loại phiếu">
+                                        </b-form-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Quy trình</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <b-form-select v-model.trim="txtQuyTrinh" :options="cboQuyTrinh"
+                                            text-field="quyTrinh" value-field="quyTrinhId" label="Chọn quy trình">
+                                        </b-form-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90">Hướng giao</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <b-form-select v-model.trim="txtHuongGiao" :options="cboHuongGiao"
+                                            text-field="HUONGGIAO" value-field="HUONGGIAO_ID"
+                                            placeholder="Chọn hướng giao">
+                                        </b-form-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w80">Báo cáo</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <b-form-select v-model.trim="txtBaoCao" :options="cboBaoCao" text-field="TEN_BC"
+                                            value-field="BAOCAO_ID" placeholder="Chọn báo cáo">
+                                        </b-form-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w80">Kiểu</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <b-form-select v-model.trim="txtKieu" :options="cboKieu" text-field="KIEU_TEN"
+                                            value-field="KIEU_ID" placeholder="Chọn kiểu">
+                                        </b-form-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w80">Từ khoá</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <ComboboxGrid
+                                            v-bind:columns="[{fieldName: 'TUKHOA_KS', headerText: 'Từ khóa KS', allowFiltering: true}]"
+                                            v-bind:dataSource="cboTuKhoa" textField="TUKHOA_KS" valueField="TUKHOA_ID"
+                                            ref="selectedDSTuKhoa" :showColumnCheckbox='true'
+                                            :enabledSelectFirstRow="false">
+                                        </ComboboxGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend-title mart10">Danh sách thiết lập loại phiếu báo cáo</div>
+                    <div class="table-content">
+                        <DataGrid v-bind:columns="[
+                    {fieldName: 'STT' , headerText: 'STT', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'HUONGGIAO' , headerText: 'Hướng giao', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'LOAIPHIEU_VT' , headerText: 'Loại phiếu', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'TUKHOA_KS' , headerText: 'Từ khóa KS', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'TEN_BC' , headerText: 'Báo cáo', textAlign: 'Left', allowFiltering: true,},
+                    {fieldName: 'KIEU_TEN' , headerText: 'Kiểu', textAlign: 'Left', allowFiltering: true,}]"
+                            v-bind:dataSource="dsLoaiPhieuBC" :showFilter="true" :allowPaging="true"
+                            @selectedRowChanged="gridLoaiPhieuBC_onSelectedRowChanged" :showColumnCheckbox='false'
+                            :enablePagingServer='false' :enabledSelectFirstRow="false">
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <b-modal id="PopUp" modal-class="PopUp" size="l" hide-footer hide-header-close body-class="modal-body p-0">
+        <div class="row">
+            <img :src="imageChuKySo" />
+        </div>
+        <div class="info-row">
+            <div class="box-col">
+                <div class="key w100">Chọn ảnh khác</div>
+                <div class="value">
+                    <div class="input-more-button -left">
+                        <input id="OpenImgUpload" type="file" accept=".png, .jpeg" class="form-control highlight"
+                            @change="changeFile">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </b-modal>
+
+    <PopupChonNhanVienXacNhan ref="dlgChonNhanVienXacNhan" @acceptChange="onChonNVXLProcess($event)" />
+
+</div>

@@ -1,0 +1,134 @@
+<b-modal 
+    :id="modalId" 
+    ref="ref-modal"
+    size="lg" 
+    no-close-on-backdrop
+    hide-footer 
+    hide-header 
+    hide-header-close 
+    body-class="modal-body p-0"
+    @shown="onModalShown"
+    @hidden="onModalHidden">
+    <div class="modal-content popup-box loai-dslam">
+        <div class="popup-header">
+            <div class="title"><span class="icon one-notepad"></span> Danh mục loại dslam</div>
+            <div
+                class="close -ap icon-close"
+                data-dismiss="modal"
+                @click="$refs['ref-modal'].hide()">
+            </div>
+        </div>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="onClickBtnNhapMoi" :class="{'disable-btn': !btnNhapMoiEnabled}">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-file-plus"></span>Nhập mới
+                    </a>
+                </li>
+                <li @click="onClickBtnGhiLai" :class="{'disable-btn': !btnGhiLaiEnabled}">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-save"></span>Ghi lại
+                    </a>
+                </li>
+                <li @click="onClickBtnHuy" :class="{'disable-btn': !btnHuyBoEnabled}">
+                    <a href="javascript:void(0)">
+                        <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                    </a>
+                </li>
+                <li @click="onClickBtnXoa" :class="{'disable-btn': !btnXoaEnabled}">
+                    <a href="javascript:void(0)">
+                        <span class="icon one-trash"></span>Xóa
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Thông tin loại Dslam</div>
+                <div class="info-row">
+                    <div class="key w90">Nhóm Dslam <bss-required-marker/></div>
+                    <div class="value" ref="ref-select-nhom-dslam">        
+                        <bss-error-marker :has-error="$v.nhomDslamId.$error">
+                            <SelectExt
+                                :settings="{dropdownParent: $refs['ref-select-nhom-dslam']}"
+                                v-model="$v.nhomDslamId.$model"
+                                :dataSource="dsNhomDslam" 
+                                dataValueField="NHOM_DSLAM_ID"
+                                dataTextField="NHOM_DSLAM" />
+                        </bss-error-marker>
+                    </div> 
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Loại Dslam <bss-required-marker/></div>
+                    <div class="value">
+                        <bss-error-marker :has-error="$v.loaiDslam.$error">
+                            <input type="text" maxlength="100" ref="ref-loai-dslam" class="form-control" v-model.trim="$v.loaiDslam.$model">
+                        </bss-error-marker>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Tham số <bss-required-marker/></div>
+                    <div class="value">
+                        <bss-error-marker :has-error="$v.thamSo.$error">
+                            <vue-numeric 	
+                                class="form-control" 
+                                v-model="thamSo" 
+                                :min="0" 
+                                maxlength="5" 
+                                :minus="false" 
+                                separator=","></vue-numeric>
+                        </bss-error-marker>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90">Ghi chú</div>
+                    <div class="value">
+                        <input type="text" maxlength="1000" class="form-control" v-model.trim="ghiChu">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w90"></div>
+                    <div class="value">
+                        <div class="list-checks-ver">
+                            <div class="item marb10">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkPortTd">
+                                    <span class="name">Tự động sinh port khi lắp thiết bị, lắp card</span>
+                                </div>
+                            </div>
+                            <div class="item ">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkBrasTs">
+                                    <span class="name">Lấy thông số, slot port từ Bras</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">Danh sách loại Dslam</div>
+                <DataGrid 
+                    ref="ref-grid"
+                    v-bind:columns="[            
+                        {fieldName: 'NHOM_DSLAM', headerText: 'Nhóm Dslam', allowFiltering: true},    
+                        {fieldName: 'LOAI_DSLAM', headerText: 'Loại Dslam', allowFiltering: true},
+                        {fieldName: 'THAMSO', headerText: 'Tham số', allowFiltering: true}, 
+                        {fieldName: 'LOAI_DSLAM_ID', isPrimaryKey: true, visible: false},
+                    ]"        
+                    v-bind:dataSource="dsLoaiDslam"
+                    :showFilter="true"
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    @selectedRowChanged="onClickRow"></DataGrid> 
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-xacnhan-xoa" centered title="Thông báo" size="sm" @ok="okXoa">        
+        <span>Bạn thật sự muốn xóa dữ liệu không ?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+   </b-modal>
+</b-modal>

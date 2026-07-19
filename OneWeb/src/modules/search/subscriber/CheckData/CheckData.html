@@ -1,0 +1,165 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header" />
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a @click="btnGetData_Click">
+          <span class="icon one-file-plus"></span> Lấy dữ liệu
+        </a>
+      </li>
+      <li v-if="button.btn_ImportExcel.Visible">
+        <a @click="btn_ImportExcel_Click">
+          <span class="icon one-xlsx-import"></span>Import Excel
+        </a>
+        <a style="display: none">
+          <label for="uploadFile">
+            <span class="icon one-upload"></span>Đọc file
+            <input ref="fileInput" type="file" id="uploadFile" v-on:change="importExcel" accept=".xls, .xlsx"
+              v-on:click="$refs.fileInput.value=null" />
+          </label>
+        </a>
+      </li>
+      <li v-if="button.btnCapNhat.Visible">
+        <a @click="btnCapNhat_Click">
+          <span class="icon one-save"></span>Cập nhật
+        </a>
+      </li>
+      <li v-if="button.btn_XuatExcel.Visible">
+        <a @click="btnExportExcel_Click" title="Xuất Excel">
+          <span class="icon one-xlsx-import"></span>Xuất Excel
+        </a>
+      </li>
+      <li v-if="button.btnChuyenTinh.Visible">
+        <a @click="btnChuyenTinh_Click">
+          <span class="icon one-file-arrow-right"></span>Chuyển tỉnh
+        </a>
+      </li>
+      <li v-if="button.btnChuyenChuQuan.Visible">
+        <a @click="btnChuyenChuQuan_Click">
+          <span class="icon one-file-arrow-right"></span>Chuyển chủ quản
+        </a>
+      </li>
+      <li v-if="button.btnXacNhanCQ.Visible">
+        <a @click="btnXacNhanCQ_Click()">
+          <span class="icon nc-icon-glyph ui-1_check-circle-08"></span> Xác nhận CQ
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="row">
+        <div v-if="Panel1.visible" :class="tag==2||tag==0? 'col-sm-12 col-12': 'col-sm-8 col-12'">
+          <div class="legend-title">Danh sách dữ liệu đối soát</div>
+          <div class="table-content">
+            <DataGrid :dataSource="ds_dulieu_thuebao_table" :columns="columns_ds_dulieu_tb" :showColumnCheckbox="false"
+              :allowPaging="true" :enablePagingServer="false" :enabled-select-first-row="false" :allowExcelExport="true"
+              :enabledSelectFirstRow="true" ref="doisoatGrid" @selectedRowChanged="gridSelected_DL"
+              @queryCellInfo="gridviewDanhSach_RowCellStyle" />
+          </div>
+        </div>
+        <div v-if="Panel2.visible" :class="Panel1.visible? 'col-sm-4 col-12': 'col-sm-12 col-12'">
+          <div class="legend-title">Danh sách dữ liệu chưa đồng bộ</div>
+          <div class="table-content">
+            <DataGrid :columns="columns_ds_dulieu_chuadongbo" :dataSource="ds_dulieu_chuadongbo"
+              :enable-paging-server="false" :allowPaging="true" :showColumnCheckbox="true" ref="chuadongbo"
+              @selectedItemsChanged="gridSelected_DLChuadongbo" :showFilter="true" :enabledSelectFirstRow="false">
+            </DataGrid>
+          </div>
+
+          <div class="legend-title">
+            <div class="pull-left"> Danh sách dữ liệu đã đồng bộ
+            </div>
+            <div class="pull-right" style="width:40%">
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w100">Trạng thái</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="trangthaixl_id"
+                        :settings="{dropdownParent: $refs['cboTrangthai']}" :dataSource="[
+                        {trangthaixl_id: 0,trangthaixl:'Tất cả'},
+                        {trangthaixl_id: 4,trangthaixl:'Đã xác nhận CQ'},
+                        {trangthaixl_id: 6,trangthaixl:'Không xác nhận CQ'},
+                        {trangthaixl_id: 7,trangthaixl:'Đã cập nhật thông số kỹ thuật'},
+                        {trangthaixl_id: 8,trangthaixl:'Đã cập nhật thông tin khách hàng'},
+                        {trangthaixl_id: 9,trangthaixl:'Đã hoàn thành tổng rà soát'},
+                        {trangthaixl_id: 10,trangthaixl:'Tỉnh khác đã xác nhận'},
+                        {trangthaixl_id: 11,trangthaixl:'Tỉnh khác chưa xác nhận'}
+                        ]"
+                        dataTextField="trangthaixl" dataValueField="trangthaixl_id"
+                        @change="onChangeTrangthai($event)" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div v-if="tag != 1" class="table-content">
+            <DataGrid :columns="columns_ds_dulieu_dadongbo" :dataSource="ds_dulieu_dadongbo" :commands="[
+              { name: 'save', cssClass: 'pad3 mar5 lh14 icon -ap one-edit btn-primary btn-search', iconCss: 'fa fa-times', width: 100 },
+              ]"
+              :commandColumn="{headerText: 'Thao tác', width: 90, cellCssClass: 'center', firstColumn: true, show: true}"
+              @commandClicked="gridCommand_Thaotac" :enable-paging-server="false" :allowPaging="true"
+              :enabledSelectFirstRow="true" @selectedRowChanged="gridSelected_DLDadongbo" :showFilter="true">
+            </DataGrid>
+          </div>
+          <div v-if="tag == 1" class="table-content">
+            <DataGrid :columns="columns_ds_dulieu_dadongbo" :dataSource="ds_dulieu_dadongbo"
+              :enable-paging-server="false" :allowPaging="true" :enabledSelectFirstRow="true"
+              @selectedRowChanged="gridSelected_DLDadongbo" :showFilter="true">
+            </DataGrid>
+          </div>
+        </div>
+        <div v-if="Panel1.visible" :class="Panel1.visible? 'col-sm-12 col-12': 'col-sm-12 col-12'">
+          <div class="legend-title">
+            <div class="pull-left">
+              Danh sách dữ liệu đã đồng bộ
+            </div>
+            <div class="pull-right" style="width:40%">
+              <div class="col-sm-12 col-12">
+                <div class="info-row">
+                  <div class="key w100">Trạng thái</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="trangthaixl_id"
+                        :settings="{dropdownParent: $refs['cboTrangthai1']}" :dataSource="listTrangthai"
+                        dataTextField="trangthaixl" dataValueField="trangthaixl_id"
+                        @change="onChangeTrangthai($event)" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div v-if="tag != 1" class="box-col">
+            <DataGrid :columns="columns_ds_dulieu_dadongbo" :dataSource="ds_dulieu_dadongbo" :commands="[
+              { name: 'save', cssClass: 'pad3 mar5 lh14 icon -ap one-edit btn-primary btn-search', iconCss: 'fa fa-times', width: 100 },
+              ]"
+              :commandColumn="{headerText: 'Thao tác', width: 90, cellCssClass: 'center', firstColumn: true, show: true}"
+              @commandClicked="gridCommand_Thaotac" :enable-paging-server="false" :allowPaging="true"
+              :enabledSelectFirstRow="true" @selectedRowChanged="gridSelected_DLDadongbo" :showFilter="true">
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    VNPT-IT &copy; 2021
+  </footer>
+  <!-- <script src="../vendor/jquery/split.js"></script>  -->
+  <!-- <popupLayDuLieu ref="lay_du_lieu"  @accept="acceptlayDuLieu" :data="dataLayDuLieu" :trangthai_id="trangthai_selectted" :loaitb_id="dataCheckeds_ds_loaihinh"/>   -->
+  <SearchAccountModal ref="searchAccountModal" @form-close="searchAccountDialogClose" />
+  <ChangeMegawanInforModal ref="popupChangeMegawanInfor" :ma_tb="ma_tb" :trangthai_dl="1" :dichvuvt_id="dichvuvt_id"
+    :row_id="row_id" @form-close="popupChangeMegawanInforClose" />
+  <FrmThayDoiTsKTRModal ref="popupFrmThayDoiTsKTR" :ma_tb="ma_tb" :row_id="row_id" :dichvuvt_id="dichvuvt_id"
+    @form-close="popupFrmThayDoiTsKTRClose" />
+  <ChangeCustomerInfoModal ref="popupChangeCustomerContract" :row_id="row_id" :dichvuvt_id="dichvuvt_id" :ma_tb="ma_tb"
+    @form-close="popupChangeCustomerContractClose" />
+
+</div>
+
+</div>

@@ -1,0 +1,2 @@
+import ProcessServiceByTeleStation from './ProcessServiceByTeleStation.vue'
+export default ProcessServiceByTeleStation

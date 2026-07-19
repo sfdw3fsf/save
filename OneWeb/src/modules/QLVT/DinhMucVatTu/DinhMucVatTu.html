@@ -1,0 +1,231 @@
+<div>
+    <!-- menu -->
+    <b-nav pills="" class="menu">
+        <!-- <b-nav-item @click="test"
+            ><span class="one-reset"></span> Lấy test</b-nav-item
+        > -->
+        <b-nav-item @click="tsbtnLayTT"><span class="one-reset"></span> Lấy TT</b-nav-item>
+        <b-nav-item :disabled="!enabled.tsbtnNew" @click="tsbtnNew"><span class="one-slid"></span> Nhập mới</b-nav-item>
+        <b-nav-item :disabled="!enabled.tsbtnSave" @click="tsbtnXacNhan"><span class="one-save"></span> Cập nhật
+        </b-nav-item>
+        <b-nav-item :disabled="!enabled.tsbtnCancel" @click="tsbtnCancel"><span class="one-cancel"></span> Hủy
+        </b-nav-item>
+        <b-nav-item :disabled="!enabled.tsbtnDel" @click="tsbtnDel"><span class="fa fa-times"></span> Xóa</b-nav-item>
+    </b-nav>
+
+    <!-- form -->
+    <b-container fluid="" class="p-3 page-content">
+        <b-row class="p-0">
+            <b-col cols="5" class="p-2 mr-2 box-form">
+                <div class="legend-title">
+                    Thông tin định mức
+                </div>
+                <b-form-group>
+                    <b-row>
+                        <b-col>
+                            <label for="" class="m-2">Dịch vụ</label>
+                            <ejs-dropdownlist class="form-control" locale="vi" v-model="gParams.cboDichVu"
+                                :dataSource="cboDichVu" :fields="{value:'DICHVUVT_ID', text: 'TEN_DVVT'}"
+                                :allowFiltering="true" @change="cboDichVuChanged">
+                            </ejs-dropdownlist>
+                        </b-col>
+                        <b-col><label for="cboLoaiHinh" class="m-2">Loại hình</label>
+                            <ejs-dropdownlist class="form-control" locale="vi" v-model="gParams.cboLoaiHinh"
+                                :dataSource="cboLoaiHinh" :fields="{value:'LOAITB_ID', text: 'LOAIHINH_TB'}"
+                                :allowFiltering="true" @change="cboLoaiHinhChanged">
+                            </ejs-dropdownlist>
+                        </b-col>
+                    </b-row>
+                </b-form-group>
+                <b-form-group label="Ngày nhập" label-for="dtpNgayNhap" label-cols="3">
+                    <ejs-datepicker :placeholder="'Ngày giao'" v-model="gParams.dtpDenNgay" format="dd/MM/yyyy"
+                        :allowEdit="false" :width="'100%'" class="redcolor" :readonly="enabled.dtpDenNgay">
+                    </ejs-datepicker>
+                </b-form-group>
+                <b-form-group label-for="txtTenDinhMuc" label-cols="3">
+                    <template v-slot:label>
+                        Tên định mức <span class="text-danger">*</span>
+                    </template>
+                    <b-form-input ref="refTxtTenDinhMuc" id="txtTenDinhMuc" v-model="gParams.txtTenDinhMuc">
+                    </b-form-input>
+                </b-form-group>
+                <b-form-group label="Ghi chú" label-for="txtGhiChu" label-cols="3">
+                    <b-form-textarea id="txtGhiChu" v-model="gParams.txtGhiChu"></b-form-textarea>
+                </b-form-group>
+            </b-col>
+            <b-col class="p-2 box-form" style="overflow: hidden">
+                <div class="legend-title">
+                    Danh sách định mức
+                </div>
+                <DataGrid ref="gridDinhMuc" :columns="[
+					{
+					fieldName: 'TEN_DM',
+					headerText: 'Tên định mức',
+					allowFiltering: true,
+					allowSorting: true,
+                    width: 130
+					},{
+					fieldName: 'NGAYLAP',
+					headerText: 'Ngày lập',
+					allowFiltering: true,
+					allowSorting: true,
+                    width: 130
+					},{
+					fieldName: 'NGUOI_CN',
+					headerText: 'Người CN',
+					allowFiltering: true,
+					allowSorting: true,
+                    width: 130
+					},{
+					fieldName: 'GHICHU',
+					headerText: 'Ghi chú',
+					allowFiltering: true,
+					allowSorting: true,
+                    width: 130
+					},
+					]" class="p-0" :enable-paging-server="false" :allowPaging="true" :data-source="dtDinhMuc" :show-filter="true"
+                    @selectedRowChanged="onDtDinhMucRowChanged" :enabledSelectFirstRow="true">
+                </DataGrid>
+            </b-col>
+        </b-row>
+        <b-row class="p-0">
+            <b-col class="p-0">
+                <div class="nav tabs tab-over">
+                    <a href="#tabPhieuChuaGiao" data-toggle="tab" class="active">Vật tư</a>
+                    <a href="#tabPhieuHenTra" data-toggle="tab">Đơn vị</a>
+                </div>
+                <div class="box-form tab-content">
+                    <div class="tab-content tab-pane active" id="tabPhieuChuaGiao">
+                        <b-row class="p-0">
+                            <b-col class="p-2" style="overflow: hidden">
+                                <div class="legend-title">
+                                    Danh sách được gán
+                                </div>
+                                <data-grid ref="gridVatTu" :columns="[
+									{ fieldName: 'TEN_VT',headerText: 'Tên vật tư',	allowFiltering: true, allowSorting: true, width: 200},
+                                    { fieldName: 'DVI_TINH', headerText: 'Đơn vị tính',	allowFiltering: true, allowSorting: true,  width: 130, textAlign:'center',},
+                                    { fieldName: 'DINHMUC',	headerText: 'Định mức',	allowFiltering: true, allowSorting: true, width: 130, textAlign:'center', allowEditing: true ,type:'number'},
+                                    {fieldName: 'ID', headerText:'', visible:false, isPrimaryKey:true} 
+									]" class="p-0" :enable-paging-server="false" :allowPaging="true" :enabledSelectFirstRow="false"
+                                    :data-source="dtVatTu" :show-filter="true" :show-column-checkbox="true"
+                                    @selectedItemsChanged="onDtVatTuItemsChanged"
+                                    @selectedRowChanged="onDtVatTuRowChanged"
+                                    dataKeyField="ID"
+                                    :editSettings='editSettings'
+                                    @cellSaved='grvVatTu_IsCheck_CellValueChanged'>
+                                </data-grid>
+                            </b-col>
+                            <b-col cols="0" class="p-2" style="width:45px">
+                                <div style="height: 100px"></div>
+                                <b-button variant="outline-primary" @click="btnVatTu_Left"><span
+                                        class="fa fa-arrow-left"></span></b-button>
+                                <div style="height: 10px"></div>
+                                <b-button variant="outline-primary" @click="btnVatTu_Right"><span
+                                        class="fa fa-arrow-right"></span></b-button>
+                            </b-col>
+                            <b-col class="p-2">
+                                <div class="legend-title">
+                                    Danh sách chưa được gán
+                                </div>
+                                <!-- <ejs-treegrid ref="tvVatTu_Right" :dataSource="getTreeVTs" :allowPaging="true"
+                                    :allowSorting="true" :allowFiltering="true" :allowResize="true"
+                                    :filterSettings="filterOptions" :selectionSettings="selectionSettings"
+                                    childMapping="children" :treeColumnIndex="0" :autoCheckHierarchy="false"
+                                    :rowSelected="onRowSelectingTreeGrid" locale="vi-VN" :dataBound="dataBound"
+                                    :pageSettings="pageSettings" :allowScrolling="true" :editSettings='editSettings'>
+                                    <e-columns>
+                                        <e-column type="checkbox" width="70" field="STT"></e-column>
+                                        <e-column field="TEN_VT" header-text="Tên vật tư" :allowEditing="false"
+                                            headerTextAlign="Center" textAlign="Left"></e-column>
+                                        <e-column field="DVI_TINH" header-text="Đơn vị tính" :allowEditing="false"
+                                            headerTextAlign="Center" textAlign="Center" width="200"></e-column>
+                                        <e-column field="DINHMUC" header-text="Định mức" :allowEditing="true"
+                                            headerTextAlign="Center" textAlign="Center" width="130"></e-column>
+
+                                    </e-columns>
+                                </ejs-treegrid> -->
+
+                                <DataGrid v-bind:columns="[
+                                        {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, width:'400px'},
+                                        {fieldName: 'DVI_TINH', headerText: 'Đơn vị tính', allowFiltering: true},
+                                        {fieldName: 'DINHMUC', headerText: 'Định mức', allowFiltering: true, width:'100px',},
+                                        
+                                    ]" v-bind:dataSource="tvVatTu_Right" ref="tvVatTu_Right" :showFilter="true"                                    
+                                    @selectedItemsChanged="gridDSChuaGan_selectedRowChanged" :showColumnCheckbox="true"
+                                    @pageChanged="pageChanged_DSChuaGan" :defaultColumnCheckboxChecked="false"
+                                    :enablePagingServer="true" :allowPaging="true"
+                                    :totalRecords="value_GrvRight_Vattu.totalRow"
+                                    >
+                                </DataGrid>
+                            </b-col>
+                        </b-row>
+                    </div>
+                    <div class="tab-content tab-pane " id="tabPhieuHenTra">
+                        <b-row class="p-0">
+                            <b-col class="p-2" style="overflow: hidden">
+                                <div class="legend-title">
+                                    Tên đơn vị đã gán
+                                </div>
+                                <data-grid ref="gridDonVi" :columns="[
+									{
+									fieldName: 'MA_DV',
+									headerText: 'Mã ĐV',
+									allowFiltering: true,
+									allowSorting: true,
+                                    width: 130,
+                                    textAlign: 'center',
+									},{
+									fieldName: 'TEN_DV',
+									headerText: 'Tên đơn vị',
+									allowFiltering: true,
+									allowSorting: true,
+                                    width: 130,
+                                    textAlign: 'center',
+									},
+									]" class="p-0" :enable-paging-server="false" :allowPaging="true" :enabledSelectFirstRow="false"
+                                    :data-source="dtDonVi" :show-filter="true" :show-column-checkbox="true"
+                                    @selectedItemsChanged="onDtDonViItemsChanged"
+                                    @selectedRowChanged="onDtDonViRowChanged">
+                                </data-grid>
+                            </b-col>
+                            <b-col cols="0" class="p-2" style="width:45px">
+                                <div style="height: 100px"></div>
+                                <b-button variant="outline-primary" @click="btnDonVi_Left"><span
+                                        class="fa fa-arrow-left"></span></b-button>
+                                <div style="height: 10px"></div>
+                                <b-button variant="outline-primary" @click="btnDonVi_Right"><span
+                                        class="fa fa-arrow-right"></span></b-button>
+                            </b-col>
+                            <b-col class="p-2" style="overflow: hidden">
+                                <div class="legend-title">
+                                    Tên đơn vị chưa gán
+                                </div>
+
+
+                                <ejs-treegrid ref="tvDonvi_Right" :dataSource="getTreeDVs" :allowPaging="true"
+                                    :allowSorting="true" :allowFiltering="true" :allowResize="true"
+                                    :selectionSettings="selectionSettings"
+                                    :allowResizing='true' :filterSettings="filterOptions" childMapping="children"
+                                    :treeColumnIndex="0" :autoCheckHierarchy="false"
+                                    :rowSelected="onRowSelectingTreeGrid" locale="vi-VN" :dataBound="dataBoundDV"
+                                    :pageSettings="pageSettings" :allowScrolling="true"                                    
+                                    >
+                                    <e-columns>
+                                        <e-column type="checkbox" width="130" field="STT"></e-column>
+                                        <e-column field="TEN_DV" header-text="Tên đơn vị" :allowEditing="false"
+                                            headerTextAlign="Center" textAlign="Left"></e-column>
+                                        <e-column field="DVI_TINH" header-text="Đơn vị tính" :allowEditing="false"
+                                            headerTextAlign="Center" textAlign="Center" width="200"></e-column>
+                                        <e-column field="DINHMUC" header-text="Định mức" 
+                                            headerTextAlign="Center" textAlign="Center" width="130" :allowEditing='true' editType='numericedit'></e-column>
+
+                                    </e-columns>
+                                </ejs-treegrid>
+                            </b-col>
+                        </b-row>
+                    </div>
+                </div>
+            </b-col>
+        </b-row>
+    </b-container>
+</div>

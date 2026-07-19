@@ -1,0 +1,189 @@
+<div>
+  <breadcrumb v-if="!isPopup || isPopup == false" :header="header" />
+
+  <div class="list-actions-top">
+    <ul class="list">
+        <li>
+            <a href="#" @click.prevent="btnLayTTMoi_Click">
+                <span class="icon one-file-attach1"></span>Lấy TT
+            </a>
+        </li>
+        <li v-if="controls.tsbtnGiaoPhoiHop.visible">
+            <a href="#" @click.prevent="tsbtnGiaoPhieu_Click" :class="{'disabled':(!controls.tsbtnGiaoPhoiHop.enabled)}">
+                <span class="icon one-upload"></span>Giao Đ/V 
+            </a>
+        </li>
+        <li v-if="controls.tsbtnHuyGiao.visible">
+            <a href="#" @click.prevent="tsbtnHuyGiao_Click" :class="{'disabled':(!controls.tsbtnHuyGiao.enabled)}">
+                <span class="icon one-sync1"></span>Hủy giao
+            </a>
+        </li>
+        <li v-if="controls.tsbtnNghiemThu.visible">
+            <a href="#" @click.prevent="tsbtnNghiemThu_Click" :class="{'disabled':(!controls.tsbtnNghiemThu.enabled)}">
+                <span class="icon one-file-check"></span>Nghiệm thu
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="box-form"> 
+        <div class="row">
+            <div class="col-sm-6 col-12"> 
+                <div class="legend-title">Thông tin giao phiếu</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12"> 
+                        <div class="info-row">
+                            <div class="key w90">Dịch vụ</div>
+                            <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="controls.cboDichVuVT.list" v-model="controls.cboDichVuVT.value"> 
+                                </select2>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="info-row"> 
+                            <div class="key w90">Số máy/Acc</div>
+                            <div class="value">
+                            <div class="select-custom">
+                                <input type="text" ref="txtMaTB" class="form-control highlight" v-model="txtMaTB" >
+                            </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Tên thuê bao</div>
+                            <div class="value">
+                                <input type="text" ref="txtTenTB" class="form-control" v-model="txtTenTB" >
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Địa chỉ LĐ</div>
+                            <div class="value">
+                                <input type="text" ref="txtDiaChiLD" class="form-control" v-model="txtDiaChiLD" >
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Hướng giao</div>
+                            <div class="value">
+                            <div :class="controls.cboHuongGiao.list.length > 0 ? 'select-custom':'disabled'" >
+                                <select2 :options="controls.cboHuongGiao.list" v-model="controls.cboHuongGiao.value" @change="cboHuongGiao_SelectedValueChanged"></select2>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12"> 
+                        <div class="info-row">
+                            <div class="key w90">Loại hình</div>
+                            <div class="value">
+                            <div class="select-custom">
+                                <select2 :options="controls.cboLoaiTB.list" v-model="controls.cboLoaiTB.value"> 
+                                </select2>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="info-row"> 
+                            <div class="key w90">Ngày BH</div>
+                            <div class="value">
+                                <div class="input-icon-right"> 
+                                    <date-picker type="datetime" input-class="form-control" :format="datetimeFormat" :value-type="'format'" v-model="dtpNgayBH"></date-picker> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Trạng thái TB</div>
+                            <div class="value">
+                                <input type="text" ref="txtTrangThaiTB" class="form-control" v-model="txtTrangThaiTB" >
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Điện thoại</div>
+                            <div class="value">
+                                <input type="text" ref="txtSoDT" class="form-control" v-model="txtSoDT" >
+                            </div>
+                        </div>
+                        <div class="info-row" >
+                            <div class="key w90">Đơn vị</div>
+                            <div class="value">
+                                <div  :class="controls.pceDonVi.enabled ?'select-custom':'disabled'">
+                                    <select2 :options="controls.pceDonVi.list" v-model="controls.pceDonVi.value"> 
+                                    </select2>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Nội dung giao</div>
+                            <div class="value">
+                                <textarea type="text" ref="txtNoiDung_Giao" class="form-control" v-model="txtNoiDung_Giao" rows="3">
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="legend-title">Tra cứu phiếu báo hỏng</div>
+                <div class="table-content">
+                    <DataGrid ref="gridChitiet" v-bind:columns="controls.gridChitiet.headers"
+                            v-bind:dataSource="controls.gridChitiet.dataSource" :showColumnCheckbox="false"
+                            :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                            :enabled-select-first-row="true" 
+                            panelDataHeight="130px"
+                            > 
+                    </DataGrid> 
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="box-form">
+        <div class="legend-title">Thông tin xử lý</div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="info-row">
+                    <div class="key w90">Kết quả XL</div>
+                    <div class="value">
+                        <div class="select-custom">
+                            <select2 :options="controls.cboKQXL.list" v-model="controls.cboKQXL.value"> 
+                            </select2>
+                        </div>
+                    </div>
+                </div>
+            </div>   
+            <div class="col-sm-6 col-12">
+                <div class="info-row">
+                    <div class="key w90">Nội dung</div>
+                    <div class="value">
+                        <input type="text" ref="txtGhiChuHong" class="form-control" v-model="txtGhiChuHong" >
+                    </div>
+                </div>
+            </div> 
+        </div>    
+        <div class="legend-title">Danh sách phiếu báo hỏng</div>
+        <div class="table-content">
+            <!-- gridviewThueBao -->
+            <DataGrid ref="gridDanhSach" v-bind:columns="controls.gridDanhSach.headers"
+                  v-bind:dataSource="controls.gridDanhSach.dataSource" :showColumnCheckbox="true"
+                  :enable-paging-server="false" :allowPaging="true" :showFilter="true" :allowResizing='true'
+                  :enabled-select-first-row="true" @selectedRowChanged="gridviewDanhSach_FocusedRowChanged"
+                  >
+                <!-- @rowDoubleClicked="gridviewVatTuRowDoubleClick" -->
+            </DataGrid> 
+            
+        </div> 
+    </div> 
+ 
+    <b-modal id="popupComponents" size="xl" 
+        hide-footer
+        hide-header
+        hide-header-close
+        body-class="modal-body p-0 model-css">
+        <component :is="popupComponent" ref="generalPopup" :dulieu="popupComponentData" v-bind="popupComponentAttr" :ispopup="true" isPopup="false" :isPopup="false" v-on="popupComponentEvts"></component> <!--v-dynamic-events="popupComponentEvents"-->
+    </b-modal>
+  </div> 
+</div>
+
+

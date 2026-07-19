@@ -1,0 +1,410 @@
+<div class="giaophieu-xuly-suco">
+    <div class="list-actions-top">
+        <ul class="list" style="width: 100% !important">
+            <li @click="onClickBtnTimKiem">
+                <a href="javascript:void(0)">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            <li v-show="btnGiaoPhieuVisible" @click="onClickBtnGiaoPhieu" :class="{'disable-btn': !btnGiaoPhieuEnabled}">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+            </li>
+            <li v-show="btnCapNhatVisible" @click="onClickBtnCapNhat" :class="{'disable-btn': !btnCapNhatEnabled}">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-check2"></span>Cập nhật
+                </a>
+            </li>
+            <li v-show="btnHuyGiaoVisible" @click="onClickBtnHuy" :class="{'disable-btn': !btnHuyGiaoEnabled}">
+                <a href="javascript:void(0)">
+                    <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Hủy giao
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnKhoaPhieuEnabled}" @click="onClickBtnKhoaPhieu">
+                <a href="javascript:void(0)">
+                    <span class="icon one-file-lock"></span>Khóa phiếu
+                </a>
+            </li>
+            <li v-show="!!suCoDuocChon" class="disable-btn" style="float: right;">
+                <a href="javascript:void(0)" style="border-left: 0; color: darkred !important; font-weight: bold;">
+                    THIỆT HẠI DOANH THU TẠM TÍNH: {{canhBaoDt}} (đ/h)
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chkNguonSuCo">
+                                <span class="name">Nguồn sự cố</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="nguonSuCoId" 
+                                :dataSource="dsNguonSuCo" 
+                                dataTextField="MOTA"
+                                dataValueField="NGUONSC_ID" 
+                                :disabled="!chkNguonSuCo"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w70">
+                            Mã sự cố
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control highlight" v-model="maSc" v-on:keyup.enter="onClickBtnTimKiem">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chkNgaySuCo">
+                                <span class="name">{{labelNgaySuCo}}</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker 	
+                                class="form-control bg-none bor0 fw6 text h24" 
+                                placeholder=""
+                                format="dd/MM/yyyy"
+                                v-model="ngaySuCo"
+                                :enabled="chkNgaySuCo"></ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w140">
+                            Mức độ sự cố
+                        </div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="mucDoSuCoId" 
+                                :dataSource="dsMucDoSuCo" 
+                                dataTextField="MUCDO_SC"
+                                dataValueField="MUCDO_ID"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chkQuyTrinh">
+                                <span class="name">Quy trình</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="quyTrinhId" 
+                                :dataSource="dsQuyTrinh" 
+                                :disabled="!chkQuyTrinh"
+                                dataValueField="QUYTRINH_ID"
+                                dataTextField="QUYTRINH"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Thao tác
+                        </div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="thaoTacId" 
+                                :dataSource="dsThaoTac" 
+                                dataValueField="TRANGTHAI_ID"
+                                dataTextField="TRANGTHAI"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w140">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chkKeoDai">
+                                <span class="name">Kéo dài ≥ (h/m/s)</span>
+                            </div>
+                        </div>
+                        <div class="value w40">
+                            <vue-numeric 	
+                                class="form-control tright" 
+                                v-model="keoDaiGio" 
+                                :disabled="!chkKeoDai" 
+                                :min="0" 
+                                maxlength="5" 
+                                :minus="false" 
+                                separator=","></vue-numeric>
+                        </div>
+                        <div class="value w40">
+                            <vue-numeric 	
+                                class="form-control tright" 
+                                v-model="keoDaiPhut" 
+                                :disabled="!chkKeoDai" 
+                                :min="0"
+                                maxlength="2" 
+                                :minus="false" 
+                                separator=","></vue-numeric>
+                        </div>
+                        <div class="value">
+                            <vue-numeric 	
+                                class="form-control tright" 
+                                v-model="keoDaiGiay" 
+                                :disabled="!chkKeoDai" 
+                                :min="0"
+                                maxlength="2" 
+                                :minus="false" 
+                                separator=","></vue-numeric>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin giao phiếu</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Hướng giao
+                        </div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="huongGiaoId" 
+                                :dataSource="dsHuongGiao" 
+                                dataValueField="HUONGGIAO_ID"
+                                dataTextField="HUONGGIAO"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w130">
+                            {{labelDonVi}} <bss-required-marker v-show="parseInt(thaoTacId) == 3" />
+                        </div>
+                        <div v-show="parseInt(thaoTacId) == 2" class="value">
+                            <SelectExt 	
+                                v-model="donViId" 
+                                :dataSource="dsDonVi" 
+                                dataValueField="DONVI_ID"
+                                dataTextField="TEN_DV"/>
+                        </div>
+                        <div v-show="parseInt(thaoTacId) != 2" class="value">
+                            <bss-error-marker :has-error="dsDonViIdError">
+                                <ComboMultiSelection
+                                valueField="DONVI_ID"
+                                textField="TEN_DV"
+                                v-model="dsDonViId"
+                                :dataSource="dsDonVi"/>
+                            </bss-error-marker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Nội dung giao <bss-required-marker />
+                        </div>
+                        <div class="value">
+                            <bss-error-marker :has-error="$v.noiDungGiao.$error">
+                                <input type="text" class="form-control" v-model.trim="$v.noiDungGiao.$model" >
+                           </bss-error-marker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w130">
+                            Mức độ khẩn cấp
+                        </div>
+                        <div class="value">
+                            <SelectExt 	
+                                v-model="mucDoKhanCapId" 
+                                :dataSource="dsMucDoKhanCap" 
+                                dataTextField="MUCDO_KC"
+                                dataValueField="MUCDO_ID"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w120">
+                            Chỉ tiêu (giờ) <bss-required-marker />
+                        </div>
+                        <div class="value">
+                            <bss-error-marker :has-error="$v.chiTieuGio.$error">
+                                <ejs-numerictextbox
+                                    ref="ref-chitieu-gio"
+                                    cssClass="tright"
+                                    format="###.###"
+                                    decimals="3"
+                                    :validateDecimalOnType="true"
+                                    :min="0"
+                                    :max="720"
+                                    v-model="$v.chiTieuGio.$model"></ejs-numerictextbox>
+                            </bss-error-marker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">Danh sách sự cố</div>
+                        <div class="pull-right">
+                            <a href="javascript:void(0)" class="btn btn-main pad4" @click="onClickBtnInSuCo">
+                                <span class="lh14 one-print"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main pad4" @click="onClickBtnTimKiem">
+                                <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main pad4" @click="allowFilteringGridSuCo = !allowFilteringGridSuCo">
+                                <span class="lh14 ui-2_filter nc-icon-outline"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-main pad4" @click="onClickBtnXuatExcelSuCo">
+                                <span class="lh14 one-excel-outline"></span>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="table-content">
+                        <DataGrid
+                            class="table-result"
+                            :panelDataHeight="allowFilteringGridSuCo ? '170' : '208'"
+                            v-bind:columns="[
+                                {fieldName: '', headerText: 'Chọn', textAlign: 'Center', allowFiltering: false, width: '50', template: getColumnTemplateChon(this)},
+                                {fieldName: 'MA_SC', headerText: 'Mã sự cố', allowFiltering: true, width: '130' },
+                                {fieldName: 'MUCDO_SC', headerText: 'Mức độ', allowFiltering: true, width: '130' },
+                                {fieldName: 'NOIDUNG_SC_HIENTHI', headerText: 'Nội dung sự cố', allowFiltering: true, width: '200' },
+                                {fieldName: 'NHOM_SC', headerText: 'Nhóm', allowFiltering: true, width: '100' },
+                                {fieldName: 'NGAY_SC', headerText: 'Ngày sự cố', allowFiltering: true, textAlign: 'Right', width: '150' },
+                                {fieldName: 'THOIGIAN', headerText: 'Kéo dài', allowFiltering: true, textAlign: 'Right', width: '130' },
+                                {fieldName: 'TRANGTHAI_SC', headerText: 'Trạng thái', textAlign: 'Right', allowFiltering: true, width: '150' },
+                                {fieldName: 'KEY', visible: false, isPrimaryKey: true },
+                            ]"        
+                            v-bind:dataSource="dsSuCo"
+                            :showFilter="allowFilteringGridSuCo"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            @queryCellInfo="onQueryCellInfoSuCo"></DataGrid>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">Danh sách phiếu</div>
+                        <div class="pull-right">
+                            <div class="list-checks">
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" name="rd1" class="check" value="1" v-model="kieuNhomPhieu">
+                                        <span class="name">Nhóm theo phiếu</span>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" name="rd1" class="check" value="2" v-model="kieuNhomPhieu">
+                                        <span class="name">Nhóm theo PTM</span>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <a href="javascript:void(0)" class="btn btn-main pad4" @click="onClickBtnInPhieu">
+                                        <span class="lh14 one-print"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main pad4" @click="napThongTinPhieu(suCoDuocChon)">
+                                        <span class="lh14 arrows-1_refresh-69 nc-icon-glyph"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main pad4" @click="allowFilteringGridPhieu = !allowFilteringGridPhieu">
+                                        <span class="lh14 ui-2_filter nc-icon-outline"></span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-main pad4" @click="onClickBtnXuatExcelPhieu">
+                                        <span class="lh14 one-excel-outline"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="table-content">
+                        <ejs-grid
+                            ref='grid-phieu'
+                            class="table-result grid-phieu tree-grid-2"
+                            locale='vi-VN'
+                            gridLines='Both'
+                            clipMode="EllipsisWithTooltip"
+                            :height="allowFilteringGridPhieu ? 165 : 208"
+                            :selectionSettings="{enableToggle: false}"
+                            :dataSource="tablePhieu.pagerData"
+                            :allowFiltering="allowFilteringGridPhieu"
+                            :allowResizing='true'
+                            :allowGrouping='true'
+                            :groupSettings="groupSettingsGridPhieu"
+                            :dataBound="onDataBound('grid-phieu')"
+                            :queryCellInfo="onQueryCellInfoPhieu">
+                            <e-columns>
+                                <e-column headerText='' textAlign="Center" clipMode="Ellipsis" width="20" :allowResizing="false" :allowFiltering="false" :template='columnTemplate'></e-column>
+                                <e-column headerText='Chi tiết' textAlign="Center" clipMode="Ellipsis" width="55" :allowFiltering="false" :template="columnTemplateChiTiet"></e-column>
+                                <e-column headerText='Chọn' :visible="visibleChonMotPhieu" textAlign="Center" clipMode="Ellipsis" width="50" :allowFiltering="false" :template="columnTemplateChonMotPhieu"></e-column>
+                                <e-column headerText='' :visible="!visibleChonMotPhieu" textAlign="Center" clipMode="Ellipsis" width="50" :allowFiltering="false" :headerTemplate='headerTemplateChonNhieuPhieu' :template="columnTemplateChonNhieuPhieu"></e-column>
+                                <e-column field='PHIEU_ID' :visible="kieuNhomPhieu == 2" headerText='Phiếu số' headerTextAlign='Center' textAlign='Right' width="100" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='TINHTRANG' :visible="kieuNhomPhieu == 1" headerText='Tình trạng' headerTextAlign='Center' width="200" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='DONVI_NHAN' headerText='Đơn vị nhận' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='NGAYGIAO' headerText='Ngày giao' headerTextAlign='Center' textAlign='Right' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='ND_GIAO' headerText='Nội dung giao' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='KHAN_HIENTHI' headerText='Khẩn' headerTextAlign='Center' width="100" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='CHITIEU_TG' headerText='Chỉ tiêu (giờ)' headerTextAlign='Center' textAlign='Right' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='CONLAI' headerText='Còn lại' headerTextAlign='Center' textAlign='Right' width="130" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='TRANGTHAI_PH' headerText='Trạng thái phiếu' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='NGAY_TRA' headerText='Ngày trả' headerTextAlign='Center' textAlign='Right' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='LYDOTRA' headerText='Lý do trả' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='ND_TRA' headerText='Nội dung trả' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='NGAY_TH' headerText='Ngày hoàn thành' headerTextAlign='Center' textAlign='Right' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='NGUOI_TH' headerText='Người hoàn thành' headerTextAlign='Center' width="150" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='GHICHU_TH' headerText='Ghi chú xử lý' headerTextAlign='Center' width="200" :filterBarTemplate='filterBarTemplate'></e-column>
+                                <e-column field='KEY' headerText='' width="0"></e-column>
+                            </e-columns>
+                        </ejs-grid>
+                        <div class="grid-ext">
+                            <Pagination 
+                                :key="tablePhieu.paginationKey"
+                                :pageSize="tablePhieu.pageSize" 
+                                :pageIndex="0"
+                                :totalRecords="tablePhieu.dataSource.length"
+                                @pageChanged="onPageChangedTablePhieu"></Pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ModalCongSoiBiSuCo ref="ref-modal-congsoi-bi-suco"></ModalCongSoiBiSuCo>
+    <ModalXemThongTin modal-id="modal-xem-thongtin" ref="ref-modal-xem-thongtin"></ModalXemThongTin>
+    <ModalInSuCo modal-id="modal-in-suco" ref="ref-modal-in-suco"></ModalInSuCo>
+    <ModalInPhieuPreview ref="ref-modal-in-phieu-preview"></ModalInPhieuPreview>
+    <ModalKhoaPhieu ref="ref-modal-khoaphieu" modal-id="modal-khoaphieu" @success="onClickBtnTimKiem"></ModalKhoaPhieu>
+    <b-modal id="modal-xacnhan-huy-giaophieu-xuly" centered title="Thông báo" size="sm" @ok="okHuyGiaoPhieu">        
+        <span>Bạn có thực sự muốn hủy giao phiếu đang chọn không?</span>
+        <template #modal-footer="{ ok, cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+</div>

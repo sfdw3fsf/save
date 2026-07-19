@@ -1,0 +1,2 @@
+import RestoreLiquidationSubsCrossSale from './RestoreLiquidationSubsCrossSale.vue'
+export default RestoreLiquidationSubsCrossSale

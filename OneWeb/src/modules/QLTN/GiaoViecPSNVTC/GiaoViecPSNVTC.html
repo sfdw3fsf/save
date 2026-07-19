@@ -1,0 +1,158 @@
+<div>
+  <input id="giaoviec_theofile" ref="giaoviec_theofile" @change="doUploadFile" type="file" hidden>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="javascript: void(0)" @click="doUpdate">
+          <span class="icon one-file-remove"></span> Cập nhật
+        </a>
+      </li>
+      <li>
+        <a href="javascript: void(0)" @click="doExportExcel">
+          <span class="icon one-excel"></span>Xuất Excel
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+      <div class="box-form">
+        <div class="legend-title">Thông tin giao việc</div>
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">
+                  Tháng TH
+              </div>
+              <div class="value">
+                <ejs-datepicker
+                  v-model="p_thang_th"
+                  :max="configs.dateConfig.max"
+                  :start="'Year'"
+                  :depth="'Year'"
+                  :format="'MM/y'"
+                  :showClearButton="false"
+                  :allowEdit="false"
+                  :width="'100%'"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w100">
+                Tác nghiệp
+              </div>
+              <div class="value">
+                <ejs-multiselect
+                  :dataSource='params.p_tacnghiep_options'
+                  :fields='configs.tacnghiep.fields'
+                  v-model="params.p_tacnghiep"
+                  :mode="configs.tacnghiep.mode"
+                  :showSelectAll="configs.tacnghiep.showSelectAll"
+                  :showDropDownIcon="configs.tacnghiep.showDropDownIcon"
+                  :filterBarPlaceholder="configs.tacnghiep.filterBarPlaceholder"
+                  :allowFiltering="configs.tacnghiep.allowFiltering"
+                  :filtering="onFilteringTacNghiep"
+                ></ejs-multiselect>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w80">Đường dẫn</div>
+              <div class="key w20">
+                  <span class="text-main f20 one-network"></span>
+              </div>
+              <div class="value">
+                <div class="input-more-button">
+                  <button class="btn" @click="browserFile" title="Đọc file gán đơn vị chăm sóc KHL">
+                    <span class="-ap icon-more_horiz"></span>
+                  </button>
+                  <input type="text" class="form-control " v-model="params.p_file_path">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2 col-12">
+            <a href="/static/files/Bieumau_giaoviec_nvtc.xlsx">Tải biểu mẫu</a>
+          </div>
+        </div>
+
+      </div>
+      <div class="box-form">
+          <div class="legend-title">Danh sách phiếu chờ giao việc</div>
+          <div class="table-content mart10">
+            <div class="nav tabs tab-over">
+              <a href="#tabDanhsach" @click="currentTab = 0" data-toggle="tab" :class="{active: currentTab === 0}">Danh sách</a>
+              <a href="#tabLoi" @click="currentTab = 1" data-toggle="tab" :class="{active: currentTab === 1}" title="Danh sách">Lỗi</a>
+            </div>
+            <div class="tab-content">
+              <div id="tabDanhsach" class="tab-pane" :class="{active: currentTab === 0}">
+                <DataGrid
+                  v-bind:columns="[
+                    {fieldName: 'MA_GD', headerText: 'MA_GD', allowFiltering: true},
+                    {fieldName: 'MA_KH', headerText: 'MA_KH', allowFiltering: true},
+                    {fieldName: 'TEN_KH', headerText: 'TEN_KH', allowFiltering: true},
+                    {fieldName: 'DIACHI_KH', headerText: 'DIACHI_KH', allowFiltering: true},
+                    {fieldName: 'DIENTHOAI_LH', headerText: 'DIENTHOAI_LH', allowFiltering: true},
+                    {fieldName: 'MA_NVTC', headerText: 'MA_NVTC', allowFiltering: true},
+                    {fieldName: 'QUAN_ID', headerText: 'QUAN_ID', allowFiltering: true},
+                    {fieldName: 'PHUONG_ID', headerText: 'PHUONG_ID', allowFiltering: true},
+                    {fieldName: 'PHO_ID', headerText: 'PHO_ID', allowFiltering: true},
+                    {fieldName: 'DACDIEM_ID', headerText: 'DACDIEM_ID', allowFiltering: true},
+                    {fieldName: 'SO_NHA', headerText: 'SO_NHA', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'SDKH_ID', headerText: 'SDKH_ID', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'DOTGIAO_ID', headerText: 'DOTGIAO_ID', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'THUTU_IN', headerText: 'THUTU_IN', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'NGAY_CN', headerText: 'NGAY_CN', textAlign: 'Right', allowFiltering: true}
+                    ]"
+                  v-bind:dataSource="dsUploaded"
+                  :enablePagingServer="false"
+                  :allowPaging="true"
+                  :allowExcelExport="true"
+                  :totalRecords="uploadPageInfo.totalElement"
+                  :pageSize="uploadPageInfo.maxSize"
+                  :pageIndex="uploadPageInfo.page"
+                  :key="keyUploadResults"
+                  :panelDataHeight='"300"'
+                  ref="dsUploaded"
+                  >
+                </DataGrid>
+              </div>
+              <div id="tabLoi" class="tab-pane" :class="{active: currentTab === 1}">
+                <DataGrid
+                  v-bind:columns="[
+                    {fieldName: 'MA_GD', headerText: 'MA_GD', allowFiltering: true},
+                    {fieldName: 'MA_KH', headerText: 'MA_KH', allowFiltering: true},
+                    {fieldName: 'TEN_KH', headerText: 'TEN_KH', allowFiltering: true},
+                    {fieldName: 'DIACHI_KH', headerText: 'DIACHI_KH', allowFiltering: true},
+                    {fieldName: 'DIENTHOAI_LH', headerText: 'DIENTHOAI_LH', allowFiltering: true},
+                    {fieldName: 'MA_NVTC', headerText: 'MA_NVTC', allowFiltering: true},
+                    {fieldName: 'QUAN_ID', headerText: 'QUAN_ID', allowFiltering: true},
+                    {fieldName: 'PHUONG_ID', headerText: 'PHUONG_ID', allowFiltering: true},
+                    {fieldName: 'PHO_ID', headerText: 'PHO_ID', allowFiltering: true},
+                    {fieldName: 'DACDIEM_ID', headerText: 'DACDIEM_ID', allowFiltering: true},
+                    {fieldName: 'SO_NHA', headerText: 'SO_NHA', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'SDKH_ID', headerText: 'SDKH_ID', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'DOTGIAO_ID', headerText: 'DOTGIAO_ID', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'THUTU_IN', headerText: 'THUTU_IN', textAlign: 'Left', allowFiltering: true},
+                    {fieldName: 'TRANGTHAI', headerText: 'Lỗi', textAlign: 'Left', allowFiltering: true},
+                    ]"
+                    :panelDataHeight='"300"'
+                  v-bind:dataSource="dsErrors"
+                  :enablePagingServer="false"
+                  :showFilter="true"
+                  :allowPaging="true"
+                  :allowExcelExport="true"
+                  :totalRecords="errorPageInfo.totalElement"
+                  :pageSize="errorPageInfo.maxSize"
+                  :pageIndex="errorPageInfo.page"
+                  :key="keyErrorResults"
+                  ref="dsErrors"
+                  >
+                </DataGrid>
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,1144 @@
+<div > 
+    <div class="list-actions-top">
+        <ul class="list">                     
+            <li>
+                <a class="pointer" @click="btnXem()">
+                    <span class="icon nc-icon-glyph design_bullet-list-67"></span>
+                    Danh sách
+                </a>
+            </li>
+            <li v-show="tsbtnGanNVVisibled">
+                <a class="pointer" @click="btnGanNV">
+                    <span class="icon -ap  icon-users"></span> Gán NV
+                </a>
+                <appGanNhanVienPhapLy ref="dlgGanNhanVienPL" @closed="dlgGanNhanVienPLClosed"></appGanNhanVienPhapLy>
+                <appGanNhanVienTN ref="dlgGanNhanVienTN" @closed="dlgGanNhanVienTNClosed"></appGanNhanVienTN>
+            </li>
+            <li v-show="tsbtnGiaoPhieuVisibled">
+                <a class="pointer" @click="btnGiaoPhieu()">
+                    <span class="icon one-file-arrow-right1"></span> Giao phiếu
+                </a>
+            </li>
+            <li v-show="tsbtnHuyGiaoVisibled">
+                <a class="pointer" @click="btnHuyGiao">
+                    <span class="icon one-cancel"></span> Hủy giao
+                </a>
+            </li>
+            <li v-show="tsbtnInVisibled">
+                <a class="pointer" @click="btnHoSo">
+                    <span class="icon nc-icon-glyph files_single-content-02"></span> Hồ sơ
+                </a>
+                <appInThongBao ref="dlgInThongBao" :kyCuoc="kyCuoc"></appInThongBao>
+            </li>
+            <li v-show="tstbnKetThucVisibled">
+                <a class="pointer" @click="btnKetThuc">
+                    <span class="icon one-file-check2"></span> Kết thúc
+                </a>
+            </li>
+            <li v-show="tsbtnCapNhatVisibled">
+                <a class="pointer" @click="btnCapNhat">
+                    <span class="icon one-reload1"></span> {{tsbtnCapNhatText}}
+                </a>
+            </li>
+
+            <li v-show="tsbtnChuyenBuocVisibled">
+                <a class="pointer" @click="btnChuyenBuoc">
+                    <span class="icon one-sync"></span> Chuyển bước
+                </a>
+            </li>
+            <li v-show="tsbtnHuyCNVisibled">
+                <a class="pointer" @click="btnHuyKQ">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy KQ
+                </a>
+            </li>
+            <li v-show="tsbtnExcelVisibled">
+                <a class="pointer" @click="btnExportExcel">
+                    <span class="icon one-xlsx-import"></span> Xuất Excel
+                </a>
+            </li>
+            <li v-show="tsbtnSuaDCVisibled">
+                <a class="pointer" @click="btnSuaDC">
+                    <span class="icon nc-icon-glyph ui-1_edit-74"></span> Sửa ĐC
+                </a>
+                <b-modal id="modal-prevent-closing" ref="modal" title="Nhập thông tin địa chỉ mới" @ok="updateDC">
+                    <form ref="form" @submit.stop.prevent="handleSubmit">
+                        <b-form-group label="Địa chỉ" label-for="name-input">
+                            <b-form-input id="name-input" v-model="txtDiaChiChange">
+                            </b-form-input>
+                        </b-form-group>
+                    </form>
+                </b-modal>
+            </li>
+            <li v-show="tsbtnInHDVisibled">
+                <a class="pointer" @click="btnInHD">
+                    <span class="icon one-print"></span> In HĐ
+                </a>
+                <appInHoaDon ref="dlgIHD"></appInHoaDon>
+            </li>
+            <li v-show="tsbtnSuaTienVisibled" :class="{disabled: !tsbtnSuaTienEnabled}">
+                <a class="pointer" @click="btnSuaTien">
+                    <span class="icon one-money-refresh"></span> Sửa tiền
+                </a>
+            </li>
+            <li v-show="tsbtnHoSoGocVisibled">
+                <a class="pointer" @click.stop="btnHoSoGoc">
+                    <span class="icon nc-icon-glyph files_single-content-02"></span> Hồ sơ gốc
+                </a>
+                <app-ho-so-goc ref="dlgHoSoGoc"></app-ho-so-goc>
+
+            </li>
+            <li v-show="tsbtnLichSuNoVisibled">
+                <a class="pointer" @click="btnLSNo">
+                    <span class="icon one-file-edit3"></span> LS nợ
+                </a>
+                <appLsNo :data="selectedXLN" :typeXuly="vkieuxl_id" :kyCuoc="kyCuoc"></appLsNo>
+            </li>
+            <li v-show="tsbtnDSThueBaoVisibled">
+                <a class="pointer" @click="btnThueBao">
+                    <span class="icon one-user-contact"></span> Thuê bao
+                </a>
+                <appDanhSachThueBaoXLN ref="dlgDSTBXLN"></appDanhSachThueBaoXLN>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form padt8 padb5">
+            <div class="pull-right">
+                <app-ky-cuoc></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 col-12">
+                <div class="nav tabs tab-over">
+                    <a href="#" class="active">Trình tự xử lý nợ</a>
+
+                </div>
+                <div class="tab-content">
+                    <div class="tree-plus" style="height: 600px;overflow: auto;">
+                        <ul class="">
+                            <li class="haschild open">
+                                <a href="javascript:void(0)" class=""
+                                    @click="tvFocusChanged(dtQuyTrinhXLN[0].BUOCXLN_ID)"><span
+                                        class="text-main icon nc-icon-glyph files_single-content-02"></span>
+                                    {{dtQuyTrinhXLN.length > 0 ? dtQuyTrinhXLN[0].BUOC_XLN: ""}}</a>
+                                <ul>
+                                    <li v-for="item in dtQuyTrinhXLN" v-if="item.UNITLEVEL == 2">
+                                        <a href="javascript:void(0)" @click="tvFocusChanged( item )" :class="{active: item.BUOCXLN_ID == childItemTreeSeleted}" ><span
+                                                class="text-main icon nc-icon-glyph files_single-content-02">
+                                            </span>{{item.BUOC_XLN}}</a>
+                                    </li>
+
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-10 col-12">
+                <div class="row">
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w80">Loại NV</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" class="form-control" v-model="cboLoaiNVXLValue">
+                                        <option v-for="item in cboLoaiNVXL" :value="item.LOAINV_ID">
+                                            {{item.LOAI_NV}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w120">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkNhanVienXLN" />
+                                    <span class="name">Nhân viên XL</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div>
+                                    <!-- <select name="" id="" class="form-control" v-model="cboNhanVienXLNValue"
+                                        :disabled="!chkNhanVienXLN">
+                                        <option value="init">Chọn nhân viên xử lý nợ</option>
+                                        <option v-for="item in cboNhanVienXLN" :value="item.NHANVIEN_ID">
+                                            {{item.MA_NV}} - {{item.TEN_HIENTHI}}</option>
+                                    </select> :rowSelected="rowSelectedDefault"-->
+                                    <app-combobox :disabled="!chkNhanVienXLN" :columns="cboNhanVienXLNFields"
+                                        @selectedChanged="nhanvienXLN_selectedChanged" :dataSource="cboNhanVienXLN"
+                                        :allowPaging="true" :enablePagingServer="false" textField="TEN_HIENTHI"
+                                        valueField="NHANVIEN_ID">
+                                    </app-combobox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w60">
+                                Số lượng
+                            </div>
+                            <div class="value">
+                                <vue-numeric :disabled="!chkLanTao" class="form-control red" v-model="txtSoLuong" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-12">
+                        <div class="info-row">
+                            <div class="key w80">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkLanTao" />
+                                    <span class="name">Lần tạo</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <!-- <div class="select-custom">
+                                    <select name="" id="" class="form-control" :disabled="!chkLanTao">
+                                        <option v-for="item in cboLanTaoDuLieu" :value="item.LANTAO_ID">
+                                            {{item.NGAY_TAO}}</option>
+                                    </select>
+                                </div> -->
+                                <app-combobox :columns="cboLanTaoDuLieuFields" :disabled="!chkLanTao"
+                                    @selectedChanged="LanTaoDuLieu_selectedChanged" :dataSource="cboLanTaoDuLieu"
+                                    textField="NGAY_TAO" valueField="LANTAO_ID"></app-combobox>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w60">
+                                Mã XLN
+                            </div>
+                            <div class="value">
+                                <input type="text" class="form-control highlight" v-on:keyup.enter="onEnterTXTMaTB"
+                                    v-model="txtMaTB" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav tabs tab-over">
+                    <a href="#tabPhieuChuaGiao" @click="selectedTab('tabPhieuChuaGiao')" data-toggle="tab"
+                        class="active">Phiếu chưa giao</a>
+                    <a href="#tabPhieuHenTra" @click="selectedTab('tabPhieuHenTra')" data-toggle="tab">Phiếu hẹn trả</a>
+                    <a href="#tabPhieuDaGiao" @click="selectedTab('tabPhieuDaGiao')" data-toggle="tab">Phiếu đã giao</a>
+                </div>
+                <div class="box-form tab-content">
+                    <div class="tab-content tab-pane active" id="tabPhieuChuaGiao">
+                        <div class="grid-stack-box">
+                            <Split :gutterSize="16">
+                                <SplitArea :size="35" :minSize="100">
+                                    <div class="box-col" id="boxLeft">
+                                        <div class="info-row">
+                                            <div class="key">Đơn vị QL</div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control"
+                                                        v-model="cboDonviQLValue">
+                                                        <option v-for="item in cboDonviQL" :value="item.DONVI_ID">
+                                                            {{item.TEN_HIENTHI}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key">
+                                                        Ngày giao
+                                                    </div>
+                                                    <div class="value">
+                                                        <ejs-datepicker :placeholder="'Ngày giao'" v-model="dtpNgayGiao"
+                                                            :format="'dd/MM/yyyy'" :allowEdit="true" :enabled="false" :width="'100%'"
+                                                            class="redcolor">
+                                                        </ejs-datepicker>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check" v-model="chkHanTra" />
+                                                            <span class="name">Hạn trả</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <ejs-datepicker :enabled="chkHanTra" :placeholder="'Hạn trả'"
+                                                            v-model="dtpHantra" :format="'dd/MM/yyyy'" :allowEdit="true"
+                                                            :width="'100%'" class="redcolor">
+                                                        </ejs-datepicker>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkBuocKhac" />
+                                                            <span class="name">Bước khác</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                :disabled="!chkBuocKhac" v-model="cboBuocKhacValue">
+                                                                <option v-for="item in cboBuocKhac"
+                                                                    :value="item.BUOCXLN_ID">{{item.BUOC_XLN}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        Tr.thái/Lần
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                v-model="cboTrangThaiValue" :disabled="!chkBuocKhac">
+                                                                <option v-for="item in cboTrangThai"
+                                                                    :value="item.TRANGTHAI_ID">{{item.TRANGTHAI}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w10 padt7">
+                                                        /
+                                                    </div>
+                                                    <div class="value w50">
+                                                        <input type="number" class="form-control"
+                                                            :disabled="!txtLanBXLEnabled" v-model="txtLanBXL" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key red">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check" v-model="chkLayChuyenBuoc" />
+                                                    <span class="name">Bước chuyển</span>
+                                                </div>
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control"
+                                                        :disabled="!chkLayChuyenBuoc" v-model="cboBuocChuyenValue">
+                                                        <option v-for="item in cboBuocChuyen" :value="item.BUOCXLN_ID">
+                                                            {{item.BUOC_XLN}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key">
+                                                        <div class="check-action red">
+                                                            <input type="checkbox" class="check"
+                                                                :disabled="!chkLayChuyenBuoc"
+                                                                v-model="chkTuNgayChuyen" />
+                                                            <span class="name">Từ ngày</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <ejs-datepicker :placeholder="'Từ ngày'"
+                                                            :enabled="chkTuNgayChuyen" v-model="dtpChuyenTuNgay"
+                                                            :format="'dd/MM/yyyy'" :allowEdit="true" :width="'100%'"
+                                                            class="redcolor">
+                                                        </ejs-datepicker>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w80 red">
+                                                        Đến ngày
+                                                    </div>
+                                                    <div class="value">
+                                                        <ejs-datepicker :placeholder="'Đến ngày'"
+                                                            :enabled="chkTuNgayChuyen" v-model="dtpChuyenDenNgay"
+                                                            :format="'dd/MM/yyyy'" :allowEdit="true" :width="'100%'"
+                                                            class="redcolor">
+                                                        </ejs-datepicker>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SplitArea>
+                                <SplitArea :size="65" :minSize="100">
+                                    <div class="box-col" id="boxRight">
+                                        <div class="row">
+                                            <div class="col-sm-4 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        TT hiện thời
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                v-model="cboTrangThaiHTValue">
+                                                                <option v-for="item in cboTrangThaiHT"
+                                                                    :value="item.TRANGTHAI_ID">{{item.TRANGTHAI}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check" v-model="chkLoaiKH" />
+                                                            <span class="name">Loại KH</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                v-model="cboLoaiKHValue" :disabled="!chkLoaiKH">
+                                                                <option v-for="item in cboLoaiKH"
+                                                                    :value="item.LOAIKH_ID">{{item.TEN_LOAIKH}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        <span class="name">Kiểu nợ</span>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"  :disabled="!(this.chkDentien || this.chkTutien)"
+                                                                v-model="cboKieuNoValue">
+                                                                <option v-for="item in cboKieuNo" :value="item.KIEU_ID">
+                                                                    {{item.TENKIEU}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        Lần xử lý
+                                                    </div>
+                                                    <div class="value">
+                                                        <input type="number" class="form-control" v-model="txtSoLanXL"
+                                                            :disabled="!txtSoLanXLEnabled" />
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check" v-model="chkTutien" />
+                                                            <span class="name">Số tiền</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w40">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control text"
+                                                                :disabled="!chkTutien" v-model="cboTudauValue">
+                                                                <option v-for="item in cboTudau" :value="item">
+                                                                    {{item}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <vue-numeric class="form-control red" :disabled="!chkTutien"
+                                                            v-model="txtTutien" />
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w80">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check" v-model="chkDentien" />
+                                                            <span class="name">Đến tiền</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w40">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control text"
+                                                                :disabled="!chkDentien" v-model="cboDendauValue">
+                                                                <option v-for="item in cboDendau" :value="item">
+                                                                    {{item}}</option>
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <vue-numeric class="form-control red" :disabled="!chkDentien"
+                                                            v-model="txtDentien" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w100">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkChieuKhoa" />
+                                                            <span class="name">Chiều
+                                                                khóa</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                :disabled="!chkChieuKhoa" v-model="cboChieuKhoaValue">
+                                                                <option v-for="item in cboChieuKhoa"
+                                                                    :value="item.CHIEUKHOA_ID">{{item.CHIEUKHOA}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-12">
+                                                        <div class="info-row">
+                                                            <div class="key w100">
+                                                                <div class="check-action">
+                                                                    <input type="checkbox" class="check"
+                                                                        v-model="chkTuThang" />
+                                                                    <span class="name">Từ
+                                                                        tháng</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="value w40">
+                                                                <div class="select-custom">
+                                                                    <select name="" id="" class="form-control text"
+                                                                        :disabled="!chkTuThang"
+                                                                        v-model="cboTudau_THValue">
+                                                                        <option v-for="item in cboTudau_TH"
+                                                                            :value="item">{{item}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="value">
+                                                                <input type="text" class="form-control"
+                                                                    :disabled="!chkTuThang" v-model="txtTuThang" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 col-12">
+                                                        <div class="info-row">
+                                                            <div class="key w60">
+                                                                Từ ngày
+                                                            </div>
+                                                            <div class="value">
+                                                                <ejs-datepicker :placeholder="'Từ ngày'"
+                                                                    :enabled="chkChieuKhoa" v-model="dtpTuNgay"
+                                                                    :format="'dd/MM/yyyy'" :allowEdit="true"
+                                                                    :width="'100%'" class="redcolor">
+                                                                </ejs-datepicker>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-12">
+                                                        <div class="info-row">
+                                                            <div class="key w100">
+                                                                <div class="check-action">
+                                                                    <input type="checkbox" class="check"
+                                                                        v-model="chkDenThang" />
+                                                                    <span class="name">Đến
+                                                                        tháng</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="value w40">
+                                                                <div class="select-custom">
+                                                                    <select name="" id="" class="form-control text"
+                                                                        :disabled="!chkDenThang"
+                                                                        v-model="cboDendau_THValue">
+                                                                        <option v-for="item in cboDendau_TH"
+                                                                            :value="item">{{item}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="value">
+                                                                <input type="text" class="form-control"
+                                                                    :disabled="!chkDenThang" v-model="txtDenThang" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 col-12">
+                                                        <div class="info-row">
+                                                            <div class="key w60">
+                                                                Đến ngày
+                                                            </div>
+                                                            <div class="value">
+                                                                <ejs-datepicker :placeholder="'Đến ngày'"
+                                                                    :enabled="chkChieuKhoa" v-model="dtpDenNgay"
+                                                                    :format="'dd/MM/yyyy'" :allowEdit="true"
+                                                                    :width="'100%'" class="redcolor">
+                                                                </ejs-datepicker>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key w80">Ghi chú</div>
+                                            <div class="value">
+                                                <textarea name="" id="" cols="30" rows="10" class="form-control"
+                                                    style="height: 64px;resize: none;" v-model="txtGhiChu"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SplitArea>
+                            </Split>
+                        </div>
+                        <div class="grid-stack-box">
+                            <Split :gutterSize="16">
+                                <SplitArea :size="60">
+                                    <div class="box-col" id="boxLeft1">
+                                        <div class="table-content" style="height: 300px;">
+                                            <DataGrid 
+                                                ref="gridPhieuChuaGiao"
+                                                :dataSource="gridPhieuChuaGiao" 
+                                                :allowPaging="true"
+                                                :enablePagingServer="false"
+                                                @selectedItemsChanged="selectedItemsChangedPhieuChuaGiao"
+                                                @selectedRowChanged="selectedRowChangedPhieuChuaGiao"
+                                                :showColumnCheckbox="true" 
+                                                :columns="collumnPhieuChuaGiao"
+                                                :editSettings=" { allowEditing: true , mode:'Batch'}"
+                                                dataKeyField="MA_XLN" 
+                                                @cellSaved="cellSavedPhieuChuaGiao"
+                                                :allowExcelExport="true"
+                                                :enabledSelectFirstRow="false">
+                                            </DataGrid>
+                                        </div>
+
+                                    </div>
+                                </SplitArea>
+                                <SplitArea :size="40">
+                                    <div class="box-col" id="boxRight1">
+                                        <div class="table-content" style="height: 300px;">
+                                            <DataGrid :dataSource="gridDotLaySoLieu" :columns="collumnDotLaySoLieu"
+                                                :aggregates="aggregatesColumns" :allowPaging="true"
+                                                :enablePagingServer="false"
+                                                :editSettings=" { allowEditing: true , mode:'Batch'}"
+                                                @cellSaved="cellSavedDotLaySoLieu" dataKeyField="STT"  
+                                                ></DataGrid>
+                                        </div>
+
+                                    </div>
+                                </SplitArea>
+                            </Split>
+                        </div>
+                    </div>
+                    <div class="tab-content tab-pane" id="tabPhieuHenTra">
+                        <div class="row">
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkLuotGiaoHT" />
+                                            <span class="name">Lượt giao</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <select name="" id="" class="form-control" :disabled="!chkLuotGiaoHT"
+                                                v-model="cboLuotGiaoPhieuHenTraValue">
+                                                <option v-for="item in cboLuotGiaoPhieuHenTra"
+                                                    :value="item.GIAOPHIEU_ID">{{item.GIAOPHIEU_ID}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w110">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkNgayHenTra" />
+                                            <span class="name">Ngày hẹn trả</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="input-icon-right">
+                                            <ejs-datepicker :placeholder="'Ngày giao'" :enabled="chkNgayHenTra"
+                                                v-model="dtpNgayHenTra" :format="'dd/MM/yyyy'" :allowEdit="true"
+                                                :width="'100%'" class="redcolor">
+                                            </ejs-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-content" style="height:580px;">
+                            <DataGrid ref="gridPhieuHenTra" :dataSource="gridPhieuHenTra" :allowPaging="true" :enablePagingServer="false"
+                                @selectedItemsChanged="selectedItemsChangedPhieuHenTra"
+                                @selectedRowChanged="selectedRowChangedPhieuHenTra" :showColumnCheckbox="true"
+                                :columns="collumnPhieuHenTra" dataKeyField="MA_XLN"
+                                :editSettings=" { allowEditing: true , mode:'Batch'}" @cellSaved="cellSavedPhieuHenTra" :enabledSelectFirstRow="false">
+                            </DataGrid>
+                        </div>
+
+                    </div>
+                    <div class="tab-content tab-pane" id="tabPhieuDaGiao">
+                        <div class="grid-stack-box">
+                            <Split :gutterSize="16">
+                                <SplitArea :size="50">
+                                    <div class="box-col" id="boxLeft">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90 red">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkTuNgayGiao" />
+                                                            <span class="name">Từ ngày</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="input-icon-right">
+                                                            <ejs-datepicker :placeholder="'Ngày giao'"
+                                                                :enabled="chkTuNgayGiao" v-model="dtpTuNgayGiao"
+                                                                :format="'dd/MM/yyyy'" :allowEdit="true" :width="'100%'"
+                                                                class="redcolor">
+                                                            </ejs-datepicker>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w110 red">
+                                                        Đến ngày
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="input-icon-right">
+                                                            <ejs-datepicker :placeholder="'Ngày giao'"
+                                                                :enabled="chkTuNgayGiao" v-model="dtpDenNgayGiao"
+                                                                :format="'dd/MM/yyyy'" :allowEdit="true" :width="'100%'"
+                                                                class="redcolor">
+                                                            </ejs-datepicker>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="key w90">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check" v-model="chkLuotGiao" />
+                                                    <span class="name">Lượt giao</span>
+                                                </div>
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" :disabled="!chkLuotGiao"
+                                                        v-model="cboLuotGiaoPhieuDaGiaoValue">
+                                                        <option v-for="item in cboLuotGiaoPhieuDaGiao"
+                                                            :value="item.GIAOPHIEU_ID">
+                                                            {{item.GIAOPHIEU_ID}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkLoaiKHDG" />
+                                                            <span class="name">Loại KH</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                :disabled="!chkLoaiKHDG" v-model="cboLoaiKHDGValue">
+                                                                <option v-for="item  in cboLoaiKHDG"
+                                                                    :value="item.LOAIKH_ID">
+                                                                    {{item.TEN_LOAIKH}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w110">
+                                                        Kiểu nợ
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control" 
+                                                                :disabled="!showKieuNoDG()" v-model="cboKieuNoDGValue">
+                                                                <option v-for="item in cboKieuNoDG"
+                                                                    :value="item.KIEU_ID">{{item.TENKIEU}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        TT hiện thời
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                v-model="cboTrangThaiXLDGValue">
+                                                                <option v-for="item in cboTrangThaiXLDG"
+                                                                    :value="item.TRANGTHAI_ID">
+                                                                    {{item.TRANGTHAI}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w110">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkChuyenBuoc" />
+                                                            <span class="name">Chuyển bước</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                :disabled="!chkChuyenBuoc" v-model="cboChuyenBuocValue">
+                                                                <option v-for="item in cboChuyenBuoc"
+                                                                    :value="item.BUOCXLN_ID">
+                                                                    {{item.BUOC_XLN}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SplitArea :size="50">
+                                <SplitArea>
+                                    <div class="box-col" id="boxRight">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        Đơn vị QL
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                v-model="cboDVQLDGValue">
+                                                                <option v-for="item in cboDVQLDG"
+                                                                    :value="item.DONVI_ID">
+                                                                    {{item.TEN_HIENTHI}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkPhieuHenDG" />
+                                                            <span class="name">Phiếu hẹn</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control"
+                                                                :disabled="!chkPhieuHenDG" v-model="cboPhieuHenDGValue">
+                                                                <option v-for="item in cboPhieuHenDG"
+                                                                    :value="item.PHIEUHEN_ID">
+                                                                    {{item.PHIEUHEN}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkTutienDG" />
+                                                            <span class="name">Số tiền</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w60">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control text"
+                                                                v-model="cboTudauDGValue" :disabled="!chkTutienDG">
+                                                                <option v-for="item in cboTudauDG" :value="item">
+                                                                    {{item}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <vue-numeric class="form-control red" :disabled="!chkTutienDG"
+                                                            v-model="txtTutienDG" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkTuThangDG" />
+                                                            <span class="name">Từ tháng</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w60">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control text"
+                                                                :disabled="!chkTuThangDG" v-model="cboTudau_THDGValue">
+                                                                <option v-for="item in cboTudau_THDG" :value="item">
+                                                                    {{item}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <input type="text" class="form-control"
+                                                            :disabled="!chkTuThangDG" v-model="txtTuThangDG" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkDentienDG" />
+                                                            <span class="name">Đến tiền</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w60">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control text"
+                                                                :disabled="!chkDentienDG" v-model="cboDendauDGValue">
+                                                                <option v-for="item in cboDendauDG" :value="item">
+                                                                    {{item}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <vue-numeric class="form-control red" :disabled="!chkDentienDG"
+                                                            v-model="txtDentienDG" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <div class="info-row">
+                                                    <div class="key w90">
+                                                        <div class="check-action">
+                                                            <input type="checkbox" class="check"
+                                                                v-model="chkDenThangDG" />
+                                                            <span class="name">Đến tháng</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value w60">
+                                                        <div class="select-custom">
+                                                            <select name="" id="" class="form-control text"
+                                                                :disabled="!chkDenThangDG"
+                                                                v-model="cboDendau_THDGValue">
+                                                                <option v-for="item in cboDendau_THDG" :value="item">
+                                                                    {{item}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="value">
+                                                        <input type="text" class="form-control"
+                                                            :disabled="!chkDenThangDG" v-model="txtDenThangDG" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SplitArea>
+                            </Split>
+                        </div>
+                        <div class="table-content" style="height: 200px;">
+                            <DataGrid ref="gridPhieuDaGiao" :dataSource="gridPhieuDaGiao" :columns='collumnPhieuDaGiao' :allowPaging="true"
+                                :enablePagingServer="false" @selectedItemsChanged="selectedItemsChangedPhieuDaGiao"
+                                @selectedRowChanged="selectedRowChangedPhieuDG" :showColumnCheckbox="true"
+                                :editSettings=" { allowEditing: true,mode:'Batch' }"
+                                @commandClick="gridPhieuDaGiaoCommand" @cellSaved="cellSavedPhieuDaGiao"
+                                dataKeyField="MA_XLN" :enabledSelectFirstRow="false"></DataGrid>
+                        </div>
+
+                        <div class="legend-title mart20">Kết quả xử lý</div>
+                        <div class="row">
+                            <div class="col-sm-6 col-12" >
+                                <div class="row">
+                                    <div class="col-sm-12 col-12">
+                                        <div class="info-row">
+                                            <div class="key w80">Kết quả XL</div>
+                                            <div class="value w20 padt5">
+                                                <!-- <a v-show="btnExcelVisibled" :disabled="!btnExcelEnabled" @click="btnExcelKQXL"
+                                                    class=" pointer link f20 one-excel-outline"></a> -->
+                                                <label for="upload" class="pointer link f20 one-excel-outline"
+                                                    v-show="btnExcelVisibled" :disabled="!btnExcelEnabled"
+                                                    style="margin-top: 10">
+                                                    <input type="file" ref="fileInput" hidden id="upload" accept=".xls,.xlsx"
+                                                        @change="btnExcelKQXL" @click="$refs.fileInput.value = null" />
+                                                </label>
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="cboKetQuaXLValue">
+                                                        <option v-for="item in cboKetQuaXL" :value="item.TRANGTHAI_XLN_ID">
+                                                            {{item.TRANGTHAI_XLN}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                 
+                                </div>
+                                <div class=" row">
+                                    <div class="col-sm-12 col-12">
+                                        <div class="info-row">
+                                            <div class="key w80">Lý do XL</div>
+        
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <select name="" id="" class="form-control" v-model="cboLyDoXLValue">
+                                                        <option v-for="item in cboLyDoXL" :value="item.NOIDUNG_XLN_ID">
+                                                            {{item.NOIDUNG_XLN}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 col-12">
+                                        <div class="info-row">
+                                            <div class="key w80">Ngày XL</div>
+        
+                                            <div class="value">
+                                                <div class="input-icon-right">
+                                                    <ejs-datepicker :placeholder="'Ngày XL'" :disabled="true" v-model="dtpNgayXLDG"
+                                                        :format="'dd/MM/yyyy'" :allowEdit="true" :width="'100%'"
+                                                        class="redcolor">
+                                                    </ejs-datepicker>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-12">
+                                        <div class="info-row">
+                                            <div class="key w70">Ngày hẹn</div>
+        
+                                            <div class="value">
+                                                <div class="input-icon-right">
+                                                    <ejs-datepicker :placeholder="'Ngày XL'" :enabled="dtpNgayHenDGEnabled"
+                                                        v-model="dtpNgayHenDG" :format="'dd/MM/yyyy'" :allowEdit="true"
+                                                        :width="'100%'" class="redcolor">
+                                                    </ejs-datepicker>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 col-12">
+                                        <div class="info-row">
+                                            <div class="key w80">Seri</div>
+        
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="txtSeri" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-12">
+                                        <div class="info-row">
+                                            <div class="key w70">Quyển</div>
+        
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="txtQuyen" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-12">
+                                        <div class="info-row">
+                                            <div class="key w70">Số seri</div>
+        
+                                            <div class="value">
+                                                <input type="number" class="form-control" v-model="txtSoSeri" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 col-12">
+                                        <div class="info-row">
+                                            <div class="key w80">Ghi chú</div>
+        
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="txtGhiChuXLN" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12" >  
+                                <div class="row flex-container-dynamic">
+                                    <div v-for="item in dsControl" class="col-sm-6 col-12 ">
+                                        <div class="info-row">
+                                            <template v-if="item.LOAI_ID == 3">
+                                                <div class="key w90">{{item.TIEUDE}}</div>     
+                                                <div class="value">
+                                                    <ejs-datepicker :ref="item.THUOCTINH_BB" v-model="dsControlProp[item.THUOCTINH_BB]"  format="dd/MM/yyyy" :allowEdit="true"
+                                                        :width="'100%'" class="redcolor">
+                                                    </ejs-datepicker>
+                                                </div>
+                                            </template>
+                                            <template v-if="item.LOAI_ID == 2">
+                                                <div class="key w80">{{item.TIEUDE}}</div>
+                                                <div class="value">
+                                                    <input :ref="item.THUOCTINH_BB"  v-model="dsControlProp[item.THUOCTINH_BB]" type="text" class="form-control" />
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>                         
+                           
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <appThuHoiVatTu ref="dlgThuHoiVatTuGP" @confirmEvent="confirmEventTHVT"></appThuHoiVatTu>
+    <appDSLoiGPXLN ref="dlgLoiGPXLN"></appDSLoiGPXLN>
+</div>

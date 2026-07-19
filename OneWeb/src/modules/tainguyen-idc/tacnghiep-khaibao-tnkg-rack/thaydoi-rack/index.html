@@ -1,0 +1,109 @@
+<div>
+  <!-- Buttons -->
+  <div class="list-actions-top">
+    <ul class="list">
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 21">
+        <b-link href="javascript:void(0)" @click="onSave" :disabled="isViewOnly"> <span class="icon one-save"></span>Ghi lại </b-link>
+      </li>
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 21">
+        <b-link href="javascript:void(0)" @click="onChuyenThucHien" :disabled=" isViewOnly ||dataGrid2Items.length == 0 ||
+        dataGrid2Items.length != phieuThiCongDetail.GIATRI_KHAIBAO"><span class="icon one-file-arrow-right"></span>Chuyển thực hiện
+        </b-link>
+      </li>
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 22 || phieuThiCongDetail.TRANGTHAI_ID == 23">
+        <b-link href="javascript:void(0)" @click="onReturn" :disabled="isViewOnly">
+          <span class="icon one-file-back"></span>Trả phiếu
+        </b-link>
+      </li>
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 22 || phieuThiCongDetail.TRANGTHAI_ID == 81">
+        <b-link href="javascript:void(0)" @click="onTransfer" :disabled="isViewOnly">
+          <span class="icon one-file-arrow-right"></span>Chuyển xử lý
+        </b-link>
+      </li>
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 22 || phieuThiCongDetail.TRANGTHAI_ID == 24">
+        <b-link href="javascript:void(0)" @click="onComplete"  :disabled="isViewOnly || dataGrid2Items.length == 0 ||
+         dataGrid2Items.length != phieuThiCongDetail.GIATRI_KHAIBAO || !allRowsProcessed">
+          <span class="icon one-file-check"></span>Hoàn thành
+        </b-link>
+      </li>
+      <li v-if="phieuThiCongDetail.TRANGTHAI_ID == 81">
+        <b-link href="javascript:void(0)" @click="onXacNhanThucHien" :disabled="isViewOnly">
+          <span class="icon one-file-check"></span>Xác nhận thực hiện
+        </b-link>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-content">
+    <!-- Work Information Component -->
+    <ThongTinCongViec :phieuThiCongId="phieutc" v-if="phieutc" ref="thongTinCongViec" />
+
+    <!-- Second DataGrid -->
+    <div class="row datagrid-section">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title d-flex justify-content-between align-items-center">
+              <span>Danh sách Rack thay đổi </span>
+              <button class="btn btn-primary me-2" @click="thayDoiRack" :disabled="isViewOnly || isCapPhatRackDisabled">
+                <span class="-ap icon icon-plus"></span> Thay đổi Rack
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="nav tabs tab-over">
+                <a href="#tab1" data-toggle="tab" :class="{active: currentTab===1}">Danh sách</a>
+                <a href="#tabHistory" data-toggle="tab" :class="{active: currentTab===2}">Lịch sử thay đổi</a>
+              </div>
+              <div class="tab-content">
+                <div class="tab-pane" :class="{active: currentTab===1}" id="tab1">
+                  <div class="row">
+                    <div class="box-form">
+                      <DataGrid ref="grd2" :allowPaging="true" :enablePagingServer="false" :showColumnCheckbox="false"
+                        v-bind:columns="dataGrid2Columns" v-bind:dataSource="dataGrid2Items" @rowSelected="grd2_RowSelected"
+                        @recordDoubleClick="onRackRowDoubleClick"
+                        :enabledSelectFirstRow="false" >
+                      </DataGrid>
+                    </div>
+                  </div>
+                </div>
+                 <div class="tab-pane" id="tabHistory" :class="{active: currentTab===2}">
+                  <div class="box-form">
+                    <div class="row">
+                      <DataGrid
+                        :enablePagingServer="false"
+                        v-bind:columns="
+                              [
+                                {fieldName: 'STT', headerText: 'STT', textAlign: 'Center', width: 80},
+                                {fieldName: 'KHOA_DULIEU', headerText: 'Rack ID', textAlign: 'Left', width: 150},
+                                {fieldName: 'TEN_RACK', headerText: 'Tên Rack', textAlign: 'Left', width: 120},
+                                {fieldName: 'HANHDONG', headerText: 'Tên tác động', textAlign: 'Left', width: 120},
+                                {fieldName: 'TENCOT', headerText: 'Trường thông tin thay đổi', textAlign: 'Left', width: 120},
+                                {fieldName: 'GIATRI_CU', headerText: 'Giá trị cũ', textAlign: 'Left', width: 150},
+                                {fieldName: 'GIATRI_MOI', headerText: 'Giá trị mới', textAlign: 'Left', width: 150},
+                                {fieldName: 'NGUOI_CN', headerText: 'Người thực hiện', textAlign: 'Left', width: 130},
+                                {fieldName: 'NGAY_CN', headerText: 'Thời điểm', textAlign: 'Left', width: 150}
+                              ]"
+                        v-bind:dataSource="historyRackList"
+                        :allowPaging="true"
+                        ref="historyItems"
+                      >
+                      </DataGrid>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Component -->
+  <ThayDoiRackModal ref="popupDanhSachRack" :phieuThiCongId="phieutc" @rackAllocated="onRackAllocated"/>
+  <ThiCongThayDoiRack ref="popupThiCongThayDoiRack" :phieuThiCongId="phieutc" @rackAllocated="onRackAllocated"/>
+  <ThongTinRackModal ref="popupChiTietRack"  />
+  <ChuyenXuLy  ref="popupChuyenXuly" ></ChuyenXuLy>
+  <TraPhieu ref="popupTraPhieu" ></TraPhieu>
+</div>

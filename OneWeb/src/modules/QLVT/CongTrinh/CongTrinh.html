@@ -1,0 +1,826 @@
+<div>
+    <b-nav pills="" class="menu">
+        <!-- <b-nav-item
+            v-show="!visible.layoutDSCT"
+            @click="visible.layoutDSCT = true"
+            ><span class="icon one-file-attach"></span> Hiện DS công
+            trình</b-nav-item
+        > -->
+        <b-nav-item v-b-tooltip.hover="" title="Lấy thông tin" @click="onbtnLayTT"><span
+                class="icon one-file-attach"></span> Lấy TT
+        </b-nav-item>
+        <b-nav-item v-show="visible.btnNhapMoi" :disabled="!enable.btnNhapMoi" @click="onbtnNhapMoi"><span
+                class="icon ui-1_circle-add nc-icon-glyph"></span> Nhập mới</b-nav-item>
+        <b-nav-item v-show="visible.btnCapNhat" @click="onbtnCapNhat"><span class="icon one-save"></span> Cập nhật
+        </b-nav-item>
+        <b-nav-item v-show="visible.btnHuyBo" @click="onbtnHuyBo"><span
+                class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy bỏ
+        </b-nav-item>
+        <b-nav-item v-show="visible.btnXoaPhieu" :disabled="!enable.btnXoaPhieu" @click="onbtnXoaPhieu"><span
+                class="icon one-trash"></span> Xóa phiếu</b-nav-item>
+        <b-nav-item v-b-modal.modalthongtinfile="" @click="ontsbtnThemFile" v-show="visible.tsbtnThemFile"><span
+                class="icon one-file-plus"></span> Thêm file</b-nav-item>
+        <!-- v-show="visible.tsbtnThemFile" -->
+        <b-nav-item-dropdown right="">
+            <template #button-content="">
+                <span class="icon one-print"></span> In biên bản
+            </template>
+            <b-dropdown-item @click="btnBC_BB28">B28. Dự toán kinh phí</b-dropdown-item>
+            <b-dropdown-item @click="btnBC_BB29">B29. Phương án kỹ thuật</b-dropdown-item>
+            <b-dropdown-item @click="btnBC_BB30">B30. Biên bản hiện trường</b-dropdown-item>
+            <b-dropdown-item @click="btnBC_BB31">B31. Biên bản sự cố</b-dropdown-item>
+            <b-dropdown-item @click="btnBC_BB32">B32. Biên bản phát sinh</b-dropdown-item>
+            <b-dropdown-item @click="btnBC_BB33">B33. Hồ sơ hoàn công</b-dropdown-item>
+        </b-nav-item-dropdown>
+    </b-nav>
+
+    <!-- form -->
+    <b-container fluid="" class="p-3 page-content">
+        <b-row>
+            <b-col class="box-form p-2">
+                <div class="legend-title">Tiêu chí tìm kiếm</div>
+                <div class="row">
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w110">Mã công trình:</div>
+                            <div class="value">
+                                <div class="input-more-button -right">
+                                    <button class="btn" @click="btnSearchMaCT">
+                                        <span class="-ap icon one-search "></span>
+                                    </button>
+                                    <input type="text" class="form-control highlight" v-model="gParams.txtMaCT_TK"
+                                        @keyup.enter="txtMaCT_TKEnter" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="gParams.ckbTuNgay" />
+                                    <span class="name">Từ ngày</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <ejs-datepicker v-model="gParams.dtpTuNgay" :format="'dd/MM/y'" :showClearButton="false"
+                                    :enabled="gParams.ckbTuNgay" class="redcolor">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row">
+                            <div class="key w90">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="gParams.ckbDenNgay" />
+                                    <span class="name">Đến ngày</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <ejs-datepicker v-model="gParams.dtpDenNgay" :format="'dd/MM/y'"
+                                    :showClearButton="false" :enabled="gParams.ckbDenNgay" :placeholder="'Từ ngày'"
+                                    class="redcolor">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row style="flex-wrap: nowrap">
+            <b-col cols="3" class="box-form mr-2 p-2" v-if="visible.layoutDSCT">
+                <b-button variant="danger" v-b-tooltip.hover="" title="Ẩn danh sách công trình"
+                    style="position: absolute; right: 6px; top: 6px" @click="visible.layoutDSCT = false">
+                    <span class="-ap icon-close"></span>
+                </b-button>
+                <div class="legend-title mart8">Danh sách công trình</div>
+                <b-input-group class="mb-2">
+                    <b-input-group-prepend>
+                        <b-button variant="outline-secondary" @click="ontxtLocDTClick"><span class="one-search"></span>
+                        </b-button>
+                    </b-input-group-prepend>
+                    <b-form-input v-model="gParams.txtLocDT" @keyup.enter="ontxtLocDTClick"></b-form-input>
+                </b-input-group>
+
+                <div class="tree-plus" style="max-height: 400px; overflow: scroll;">
+                    <div class="tree-view-wrapper">
+                        <ejs-treeview id="treeview" ref="tvDoiTuong" :fields="getTree" :allowMultiSelection="true"
+                            @nodeSelected="onTreeDSCTSelected"></ejs-treeview>
+                    </div>
+                </div>
+            </b-col>
+            <b-col :cols="visible.layoutDSCT ? 9 : 12" class="pl-2 pr-2">
+                <div :class="enable.layoutGroupTTCT ? '' : 'disabledbutton'">
+
+                    <b-row>
+                        <Split :gutterSize="0">
+                            <SplitArea :size="50" :minSize="500">
+                                <b-col align-self="stretch" class="mr-1 box-col box-form h-100 p-2"
+                                    style="margin-bottom: 0px;">
+                                    <div class="legend-title mart8">
+                                        Thông tin công trình
+                                    </div>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtMaCT" class="col-form-label">Mã công trình</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-input-group id="maCongTrinh">
+                                                <b-form-input id="txtMaCT" v-model="gParams.txtMa_CT"></b-form-input>
+                                                <b-input-group-append>
+                                                    <b-button variant="outline-primary" @click="ontxtMa_CTClick">...
+                                                    </b-button>
+                                                    <ejs-dialog :visible="false" ref="popup_frmNhapText"
+                                                        :animationSettings="animationSettings" :target="target"
+                                                        :showCloseIcon="false" :closeOnEscape="true"
+                                                        :enableResize="true" :allowDragging="true" width="30%"
+                                                        :isModal="true" :cssClass="'popup-box'">
+                                                        <frmNhapText ref="frmNhapText" @onXacNhan="frmNhapTextConfirm">
+                                                        </frmNhapText>
+                                                    </ejs-dialog>
+                                                </b-input-group-append>
+                                            </b-input-group>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="dtpNgayLap" class="col-form-label">Ngày lập</label>
+                                        </b-col>
+                                        <b-col class="over-hidden">
+                                            <ejs-datepicker v-model="gParams.dtpNgayTao" :format="'dd/MM/y'"
+                                                :showClearButton="false" :placeholder="'Từ ngày'" class="redcolor"
+                                                @change="dtpNgayTaoChanged">
+                                            </ejs-datepicker>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtMaCtChung" class="col-form-label">Mã CT chung</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtMaCtChung" v-model="gParams.txtMaCT_Cha">
+                                            </b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+
+                                        <b-col cols="2">
+                                            <label for="txtTenCT" class="col-form-label">Tên công trình</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtTenCT" v-model="gParams.txtTen_CT"
+                                                @dblclick="dbltxtTen_CTClick"></b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtGiaTriDuToan" class="col-form-label">Giá trị dự toán</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="input-icon-right">
+                                                <vue-numeric currency="" separator="," v-model="gParams.calGT_DT"
+                                                    class="screen-cal form-control tright text-rose redColor"
+                                                    style="color: blue !important; font-weight: bold"></vue-numeric>
+                                                <span class="icon one-calculator"
+                                                    @click="enable.isCalculatorDTShow = !enable.isCalculatorDTShow"></span>
+                                                <Calculator @display="gParams.calGT_DT = $event"
+                                                    :value="gParams.calGT_DT" :is-show="enable.isCalculatorDTShow"
+                                                    @close="enable.isCalculatorDTShow = !enable.isCalculatorDTShow">
+                                                </Calculator>
+                                            </div>
+                                        </b-col>
+
+                                        <b-col cols="2">
+                                            <label for="txtGiaTriQT" class="col-form-label">Giá trị QT</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="input-icon-right">
+                                                <vue-numeric currency="" separator="," v-model="gParams.calGT_QT"
+                                                    class="screen-cal form-control tright text-rose"
+                                                    style="color: red !important; font-weight: bold"></vue-numeric>
+                                                <span class="icon one-calculator"
+                                                    @click="enable.isCalculatorQTShow = !enable.isCalculatorQTShow"></span>
+                                                <Calculator @display="gParams.calGT_QT = $event"
+                                                    :value="gParams.calGT_QT" :is-show="enable.isCalculatorQTShow"
+                                                    @close="enable.isCalculatorQTShow = !enable.isCalculatorQTShow">
+                                                </Calculator>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtDiaChiTC" class="col-form-label">Địa chỉ thi công</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtDiaChiTC" v-model="gParams.txtDiaChi_TC">
+                                            </b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboDonViQL" class="col-form-label">Đơn vị quản lý</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboDvi_QL" :dataSource="cboDvi_QL"
+                                                    :fields="{value:'DONVI_ID', text: 'TEN_DV'}" :allowFiltering="true"
+                                                    :filtering='FilerDVQuanLy'>
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboDonViTC" class="col-form-label">Đơn vị thi công</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboDvi_TC" :dataSource="cboDvi_TC"
+                                                    :fields="{value:'DONVI_ID', text: 'TEN_DV'}" :allowFiltering="true"
+                                                    :filtering='FilerDVThiCong'>
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboDonViPD" class="col-form-label">Đơn vị PD</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboDVi_PD" :dataSource="cboDVi_PD"
+                                                    :fields="{value:'DONVI_ID', text: 'TEN_DV'}" :allowFiltering="true"
+                                                    :filtering='FilerDVPD'>
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtNoiDung" class="col-form-label">Nội dung</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-textarea id="txtNoiDung" v-model="gParams.txtNoiDung"></b-textarea>
+                                        </b-col>
+                                    </b-row>
+                                </b-col>
+                            </SplitArea>
+                            <SplitArea :size="50" :minSize="500">
+                                <b-col align-self="stretch" class="ml-1 box-col box-form h-100 p-2"
+                                    style="margin-bottom: 0px;">
+                                    <div class="legend-title mart8">
+                                        Thông tin thiết bị cần mua
+                                    </div>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtSoHieuCT" class="col-form-label">Số hiệu CT</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtSoHieuCT" v-model="gParams.txtSoHieuCT"></b-form-input>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="txtCoSoDuToan" class="col-form-label">Cơ sở dự toán</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtCoSoDuToan" v-model="gParams.txtCS_DT"
+                                                @dblclick="txtCS_DTDblClick"></b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="dtpNgayNT" class="col-form-label">Ngày nghiệm thu</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-input-group style="flex-wrap: nowrap;">
+                                                <ejs-datepicker v-model="gParams.dtpNgayNT" :format="'dd/MM/y'"
+                                                    :showClearButton="false" class="redcolor">
+                                                </ejs-datepicker>
+
+                                                <b-input-group-append>
+                                                    <b-button variant="outline-primary" @click="ondtpNgayNTClick"><span
+                                                            class="icon one-save"></span>
+                                                    </b-button>
+                                                </b-input-group-append>
+                                            </b-input-group>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="dtpNgayHT" class="col-form-label">Ngày hoàn thành</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-input-group style="flex-wrap: nowrap;">
+                                                <ejs-datepicker v-model="gParams.dtpNgayHT" :format="'dd/MM/y'"
+                                                    :showClearButton="false" class="redcolor">
+                                                </ejs-datepicker>
+                                                <b-input-group-append>
+                                                    <b-button variant="outline-primary" @click="ondtpNgayHTClick"><span
+                                                            class="icon one-save"></span>
+                                                    </b-button>
+                                                </b-input-group-append>
+                                            </b-input-group>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboNhomCT" class="col-form-label">Nhóm CT</label>
+                                        </b-col>
+                                        <b-col>
+                                            <ComboboxGrid ref="cboGNhomCT" id="cboNhomCT" data-key-field="mucDichId"
+                                                :allow-paging="false" :columns="[
+                                                {
+                                                fieldName: 'mucDich',
+                                                headerText: 'Mục đích',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },
+                                                ]" :data-source="cboNhomCT" :show-filter="true" textField="mucDich"
+                                                valueField="mucDichId" @selectedChanged="oncboNhomCTChanged">
+                                            </ComboboxGrid>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="cboLoaiCT" class="col-form-label">Loại công trình</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboLoaiCT" :dataSource="cboLoaiCT"
+                                                    popupWidth="500px"
+                                                    :fields="{value:'loaiCtId', text: 'loaiCt'}" :allowFiltering="true"
+                                                    @change="">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboNguonVon" class="col-form-label">Nguồn vốn</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboNguonVon" :dataSource="cboNguonVon"
+                                                    :fields="{value:'NGUONVON_ID', text: 'NGUONVON'}"
+                                                    popupWidth="500px"
+                                                    :allowFiltering="true" @change="">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="cboTrangThai" class="col-form-label">Trạng thái</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboTrangThai" :dataSource="cboTrangThai"
+                                                    :fields="{value:'TRANGTHAI_CT_ID', text: 'TRANGTHAI_CT'}"
+                                                    :allowFiltering="true" @change="">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboDuAnIMS" class="col-form-label">Dự án IMS</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-input-group style="flex-wrap: nowrap;">
+                                                <ComboboxGrid ref="refcboDuAnIMS" id="cboDuAnIMS"
+                                                    data-key-field="ProjectID" :allow-paging="true"
+                                                    :enablePagingServer="false" :enabledSelectFirstRow="false"
+                                                    :show-column-checkbox="false" :columns="[
+                                                    {
+                                                    fieldName: 'ProjectID',
+                                                    headerText: 'Dự án ID',
+                                                    allowFiltering: true,
+                                                    allowSorting: true,
+                                                    },{
+                                                    fieldName: 'ProjectName',
+                                                    headerText: 'Tên dự án',
+                                                    allowFiltering: true,
+                                                    allowSorting: true,
+                                                    },{
+                                                    fieldName: 'ProjectCode',
+                                                    headerText: 'Mã dự án',
+                                                    allowFiltering: true,
+                                                    allowSorting: true,
+                                                    },
+                                                    ]" textField="ProjectCode" valueField="ProjectID"
+                                                    :data-source="cboDuAnIMS" :show-filter="true"
+                                                    @selectedChanged="oncboDuAnIMSChanged">
+                                                </ComboboxGrid>
+                                                <b-input-group-append>
+                                                    <b-button variant="outline-primary" @click="cboDuAnIMS_ButtonClick">
+                                                        <span class="-ap icon-close"></span>
+                                                    </b-button>
+                                                </b-input-group-append>
+                                                <b-input-group-append>
+                                                    <b-button variant="outline-primary" @click="v_btnRef_Click"><span
+                                                            class="-ap one-reload"></span>
+                                                    </b-button>
+                                                </b-input-group-append>
+                                            </b-input-group>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="cboLoaiSoHieu" class="col-form-label">Loại số hiệu</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboLoaiSoHieu" :dataSource="cboLoaiSoHieu"
+                                                    :fields="{value:'LOAISH_ID', text: 'LOAI_SH'}"
+                                                    :allowFiltering="true" @change="cboLoaiSoHieuChanged">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboLyDoThiCong" class="col-form-label">Lý do TC</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboLyDoTC" :dataSource="cboLyDoTC"
+                                                    :fields="{value:'mucDichId', text: 'mucDich'}" 
+                                                    popupWidth="500px"
+                                                    :allowFiltering="true" @change="">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="cboLoaiThietBi" class="col-form-label">Loại thiết bị</label>
+                                        </b-col>
+                                        <b-col>
+                                            <div class="select-custom">
+                                                <ejs-dropdownlist class="form-control" locale="vi"
+                                                    v-model="gParams.cboChungLoai" :dataSource="cboChungLoai"
+                                                    popupWidth="500px"
+                                                    :fields="{value:'chungLoaiTbiId', text: 'tenClTbi'}"
+                                                    :allowFiltering="true" @change="">
+                                                </ejs-dropdownlist>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboNVDaiDien" class="col-form-label" v-b-tooltip.hover=""
+                                                title="Nhân viên đại diện đội quản lý sử dụng">NV ĐD Đội QLSD</label>
+                                        </b-col>
+                                        <b-col>
+                                            <ComboboxGrid ref="cboGridNV_DD" id="cboNV_DD" data-key-field="nhanVienId"
+                                                :allow-paging="false" :columns="[{
+                                                fieldName: 'tenNv',
+                                                headerText: 'Nhân viên',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },{
+                                                fieldName: 'tenDv',
+                                                headerText: 'Đơn vị',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },
+                                                ]" :data-source="cboNV_DD" :show-filter="true" textField="tenNv"
+                                                valueField="nhanVienId" @selectedChanged="oncboNV_DDChanged">
+                                            </ComboboxGrid>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="cboHeThong" class="col-form-label">Hệ thống</label>
+                                        </b-col>
+                                        <b-col id="div-hethong">
+                                            <ComboboxGrid ref="cboHeThong" id="cboHeThong" data-key-field="HETHONG_ID"
+                                                :allow-paging="false" :columns="[{
+                                                fieldName: 'TEN_HETHONG',
+                                                headerText: 'Hệ thống',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },{
+                                                fieldName: 'LINHVUC',
+                                                headerText: 'Lĩnh vực',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },
+                                                ]" textField="TEN_HETHONG" valueField="HETHONG_ID"
+                                                :data-source="cboHeThong" :show-filter="true"
+                                                @selectedChanged="oncboHeThongChanged">
+                                            </ComboboxGrid>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="cboNhanVienKyThuat" class="col-form-label">Nhân viên kỹ
+                                                thuật</label>
+                                        </b-col>
+                                        <b-col>
+                                            <ComboboxGrid ref="cboNV_KT" id="cboNhanVienKyThuat"
+                                                data-key-field="nhanVienId" :allow-paging="false" :columns="[{
+                                                fieldName: 'tenNv',
+                                                headerText: 'Tên nhân viên',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },{
+                                                fieldName: 'tenDv',
+                                                headerText: 'Đơn vị',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },
+                                                ]" textField="tenNv" valueField="nhanVienId" :data-source="cboNV_KT"
+                                                :show-filter="true" @selectedChanged="oncboNV_KTChanged">
+                                            </ComboboxGrid>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <label for="cboNhanVienDDTC" class="col-form-label">NV đại diện Đội TC</label>
+                                        </b-col>
+                                        <b-col id="div-nhanvienddtc">
+                                            <ComboboxGrid ref="cboNV_TK" id="cboNhanVienDDTC"
+                                                data-key-field="nhanVienId" :allow-paging="false" :columns="[{
+                                                fieldName: 'tenNv',
+                                                headerText: 'Tên nhân viên',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },{
+                                                fieldName: 'tenDv',
+                                                headerText: 'Đơn vị',
+                                                allowFiltering: true,
+                                                allowSorting: true,
+                                                },
+                                                ]" textField="tenNv" valueField="nhanVienId" :data-source="cboNV_TK"
+                                                :show-filter="true" @selectedChanged="oncboNV_TKChanged"
+                                                :enabledSelectFirstRow="true">
+                                            </ComboboxGrid>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtHienTrang" class="col-form-label">Hiện trạng</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtHienTrang" v-model="gParams.txtHienTrang"
+                                                @dblclick="txtHienTrangDblClick"></b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="mb-2">
+                                        <b-col cols="2">
+                                            <label for="txtBienPhap" class="col-form-label">Biện pháp</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-input id="txtBienPhap" v-model="gParams.txtBienPhap"
+                                                @dblclick="txtBienPhapDblClick"></b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                </b-col>
+                            </SplitArea>
+                        </Split>
+                    </b-row>
+
+                </div>
+
+                <b-row>
+                    <b-col class="p-0">
+                        <div class="box-form p-0">
+                            <b-tabs content-class="p-1 border-0" v-model="tabActived.currentTab"
+                                @activate-tab="tabDSChanged">
+                                <b-tab title="Danh sách công trình" v-if="visible.tabDSCongTrinh">
+                                    <DataGrid ref="grvDS_CongTrinh" data-key-field="SOHIEU_CT" :allow-paging="false"
+                                        :columns="[ 
+                                        { fieldName: 'SOHIEU_CT', headerText: 'Số hiệu công trình', allowFiltering: true, allowSorting: true, freeze: 'Left', },
+                                        { fieldName: 'MA_CT', headerText: 'Mã CT', allowFiltering: true, allowSorting: true, freeze: 'Left', },
+                                        { fieldName: 'MACT_CHUNG', headerText: 'Mã CT chung', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'NGAYLAP', headerText: 'Ngày lập', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'TEN_CT', headerText: 'Tên CT', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'LOAI_CT', headerText: 'Loại CT', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'NGUONVON', headerText: 'Nguồn vốn', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'NGAY_NT', headerText: 'Ngày NT', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'NGAY_HT', headerText: 'Ngày HT', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'DONVI_QL', headerText: 'Đơn vị QL', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'DONVI_TC', headerText: 'Đơn vị TC', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'MA_DUAN_IMS', headerText: 'Dự án IMS', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'NGUOI_CN', headerText: 'Người lập', allowFiltering: true, allowSorting: true, }, ]"
+                                        :data-source="grvDSCongTrinh" :show-filter="true"
+                                        @selectedRowChanged="onGridDSCongTrinhRowChanged" :allowPaging="true"
+                                        :enablePagingServer="false">
+                                    </DataGrid>
+                                    <!-- :enabledSelectFirstRow="false" -->
+                                </b-tab>
+                                <b-tab title="Danh sách chi tiết vật tư công trình">
+                                    <DataGrid :allow-paging="false" data-key-field="MA_VT"
+                                        :columns="[ { fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: true, },
+                                         { fieldName: 'TEN_VT', headerText: 'Tên VT', allowFiltering: true, allowSorting: true, },
+                                        { fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, allowSorting: true, cellCssClass: 'c-red', type:'number', format:'N0'},
+                                        { fieldName: 'SL_DUYET', headerText: 'SL duyệt', allowFiltering: true, allowSorting: true, cellCssClass: 'c-orange', type:'number', format:'N0'}, 
+                                        { fieldName: 'TIEN', headerText: 'Thành tiền', allowFiltering: true, allowSorting: true, type:'number', format:'N0'}, 
+                                        { fieldName: 'SL_DT', headerText: 'SL dự toán', allowFiltering: true, allowSorting: true, cellCssClass: 'c-brown', type:'number', format:'N0'}, 
+                                        { fieldName: 'SL_QT', headerText: 'SL quyết toán', allowFiltering: true, allowSorting: true, cellCssClass: 'c-blue', type:'number', format:'N0'},
+                                        { fieldName: 'SL_CHENHLECH', headerText: 'SL chênh lệch', allowFiltering: true, allowSorting: true, cellCssClass: 'c-purple', type:'number', format:'N0'},
+                                        { fieldName: 'TIEN_DT', headerText: 'Tiền dự toán', allowFiltering: true, allowSorting: true, type:'number', format:'N0'},
+                                        { fieldName: 'TIEN_QT', headerText: 'Tiền QT', allowFiltering: true, allowSorting: true, type:'number', format:'N0'}, 
+                                        { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true, }, ]" :data-source="grvCTVT"
+                                        :show-filter="true" :allowPaging="true" :enablePagingServer="false" :aggregates="PTAggregatesColumns">
+                                    </DataGrid>
+                                </b-tab>
+                                <b-tab title="Danh sách công trình gán" v-if="visible.tabDSCTGan">
+                                    <b-row>
+                                        <b-col style="overflow: scroll" class="p-2">
+                                            <div class="legend-title mart8">
+                                                Thông tin công trình đã gán
+                                            </div>
+                                            <DataGrid :allow-paging="false" data-key-field="MA_GD"
+                                                :columns="[
+                                                { fieldName: 'SOHIEU_CT', headerText: 'Số hiệu CT', allowFiltering: true, allowSorting: true, freeze: 'Left', cellCssClass: 'c-red', }, 
+                                                { fieldName: 'MA_CT', headerText: 'Mã CT', allowFiltering: true, allowSorting: true, freeze: 'Left', cellCssClass: 'c-blue', },
+                                                { fieldName: 'NGAYLAP', headerText: 'Ngày lập', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'TEN_CT', headerText: 'Tên CT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'LOAI_CT', headerText: 'Loại CT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGUONVON', headerText: 'Nguồn vốn', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGAY_NT', headerText: 'Ngày NT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGAY_HT', headerText: 'Ngày HT', allowFiltering: true, allowSorting: true, }, 
+                                                { fieldName: 'DONVI_QL', headerText: 'Đơn vị QL', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'DIACHI_TC', headerText: 'Địa chỉ TC', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGUOI_CN', headerText: 'Người lập', allowFiltering: true, allowSorting: true, }, ]" ref="gridDSCTDG"
+                                                :data-source="grvDSCTDG" :show-filter="true"
+                                                :show-column-checkbox="true" :default-column-checkbox-checked="false"
+                                                :allowPaging="true" :enablePagingServer="false"
+                                                :enabledSelectFirstRow="false">
+                                            </DataGrid>
+                                        </b-col>
+                                        <b-col cols="0" style="width: 47px" class="p-0">
+                                            <b-row style="height: 100px"></b-row>
+                                            <b-button class="row" variant="outline-primary" @click="btnGan"><span
+                                                    class="fa fa-arrow-left"></span></b-button>
+                                            <b-row style="height: 10px"></b-row>
+                                            <b-button class="row" variant="outline-primary" @click="btnGo"><span
+                                                    class="fa fa-arrow-right"></span></b-button>
+                                        </b-col>
+                                        <b-col style="overflow: scroll" class="p-2">
+                                            <div class="legend-title mart8">
+                                                Thông tin công trình chưa gán
+                                            </div>
+                                            <DataGrid :allow-paging="false" data-key-field=""
+                                                :columns="[ 
+                                                { fieldName: 'SOHIEU_CT', headerText: 'Số hiệu CT', allowFiltering: true, allowSorting: true, freeze: 'Left', cellCssClass: 'c-red', },
+                                                { fieldName: 'MA_CT', headerText: 'Mã CT', allowFiltering: true, allowSorting: true, freeze: 'Left', cellCssClass: 'c-blue', },
+                                                { fieldName: 'NGAYLAP', headerText: 'Ngày lập', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'TEN_CT', headerText: 'Tên CT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'LOAI_CT', headerText: 'Loại CT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGUONVON', headerText: 'Nguồn vốn', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGAY_NT', headerText: 'Ngày NT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGAY_HT', headerText: 'Ngày HT', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'DONVI_QL', headerText: 'Đơn vị QL', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'DIACHI_TC', headerText: 'Địa chỉ TC', allowFiltering: true, allowSorting: true, },
+                                                { fieldName: 'NGUOI_CN', headerText: 'Người lập', allowFiltering: true, allowSorting: true, }, ]" ref="gridDSCTCG"
+                                                :data-source="grvDSCTCG" :show-filter="true"
+                                                :show-column-checkbox="true" :default-column-checkbox-checked="false"
+                                                :allowPaging="true" :enablePagingServer="false"
+                                                :enabledSelectFirstRow="false">
+                                            </DataGrid>
+                                        </b-col>
+                                    </b-row>
+                                </b-tab>
+                            </b-tabs>
+                        </div>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+        <b-row> </b-row>
+    </b-container>
+
+    <!-- modal thong tin file -->
+    <b-modal id="modalthongtinfile" title="Thông tin file" size="xl" centered="" no-close-on-backdrop="" hide-footer="">
+        <template #modal-header="{ close }">
+            <h3>Thông tin file</h3>
+            <b-button-group>
+                <b-button size="sm" variant="outline-primary" @click="onbtnClear">
+                    Làm mới
+                </b-button>
+                <b-button size="sm" variant="outline-primary" @click="onbtnThemFile">
+                    {{text.btnThemFile}}
+                </b-button>
+                <b-button size="sm" variant="outline-danger" @click="closeFile()">
+                    <span class="-ap icon-close"></span>
+                </b-button>
+            </b-button-group>
+        </template>
+        <b-container fluid="">
+            <b-row>
+                <b-col class="pl-0 pr-1">
+                    <b-row class="mb-2">
+                        <b-col cols="2">
+                            <label for="cboLoaiVB" class="col-form-label">Loại VB</label>
+                        </b-col>
+                        <b-col>
+                            <div class="select-custom">
+                                <ejs-dropdownlist class="form-control" locale="vi" v-model="gParams.cboLoaiFile"
+                                    :dataSource="cboLoaiFile" :fields="{value:'LOAIVB_ID', text: 'LOAI_VB'}"
+                                    :allowFiltering="true" @change="">
+                                </ejs-dropdownlist>
+                            </div>
+                        </b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col cols="2">
+                            <label for="dtpNgayVB" class="col-form-label">Ngày VB</label>
+                        </b-col>
+                        <b-col class="over-hidden">
+                            <ejs-datepicker v-model="gParams.dtpNgayVB" :format="'dd/MM/y'" :showClearButton="false"
+                                :enabled="true" class="redcolor">
+                            </ejs-datepicker>
+                        </b-col>
+                        <b-col cols="2">
+                            <label for="dtpNgayTT" class="col-form-label">Ngày TT</label>
+                        </b-col>
+                        <b-col class="over-hidden">
+                            <ejs-datepicker v-model="gParams.dtpNgayTT" :format="'dd/MM/y'" :showClearButton="false"
+                                :enabled="true" class="redcolor">
+                            </ejs-datepicker>
+                        </b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col cols="2">
+                            <label for="txtSoCV" class="col-form-label">Số CV</label>
+                        </b-col>
+                        <b-col>
+                            <b-form-input id="txtSoCV" v-model="gParams.txtSoCV"></b-form-input>
+                        </b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col cols="2">
+                            <label for="txtLyDoTH" class="col-form-label">Lý do TH</label>
+                        </b-col>
+                        <b-col>
+                            <b-form-input id="txtLyDoTH" v-model="gParams.txtLyDoTH"></b-form-input>
+                        </b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col cols="2">
+                            <label for="btnFileVC" class="col-form-label">File VC</label>
+                            <b-button variant="outline-primary" style="position: absolute; right: 0"
+                                @click="onbtnFilePath" :disabled="!enable.btnFilePath">...</b-button>
+                            <!-- <input
+                                ref="filePath"
+                                hidden
+                                type="file"
+                                id="docpicker"
+                                @change="onChangeFileVC"
+                                @click="$refs.filePath.value = null"
+                                accept=".doc,.docx,.pdf,.*"
+                                multiple="multiple"
+                            /> -->
+                            <b-form-file v-show="false" ref="ref-choose-file" multiple @change="onChangeFileVC"
+                                accept=".doc,.docx,.pdf,.*"></b-form-file>
+                        </b-col>
+                        <b-col>
+                            <data-grid ref="grvFileVB" class="no-header" data-key-field="MA_GD"
+                                :columns="gridFileVBColumn" :data-source="grvFileVB" :show-filter="false"
+                                :allow-paging="false" @commandClick="onFileVBCommand"
+                                @selectedRowChanged="onGridFileVBRowChanged">
+                            </data-grid>
+                        </b-col>
+                    </b-row>
+                </b-col>
+                <b-col class="pr-0 pl-1">
+                    <div class="legend-title">
+                        <span></span> Danh sách file:
+                    </div>
+                    <data-grid ref="grvDSFile" data-key-field="" :columns="gridDsFileColumn" :data-source="grvDSFile"
+                        :allow-paging="true" @commandClick="onDsFileCommand"
+                        @selectedRowChanged="onGridDsFileRowChanged">
+                    </data-grid>
+                </b-col>
+            </b-row>
+        </b-container>
+    </b-modal>
+    <b-modal hide-footer size="lg" :title="frmNoiDungTT.title" class="modal" id="popupNoiDungTT">
+        <div>
+            <!-- <div class="popup-header">
+                <div class="title">{{frmNoiDungTT.title}}</div>
+                <div
+                    class="close -ap icon-close"
+                    @click="$bvModal.hide('popupNoiDungTT')"
+                    data-dismiss="modal"
+                ></div>
+            </div> -->
+            <div class="list-actions-top">
+                <ul class="list">
+                    <li>
+                        <a @click="onClickXacNhan()" class="pointer">
+                            <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>
+                            Xác nhận
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="popup-body">
+                <div class="info-row">
+                    <div class="key w90">
+                        {{frmNoiDungTT.title}}
+                    </div>
+                    <div class="value">
+                        <textarea class="form-control" v-model="gParams.vnoidung"
+                            style="height: 100px;resize: vertical;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </b-modal>
+</div>

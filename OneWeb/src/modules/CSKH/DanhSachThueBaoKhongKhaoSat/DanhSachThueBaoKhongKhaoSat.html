@@ -1,0 +1,244 @@
+<div class="">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="getDsThueBao">
+                    <span class="icon nc-icon-glyph files_archive-paper"></span> Lấy DS
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="setButton(1)" :class="{'disabled': !nhapMoiBtnEnable}">
+                    <span class="icon one-file-plus"></span> Nhập mới
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="capNhap" :class="{'disabled': !ghiLaiBtnEnable}">
+                    <span class="icon one-save"></span> Ghi lại
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" :class="{'disabled': !huyBoBtnEnable}" @click="clear">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Huỷ
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="deleteThueBao" :class="{'disabled': !xoaBtnEnable}">
+                    <span class="icon one-trash"></span> Xoá
+                </a>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onOpenDocFileThemPopup"
+                    :class="{'disabled': !nhapExcelBtnEnable}">
+                    <span class="icon one-book"></span> Đọc file thêm
+                </a>
+                <appDSKhoaMoUploadXLS ref="frmDsKhoaMo_DocFileThem"></appDSKhoaMoUploadXLS>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onOpenDocFileXoaPopup"
+                    :class="{'disabled': !nhapExcelBtnEnable}">
+                    <span class="icon one-book"></span> Đọc file xóa
+                </a>
+                <appDSKhoaMoUploadXLSXoa ref="frmDsKhoaMo_DocFileXoa"></appDSKhoaMoUploadXLSXoa>
+            </li>
+            <li>
+                <a href="javascript: void(0)" @click="onXuatFileClicked">
+                    <span class="icon one-download"></span> Xuất File
+                </a>
+                <appModalXuatDuLieu id="modal-xuat-dulieu" :thuocTinh="dsThuocTinh" :data="dgvThueBaoKhongKhoaMo.dataSource"/>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="pull-right w120"><KyCuoc ref="kyCuocInput" :isTextBold="true"  @handleChangeKyCuoc="handleKyHoaDon"/></div>
+
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="legend-title">Thông tin tra cứu</div>
+                    <div class="info-row">
+                        <div class="key w90">Loại DS
+                        </div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <b-form-select v-model="loaiDSThueBaoKhongKhaoSatSelected" class="form-control"
+                                    :options="loaiDSThueBaoKhongKhaoSatGetter" @change="getDsThueBao">
+                                </b-form-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Mã TT/Mã TB
+                            <span style="position: relative">
+                                <span style="color: red; position: absolute; left: 1px;">*</span>
+                            </span>
+                        </div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click.prevent="ShowSearchAccount">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" class="form-control highlight bold" v-model="maTB"
+                                    @keyup.enter="onKeyPress">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Tên TB
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="tenTB" readonly>
+                        </div>
+                    </div>
+                    <div class="row" style="margin: 0px -7px !important;">
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="chk_from_date">
+                                        <span class="name">Ngày TH</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <!-- <div class="input-icon-right">
+                                        <flat-pickr :disabled="!chk_from_date" v-model="from_date" class="form-control"
+                                            :config="dateConfig" placeholder="Chọn ngày tiếp nhận" />
+                                        <span class="icon one-calendar"></span>
+                                    </div> -->
+                                    <ejs-datetimepicker :readonly="!chk_from_date" v-model="from_date" :value="today"
+                                        :max="today" :format="'dd/MM/y HH:mm'" step=60>
+                                    </ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w90">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="chk_to_date">
+                                        <span class="name">Đến ngày</span>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    <ejs-datetimepicker :readonly="!chk_to_date" v-model="to_date" :value="today"
+                                        :max="today" :format="'dd/MM/y HH:mm'" step=60>
+                                    </ejs-datetimepicker>
+                                    <!-- <div class="input-icon-right">
+                                        <flat-pickr :disabled="!chk_to_date" v-model="to_date" class="form-control" :config="dateConfig"
+                                            placeholder="Chọn đến ngày" />
+                                        <span class="icon one-calendar"></span>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90">Lý do
+                            <span style="position: relative">
+                                <span style="color: red; position: absolute; left: 1px;">*</span>
+                            </span>
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="lyDo">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w90 vtop">Nội dung
+                        </div>
+                        <div class="value">
+                            <textarea class="form-control" style="height: 100px;resize: vertical;"
+                                v-model="ghiChu"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-12">
+                    <div class="legend-title">Kết quả tìm kiếm</div>
+                    <CSKHGrid :columns="dgvThueBaoNo.columns"
+                        :dataSource="dgvThueBaoNo.dataSource"
+                        :showColumnCheckbox="true"
+                        addClassWhenRowChecked="font-weight-bold"
+                        :showFilter="true"
+                        dataKeyField="THUEBAO_ID"
+                        ref="dgvThueBaoNo"
+                        :allowPaging="true"
+                        :enablePagingServer="dgvThueBaoNo.enablePagingServer"
+                        :enabledSelectFirstRow="false"
+                        :totalRecords="dgvThueBaoNo.pageInfo.totalElement"
+                        :pageSize="dgvThueBaoNo.pageInfo.maxSize"
+                        :pageIndex="dgvThueBaoNo.pageInfo.page"
+                        @pageChanged="dgvThueBaoNo_PageChangeHandler"
+                        @dataBound="dgvThueBaoNo_dDataBound"
+                        :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                    ></CSKHGrid>
+                    <!--
+                    <div class="table-content">
+                         <CustomDataGrid :columns="fieldsDSThongTinThueBaoNo2" :showColumnCheckbox="true"
+                            dataKeyField="THUEBAO_ID" ref="gridDsThongTinThueBaoNo" :textBoldWhenSelected="true"
+                            :dataSource="dsThueBaoNo" :showFilter="true"></CustomDataGrid>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin tra cứu</div>
+            <div class="table-content">
+                <!-- <CustomDataGrid :columns="fields2" :dataSource="dsThueBaoKhongKhoaMo" :showColumnCheckbox="true"
+                    @selectedRowChanged="onDsThueBaoKhongKhoaMoRowChanged" :textBoldWhenSelected="true"
+                    :showFilter="true" dataKeyField="THUEBAO_ID" ref="gridThueBaoKhongKhoaMo"></CustomDataGrid>
+ -->
+
+                <CSKHGrid :columns="dgvThueBaoKhongKhoaMo.columns"
+                    :dataSource="dgvThueBaoKhongKhoaMo.dataSource"
+                    :showColumnCheckbox="true"
+                    :enablePagingServer="dgvThueBaoKhongKhoaMo.enablePagingServer"
+                    addClassWhenRowChecked="font-weight-bold"
+                    :showFilter="true"
+                    dataKeyField="THUEBAO_ID"
+                    ref="dgvThueBaoKhongKhoaMo"
+                    :enabledSelectFirstRow="false"
+                    :aggregates="TCaggregatesColumns"
+                    :allowPaging="true"
+                    :totalRecords="dgvThueBaoKhongKhoaMo.pageInfo.totalElement"
+                    :pageSize="dgvThueBaoKhongKhoaMo.pageInfo.maxSize"
+                    :pageIndex="dgvThueBaoKhongKhoaMo.pageInfo.page"
+                    :useAggregates="true"
+                    @pageChanged="dgvThueBaoKhongKhoaMo_PageChangeHandler"
+                    @recordClick="dgvThueBaoKhongKhoaMo_Click"
+                    @selectedItemsChanged="dgvThueBaoKhongKhoaMo_ItemsChecked"
+                    :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                ></CSKHGrid>
+            </div>
+        </div>
+    </div>
+    <!-- <b-modal id="dsKhoaMoUploadXLS" title="Danh sách các thuê bao không khoá/không mở" size="xl"
+        :loaiDs="loaiDSThueBaoKhongKhaoSatSelected" hide-footer>
+        <template v-slot:modal-header>
+            <div class="title" style='text-transform: uppercase;font-size: 20px;'><span class="icon one-notepad"></span>Nhật ký thu nợ</div>
+            <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide('dsKhoaMoUploadXLS')"></div>
+        </template>
+        <DSKhoaMoUploadXLS />
+    </b-modal> -->
+    <b-modal id="popup-xoaConfirm" ref="xoaConfirm" title="Thông báo!">
+        <span v-if="loaiDSThueBaoKhongKhaoSatSelected == '6'">Bạn thật sự muốn xóa thuê bao này khỏi danh sách Thuê bao
+            không khảo sát Lắp mới?</span>
+        <span v-else-if="loaiDSThueBaoKhongKhaoSatSelected == '7'">Bạn thật sự muốn xóa thuê bao này khỏi danh sách thuê
+            bao không khảo sát Báo hỏng?</span>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="$bvModal.hide('popup-xoaConfirm')">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="onXoaConfirm">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <appThongBaoModal idModal="popup-thongbao" :content="thongBaoTimKiemMaTB"></appThongBaoModal>
+    <appYesNoModal content="Bạn chắc chắn muốn thêm dữ liệu ?" idModal='popup-confirmThemMoi' @onOk="onThemMoiConfirm" />
+    <appYesNoModal content="Bạn chắc chắn muốn cập nhật dữ liệu ?" idModal='popup-confirmCapNhap' @onOk="onCapNhapConfirm" />
+    <b-modal id="popupComponents" size="xl"
+        hide-footer
+        hide-header
+        hide-header-close
+        body-class="modal-body p-0">
+        <component :is="popupComponent" @form-close="searchAccountClosed" :isPopup="true"></component>
+    </b-modal>
+</div>

@@ -1,0 +1,161 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header"/>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="layDl">
+                    <span class="icon one-search"></span>Lấy dữ liệu
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="themMoi">
+                    <span class="icon one-file-plus"></span>Thêm mới
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="capNhat">
+                    <span class="icon one-save"></span>Cập nhật
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="xoa">
+                    <span class="icon one-trash"></span>Xoá
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-2 col-12">
+                <DataGrid3 :columns="dsThamSo.header" :dataSource="dsThamSo.list" 
+                :enable-paging-server="false" :allowPaging="false" @rowDoubleClicked="rowThamSoDoubleClicked"
+                :showFilter="true" ref="gridThamSo" :showColumnCheckbox="false">
+                </DataGrid3>
+            </div>
+            <div class="col-sm-10 col-12">
+                <div class="row">
+                    <DataGrid3 :dataSource="dsTemplate.list" 
+                    :columns="[
+                        {fieldName: 'temp_id', headerText: 'TEMP_ID', allowFiltering: true, width:'100'}, 
+                        {fieldName: 'ten_loaitd', headerText: 'Loại tác động', allowFiltering: true, template: cLoaiTacDongTemplate, width:'250'}, 
+                        {fieldName: 'hangsx_id', headerText: 'HANGSX_ID', allowFiltering: true, width:'120'}, 
+                        {fieldName: 'ten_onu', headerText: 'Loại ONU', allowFiltering: true, template: cLoaiOnuTemplate, width:'220'}, 
+                        {fieldName: 'ftth', headerText: 'FTTH', allowFiltering: true, template: cFtthTemplate, width:'100', textAlign: 'center'}, 
+                        {fieldName: 'mytv', headerText: 'MYTV', allowFiltering: true, template: cMytvTemplate, width:'100', textAlign: 'center'}, 
+                        {fieldName: 'ims', headerText: 'IMS', allowFiltering: true, template: cImsTemplate, width:'100', textAlign: 'center'}, 
+                        {fieldName: 'bosung', headerText: 'BOSUNG', allowFiltering: true, template: cBoSungTemplate, width:'100', textAlign: 'center'},  
+                        {fieldName: 'bosung_ims', headerText: 'BOSUNG_IMS', allowFiltering: true, template: cBoSungImsTemplate, width:'100', textAlign: 'center'}, 
+                        {fieldName: 'bnm_br_id', headerText: 'BNM_BR_ID', allowFiltering: true, width:'100'}, 
+                        {fieldName: 'ngay_cn', headerText: 'Ngày CN', allowFiltering: true, width:'150'}, 
+                        {fieldName: 'nguoi_cn', headerText: 'Người CN', allowFiltering: true, width:'150'}, 
+                        {fieldName: 'ip_cn', headerText: 'IP CN', allowFiltering: true, width:'150'}, 
+                        {fieldName: 'is_active', headerText: 'ACTIVE', allowFiltering: true, freeze: 'Right', template: cActiveTemplate, width:'100', textAlign: 'center'},  
+                    ]"
+                    :enable-paging-server="false" :allowPaging="true" @rowSelected="selectTemplateItem"
+                    :showFilter="true" ref="gridTemplate" :showColumnCheckbox="false" pageSize="5">
+                    </DataGrid3>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="legend-title">Template</div>
+                        <div class="info-row">
+                            <textarea class="form-control" v-model="frm.template" rows="20" ref="txtTemplate"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="legend-title">Thông tin chi tiết</div>
+                        <div class="info-row">
+                            <div class="key w90">Loại tác động</div>
+                            <div class="value">
+                                <input v-model="frm.loaiTacDong" ref="txtLoaiTacDong" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w90">Loại ONU</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <SelectExt v-model="frm.loaiOnuId" ref="cboLoaiOnu" :allowFiltering="true" dataTextField="ten_onu"
+                                        dataValueField="onu_id" :dataSource="options.loaiOnu"></SelectExt>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-12">
+                                <div class="info-row">
+                                    <div class="key w90">Hãng SX</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="frm.hangSxId" ref="cboHangSx" :allowFiltering="true" dataTextField="ten_hang_sx"
+                                                dataValueField="hangsx_id" :dataSource="options.hangSx"></SelectExt>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="key w50">BR ID</div>
+                                    <div class="value">
+                                        <input v-model="frm.brId" ref="txtBrId" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.ftth" type="checkbox" class="check">
+                                        <span class="name">FTTH</span>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.bsMytv" type="checkbox" class="check">
+                                        <span class="name">Bổ sung MyTV</span>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.active" type="checkbox" class="check">
+                                        <span class="name" style="font-weight: bold">ACTIVE</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.mytv" type="checkbox" class="check">
+                                        <span class="name">MYTV</span>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.bsIms" type="checkbox" class="check">
+                                        <span class="name">Bổ sung IMS</span>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.boQuaLoaiOnu" type="checkbox" class="check">
+                                        <span class="name">Bỏ qua loại ONU</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-12">
+                                <div class="info-row">
+                                    <div class="check-action">
+                                        <input v-model="frm.ims" type="checkbox" class="check">
+                                        <span class="name">IMS</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <textarea class="form-control" v-model="noteBnm" rows="5" readonly style="color: red; border: 1px solid red"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

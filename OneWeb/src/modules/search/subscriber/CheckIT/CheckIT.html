@@ -1,0 +1,150 @@
+
+<div class="main-wrapper">
+  <breadcrumb :header="header"/>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" :disabled="!btnShowPopupLayDL" v-on:click.prevent="btnShowPopupLayDL" >
+         <span class="icon one-file-plus"></span> Lấy dữ liệu
+       </a> 
+     </li>
+     <li>
+       <a href="javascript: void(0)" @click="onXuatExcel" title="Xuất Excel" >
+           <span class="icon one-xlsx-import"></span>Xuất Excel
+       </a>
+     </li>
+     <li class="dropdown" @click="xuatPhieuShow = !xuatPhieuShow" style="position: static;">
+      <a href="#"> <span class="icon one-file-arrow-right1"></span>Thống kê
+        <svg width="16" height="16" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </a>
+      <ul v-show="xuatPhieuShow" class="ui-xuat-phieu">
+        <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"><a href="#" @click="tsbtnThongKeTheoFile_Click()"
+            style="color: #007bff; text-decoration: none"> <span class="icon one-xlsx-import"></span>Thống kê theo file</a>
+        </li>
+        <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"><a href="#" @click="tsbtnThongKeTheoLoaiHinh_Click()"
+            style="color: #007bff;text-decoration: none"><span class="icon one-xlsx-import"></span>Thống kê theo loại hình</a>
+        </li>
+        <li class="xuat-phieu" style="padding: 10px 10px 10px 10px;"><a href="#" @click="tsbtnThongKeTheoNgay_Click()"
+          style="color: #007bff;text-decoration: none"><span class="icon one-xlsx-import"></span>Thống kê theo ngày</a>
+      </li>
+      </ul>
+    </li>
+    <li  v-if="button.tsbtnGhepThueBao.visible">
+      <a @click="tsbtnGhepThueBao_Click()"
+        :class="button.tsbtnGhepThueBao.enabled  ? '' : 'disabled'">
+        <span class="icon one-henld"></span>
+        Ghép thuê bao
+      </a>
+    </li>
+    <li  v-if="button.tsbtnGhepChiTiet.visible">
+      <a @click="tsbtnGhepChiTiet_Click()"
+        :class="button.tsbtnGhepChiTiet.enabled  ? '' : 'disabled'">
+        <span class="icon one-henld"></span>
+        Ghép  chi tiết
+      </a>
+    </li>
+
+     
+    </ul>
+    <div class="more" style="padding-right: 7px;">
+      <div class="row">
+        <div class="col"  v-if="button.tsbtnThemChiTiet.visible">
+          <div class="info-row" >
+            <button class='btn'  style="color: #007bff"  @click="tsbtnThemChiTiet_Click()">
+                <span class="icon nc-icon-glyph ui-1_circle-add"></span> Thêm chi tiết
+            </button> 
+          </div>
+        </div>
+        <div class="col">
+            <div class="info-row" style="width:300px">
+                <div class="value" style="color: #007bff">
+                    <div class="input-icon-right">
+                      <SelectExt v-model="params.p_loai" :options="params.p_loaidanhsach_option"  @select="onChangeLoaiHinh" /> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+          <div class="info-row" style="width:180px">
+            <button class='btn' style="color: #007bff" href="#">
+                <a href="#"><span class="icon nc-icon-glyph ui-1_circle-remove"></span> Đóng</a>
+            </button> 
+          </div>
+        </div>
+      </div> 
+      
+    </div>
+</div>
+
+<div class="page-content">        
+        <div class="box-form">
+            <div class="legend-title">Dối soát dữ liệu thuê bao</div>
+            <div class="row">
+              <div  class="col-sm-8 col-12">
+                <div class="table-content">
+                  <DataGrid :dataSource="ds_dulieu_thuebao_table"
+                      :columns="columns_ds_dulieu_tb"
+                      :showColumnCheckbox="false"
+                      :allowPaging="true"
+                      :enablePagingServer="false"
+                      :enabled-select-first-row="false"
+                      :contextMenuItems="menuContextItems"
+                      :allowExcelExport="true"
+                      :enabledSelectFirstRow="true"
+                      ref="doisoatGrid"
+                      @selectedRowChanged="gridSelectedItems"
+                      @contextMenuClick="contextMenuClick"  
+                      
+            />
+
+              
+                </div>
+              </div>
+              <div class="col-sm-4 col-12" >
+                <div class="legend-title">Danh sách thuê bao gốc chưa gán</div>
+                <div class="box-col">
+                  <DataGrid :columns="columns_ds_thuebao_goc_chuagan" 
+                    :dataSource="ds_thuebao_goc_chuagan" 
+                    :enable-paging-server="false"
+                    :allowPaging="true" 
+                    @selectedRowChanged="gridSelected_TBGoc_ChuaGan_Items"
+                    :showFilter="true">
+                  </DataGrid>
+                </div>
+               
+                <div class="legend-title">Danh sách chi tiết thuê bao chưa gán</div>
+                <div class="box-col" >
+                  <DataGrid :columns="columns_ds_thuebao_chitiet_chuagan" 
+                    :dataSource="ds_thuebao_chitiet_chuagan" 
+                    :enable-paging-server="false"
+                    :allowPaging="true" 
+                    :enabledSelectFirstRow="true" 
+                    @selectedRowChanged="gridSelectedChiTiet"
+                    :showFilter="true">
+                  </DataGrid>
+                </div>
+              </div>
+            </div>
+
+           
+        </div>
+    </div>
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+     <!-- <script src="../vendor/jquery/split.js"></script>  -->
+   <popupLayDuLieu ref="lay_du_lieu"  @accept="acceptlayDuLieu" :data="dataLayDuLieu" :trangthai_id="trangthai_selectted" :loaitb_id="dataCheckeds_ds_loaihinh"/>  
+
+   <ejs-dialog :enableResize="true" :visible="false" :position="position" ref="searchAccountDialog" :header="'Tra cứu danh bạ'" showCloseIcon="true" target="#app" width="80%" height="800">
+    <div class="SubcriberHistory-popup popupBody">
+      <searchAccount :isPopup="true" @form-close="searchAccountDialogClose" />
+    </div>
+  </ejs-dialog>
+
+ 
+</div>
+
+</div>

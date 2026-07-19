@@ -1,0 +1,156 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a @click="btnTimKiem_Click">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            <li :class="!enable.btnXoaTB ? 'non-ative' : ''">
+                <a @click="btnXoaTB_Click">
+                    <span class="icon one-trash"></span>Xóa TB
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin thanh lý</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Dịch vụ VT</div>
+                        <div class="value">
+                            <ejs-dropdownlist-tt
+                                locale="vi-VN" @change="cboDichVuVT_Changed"
+                                v-model="dichvuvt"
+                                :dataSource="lstDichVuVT"
+                                :allowFiltering="true" :filtering="onFilterDichVuVT"
+                                :fields="{ value: 'DICHVUVT_ID', text: 'TEN_DVVT' }"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Trạng thái TB</div>
+                        <div class="value">
+                            <ejs-dropdownlist-tt
+                                locale="vi-VN" @change="cboTrangThaiTB_Changed"
+                                v-model="trangthaitb"
+                                :dataSource="lstTrangThaiTB"
+                                :allowFiltering="true" :filtering="onFilterTrangThaiTB"
+                                :fields="{ value: 'TRANGTHAITB_ID', text: 'TRANGTHAI_TB' }"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Số máy/Acc</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="btnTraCuuMaTB_Click">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <input type="text" class="form-control" v-model="txtMaTB" @keyup="txtMaTB_KeyUp">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key">
+                            Thời gian cắt &gt;=
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control tright" v-model="txtThangcat" id="txtThangcat" @keyup="txtThangcat_TextChanged" @keydown="checkNumber">
+                        </div>
+                        <div class="value w20 padt5">
+                            Tháng
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Mã KH</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtMaKH">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Tên thuê bao</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtTenTB">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Tên KH</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtTenKH">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Địa chỉ LĐ</div>
+                        <div class="value">
+                            <input type="text" class="form-control" v-model="txtDCTB">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">
+                    Danh sách thuê bao
+                </div>
+                <div class="pull-right">
+                    <div class="check-action normal">
+                        <input type="checkbox" class="check" id="chkVuotLoi">
+                        <span class="name">Vượt lỗi</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="table-content">
+                <DataGridCustom
+                    ref="ds_thuebao"
+                    v-bind:columns="columnsDSTB"
+                    v-bind:dataSource="ds_thuebao"
+                    :showColumnCheckbox="true"
+                    :showFilter="true" :totalRecords="totalRecords"
+                    :enabledSelectFirstRow="true"
+                    :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                    panelDataHeight="300"
+                    @rowSelected="gridDanhSachTB_FocusedRowChanged"
+                    :allowPaging="true" :enablePagingServer="true"
+                    @selectedItemsChanged="gridDanhSachTB_SelectRow"
+                    @pageChanged="gridDanhSachTB_pageChanged"
+                ></DataGridCustom>  
+            </div>
+        </div>
+    </div>
+
+    <b-modal id="popupComponents" size="xl"
+        hide-footer
+        hide-header
+        hide-header-close
+        body-class="modal-body p-0">
+        <component :is="popupComponent" ref="popupComponent" :dulieu="popupComponentData" isPopup="true" 
+                    @form-close="popupClosed" @acceptChangeCTV="popupClosed" @acceptChangeNGT="popupClosed"></component>
+    </b-modal>
+</div>

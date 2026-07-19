@@ -1,0 +1,1121 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div v-if="anhien_nut" class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript: void(0)" @click="tsbtnGhiLai_Click" title="Ghi lại"
+                    :class="{'disabled': !tsbtnGhiLai.Enabled}">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <!-- <li>
+                <a href="javascript: void(0)" @click="tsbtnXoa_Click" title="Xóa"
+                    :class="{'disabled': !tsbtnXoa.Enabled}">
+                    <span class="icon ui-1_trash nc-icon-glyph"></span>Xóa
+                </a>
+            </li> -->
+            <li>
+                <a href="javascript: void(0)" @click="Giaophieu_Click" title="Giao phiếu" :class="{'disabled': !tsbtnGiaophieu.Enabled}" >
+                    <span class="icon one-file-arrow-right1"></span>Giao phiếu
+                </a>
+            </li>
+            <li  @click="$refs.files.click()">
+                <a><span class="icon fa fa-cloud-upload"></span>Upload File</a>
+                <input style="display: none;" type="file" multiple="multiple" class="file" ref="files" id="upload-file" @change="changeFileUpload" />
+              </li>
+              <li @click="tsbtnDownloadFileNT_Click">
+                <a> <span class="icon one-file-download"></span>Download File</a>
+              </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">
+                    <span v-b-toggle.collapse-tthc class="icon fa fa-angle-up"></span>
+                    <span v-b-toggle.collapse-tthc class="icon fa fa-angle-down"></span> Thông tin chung
+                </div>
+                <div v-if = "dsData.length > 1" class="pull-right">
+                    <div class="list-checks normal">                  
+                        <div class="item bold">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="diemdau" @change="updateDiemDau">
+                                <span class="name">Điểm đầu</span>
+                            </div>
+                        </div>
+                        <div class="item bold">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="diemcuoi" @change="updateDiemCuoi">
+                                <span class="name">Điểm cuối</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <b-collapse v-if="items.loai_kl_id == 1 || items.loai_kl_id == 2" visible id="collapse-tthc">
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Dịch vụ</div>
+                                        <div class="value">
+                                            <div class="select-custom disabled greyColor" style="background-color: grey;">
+                                                <SelectExt id="cboDichVuVT" v-model="items.dichvuvt_id"
+                                                    :settings="{dropdownParent: $refs['cboDichVuVT']}" :dataSource="lstDSDichvu"
+                                                    dataTextField="ten_dvvt" dataValueField="dichvuvt_id"
+                                                    @change="onChangeDichVuVT($event)"
+                                                    />
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Loại hình</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboLoaiHinhTB" v-model="items.loaitb_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiHinhTB']}" :dataSource="lstLoaiHinhTB"
+                                                dataTextField="loaihinh_tb" dataValueField="loaitb_id"
+                                                @change="onChangeDichVuVT($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã kênh khác</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboMakenhKhac" v-model="items.makenh_khac"
+                                                :settings="{dropdownParent: $refs['cboMakenhKhac']}" :dataSource="lstMakenhKhac"
+                                                dataTextField="TENKENH" dataValueField="MAKENH"
+                                                @change="onChangeMakenh($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Công văn</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.so_congvan">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã hợp đồng</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ma_hd">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ngày bắt đầu</div>
+                                    <div>
+                                        <div class="input-icon-right disabled greyColor">
+                                            <k-date-picker format="DD/MM/YYYY hh:mm:ss" type="datetime" v-model="items.ngay_sd"
+                                             />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ngày kết thúc</div>
+                                    <div>
+                                        <div class="input-icon-right disabled greyColor">
+                                            <k-date-picker format="DD/MM/YYYY hh:mm:ss" type="datetime" v-model="items.ngay_cat"
+                                                 />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên gợi nhớ  <k-required-marker/></div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ten_goinho">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên KH <k-required-marker/></div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_kh">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Phân loại KH</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboLoaiKH" v-model="items.loaikh_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiKH']}" :dataSource="lstLoaiKH"
+                                                dataTextField="ten_loaikh_dis" dataValueField="loaikh_id"
+                                                @change="onChangeLoaiKH($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã thuê bao <k-required-marker/></div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button @click="showPopupSearchAccount" class="btn disabled greyColor">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <SearchAccountModal ref="searchAccountModal" @form-close="acceptSearchAccount" />
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ma_tb" ref="MaTB"
+                                                v-on:keyup.enter="txtMaTB_KeyPress" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên TB</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tỉnh đầu</div>
+                                    <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboTinhDau" v-model="items.tinhdau"
+                                                    :settings="{dropdownParent: $refs['cboTinhDau']}" :dataSource="lstTinhdau"
+                                                    dataTextField="tentinh" dataValueField="tinh_id"
+                                                    />
+                                            </div>
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Địa chỉ đầu</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.diachi_dau">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tỉnh cuối</div>
+                                    <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboTinhDau" v-model="items.tinhcuoi"
+                                                    :settings="{dropdownParent: $refs['cboTinhDau']}" :dataSource="lstTinhcuoi"
+                                                    dataTextField="tentinh" dataValueField="tinh_id"
+                                                    />
+                                            </div>
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Địa chỉ cuối</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.diachi_cuoi">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="value">
+                                        <div class="list-checks">
+                                            <div class="item">
+                                               <div class="item bold" style="color: #800000">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" class="check disabled greyColor" v-model="items.qua_vtt_dau">
+                                                        <span class="name">Qua VTT đầu</span>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="value">
+                                        <div class="list-checks">
+                                            <div class="item">
+                                                <div class="item bold" style="color: #800000">
+                                                    <div class="check-action">
+                                                        <input type="checkbox" class="check disabled greyColor" v-model="items.qua_vtt_dau">
+                                                        <span class="name">Qua VTT cuối</span>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Giao diện cổng</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboGiaodiencong" v-model="items.gdkn_id"
+                                                :settings="{dropdownParent: $refs['cboGiaodiencong']}" :dataSource="lstGiaodienCong"
+                                                dataTextField="giaodien_cong" dataValueField="gdkn_id"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tốc độ</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboTocdo" v-model="items.tocdo_id"
+                                                :settings="{dropdownParent: $refs['cboTocdo']}" :dataSource="lstTocdo"
+                                                dataTextField="text" dataValueField="id"
+                                                @change="onChangeTocdo($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">ĐV Chủ trì</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviChutri" name="cbb_DonviChutri" id="cbb_DonviChutri" v-model="items.donvi_chutri" :options="dsDonviChutri" @select="onChangeDonviChutri($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">ĐV phối hợp</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviPhoihop" name="cbb_DonviPhoihop" id="cbb_DonviPhoihop" v-model="items.donvi_phoihop_id" :options="dsDonviPhoihop" @select="onChangeDonviPhoihop($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12"> 
+                                <div class="info-row">
+                                    <div class="key w100">Trạng thái TB</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cbb_TrangthaiTB" v-model ="items.trangthaitb_id"
+                                                :settings="{dropdownParent: $refs['cbb_TrangthaiTB']}" :dataSource="dsTrangthaiTB"
+                                                dataTextField="trangthai_tb" dataValueField="trangthaitb_id"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ghi chú</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ghichu_net">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-collapse>
+            <b-collapse v-if="items.loai_kl_id == 3" visible id="collapse-tthc">
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Dịch vụ</div>
+                                        <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboDichVuVT" v-model="items.dichvuvt_id"
+                                                    :settings="{dropdownParent: $refs['cboDichVuVT']}" :dataSource="lstDSDichvu"
+                                                    dataTextField="ten_dvvt" dataValueField="dichvuvt_id"
+                                                    @change="onChangeDichVuVT($event)"
+                                                    />
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Loại hình</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboLoaiHinhTB" v-model="items.loaitb_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiHinhTB']}" :dataSource="lstLoaiHinhTB"
+                                                dataTextField="loaihinh_tb" dataValueField="loaitb_id"
+                                                @change="onChangeDichVuVT($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã thuê bao <k-required-marker/></div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button @click="showPopupSearchAccount" class="btn">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <SearchAccountModal ref="searchAccountModal" @form-close="acceptSearchAccount" />
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ma_tb" ref="MaTB"
+                                                v-on:keyup.enter="txtMaTB_KeyPress" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên TB</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã hợp đồng</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ma_hd">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Loại kênh TK</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboLoaikenhTK" v-model="items.loai_trungke_id"
+                                                :settings="{dropdownParent: $refs['cboLoaikenhTK']}" :dataSource="lstLoaikenhTK"
+                                                dataTextField="loai_kenhtrungke" dataValueField="loai_kenhtrungke_id"
+                                                @change="onChangeLoaikenhTK($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên kênh</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã kênh khác</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboMakenhKhac" v-model="items.makenh_khac"
+                                                :settings="{dropdownParent: $refs['cboMakenhKhac']}" :dataSource="lstMakenhKhac"
+                                                dataTextField="TENKENH" dataValueField="MAKENH"
+                                                @change="onChangeMakenh($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ngày mở</div>
+                                    <div>
+                                        <div class="input-icon-right disabled greyColor">
+                                            <k-date-picker format="DD/MM/YYYY hh:mm:ss" type="datetime" v-model="items.ngay_sd"
+                                             />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Công văn</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.so_congvan">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Đơn vị SD</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviSudung" name="cbb_DonviSudung" id="cbb_DonviSudung" v-model="items.donvi_sd_id" :options="dsDonviSudung" @select="onChangeDonviSudung($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tỉnh đầu</div>
+                                    <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboTinhDau" v-model="items.tinhdau"
+                                                    :settings="{dropdownParent: $refs['cboTinhDau']}" :dataSource="lstTinhdau"
+                                                    dataTextField="tentinh" dataValueField="tinh_id"
+                                                    />
+                                            </div>
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Địa chỉ đầu</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.diachi_dau">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tỉnh cuối</div>
+                                    <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboTinhDau" v-model="items.tinhcuoi"
+                                                    :settings="{dropdownParent: $refs['cboTinhDau']}" :dataSource="lstTinhcuoi"
+                                                    dataTextField="tentinh" dataValueField="tinh_id"
+                                                    />
+                                            </div>
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Địa chỉ cuối</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.diachi_cuoi">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Giao diện cổng</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboGiaodiencong" v-model="items.gdkn_id"
+                                                :settings="{dropdownParent: $refs['cboGiaodiencong']}" :dataSource="lstGiaodienCong"
+                                                dataTextField="giaodien_cong" dataValueField="gdkn_id"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tốc độ</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboTocdo" v-model="items.tocdo_id"
+                                                :settings="{dropdownParent: $refs['cboTocdo']}" :dataSource="lstTocdo"
+                                                dataTextField="text" dataValueField="id"
+                                                @change="onChangeTocdo($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">ĐV Chủ trì</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviChutri" name="cbb_DonviChutri" id="cbb_DonviChutri" v-model="items.donvi_chutri" :options="dsDonviChutri" @select="onChangeDonviChutri($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">ĐV phối hợp</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviPhoihop" name="cbb_DonviPhoihop" id="cbb_DonviPhoihop" v-model="items.donvi_phoihop_id" :options="dsDonviPhoihop" @select="onChangeDonviPhoihop($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                           
+                            <div class="col-sm-6 col-12"> 
+                                <div class="info-row">
+                                    <div class="key w100">Trạng thái TB</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cbb_TrangthaiTB" v-model ="items.trangthaitb_id"
+                                                :settings="{dropdownParent: $refs['cbb_TrangthaiTB']}" :dataSource="dsTrangthaiTB"
+                                                dataTextField="trangthai_tb" dataValueField="trangthaitb_id"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ghi chú</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ghichu_net">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-collapse>
+            <b-collapse v-if="items.loai_kl_id == 4" visible id="collapse-tthc">
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Dịch vụ</div>
+                                        <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboDichVuVT" v-model="items.dichvuvt_id"
+                                                    :settings="{dropdownParent: $refs['cboDichVuVT']}" :dataSource="lstDSDichvu"
+                                                    dataTextField="ten_dvvt" dataValueField="dichvuvt_id"
+                                                    @change="onChangeDichVuVT($event)"
+                                                    />
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Loại hình</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboLoaiHinhTB" v-model="items.loaitb_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiHinhTB']}" :dataSource="lstLoaiHinhTB"
+                                                dataTextField="loaihinh_tb" dataValueField="loaitb_id"
+                                                @change="onChangeDichVuVT($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã thuê bao <k-required-marker/></div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button @click="showPopupSearchAccount" class="btn">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <SearchAccountModal ref="searchAccountModal" @form-close="acceptSearchAccount" />
+                                            <input type="text" class="form-control " v-model="items.ma_tb" ref="MaTB"
+                                                v-on:keyup.enter="txtMaTB_KeyPress" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên TB</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã hợp đồng</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ma_hd">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Loại kênh TK</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboLoaiHinhTB" v-model="items.loai_trungke_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiHinhTB']}" :dataSource="lstLoaikenhTK"
+                                                dataTextField="loai_kenhtrungke" dataValueField="loai_kenhtrungke_id"
+                                                @change="onChangeLoaikenhTK($event)"
+                                                />
+                                        </div> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên kênh</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã kênh khác</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboMakenhKhac" v-model="items.makenh_khac"
+                                                :settings="{dropdownParent: $refs['cboMakenhKhac']}" :dataSource="lstMakenhKhac"
+                                                dataTextField="TENKENH" dataValueField="MAKENH"
+                                                @change="onChangeMakenh($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ngày bắt đầu</div>
+                                    <div>
+                                        <div class="input-icon-right disabled greyColor">
+                                            <k-date-picker format="DD/MM/YYYY hh:mm:ss" type="datetime" v-model="items.ngay_sd"
+                                             />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ngày kết thúc</div>
+                                    <div>
+                                        <div class="input-icon-right disabled greyColor">
+                                            <k-date-picker format="DD/MM/YYYY hh:mm:ss" type="datetime" v-model="items.ngay_cat"
+                                                 />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Công văn</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.so_congvan">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Đơn vị SD</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviSudung" name="cbb_DonviSudung" id="cbb_DonviSudung" v-model="items.donvi_sd_id" :options="dsDonviSudung" @select="onChangeDonviSudung($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tỉnh đầu</div>
+                                    <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboTinhDau" v-model="items.tinhdau"
+                                                    :settings="{dropdownParent: $refs['cboTinhDau']}" :dataSource="lstTinhdau"
+                                                    dataTextField="tentinh" dataValueField="tinh_id"
+                                                    />
+                                            </div>
+                                            <!-- <input type="text" class="form-control disabled greyColor" v-model="items.tinhdau"> -->
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Địa chỉ đầu</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.diachi_dau">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tỉnh cuối</div>
+                                    <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboTinhDau" v-model="items.tinhcuoi"
+                                                    :settings="{dropdownParent: $refs['cboTinhDau']}" :dataSource="lstTinhcuoi"
+                                                    dataTextField="tentinh" dataValueField="tinh_id"
+                                                    />
+                                            </div>
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Địa chỉ cuối</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.diachi_cuoi">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Giao diện cổng</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt id="cboGiaodiencong" v-model="items.gdkn_id"
+                                                :settings="{dropdownParent: $refs['cboGiaodiencong']}" :dataSource="lstGiaodienCong"
+                                                dataTextField="giaodien_cong" dataValueField="gdkn_id"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tốc độ</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboTocdo" v-model="items.tocdo_id"
+                                                :settings="{dropdownParent: $refs['cboTocdo']}" :dataSource="lstTocdo"
+                                                dataTextField="text" dataValueField="id"
+                                                @change="onChangeTocdo($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">ĐV Chủ trì</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviChutri" name="cbb_DonviChutri" id="cbb_DonviChutri" v-model="items.donvi_chutri" :options="dsDonviChutri" @select="onChangeDonviChutri($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">ĐV phối hợp</div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                           <treeselect placeholder="Chọn đơn vị" ref="cbb_DonviPhoihop" name="cbb_DonviPhoihop" id="cbb_DonviPhoihop" v-model="items.donvi_phoihop_id" :options="dsDonviPhoihop" @select="onChangeDonviPhoihop($event)" >
+                                            </treeselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                           
+                            <div class="col-sm-3 col-12"> 
+                                <div class="info-row">
+                                    <div class="key w100">Trạng thái TB</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cbb_TrangthaiTB" v-model ="items.trangthaitb_id"
+                                                :settings="{dropdownParent: $refs['cbb_TrangthaiTB']}" :dataSource="dsTrangthaiTB"
+                                                dataTextField="trangthai_tb" dataValueField="trangthaitb_id"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Bundle</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.bundle">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Đối tác IP</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ip_pop">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">IPv4</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ip_wan">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">IPv6</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ipv6_wan">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Số hiệu ASN ĐT</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.sohieu_asn_dt">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Ghi chú</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ghichu_net">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-collapse>
+            <b-collapse v-if="items.loai_kl_id == 5" visible id="collapse-tthc">
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">Dịch vụ</div>
+                                        <div class="value">
+                                            <div class="select-custom disabled greyColor">
+                                                <SelectExt id="cboDichVuVT" v-model="items.dichvuvt_id"
+                                                    :settings="{dropdownParent: $refs['cboDichVuVT']}" :dataSource="lstDSDichvu"
+                                                    dataTextField="ten_dvvt" dataValueField="dichvuvt_id"
+                                                    @change="onChangeDichVuVT($event)"
+                                                    />
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Loại hình</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboLoaiHinhTB" v-model="items.loaitb_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiHinhTB']}" :dataSource="lstLoaiHinhTB"
+                                                dataTextField="loaihinh_tb" dataValueField="loaitb_id"
+                                                @change="onChangeDichVuVT($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã thuê bao <k-required-marker/></div>
+                                    <div class="value">
+                                        <div class="input-more-button">
+                                            <button @click="showPopupSearchAccount" class="btn">
+                                                <span class="-ap icon-more_horiz"></span>
+                                            </button>
+                                            <SearchAccountModal ref="searchAccountModal" @form-close="acceptSearchAccount" />
+                                            <input type="text" class="form-control " v-model="items.ma_tb" ref="MaTB"
+                                                v-on:keyup.enter="txtMaTB_KeyPress" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên thuê bao</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Mã HD lắp mới</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ma_hd">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên kênh</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_tb">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Tên KH <k-required-marker/></div>
+                                    <div class="value">
+                                            <input type="text" class="form-control disabled greyColor" v-model="items.ten_kh">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Phân loại KH</div>
+                                    <div class="value">
+                                        <div class="select-custom disabled greyColor">
+                                            <SelectExt id="cboLoaiKH" v-model="items.loaikh_id"
+                                                :settings="{dropdownParent: $refs['cboLoaiKH']}" :dataSource="lstLoaiKH"
+                                                dataTextField="ten_loaikh_dis" dataValueField="loaikh_id"
+                                                @change="onChangeLoaiKH($event)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">VSAT Type</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.ma_yc">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">VSAT_Ser</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.moc_int">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">SAT_ID</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.pos_id">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-12">
+                                <div class="info-row">
+                                    <div class="key w100">Bw_Type</div>
+                                    <div class="value">
+                                            <input type="text" class="form-control" v-model="items.data">
+                                            <span class="name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-collapse>
+        </div>
+
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">
+                    Danh sách khai báo thông tin phân đoạn
+                </div>
+                <div v-if="anhien_nut" class="pull-right">
+                    <button class="btn btn-success btn-sm float-right mb-2" @click="onToolbarClick">+</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="table-content">
+                <div>
+                        <DataGrid v-bind:columns="TTKenhluong.headers" v-bind:dataSource="TTKenhluong.data" :enable-paging-server="false"
+                            :allowPaging="true" :showFilter="true"  @rowSelected="gridTTKenhluongSelected" panelDataHeight="250"
+                            :showColumnCheckbox="true" :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                  
+                            ref="TTKenhluong" :enabledSelectFirstRow="true"  >
+                        </DataGrid>
+                    </div>
+            </div>
+
+        </div>
+        <GiaophieuModal ref="popupGiaophieu" :isPopup = "true" :tinh_id = "tinh_id" :thongTinThueBao = "items"  @form-close = "giaophieu"/> 
+        <popupSegment ref="popupSegment"  @success = "capnhat"/> 
+        <frmDSHoSoBC ref="frmDSHoSoBC" v-bind="frmDSHoSoBC.input" />
+    </div>
+</div>

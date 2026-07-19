@@ -1,0 +1,187 @@
+<div class="giaophieu-khieunai">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li :class="{'disable-btn': !btnTimKiem.enabled}" @click="onClickBtnTimKiem">
+                <a href="javascript:void(0)">
+                    <span class="icon one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnGiaoPhieu.enabled}" @click="onClickBtnGiaoPhieu_01">
+                <a href="javascript:void(0)">
+                    <span class="icon  one-file-arrow-right"></span> Giao phiếu
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnHuyGiao.enabled}" @click="onClickBtnHuyGiao">
+                <a href="javascript:void(0)">
+                    <span class="icon one-cancel"></span> Huỷ giao
+                </a>
+            </li>
+            <li :class="{'disable-btn': !btnCapNhatDonVi.enabled}" @click="onClickBtnCapNhatDonVi">
+                <a href="javascript:void(0)">
+                    <span class="icon  one-reload1"></span> Cập nhật ĐV
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Số máy/Acc
+                        </div>
+                        <div class="value">
+                            <input type="text" v-model.trim="soMayTimKiem" v-on:keyup.enter="hienThiDanhSachKhieuNai" class="form-control highlight">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Ngày giao
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker
+                                :style="{'padding-top': '7px'}"
+                                class="form-control bg-none bor0 fw6 text h24" 
+                                placeholder=""
+                                format="dd/MM/yyyy"
+                                v-model="ngayGiaoTimKiem"
+                                :showClearButton="false"></ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Trạng thái
+                        </div>
+                        <div class="value">
+                            <SelectExt
+                                v-model="trangThaiId" 
+                                :dataSource="dsTrangThai" 
+                                dataValueField="trangthai_id"
+                                dataTextField="trangthai" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-title">Thông tin giao phiếu</div>
+            <div class="row">
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Hướng giao
+                        </div>
+                        <div class="value">
+                            <SelectExt
+                                v-model="huongGiaoId" 
+                                :dataSource="dsHuongGiao" 
+                                dataValueField="huonggiao_id"
+                                dataTextField="huonggiao" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Công văn giao
+                        </div>
+                        <div class="value">
+                            <input type="text" v-model="soCongVan" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Số máy/Acc
+                        </div>
+                        <div class="value">
+                            <input type="text" v-model="soMayGiaoPhieu" class="form-control highlight">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w70">
+                            Ngày giao
+                        </div>
+                        <div class="value">
+                            <ejs-datetimepicker	
+                                :style="{'padding-top': '7px'}"
+                                class="form-control bg-none bor0 fw6 text h24"
+                                placeholder="" 
+                                v-model="ngayGiaoPhieu"
+                                format="dd/MM/yyyy HH:mm"
+                                :showClearButton="false"
+                                :enabled="false"></ejs-datetimepicker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-7 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Nội dung giao
+                        </div>
+                        <div class="value">
+                            <input v-model="noiDungGiao" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Đơn vị XL
+                        </div>
+                        <div class="value">
+                            <SelectExt
+                                v-model="donViXuLyId" 
+                                :dataSource="dsDonViXuLy" 
+                                dataValueField="ID"
+                                dataTextField="NAME" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách phiếu yêu cầu</div>
+            <DataGrid
+                ref="grid-khieu-nai"
+                class="table-result"
+                v-bind:columns="[
+                    {fieldName: '', headerText: '', textAlign: 'Center', allowFiltering: false, width: '50', headerTemplate: getHeaderTemplateChonNhieu(this), template: getColumnTemplateChonNhieu(this)},
+                    {fieldName: 'MA_KN', headerText: 'Mã khiếu nại', allowFiltering: true, width: '130' },
+                    {fieldName: 'NGAY_TN_HT', headerText: 'Ngày tiếp nhận', textAlign: 'Right', allowFiltering: true, width: '130' },
+                    {fieldName: 'MA_TB', headerText: 'Số máy/Acc', allowFiltering: true, width: '130' },
+                    {fieldName: 'TEN_TB', headerText: 'Tên thuê bao', allowFiltering: true, width: '130' },
+                    {fieldName: 'DIACHI_TB', headerText: 'Đia chỉ TB', allowFiltering: true, width: '200' },
+                    {fieldName: 'DONVINHAN', headerText: 'Đơn vị nhận', allowFiltering: true, width: '130' },
+                    {fieldName: 'LOAI_CDKN', headerText: 'Loại CĐ', allowFiltering: true, width: '130' },
+                    {fieldName: 'ND_KHIEUNAI', headerText: 'Nội dung KN', allowFiltering: true, width: '130' },
+                    {fieldName: 'MA_NV', headerText: 'Nhân viên TC', allowFiltering: true, width: '130' },
+                    {fieldName: 'PHONG_BH', headerText: 'Phòng bán hàng', allowFiltering: true, width: '130' },
+                    {fieldName: 'KHIEUNAI_ID', visible: false, isPrimaryKey: true },
+                ]"        
+                v-bind:dataSource="dsKhieuNai"
+                :showFilter="true"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :selectionSettings="{type: 'Multiple', mode: 'Cell', cellSelectionMode: 'Box'}"
+                @recordClick="onSelectRowKhieuNai"
+                @cellSelected="gridDsKhieuNai_OnCellSelectedChange"></DataGrid>
+        </div>
+    </div>
+    <b-modal ref="modal-xacnhan-huy" centered title="Thông báo" size="sm">        
+        <span>Bạn thật sự muốn hủy giao phiếu đã chọn?</span>
+        <template #modal-footer="{ cancel }">
+             <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+             <b-button variant="primary" style="color: white" @click="okHuyGiaoPhieu">Đồng ý</b-button>
+        </template>
+   </b-modal>
+</div>

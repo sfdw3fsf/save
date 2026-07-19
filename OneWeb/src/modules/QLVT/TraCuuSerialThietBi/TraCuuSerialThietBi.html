@@ -1,0 +1,332 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li @click="onClickTimKiem()">
+                <a  >
+                    <span class="icon  one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <li @click="onClickLamMoi()">
+                <a >
+                    <span class="icon  one-reload"></span> Làm mới
+                </a>
+            </li>
+            <li @click="onClickChiTiet()" :class="{ disabledInput: disabledInput.isChiTiet }">
+                <a   >
+                    <span class="icon  nc-icon-glyph ui-1_eye-17"></span> Chi tiết
+                </a>
+            </li>
+            <li @click="onClickShowPort()">
+                <a >
+                    <span class="icon  one-clipart-arrow-right"></span> Show port
+                </a>
+            </li>
+            <li @click="onClickPhieuQT()" v-if="Visible.XemQT" :class="{ disabledInput: this.Enabled.XemQT === false }">
+                <a >
+                    <span class="icon  one-clipart-arrow-right"></span> Phiếu QT
+                </a>
+                <ejs-dialog
+                    :enableResize='true'
+                    :allowDragging='true'
+                    :visible='false'
+                    ref="popupTraCuuDenghi"
+                    :animationSettings='animationSettings'
+                    showCloseIcon=true width='80%'
+                    :header='"TRA CỨU PHIẾU DANH SÁCH ĐỀ NGHỊ QUYẾT TOÁN"'
+                    :target='target'
+                    style="bottom: 20px;"
+                    > 
+                    <TraCuuDeNghi ref="frmTraCuuDeNghi"></TraCuuDeNghi>
+                </ejs-dialog>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div v-bind:style="{ width:widthKetQua }">
+                <div class="box-form">
+                    <div class="legend-title" >
+                        <span :class="classIconDieuKienLoc" @click="onClickDieuKienLoc()"></span> Điều kiện lọc
+                    </div>
+                    <div class="info-row" v-if="Visible.boxDieuKienLoc">
+                        <div class="key w30">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="params.isDieuKien">
+                                <span class="name"></span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="row">
+                                <div class="col-sm-2 col-12">
+                                    <div class="select-custom" >
+                                        <select name="" id="" class="form-control" v-model="params.dieuKien" :disabled ="!params.isDieuKien">
+                                            <option v-for="dieuKien in dataSource.DSDieuKien"
+                                                v-bind:value="dieuKien.kieuTkId">
+                                                {{dieuKien.kieuTk}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12" >
+                                    <input type="text" class="form-control highlight" v-model="params.timKiem" :disabled="!params.isDieuKien" @keyup.enter="onClickTimKiem">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-form">
+                    <div class="tabs nav tab-over">
+                        <a href="#ketqua" data-toggle="tab" class="active">Kết quả tìm kiếm</a>
+                        <a href="#cuoncap" data-toggle="tab">Thông tin cuộn cáp</a>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="ketqua">
+                            <div class="legend-title">
+                                <span :class="classIconNhapXuatDieuChuyen" @click="onClickNhapXuatDieuChuyen()"></span> Danh sách nhập, xuất, điều chuyển vật tư
+                            </div>
+
+                            <div class="table-content"  v-if="Visible.boxNhapXuatDieuChuyen">
+                                <DataGrid ref="" class="table-result table-gachle" v-bind:columns="[
+                                    {fieldName: 'LOAI_CT', headerText: 'Loại CT', allowFiltering: true, allowSorting: true, freeze: 'Left'},
+                                    {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, allowSorting: true , freeze: 'Left'},
+                                    {fieldName: 'ND_GIAO', headerText: 'Nội dung', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'MA_KHO_GIAO', headerText: 'Mã kho giao', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'KHO_GIAO', headerText: 'Kho giao', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'MA_KHO_NHAN', headerText: 'Mã kho nhận', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'KHO_NHAN', headerText: 'Kho nhận', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGAY_CT', headerText: 'Ngày CT', allowFiltering: true, allowSorting: true, textAlign: 'Left'},
+                                    {fieldName: 'NGAY_HT', headerText: 'Ngày hoàn thành', allowFiltering: true, allowSorting: true, textAlign: 'Left'},
+                                    {fieldName: 'MUCDICH', headerText: 'Mục đích', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: true , format: 'n3', type: 'number'},
+                                    {fieldName: 'DONGIA', headerText: 'Đơn giá', allowFiltering: true, allowSorting: true , format: 'n3', type: 'number'},
+                                    ]" 
+                                    v-bind:dataSource="this.dataSource.DSNhapXuat" 
+                                    :showFilter="true"
+                                    dataKeyField=""
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"
+                                    >
+                                </DataGrid>
+
+                            </div>
+
+                            <div class="legend-title mart20">
+                                <span :class="classIconTamUng" @click="onClickTamUng()"></span> Danh sách tạm ứng vật tư
+                            </div>
+                            <div class="table-content"  v-if="Visible.boxTamUng">
+                                <DataGrid ref="" class="table-result table-gachle" v-bind:columns="[
+                                    {fieldName: 'MA_VT', headerText: 'Mã vật tư', allowFiltering: true, allowSorting: true , freeze: 'Left'},
+                                    {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, allowSorting: true , freeze: 'Left'},
+                                    {fieldName: 'DVI_TINH', headerText: 'Đơn vị tính', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'MA_KHO_GIAO', headerText: 'Mã kho giao', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'KHO_GIAO', headerText: 'Kho giao', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'KHO_NHAN', headerText: 'Kho nhận', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'MA_KHO_NHAN', headerText: 'Mã kho nhận', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SL_GIAO', headerText: 'SL giao', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SL_TON_HT', headerText: 'SL tồn', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGAY_CT', headerText: 'Ngày CT', allowFiltering: true, allowSorting: true, textAlign: 'Left'},
+                                    {fieldName: 'MATHUNG', headerText: 'Mã thùng', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},
+                                    ]" 
+                                    v-bind:dataSource="this.dataSource.DSTamUng" 
+                                    :showFilter="true" 
+                                    dataKeyField=""
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"
+                                    >
+                                </DataGrid>
+                            </div>
+
+                            <div class="legend-title mart20">
+                                <span :class="classIconThueBao" @click="onClickThueBao()"></span> Lịch sử thuê bao sử dụng vật tư
+                            </div>
+                            <div class="table-content"  v-if="Visible.boxThueBao">
+                                <DataGrid ref="gridThueBao" class="table-result table-gachle" v-bind:columns="[
+                                    {fieldName: 'COL_GROUP', headerText: 'Thuê bao', allowFiltering: true, allowSorting: true , isGroupedColumn:true},                                  
+                                    {fieldName: 'MA_TB', headerText: 'Mã TB', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'MA_LT', headerText: 'Số ảo', allowFiltering: true, allowSorting: true}, 
+                                    {fieldName: 'TEN_TB', headerText: 'Tên TB', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'DIACHI_LD', headerText: 'Địa chỉ LĐ', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'TEN_KIEULD', headerText: 'Kiểu LĐ', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'MOTA', headerText: 'Mô tả', template: onClickXemAnh, allowFiltering: true, allowSorting: true, textAlign:'Center',},
+                                    {fieldName: 'LOAIHINH_TB', headerText: 'Loại hình', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'TEN_VT', headerText: 'Tên VT', allowFiltering: true, allowSorting: true},                             
+                                    {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGAY_CAP', headerText: 'Ngày cấp', allowFiltering: true, allowSorting: true, textAlign: 'Left'},  
+                                    {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: true},                             
+                                    {fieldName: 'KIEU_TBI', headerText: 'Kiểu Tbị', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'NGUOI_CN', headerText: 'Người CN', allowFiltering: true, allowSorting: true},                                     
+                                    {fieldName: 'GIAOPHIEU', headerText: 'Giao phiếu', allowFiltering: true, allowSorting: true},                             
+                                    {fieldName: 'SERIAL_GP', headerText: 'Serial GP', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'TINHTRANG_TH', headerText: 'Tình trạng', allowFiltering: true, allowSorting: true},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: true},
+                                    {fieldName: '', headerText: '', allowFiltering: false, width: 120, template: onClickCapNhatTrangThai, cssClass: 'text-center', visible:Visible.gcolChucNang}, 
+                                    ]" 
+                                    v-bind:dataSource="this.dataSource.DSThueBao" 
+                                    :showFilter="true"                                 
+                                    @selectedRowChanged="DSThueBaoSelectRow"                              
+                                    :allowPaging="true"
+                                    :enablePagingServer="false"                               
+                                    >
+                                </DataGrid>
+
+                            </div>
+                        </div>
+
+
+                        <div class="tab-pane" id="cuoncap">
+                            <div class="grid-stack-box">
+                                <div class="col-sm-3 col-12" id="boxLeft">
+                                    <div class="legend-title">Lịch sử cuộn cáp</div>
+                                    <div class="tree-plus">
+                                        <div class="tree-view-wrapper">                                            
+                                            <ejs-treeview id='treeview' ref="treeObj" :fields="fields" @nodeSelected="maTbiSelect"></ejs-treeview>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-9 col-12" id="boxRight">
+                                    <div class="legend-title">
+                                        <span :class="classIconCuonCap" @click="onClickCuonCap"></span> Thông tin cuộn cáp
+                                    </div>
+                                    <div class="row" v-if="Visible.boxCuonCap">
+                                        <div class="col-sm-4 col-12">
+                                            <div class="info-row">
+                                                <div class="key w70">
+                                                    Cáp gốc
+
+                                                </div>
+                                                <div class="value">
+                                                    <input type="text" class="form-control" v-model="params.capGoc" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 col-12">
+                                            <div class="info-row">
+                                                <div class="key w70">
+                                                    Cuộn cáp
+
+                                                </div>
+                                                <div class="value">
+                                                    <input type="text" class="form-control" v-model="params.txtCuonCap" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 col-12">
+                                            <div class="info-row">
+                                                <div class="key w70">
+                                                    Từ kho
+
+                                                </div>
+                                                <div class="value">
+                                                    <input type="text" class="form-control" v-model="params.tuKho" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-content" v-if="Visible.boxCuonCap">
+                                        <DataGrid ref="" class="table-result table-gachle" v-bind:columns="[
+                                            {fieldName: 'LOAI_CT', headerText: 'Loại CT', allowFiltering: true, allowSorting: true , freeze: 'Left'},
+                                            {fieldName: 'SOPHIEU', headerText: 'Số phiếu', allowFiltering: true, allowSorting: true , freeze: 'Left'},
+                                            {fieldName: 'ND_GIAO', headerText: 'Nội dung', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'MA_KHO_GIAO', headerText: 'Mã kho giao', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'KHO_GIAO', headerText: 'Kho giao', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'MA_KHO_NHAN', headerText: 'Mã kho nhận', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'KHO_NHAN', headerText: 'Kho nhận', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'NGAY_CT', headerText: 'Ngày CT', allowFiltering: true, allowSorting: true , textAlign: 'Left'},
+                                            {fieldName: 'NGAY_HT', headerText: 'Ngày hoàn thành', allowFiltering: true, allowSorting: true , textAlign: 'Left'},
+                                            {fieldName: 'MUCDICH', headerText: 'Mục đích', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'LOHANG', headerText: 'Lô hàng', allowFiltering: true, allowSorting: true},
+                                            {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: true},
+                                            ]" v-bind:dataSource="this.dataSource.DSTTCuonCap" :showFilter="true"
+                                            dataKeyField="">
+                                        </DataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div style="width:35%" v-if="disabledInput.isChiTiet">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">Thông tin của thiết bị</div>
+                        <div class="pull-right">
+                            <button class="btn btn-main lh14 pad4" @click="onClickClose">
+                                <span class="-ap icon-close"></span>
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="file-canvas" id="thongTinTbi" style="height: 500px;" v-html="params.thongTinTbi">
+
+                    </div>
+                    <div class="legend-title mart20">
+                        Danh sách serial tìm được theo serial GP
+                    </div>
+                    <div class="table-content">
+                        <DataGrid ref="" class="table-result table-gachle" v-bind:columns="[
+                            {fieldName: '', headerText: '', allowFiltering: false, width: 120, template: onClickTimSerial, cssClass: 'text-center'}, 
+                            {fieldName: 'SERIAL', headerText: 'Serial', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'SERIAL_GP', headerText: 'Serial GP DL', allowFiltering: true, allowSorting: true},
+                            {fieldName: 'SERIAL_GP_TT', headerText: 'Serial GP TT', allowFiltering: true, allowSorting: true},                            
+                            ]" v-bind:dataSource="this.dataSource.DSSerialGP" :showFilter="true" dataKeyField="">
+                        </DataGrid>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ejs-dialog      
+        ref="popupTestPortV2"            
+        :enableResize='true'
+        :visible="false"
+        :position="{X: 'center', Y: 'top'}"
+        :isModal="false"
+        :cssClass="'popup-show-port'"
+        header='<div class="main-title">Kiểm Tra Port thuê bao</div>'
+        showCloseIcon=false
+        target=".main-wrapper"
+        width="60%" 
+        height="500"
+        allowDragging="true"
+        >
+        <div>
+            <CheckPort ref="frmTestPort" v-if="checkPortDialog.isVisiable" type="modal"  v-bind="checkPortDialog.input"></CheckPort>
+        </div>        
+    </ejs-dialog>
+
+    <b-modal 
+        no-close-on-backdrop
+        hide-footer 
+        hide-header 
+        hide-header-close 
+        size="md"
+        class="modal" 
+        id="popupXemAnh">
+        
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">Hình ảnh thiết bị</div>
+                    <div class="close -ap icon-close"  @click="$bvModal.hide('popupXemAnh')" data-dismiss="modal">
+                    </div>
+                </div>
+               
+                <div class="popup-body">
+                    <div class="info-row" >
+                        <img :src="urlImage" alt="" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+        
+    </b-modal>
+</div>

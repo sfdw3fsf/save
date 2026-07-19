@@ -1,0 +1,219 @@
+<ejs-dialog :enableResize="true" :allowDragging="true" :visible="false" :animationSettings="animationSettings"
+    ref="dlgInHoaDon" width="80%" :target="target" :showCloseIcon="true"
+    header='<div class="title"> <span class="icon nc-icon-outline ui-1_settings"></span> In hóa đơn </div>'
+    :close="reset" z-index="0" id="frmInHoaDon" :open="openDialog">
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a class="pointer" @click="btnInHoaDon">
+                    <span class="icon one-file-money"></span> Hóa đơn
+                </a>
+                <app-sua-seri ref="dlgAddSeriIHD" @dataInputChanged="addSeri"></app-sua-seri>
+            </li>
+            <li>
+                <a class="pointer" @click="btnSuaSeri">
+                    <span class="icon one-seri"></span> Sửa Seri
+                </a>
+                <app-sua-seri ref="dlgSuaSeriIHD" @dataInputChanged="updateEditSeri"></app-sua-seri>
+            </li>
+        </ul>
+    </div>
+    <div class="popup-body mart10">
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">
+                    <div class="title">Thông tin hóa đơn</div>
+                </div>
+                <div class="pull-right">
+                    <div class="check-action normal">
+                        <input type="checkbox" class="check" v-model="chkInTrucTiep" />
+                        <span class="name">In trực tiếp</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Mẫu in</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <app-combobox :columns="mauInCollumn" :dataSource="cboMauIn" textField="TEN_BC"
+                                    @selectedChanged="mauInSelectedChanged"></app-combobox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="chkAllMIG" />
+                                <span class="name">Mã in ghép</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <input type="text" value="" class="form-control highlight" :disabled="!chkAllMIG"
+                                v-model="txtMaIG" @keyup.enter="txtMaIGEnter" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+
+                        <app-ky-cuoc label="Kỳ HĐ" @handleChangeKyCuoc="handleKyCuoc"></app-ky-cuoc>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Mã TT</div>
+                        <div class="value">
+                            <div class="input-more-button">
+                                <button class="btn" @click="btnLayMaTT">
+                                    <span class="-ap icon-more_horiz"></span>
+                                </button>
+                                <app-tra-cuu-thong-tin-thue-bao ref="dlgTraCuuTTTB"
+                                    @getTTTB="eventGetTTTB"></app-tra-cuu-thong-tin-thue-bao>
+                                <input ref="inputMaTT" type="text" class="form-control highlight bold" v-model="txtMaTT"
+                                    v-on:keyup.enter="txtMaTTEnter" />
+                            </div>
+                        </div>
+                        <div class="value w30">
+                            <label for="uploadIHD" class="btn btn-second h32">
+                                <span class="one-excel normal"></span>
+                                <input type="file" ref="fileInputIHD" hidden id="uploadIHD" accept=".xls,.xlsx"
+                                    @change="btnNhapExcel" @click="$refs.fileInputIHD.value = null" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            Số thùng
+                        </div>
+                        <div class="value">
+                            <input type="text" value="" class="form-control highlight bold" v-model="txtSoThung"
+                                disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Seri
+                        </div>
+                        <div class="value">
+                            <input type="text" value="" class="form-control highlight bold" v-model="txtSeri"
+                                disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="key w50">
+                            Số seri
+                        </div>
+                        <div class="value">
+                            <input type="text" value="" class="form-control highlight bold" v-model="txtSoSeri"
+                                disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-8 col-12">
+                    <div class="info-row">
+                        <div class="key w80">Tên TT</div>
+                        <div class="value">
+                            <input type="text" class="form-control highlight bold" v-model="txtTenTT" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Tổng nợ
+                        </div>
+                        <div class="value">
+                            <vue-numeric type="text" class="form-control highlight tright bold" value="100"
+                                v-model="txtTongNo" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-8 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            Địa chỉ TT
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control highlight bold" value="Trung tâm kinh doanh"
+                                v-model="txtDiaChiTT" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Chu kỳ nợ</div>
+                        <div class="value">
+                            <ejs-datepicker :placeholder="'Chọn chu kỳ nợ'" v-model="vkyhoadon" :value="value"
+                                :start="'Year'" :depth="'Year'" :format="'MM/y'" :change="onKyHoaDonChange"
+                                :showClearButton="false" :allowEdit="false" class="text-red">
+                            </ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w80">
+                    <div class="check-action">
+                        <input type="checkbox" class="check" :disabled="true" v-model="chkQuan" />
+                        <span class="name">Quận</span>
+                    </div>
+                </div>
+                <div class="value">
+                    <div class="select-custom">
+                        <ejs-multiselect mode="CheckBox" selectAllText="Chọn tất cả" unSelectAllText="Bỏ chọn tất cả"
+                            locale="vi-VN" :dataSource="cboQuanTT" :allowFiltering="true"
+                            :fields="{value:'QUAN_ID', text: 'TEN_QUAN'}" :showSelectAll="true" :showDropDownIcon="true"
+                            :value="cboQuanTTValue"></ejs-multiselect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="legend-title">
+            <div class="pull-left">
+                <div class="title">Danh sách hóa đơn</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="nav tabs tab-over">
+            <a href="#tab1" data-toggle="tab" :class="tabActived =='tabDanhSach' ? 'active' : ''"
+                @click="selectedTab('tabDanhSach')">
+                Danh sách
+            </a>
+            <a href="#tab2" data-toggle="tab" :class="tabActived =='tabLoi' ? 'active' : ''"
+                @click="selectedTab('tabLoi')">
+                Lỗi
+            </a>
+        </div>
+        <div class="tab-content">
+            <div :class="[tabActived =='tabDanhSach' ? 'active' : '','tab-pane']" id="tab1">
+                <DataGrid ref="gridHD" :dataSource="gcHoaDon" :showColumnCheckbox="true" :columns="gcHoaDonCollumn"
+                    @selectedItemsChanged="selectedItemsChangedHoaDon" @selectedRowChanged="selectedRowChangedHoaDon"
+                    dataKeyField="MA_TT" :allowPaging="true" :enablePagingServer="false" :key="keyReset"></DataGrid>
+            </div>
+            <div :class="[tabActived =='tabLoi' ? 'active' : '','tab-pane']" id="tab2">
+                <DataGrid :dataSource="gcLoi" :columns="gcLoiCollumn" dataKeyField="MA_TT" :allowPaging="true"
+                    :enablePagingServer="false"></DataGrid>
+            </div>
+        </div>
+    </div>
+    <iframe id="textfile" style="visibility: hidden"></iframe>
+</ejs-dialog>

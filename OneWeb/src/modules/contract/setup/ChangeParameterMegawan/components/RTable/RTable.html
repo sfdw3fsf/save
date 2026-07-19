@@ -1,0 +1,90 @@
+<div>
+  <div class="table-content" :style="{height: height}">
+    <table class="table-result table-gachle">
+        <thead class="center">
+            <tr>
+                <th class="w20"></th>
+                <th v-if="checkSelect"></th>
+                <th v-for="field in fields">{{ field.label }}</th>
+                <th v-if="isDelete || isRefresh">Thao tác</th>
+            </tr>
+            <tr v-if="columnFilter">
+                <th class="w20"></th>
+                <th v-if="checkSelect">
+                  <div class="check-action">
+                    <input type="checkbox" class="check" v-model="checkAll" @change="onCheckAll">
+                    <span class="name"></span>
+                  </div>
+                </th>
+                <th v-for="field in fields">                                            
+                    <div class="input-icon-right">
+                        <input type="text" class="form-control" @input="onChangeSearch($event.target.value, field.key)">
+                        <span class="icon nc-icon-outline ui-1_zoom"></span>
+                    </div>
+                </th>
+                <th v-if="isDelete || isRefresh"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-if="$data.searchResults == null || $data.searchResults.length == 0">
+              <td :colspan="fields.length + 1 + (checkSelect ? 1 : 0) + (isDelete || isRefresh ? 1 : 0)" style="text-align:center">
+                Không có bản ghi nào để hiển thị
+              </td>
+            </tr>
+            <tr v-for="(item, idx) in $data.searchResults" :key="idx" :style="{background: index == idx ? '#FFF0C8 !important' : null }" @click="onSelectRow(item, idx)">
+              <td>
+                <span class="fa fa-play text-main" v-if="index == idx"></span>
+              </td>
+              <td v-if="checkSelect" class="center">
+                <div class="check-action">
+                  <input type="checkbox" class="check" v-model="item.isChecked" @change="onCheckRow(item)">
+                  <span class="name"></span>
+                </div>
+              </td>
+              <td v-for="field in fields" :class="[field.tdClass]">{{ item[field.key] }}</td>
+              <td v-if="isDelete || isRefresh" class="center">
+                <button v-if="isDelete" class="btn btn-danger lh14 pad3" @click="onDeleteRow(item)" v-b-tooltip.hover :title="deleteToolTip">
+                  <span class="-ap icon-close"></span>
+                </button>
+                <button v-if="isRefresh" class="btn btn-primary lh14 pad3" @click="onRefresh" v-b-tooltip.hover :title="refreshToolTip">
+                  <span class="btn-refresh nc-icon-outline arrows-1_refresh-68"></span>
+                </button>
+              </td>
+            </tr>
+        </tbody>
+        <tfoot v-if="fields.filter(x => x.hasOwnProperty('footerCount')).length > 0">
+          <tr>
+            <td></td>
+            <td v-if="checkSelect"></td>
+            <td v-for="item in fields">
+              <input v-if="item.footerCount" type="text" class="form-control tright" :value="$data.searchResults.length" :disabled="true" />
+            </td>
+            <td v-if="isDelete || isRefresh"></td>
+          </tr>
+        </tfoot>
+    </table>
+  </div>
+  <!-- <div class="tc-pagination" v-if="!($data.searchResults == null || $data.searchResults.length == 0)"> -->
+  <div class="tc-pagination">
+    <button @click="firstPage()" :disabled="currentPageIndex == 0" class="btn one-arrow-left-forward"></button>
+    <button @click="previousPage()" :disabled="currentPageIndex == 0" class="btn fa fa-angle-double-left"></button>
+    <button @click="doSelectNearby(false)" class="btn fa fa-angle-left"></button>
+    <span class="text">Bản ghi</span>
+    <div class="dropdown inline">
+      <div class="fw6 input-number" data-toggle="dropdown">
+        <span class="text-main">{{ getSelectedRow }}</span>/{{ rowCount }}
+      </div>
+      <div class="dropdown-menu">
+        <button @click="setPageSize(10)" class="dropdown-item">10</button>
+        <button @click="setPageSize(20)" class="dropdown-item">20</button>
+        <button @click="setPageSize(50)" class="dropdown-item">50</button>
+        <button @click="setPageSize(100)" class="dropdown-item">100</button>
+      </div>
+    </div>
+    <button @click="doSelectNearby(true)" class="btn fa fa-angle-right"></button>
+    <button @click="nextPage()" :disabled="currentPageIndex >= pageCount - 1"
+      class="btn fa fa-angle-double-right"></button>
+    <button @click="lastPage()" :disabled="currentPageIndex >= pageCount - 1"
+      class="btn one-arrow-right-forward"></button>
+  </div>
+</div>

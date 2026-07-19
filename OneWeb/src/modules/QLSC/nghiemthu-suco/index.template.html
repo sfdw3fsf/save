@@ -1,0 +1,429 @@
+<div class="nghiemthu-suco">
+    <div class="list-actions-top">
+        <ul class="list" style="width: 100% !important">
+            <li @click="onClickBtnTimKiem">
+                <a href="javascript:void(0)">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            <li @click="onClickBtnNghiemThu" :class="{'disable-btn': !idSuCoDuocChon}">
+                <a href="javascript:void(0)">
+                    <span class="icon one-ghichu"></span>Nghiệm thu
+                </a>
+            </li>
+            <li v-show="!!canhBaoDt" class="disable-btn" style="float: right;">
+                <a href="javascript:void(0)" style="border-left: 0; color: darkred !important; font-weight: bold;">
+                    THIỆT HẠI DOANH THU TẠM TÍNH: {{canhBaoDt}} (đ/h)
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-6 col-12" v-show="showTttk && !expandDsPhieu && !expandDsSuCo">
+                <div class="box-form" style="height: 98%;">
+                    <div class="legend-title">
+                        <div class="pull-left">Thông tin tìm kiếm</div>
+                        <div class="pull-right">
+                            <button class="btn btn-sm btn-second nc-icon-outline arrows-1_refresh-69 lh16" title="Làm mới" @click="onClickBtnLamMoiTttk"></button>
+                            <button class="btn btn-sm btn-second -ap icon-close lh16" title="Đóng khung" @click="onToggleTttk"></button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w130">Nhóm sự cố</div>
+                                    <div class="value">
+                                        <SelectExt 
+                                            v-model="nhomSuCoId" 
+                                            :dataSource="dsNhomSuCo" 
+                                            dataTextField="NHOM_SC"
+                                            dataValueField="NHOMSC_ID"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w120">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkNgaySuCo">
+                                            <span class="name">Ngày sự cố</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <ejs-datepicker 	
+                                                    class="form-control bg-none bor0 fw6 text h24" 
+                                                    placeholder=""
+                                                    format="dd/MM/yyyy"
+                                                    v-model="ngaySuCoTu"
+                                                    :enabled="chkNgaySuCo"></ejs-datepicker>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <ejs-datepicker 	
+                                                    class="form-control bg-none bor0 fw6 text h24" 
+                                                    placeholder=""
+                                                    format="dd/MM/yyyy"
+                                                    v-model="ngaySuCoDen"
+                                                    :enabled="chkNgaySuCo"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w130">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkMaSuCo">
+                                            <span class="name">Mã sự cố</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" :disabled="!chkMaSuCo" class="form-control" v-model="maSuCo" v-on:keyup.enter="onClickBtnTimKiem">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w120">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkNgayBao">
+                                            <span class="name">Ngày báo</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-12">
+                                                <ejs-datepicker
+                                                    style="padding-top: 6px"
+                                                    class="form-control bg-none bor0 fw6 text h24" 
+                                                    placeholder=""
+                                                    format="dd/MM/yyyy"
+                                                    v-model="ngayBaoTu"
+                                                    :enabled="chkNgayBao"></ejs-datepicker>
+                                            </div>
+                                            <div class="col-sm-6 col-12">
+                                                <ejs-datepicker
+                                                    style="padding-top: 6px"
+                                                    class="form-control bg-none bor0 fw6 text h24" 
+                                                    placeholder=""
+                                                    format="dd/MM/yyyy"
+                                                    v-model="ngayBaoDen"
+                                                    :enabled="chkNgayBao"></ejs-datepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w130">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkNguoiBao">
+                                            <span class="name">Người báo</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <ComboboxGridNhanVien v-model="nguoiBaoId" :disabled="!chkNguoiBao"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w120">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkMucDoSuCo">
+                                            <span class="name">Mức độ sự cố</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <SelectExt 	
+                                            v-model="mucDoSuCoId" 
+                                            :dataSource="dsMucDoSuCo" 
+                                            dataTextField="MUCDO_SC"
+                                            dataValueField="MUCDO_ID" 
+                                            :disabled="!chkMucDoSuCo"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w130">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkNguonSuCo">
+                                            <span class="name">Nguồn sự cố</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <SelectExt 	
+                                            v-model="nguonSuCoId" 
+                                            :dataSource="dsNguonSuCo" 
+                                            dataTextField="MOTA"
+                                            dataValueField="NGUONSC_ID" 
+                                            :disabled="!chkNguonSuCo"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w120">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkKeoDaiTu">
+                                            <span class="name">Kéo dài</span>
+                                        </div>
+                                    </div>
+                                    <div class="value w28">
+                                        <button 
+                                            class="btn btn-second pad8" 
+                                            :disabled="!chkKeoDaiTu" 
+                                            @click="onClickBtnKeoDaiTu" 
+                                            style="line-height: 14px;">
+                                            {{toanTuKeoDaiTu}}
+                                        </button>
+                                    </div>
+                                    <div class="value w50">
+                                        <vue-numeric 
+                                            class="form-control" 
+                                            v-model="keoDaiTuH" 
+                                            :disabled="!chkKeoDaiTu" 
+                                            :min="0" 
+                                            maxlength="5" 
+                                            :minus="false" 
+                                            separator=","></vue-numeric>
+                                    </div>
+                                    <div class="key padl6 w30 center">h</div>
+                                    <div class="value w50">
+                                        <vue-numeric 
+                                            class="form-control" 
+                                            v-model="keoDaiTuM" 
+                                            :disabled="!chkKeoDaiTu" 
+                                            :min="0" 
+                                            maxlength="2" 
+                                            :minus="false" 
+                                            separator=","></vue-numeric>
+                                    </div>
+                                    <div class="key padl6 w30 center">m</div>
+                                    <div class="value w50">
+                                        <vue-numeric 
+                                            class="form-control" 
+                                            v-model="keoDaiTuS" 
+                                            :disabled="!chkKeoDaiTu" 
+                                            :min="0" 
+                                            maxlength="2" 
+                                            :minus="false" 
+                                            separator=","></vue-numeric>
+                                    </div>
+                                    <div class="value padt7">s</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5 col-12">
+                                <div class="info-row">
+                                    <div class="key w130">
+                                        <div class="check-action">
+                                            <input type="checkbox" class="check" v-model="chkTinhTrang">
+                                            <span class="name">Tình trạng</span>
+                                        </div>
+                                    </div>
+                                    <div class="value">
+                                        <SelectExt 	
+                                            v-model="tinhTrangId" 
+                                            :dataSource="dsTinhTrang" 
+                                            dataValueField="TINHTRANG_ID" 
+                                            dataTextField="TINHTRANG"
+                                            :disabled="!chkTinhTrang"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 col-12">
+                                <div class="info-row">
+                                    <div class="key w120">
+                                        <div class="check-action" v-show="showKeoDaiDen">
+                                            <input type="checkbox" class="check" v-model="chkKeoDaiDen">
+                                            <span class="name">Kéo dài</span>
+                                        </div>
+                                    </div>
+                                    <div class="value w28">
+                                        <button 
+                                            class="btn btn-second pad8" 
+                                            :disabled="!chkKeoDaiDen" 
+                                            style="line-height: 14px;" 
+                                            :style="{visibility: showKeoDaiDen ? 'visible' : 'hidden'}"
+                                            @click="onClickBtnKeoDaiDen">
+                                            {{toanTuKeoDaiDen}}
+                                        </button>
+                                    </div>
+                                    <div class="value w50">
+                                        <vue-numeric
+                                            v-show="showKeoDaiDen"
+                                            class="form-control" 
+                                            v-model="keoDaiDenH" 
+                                            :disabled="!chkKeoDaiDen" 
+                                            :min="0" 
+                                            maxlength="5" 
+                                            :minus="false" 
+                                            separator=","></vue-numeric>
+                                    </div>
+                                    <div class="key padl6 w30 center">h</div>
+                                    <div class="value w50">
+                                        <vue-numeric
+                                            v-show="showKeoDaiDen"
+                                            class="form-control" 
+                                            v-model="keoDaiDenM" 
+                                            :disabled="!chkKeoDaiDen" 
+                                            :min="0" 
+                                            maxlength="2" 
+                                            :minus="false" 
+                                            separator=","></vue-numeric>
+                                    </div>
+                                    <div class="key padl6 w30 center">m</div>
+                                    <div class="value w50">
+                                        <vue-numeric
+                                            v-show="showKeoDaiDen"
+                                            class="form-control" 
+                                            v-model="keoDaiDenS" 
+                                            :disabled="!chkKeoDaiDen" 
+                                            :min="0" 
+                                            maxlength="2" 
+                                            :minus="false" 
+                                            separator=","></vue-numeric>
+                                    </div>
+                                    <div class="value padt7">s</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w130">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="chkNoiDungSuCo">
+                                    <span class="name">Nội dung sự cố</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <textarea class="form-control" style="resize: none; height: 100px;" :disabled="!chkNoiDungSuCo" v-model="noiDungSuCo"></textarea> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-show="!expandDsSuCo" class="col-12" :class="{'col-sm-6': showTttk && !expandDsPhieu}" :style="{'padding-left': !showTttk && !expandDsPhieu ? '50px' : '7px'}">
+                <div class="box-form" style="position: relative; height: 98%;">
+                    <div v-show="!showTttk && !expandDsPhieu" @click="onToggleTttk" style="cursor: pointer; height: 100%; width: 40px; border: 1px solid #ccc; border-radius: 5px; background-color: #BAE7FF; position: absolute; left: -45px; top: 0px;">
+                        <div style="transform: rotate(-90deg); white-space: nowrap; position: relative; text-align: center; top: 50%; ">
+                            <span style="position: relative; left: -100%;">Thông tin tìm kiếm</span>
+                        </div>
+                    </div>
+                    <div class="legend-title">
+                        <div class="pull-left">Danh sách phiếu điều xử lý</div>
+                        <div class="pull-right">
+                            <button class="btn btn-sm btn-second one-excel-outline lh16" title="Xuất Excel" @click="onClickBtnExcelPhieuDieuXuLy"></button>
+                            <button class="btn btn-sm btn-second nc-icon-outline arrows-1_refresh-69 lh16" title="Làm mới" @click="onClickBtnLamMoiPhieuDieuXuLy"></button>
+                            <button class="btn btn-sm btn-second nc-icon-outline ui-2_filter lh16" title="Ẩn / Hiện lọc" @click="allowFilteringGridPhieuDieuXuLy = !allowFilteringGridPhieuDieuXuLy"></button>
+                            <button class="btn btn-sm btn-second one-design-per lh16" title="Mở rộng" @click="toggleExpandDsPhieuDieuXuLy"></button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="table-content">
+                        <DataGrid
+                            ref='grid-phieudieu-xuly'
+                            class="table-result"
+                            :panelDataHeight="expandDsPhieu ? '605' : (!allowFilteringGridPhieuDieuXuLy ? '210' : '167')"
+                            v-bind:columns="[
+                                {fieldName: '', headerText: 'Chức năng', textAlign: 'Center', freeze: 'Left', allowFiltering: false, width: '125', clipMode: 'Ellipsis', template: getColumnTemplateChucNang(this)},
+                                {fieldName: 'DONVI_NHAN', headerText: 'Đơn vị xử lý', allowFiltering: true, width: '130' },
+                                {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'ND_GIAO', headerText: 'Nội dung giao', allowFiltering: true, width: '200' },
+                                {fieldName: 'TTPH_XL', headerText: 'Trạng thái', allowFiltering: true, width: '130' },
+                                {fieldName: 'KHAN', headerText: 'Khẩn', allowFiltering: true, width: '130' },
+                                {fieldName: 'CHITIEU_TG', headerText: 'Chỉ tiêu', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'CONLAI', headerText: 'Còn lại', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'NGAY_XL', headerText: 'Ngày XL', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'GHICHU_XL', headerText: 'Ghi chú XL', allowFiltering: true, width: '130' },
+                                {fieldName: 'NHANVIEN_XL', headerText: 'Nhân viên XL', allowFiltering: true, width: '130' },
+                                {fieldName: 'NGAY_NT', headerText: 'Ngày NT', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'GHICHU_NT', headerText: 'Ghi chú NT', allowFiltering: true, width: '130' },
+                                {fieldName: 'NHANVIEN_NT', headerText: 'Nhân viên NT', allowFiltering: true, width: '130' },
+                                {fieldName: '', headerText: 'Ảnh SC', textAlign: 'Center', allowFiltering: false, freeze: 'Right', width: '100', clipMode: 'Ellipsis', template: getColumnTemplateAnhSc(this) },
+                                {fieldName: 'KEY', visible: false, isPrimaryKey: true },
+                            ]"        
+                            v-bind:dataSource="dsPhieuDieuXuLy"
+                            :showFilter="allowFilteringGridPhieuDieuXuLy"
+                            :allowPaging="true"
+                            :enablePagingServer="false"></DataGrid>
+                        <div v-show="showZoomImg" class="panel-zoom-img"><img :src="zoomImg" alt="" style="height: 100%; width: 100%;" /></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" v-show="!expandDsPhieu">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <div class="pull-left">Danh sách sự cố</div>
+                        <div class="pull-right">
+                            <button class="btn btn-sm btn-second one-excel-outline lh16" title="Xuất Excel" @click="onClickBtnExcelSuCo"></button>
+                            <button class="btn btn-sm btn-second nc-icon-outline arrows-1_refresh-69 lh16" title="Làm mới" @click="onClickBtnTimKiem"></button>
+                            <button class="btn btn-sm btn-second nc-icon-outline ui-2_filter lh16" title="Ẩn / Hiện lọc" @click="allowFilteringGridSuCo = !allowFilteringGridSuCo"></button>
+                            <button class="btn btn-sm btn-second one-design-per lh16" title="Mở rộng" @click="toggleExpandDsSuCo"></button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="table-content">
+                        <DataGrid
+                            class="table-result"
+                            :panelDataHeight="expandDsSuCo ? '605' : '350'"
+                            v-bind:columns="[
+                                {fieldName: '', headerText: 'Chọn', textAlign: 'Center', allowFiltering: false, width: '50', template: getColumnTemplateChon(this)},
+                                {fieldName: 'MA_SC', headerText: 'Mã sự cố', allowFiltering: true, width: '130' },
+                                {fieldName: 'TEN_SC', headerText: 'Tên sự cố', allowFiltering: true, width: '150' },
+                                {fieldName: 'MUCDO_SC', headerText: 'Mức độ', allowFiltering: true, width: '130' },
+                                {fieldName: 'NHOM_SC', headerText: 'Nhóm', allowFiltering: true, width: '130' },
+                                {fieldName: 'NGUON_SC', headerText: 'Nguồn', allowFiltering: true, width: '100' },
+                                {fieldName: 'NOIDUNG_SC', headerText: 'Nội dung sự cố', allowFiltering: true, width: '200' },
+                                {fieldName: 'NGAY_SC', headerText: 'Ngày sự cố', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'THOIGIAN', headerText: 'Kéo dài', textAlign: 'Right', allowFiltering: true, width: '130' },
+                                {fieldName: 'TRANGTHAI_SC', headerText: 'Trạng thái', allowFiltering: true, width: '130' },
+                                {fieldName: 'KHOAPHIEU', headerText: 'Khóa phiếu', allowFiltering: true, width: '130' },
+                            ]"        
+                            v-bind:dataSource="dsSuCo"
+                            :showFilter="allowFilteringGridSuCo"
+                            :allowPaging="true"
+                            :enablePagingServer="false"
+                            @queryCellInfo="onQueryCellInfoSuCo"></DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-ghichu" scrollable centered title="Nghiệm thu xử lý" ok-only @ok="okCapNhatGhiChu" @shown="$refs['ref-ghichu'].focus()">
+        <div>Ghi chú:</div>
+        <div>
+            <input type="text" class="form-control" v-model="ghiChuNt" ref="ref-ghichu" v-on:keyup.enter="okCapNhatGhiChu">
+        </div>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <b-modal id="modal-nhacviec" scrollable centered title="Nhắc việc" ok-only @ok="okNhacViec" @shown="$refs['ref-nhacviec'].focus()">
+        <div>Nội dung SMS:</div>
+        <div>
+            <input type="text" class="form-control" v-model="noiDungNhacViec" ref="ref-nhacviec" v-on:keyup.enter="okNhacViec">
+        </div>
+        <template #modal-footer="{ ok, cancel }">
+            <b-button variant="secondary" style="color: white" @click="cancel()">Hủy</b-button>
+            <b-button variant="primary" style="color: white" @click="ok()">Đồng ý</b-button>
+        </template>
+    </b-modal>
+    <ModalTraPhieu modal-id="modal-traphieu" :phieu-id="idPhieuNt" @success="onTraPhieuThanhCong"></ModalTraPhieu>
+    <ModalKhoaPhieu ref="ref-modal-khoaphieu" modal-id="modal-khoaphieu" @success="onClickBtnTimKiem"></ModalKhoaPhieu>
+</div>

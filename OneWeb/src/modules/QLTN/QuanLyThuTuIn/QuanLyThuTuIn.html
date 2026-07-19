@@ -1,0 +1,127 @@
+<ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="dlgQuanLyThuTuIn"
+    header='<div class="title"><span class="icon one-notepad"></span> Quản lý thứ tự in</div>'
+    :animationSettings='animationSettings' showCloseIcon=true width='80%' :target='target' :open="openForm"
+    :close="resetData" :isModal='true'>
+    <div class="">
+        <div class="list-actions-top">
+            <ul class="list">
+                <li @click="Nhapmoi()">
+                    <a href="javascript:;" title="Nhập mới">
+                        <span class="icon one-file-plus"></span> Nhập mới
+                    </a>
+                </li>
+                <li @click="DanhSach()">
+                    <a href="javascript:;" title="Hiển thị thông tin tìm kiếm">
+                        <span class="icon nc-icon-glyph design_bullet-list-67"></span>Danh sách
+                    </a>
+                </li>
+                <li @click="CapNhat()">
+                    <a href="javascript:;" title="Cập nhật">
+                        <span class="icon one-reload1"></span>Cập nhật
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;" @click="XuatExcel()" title="Xuất Excel" :class="{disabled :  dsThuTuIn.length <= 0}">
+                        <span class="icon one-xlsx-import"></span> Xuất Excel
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-body">
+            <div class="box-form">
+                <div class="legend-title">Chọn file in</div>
+                <div class="row">
+                    <div class="col-sm-6 col-12">
+                        <div class="note red mart7">
+                            <span class="one-alert text-warning f24 inline vcenter"></span> Cấu trúc file gồm sheet1:MA_TT, THUTU, DOT
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <appKyCuoc :disabled="true" label="Kỳ cước" :value="prevMonth" @handleChangeKyCuoc="handleKyCuoc">
+                        </appKyCuoc>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w100">
+                        Tên File <span class="required">*</span>
+                    </div>
+                    <div class="value">
+                        <div class="input-more-button">
+                            <label for="uploadTTI" class="btn">
+                                <span class="-ap icon-more_horiz"></span>
+                                <input ref="fileInput" type="file" id="uploadTTI" style="display: none"
+                                    @change="onChangeFile" accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                            </label>
+                            <input autofocus ref="duongDan" v-model="duongDan" type="text"
+                                class="form-control highlight">
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w100">
+                        Nhân viên TC <span class="required">*</span>
+                    </div>
+                    <div class="value">
+                        <!-- <div class="select-custom">
+              <select ref="selectNV" v-model="selectNV" name="" id="" class="form-control">
+                <option value="">Chọn nhân viên thu cước</option>
+                <option v-for="item in danhsachNhanVienTC" :value="item.NHANVIEN_ID">{{item.TEN_HIENTHI}}</option>
+              </select>
+            </div> -->
+                        <div class="input-icon-right">
+                            <ComboboxGrid v-bind:columns="[
+                    {fieldName: 'MA_NV', headerText: 'Mã nhân viên', allowFiltering: true},
+                    {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true},
+                    ]" v-bind:dataSource="danhsachNhanVienTC" textField="TEN_HIENTHI" valueField="NHANVIEN_ID"
+                                @selectedChanged="nvtc_selectedChanged" placeholder="Chọn nhân viên thu cước"
+                                :enabledSelectFirstRow="false"></ComboboxGrid>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="key w100">
+                    </div>
+                    <div class="value w80">
+                        <div class="check-action mart7">
+                            <input v-model="pTucThi" type="checkbox" class="check" :disabled="checkTucThi">
+                            <span class="name">Tức thì</span>
+                        </div>
+                    </div>
+                    <div class="value">
+                        <div class="note red mart7 ">
+                            <span class="one-alert text-warning f24 inline vcenter"></span><span class="italic"> {{lbl_thongbao}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <div class="legend-title">
+                    <div class="pull-left">Danh sách thứ tự in</div>
+                    <div class="pull-right red">
+                        00:00:00
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="nav tabs tab-over">
+                    <a href="javascript:;" data-toggle="tab" :class="{active:!isTab}" @click="isTab=false">
+                        Danh sách
+                    </a>
+                    <a href="javascript:;" data-toggle="tab" :class="{active:isTab}" @click="isTab=true">
+                        Lỗi
+                    </a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tabDS" v-show="!isTab">
+                        <DataGrid :columns="fieldsThuTu" :dataSource="dsThuTuIn" :showFilter="true" ref="tabIn"
+                            :allowPaging="true" :enablePagingServer="false"></DataGrid>
+                    </div>
+                    <div class="tab-pane active" id="tabLoi" v-show="isTab">
+                        <DataGrid :columns="fieldsLoi" :dataSource="dsLoi" :showFilter="true" ref="tabLoi"
+                            :allowPaging="true" :enablePagingServer="false"></DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</ejs-dialog>

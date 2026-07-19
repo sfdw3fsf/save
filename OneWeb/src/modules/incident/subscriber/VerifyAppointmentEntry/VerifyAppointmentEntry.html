@@ -1,0 +1,177 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <div class="list-actions-top">
+            <ul class="list">
+                <li>
+                    <a href="javascript: void(0)" @click="btnLayTTMoi_Click">
+                        <span class="icon one-reload1"></span>Lấy TT
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript: void(0)" @click="tsbtnCapNhat_Click">
+                        <span class="icon one-save"></span>Cập nhật
+                    </a>
+                </li>
+                <li v-if="btn.btn_giuphieu">
+                    <a href="javascript: void(0)" @click="tsmGiuPhieu_Click">
+                        <span class="icon one-file-bookmark1"></span>Giữ phiếu
+                    </a>
+                </li>
+                <li  v-if="btn.btn_huygiuphieu">
+                    <a  @click="tsmHuyGiuPHieu_Click">
+                        <span class="icon one-key"></span>Huỷ giữ phiếu
+                    </a>
+                </li>
+                <li v-if="tag==0">
+                    <a href="javascript: void(0)" v-b-modal.popup-frmLichSuHenBaoHong>
+                        <span
+                            class="icon business_notes nc-icon-glyph"
+                        ></span>
+                        Lịch sử hẹn  
+                    </a>
+                    <frmLichSuHenBaoHong :baoHongId="baohong_id" :kieu="2" />
+                </li>
+                <li v-if="tag==1">
+                    <a href="javascript: void(0)" v-b-modal.popup-frmLichSuHenBaoHong>
+                        <span
+                            class="icon business_notes nc-icon-glyph"
+                        ></span>
+                        Lịch sử hẹn  
+                    </a>
+                    <frmLichSuHenBaoHong :hdtbId="hdtb_id" :kieu="1" /> 
+                </li>
+                <li v-if="tag==0">
+                    <a href="javascript: void(0)" v-b-modal.popup-frmLichSuBaoHong>
+                        <span
+                            class="icon files_single-copy-04 nc-icon-glyph"
+                        ></span>
+                        Lịch sử BH
+                    </a>
+                    <frmLichSuBaoHong :thueBaoId="thuebao_id" />
+                </li>
+            </ul>
+            
+        </div>
+    </vue-nav>
+    <div class="page-content">
+
+        <div class="box-form">
+             <div class="legend-title">Thông tin xác minh</div>
+             <div class="row">
+                 <div class="col-sm-3 col-12 border">
+                     <div class="info-row">
+                         <div class="key w110">
+                             <div class="check-action">
+                                 <input type="checkbox" class="check" v-model="ckbSendSMS">
+                                 <span class="name">Tự động nhắn cho KH</span>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-sm-9 col-12">
+                     <div class="row">
+                         <div class="col-sm-5 col-12">
+                             <div class="info-row">
+                                 <div class="value">
+                                    <div class="input-icon-right">
+                                        <vue-date type="datetime" :labelWidth="'90'" v-model="dtpGioHen_Tu" label="Từ giờ" :format="dateFormat" :value-type="'format'"></vue-date>
+                                    </div>
+                                 </div>
+                             </div>
+                             <div class="info-row">
+                                 <div class="value">
+                                    <div class="input-icon-right">
+                                        <vue-date type="datetime" :labelWidth="'90'" v-model="dtpGioHen_Den" label="Đến giờ" :format="dateFormat" :value-type="'format'"></vue-date>
+                                    </div>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-sm-7 col-12">
+                             <div class="info-row">
+                                 <div class="key w80">Ghi chú</div>
+                                 <div class="value">
+                                     <textarea class="form-control" style="height: 70px;resize: none;" v-model="txtGhichu"></textarea>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                    
+                     <div class="info-row">
+                         <div class="key w95">Lý do hẹn</div>
+                         <div class="value">
+                             <div class="select-custom">
+                                <SelectExt id="cbb_LyDoHen" v-model.trim="dataSelected.lydohen_id" :settings="{dropdownParent: $refs['dsLydohen']}" :dataSource="options.DsLyDoHen" dataTextField="lydohen" dataValueField="lydohen_id" @change="onChangeLyDoHen($event)" />
+                                 </div>
+                         </div>
+                     </div>
+                 </div>
+                 
+               
+             </div>
+             
+         </div>
+         <div class="box-form">
+             <div class="legend-title">
+                
+                 <div class="pull-left">
+                     <div class="list-checks">
+                         <span style="padding-right: 10px;">Danh sách phiếu nhập hẹn</span>
+                         <div class="item">
+                             <div class="check-action">
+                                 <input type="radio" :checked="rdoChuaXM" class="check" @change="rdoChuaXM_CheckedChanged($event)">
+                                 <span class="name">Chưa XM</span>
+                             </div>
+                         </div>
+                         <div class="item">
+                             <div class="check-action">
+                                 <input type="radio" class="check" :checked="rdoDaXM" @change="rdoDaXM_CheckedChanged($event)">
+                                 <span class="name">Đã XM</span>
+                             </div>
+                         </div>
+                         <span style="padding-left: 10px; color:red;">Thông báo: {{lblThongBao}} </span>
+                     </div>
+                 </div>
+                 <div class="pull-right">
+                    <a href='javascript: void(0)' @click='ExportPhieuHen'>
+                        <span class='icon one-excel'></span> Xuất Excel
+                    </a>
+                </div>
+                 <div class="clearfix"></div>
+             </div>
+             <DataGrid 
+                v-if="tag==0"
+                v-bind:columns="collumnsDSPhieuhen" 
+                v-bind:dataSource="options.dtPhieuHen" 
+                :allowExcelExport="true"
+                :showFilter="true" 
+                ref="DSPhieuhen"
+                :allowPaging="true" 
+                :enablePagingServer="false" 
+                :enabledSelectFirstRow="true" 
+                :enableVirtualization="true"
+                @rowSelected="grvDSHen_BaoHong_FocusedRowChanged" 
+                :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                panelDataHeight="250">
+         </DataGrid>
+         <DataGrid 
+            v-if="tag==1"
+            v-bind:columns="collumnsDSPhieuhenLD" 
+            v-bind:dataSource="options.dtPhieuHen"
+            :allowExcelExport="true"
+            :showFilter="true" 
+            ref="DSPhieuhen"
+            :allowPaging="true" 
+            :enablePagingServer="false" 
+            :enabledSelectFirstRow="true" 
+            :enableVirtualization="true"
+            @rowSelected="grvDSHen_BaoHong_FocusedRowChanged" 
+            :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+            panelDataHeight="250">
+    </DataGrid>
+         </div>
+
+        
+     </div>
+</div>
+

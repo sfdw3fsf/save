@@ -1,0 +1,2 @@
+import CompleteProfileChangeAccount from './CompleteProfileChangeAccount'
+export default CompleteProfileChangeAccount

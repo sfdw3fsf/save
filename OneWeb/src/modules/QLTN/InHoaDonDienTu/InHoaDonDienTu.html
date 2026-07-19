@@ -1,0 +1,172 @@
+<div >
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="javascript:void(0)" @click="traCuu()">
+                    <span class="icon one-file-search"></span> Tra cứu
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="docFile()">
+                    <span class="icon one-book"></span> Đọc file
+                </a>
+                <PopupDocFile @sendData="sendData" :kyCuoc="pKyCuoc" />
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="taiNhieuFile()">
+                    <span class="icon one-pdf-download"></span> Xuất Pdf
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="taiFile()">
+                    <span class="icon one-pdf-download"></span> Xuất Pdf V2
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="chuyenDoiTaiFile_v3()">
+                    <span class="icon one-pdf-download"></span>Xuất Pdf V3
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" @click="onExcelExport()">
+                    <span class="icon one-pdf-download"></span>Xuất File
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="pull-right custom-kycuoc">
+                <app-ky-cuoc @handleChangeKyCuoc="handleKyCuoc"></app-ky-cuoc>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w110">Tìm kiếm theo</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <select
+                                    v-model="selectedTieuChi"
+                                    class="form-control"
+                                >
+                                    <option
+                                        v-for="item in listTieuChi"
+                                        :value="item.id"
+                                        >{{item.name}}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w60">Giá trị</div>
+                        <div class="value">
+                            <div class="input-icon-left">
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    v-model="giaTri"
+                                    class="form-control highlight"
+                                    v-on:keyup.enter="traCuu"
+                                />
+                                <span
+                                    class="icon nc-icon-outline ui-1_zoom"
+                                ></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="note">
+                        <span class="icon one-alert text-warning f20"></span>
+                        <span class="text-main"
+                            >Tìm kiếm danh sách hóa đơn chuyển đổi chuyển
+                            khoản</span
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="key w110">
+                    <div class="check-action">
+                        <input
+                            type="checkbox"
+                            v-model="checkHTTT"
+                            class="check"
+                        />
+                        <span class="name">Hình thức TT</span>
+                    </div>
+                </div>
+                <div class="value">
+                    <div class="select-custom">
+                        <ejs-multiselect
+                            selectAllText="Chọn tất cả"
+                            unSelectAllText="Bỏ chọn tất cả"
+                            :dataSource="listHTTTGetter"
+                            mode="CheckBox"
+                            v-model="selectedHTTT"
+                            :fields="fieldsHTTT"
+                            :enabled="checkHTTT"
+                            showSelectAll="true"
+                            :value="selectedHTTT"
+                        ></ejs-multiselect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">
+                <div class="pull-left">
+                    Danh sách hóa đơn
+                </div>
+                <div class="pull-right normal">
+                    <div class="check-action">
+                        <input type="checkbox" class="check" />
+                        <!-- <span class="name">In trực tiếp</span> -->
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="table-content">
+                <DataGrid
+                    :columns="fieldDsCongNo"
+                    :showFilter="true"
+                    :dataSource="listHoaDon"
+                    dataKeyField="MA_TT"
+                    @selectedRowChanged="onCongNoRowChange"
+                    :showColumnCheckbox="true"
+                    :allowPaging="true" :enablePagingServer="false"
+                    :enabledSelectFirstRow="false"
+                    ref="dsHoaDon"
+                ></DataGrid>
+            </div>
+        </div>
+    </div>
+<b-modal id="popup-taifile" size="sm" hide-footer hide-header hide-header-close body-class="modal-body p-0" centered
+    @shown="onModalShown">
+    <div class="modal-content popup-box">
+        <div class="popup-header">
+            <div class="title">Đang tải file pdf</div>
+            <div class="close -ap icon-close" data-dismiss="modal" @click="$bvModal.hide('popup-taifile')">
+            </div>
+        </div>
+        <div class="popup-body" style="min-height: 100px; position: relative;">
+            <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false"
+                :paginate-elements-by-height="2000" filename="one_bss" :pdf-quality="2" :manual-pagination="false"
+                pdf-format="a3" pdf-orientation="portrait" pdf-content-width="100%" ref="html2Pdf">
+                <section slot="pdf-content">
+                    <div v-html="srcHtml"></div>
+                </section>
+            </vue-html2pdf>
+        </div>
+    </div>
+</b-modal>
+
+</div>

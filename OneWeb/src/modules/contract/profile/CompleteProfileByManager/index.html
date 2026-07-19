@@ -1,0 +1,428 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <ul class="list">
+            <li>
+                <a @click="clickButton('laytt')">
+                    <span class="icon one-file-attach1"></span>Lấy TT
+                </a>
+            </li>
+            <li>
+                <a @click="clickButton('traphieu')">
+                    <span class="icon one-file-back"></span>Trả phiếu
+                </a>
+            </li>
+            <li>
+                <a @click="clickButton('xacnhan')">
+                    <span class="icon nc-icon-glyph ui-1_check-circle-08"></span>Xác nhận
+                </a>
+            </li>
+            <li>
+                <a @click="clickButton('hoancong')">
+                    <span class="icon one-hoancong"></span>Hoàn công
+                </a>
+            </li>
+            <li>
+                <!-- :class="{ disabled: !button.themfile }" -->
+                <a @click="clickButton('themfile')" :class="{ disabled: !button.themfile }">
+                    <span class="icon nc-icon-glyph ui-1_circle-add"></span>Thêm file
+                </a>
+            </li>
+            <!-- <li>
+                <a @click="clickButton('huongdan')">
+                    <span class="icon one-book1"></span>Hướng dẫn
+                </a>
+            </li> -->
+        </ul>
+    </vue-nav>
+    <div class="page-content">
+        <ejs-splitter id='splitter' ref='splitterObj'>
+            <e-panes>
+                <e-pane content='#boxLeft' size ='20%'></e-pane>
+                <e-pane content='#boxMid' size ='80%'></e-pane>
+            </e-panes>
+        </ejs-splitter>
+        <div class="row">
+            <div id="boxLeft" style="display: none;">
+                <div class="box-form">
+                    <div class="legend-title">Thông tin đối tượng hồ sơ</div>
+                    <div class="input-more-button -right">
+                        <button class="btn" @click="sortTreeView">
+                            <span class="one-sort"></span>
+                        </button>
+                        <div class="input-icon-left">
+                            <input id="txtFilter" type="text" class="form-control" @keyup="searchNodes">
+                            <span class="icon nc-icon-outline ui-2_filter"></span>
+                        </div>
+                    </div>
+                    <div class="tree-plus mart10">
+                        <ejs-treeview id="treeview" ref="treeObj" :fields='tt_doituong_hs.fieldsDonVi' :nodeSelected="tvDonVi_FocusedNodeChanged"></ejs-treeview>
+                    </div>
+                </div>
+            </div>
+            <div id="boxMid" class="row" style="display: none;">
+                <div class="col-md-9 col-12">
+                    <ejs-splitter id='splitter1' ref='splitterObj1' style='height: fit-content;'>
+                        <e-panes>
+                            <e-pane content='#boxLeft1' size='50%'></e-pane>
+                            <e-pane content='#boxMid1' size='50%'></e-pane>
+                        </e-panes>
+                    </ejs-splitter>
+                    <div class="row">
+                        <div id="boxLeft1" style="display: none;">
+                            <div class="box-form">
+                                <div class="legend-title">Các thông tin về bộ hồ sơ</div>
+                                <div class="title-bg-main fw6">Thông tin tìm kiếm</div>
+                                <div class="info-row">
+                                    <div class="key">
+                                        Kiểu giao
+                                    </div>
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="tt_bo_hs.kieu_giao" :allowFiltering="true" 
+                                                data-text-field="NAME" 
+                                                data-value-field="ID"
+                                                :dataSource="cbKieuGiao">
+                                            </SelectExt>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="info-row">
+                                            <div class="key">
+                                                Số lô HS
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <SelectExt v-model="tt_bo_hs.so_lo_hs" :allowFiltering="true" 
+                                                        data-text-field="malo_hs" 
+                                                        data-value-field="lohs_id" :dataSource="cbloHS" 
+                                                    >
+                                                    </SelectExt>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row">
+                                            <div class="key  w80">
+                                                Mã KH/GD
+                                            </div>
+                                            <div class="value">
+                                                <input ref="ma_gd" type="text" class="form-control highlight" v-model="tt_bo_hs.ma_gd"
+                                                @keyup.enter="txtMaGD_KeyPress"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="info-row">
+                                            <div class="key">
+                                                Đơn vị giao
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <SelectExt v-model="tt_bo_hs.dv_giao" :allowFiltering="true" 
+                                                        data-text-field="NAME" data-value-field="ID"
+                                                        :dataSource="cbdvGiao">
+                                                    </SelectExt>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row">
+                                            <div class="key w80">
+                                                Trạng thái
+                                            </div>
+                                            <div class="value">
+                                                <div class="select-custom">
+                                                    <SelectExt v-model="tt_bo_hs.trang_thai" :allowFiltering="true" 
+                                                        data-text-field="NAME" data-value-field="ID"
+                                                        :dataSource="cbTrangThai">
+                                                    </SelectExt>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="info-row">
+                                            <div class="key">
+                                                <div class="check-action">
+                                                    <input type="checkbox" class="check" v-model="tt_bo_hs.ischkTungay">
+                                                    <span class="name">Giao từ ngày</span>
+                                                </div>
+                                            </div>
+                                            
+                                                <vue-date labelWidth="0" v-model="tt_bo_hs.giao_tungay" type="date" 
+                                                    format="DD/MM/YYYY" 
+                                                    label=""
+                                                    :disable="!tt_bo_hs.ischkTungay"
+                                                    >
+                                                </vue-date>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row">
+                                            <div class="key  w80">
+                                                Đến ngày
+                                            </div>
+                                            <vue-date labelWidth="0" v-model="tt_bo_hs.denngay" type="date" 
+                                            format="DD/MM/YYYY" label="" :disable="!tt_bo_hs.ischkTungay">
+                                            </vue-date>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="title-bg-main">
+                                    <span class="title">Thông tin bộ hồ sơ</span>
+                                    <div class="check-action marl10">
+                                        <input type="checkbox" class="check" v-model="tt_bo_hs.ischkTuDong" />
+                                        <span class="name">Tự động chọn cùng lô</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="info-row">
+                                            <div class="key">
+                                                Số lô HS
+                                            </div>
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="tt_bo_hs.solohs" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row">
+                                            <div class="key  w80">
+                                                Mã KH
+                                            </div>
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="tt_bo_hs.makh"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="info-row">
+                                            <div class="key">
+                                                Trạng thái
+                                            </div>
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="tt_bo_hs.trangthai"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row">
+                                            <div class="key  w80">
+                                                Tên KH
+                                            </div>
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="tt_bo_hs.tenkh" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-12">
+                                        <div class="info-row">
+                                            <div class="key">
+                                                Đơn vị giao
+                                            </div>
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="tt_bo_hs.dvgiao" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="info-row">
+                                            <div class="key  w80">
+                                                Mã GD
+                                            </div>
+                                            <div class="value">
+                                                <input type="text" class="form-control" v-model="tt_bo_hs.magd" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="key">
+                                        Nội dung trả
+                                    </div>
+                                    <div class="value">
+                                        <textarea name="" class="form-control" style="height:62px;resize:none" id="" cols="30"
+                                            rows="10" v-model="tt_bo_hs.nd_tra"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="boxMid1" style="display: none;">
+                            <div class="box-form" style="height: 490px;">
+                                <div class="legend-title">Chi tiết bộ hồ sơ</div>
+                                <!-- <DataGrid v-bind:columns="[ 
+                                                                {fieldName: 'TEN_LOAIDV', headerText: 'Loại đơn vị', isGroupedColumn:true}, 
+                                                                {fieldName: 'MA_DV', headerText: 'Mã ĐV', allowFiltering: true}, 
+                                                                {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true}, 
+                                                                // {fieldName: 'DUNGLUONG', headerText: 'Dung lượng', allowFiltering: true}, 
+                                                                // {fieldName: 'DIACHI', headerText: 'Địa chỉ', allowFiltering: true}, 
+                                                                ]" v-bind:dataSource="options.ct_hoso" :showColumnCheckbox="true"
+                                    :showFilter="true"></DataGrid> -->
+                                <DataGrid rref="chi_tiet_ho_so" :showFilter="true" :allowPaging="true" :showColumnCheckbox="true" 
+                                    :enablePagingServer="false" :dataSource="options.ct_hoso" dataKeyField="ma_tb"
+                                    @selectedRowChanged="focusItemCTHS"  :columns="config.ct_hoso"/>
+                                
+                            </div>
+                        </div>
+                        <!-- <b-modal size="lg" ref="saveFileModal" hide-footer hide-header hide-header-close body-class="modal-body p-0"> -->
+                            <SaveFileModal ref="saveFileModal" :url="this.url" :file_name="this.fileName" @download="download" />
+                        <!-- </b-modal> -->
+
+                    </div>
+                    <div class="box-form">
+                        <div class="legend-title">Danh sách bộ hồ sơ</div>
+                            <DataGrid
+                                ref="options_hoso"
+                                :showFilter="true" :allowPaging="true" :enablePagingServer="false"
+                                :dataSource="options.hoso" :columns="config.hoso" 
+                                @selectedItemsChanged="focusItemDSHS" 
+                                :showColumnCheckbox="true"
+                            />
+                            <!-- <ejs-grid :dataSource="options.hoso" :allowFiltering="true" :allowPaging="true" 
+                                :pageSettings='{pageSize:10,pageSizes: [10,50,100,200]}' 
+                                :enablePagingServer="false" :allowSelection ="true"
+                                @selectedRowChanged="focusItemDSHS" :selectedRowIndex=0
+                                :selectionSettings='selectionOptions'>
+                                <e-columns>
+                                    <e-column type='checkbox' width='50' textAlign='center'></e-column>
+                                    <e-column headerText='STT' field="stt" width='80' textAlign='center'></e-column>
+                                    <e-column field='ma_gd' headerText='Mã GD' width='80' textAlign='center'></e-column>
+                                    <e-column field='ten_kh' headerText='Tên khách hàng' width='80' textAlign='center'></e-column>
+                                    <e-column field='Tuyen_thu' headerText='Tuyến thu' width='80' textAlign='center'></e-column>
+                                    <e-column field='upfile' headerText='UpFile' width='80' textAlign='center' :template='upfileTemplate'></e-column>
+                                    <e-column field='da_xn' headerText='Đã xách nhận' width='80' textAlign='center' :template='xnTemplate'></e-column>
+                                </e-columns>
+                            </ejs-grid> -->
+
+                            <!-- <ejs-grid :allowFiltering="true" :allowPaging="true" 
+                                :pageSettings='{pageSize:10,pageSizes: [10,50,100,200]}' 
+                                :enablePagingServer="false" :allowSelection ="true"
+                                :selectedRowIndex=1
+                                :dataSource="options.hoso"
+                                :filterSettings="{showFilterBarOperator: false, mode: 'Immediate', immediateModeDelay: 500}"
+                                gridLines='Both'
+                                :rowSelected="focusItemDSHS"
+                            >
+                                <e-columns>
+                                    <e-column type='checkbox' width='30' headerTextAlign="center" textAlign="center"></e-column>
+                                    <e-column headerText='STT' field="stt" width='50' textAlign='center'></e-column>
+                                    <e-column field='ma_gd' headerText='Mã GD' width='80' textAlign='center'></e-column>
+                                    <e-column field='ten_kh' headerText='Tên khách hàng' width='80' textAlign='center'></e-column>
+                                    <e-column field='Tuyen_thu' headerText='Tuyến thu' width='80' textAlign='center'></e-column>
+                                    <e-column field='upfile' headerText='UpFile' width='80' textAlign='center' :template='upfileTemplate'></e-column>
+                                    <e-column field='da_xn' headerText='Đã xách nhận' width='80' textAlign='center' :template='xnTemplate'></e-column>
+                                    <e-column field='da_xn' headerText='Đã xách nhận' width='80' textAlign='center' :template='xnTemplate'></e-column>
+                                    <e-column field='da_xn' headerText='Đã xách nhận' width='80' textAlign='center' :template='xnTemplate'></e-column>
+                                </e-columns>
+                            </ejs-grid> -->
+                    </div>
+                </div>
+                <div class="col-md-3 col-12" id="boxRight" v-if="isEnableFileds">
+                    <div class="box-form">
+                        <div class="legend-title padb2" >
+                            <div class="pull-left">
+                                <span class="title inline vcenter">Thông tin file</span>
+                                <button class="btn btn-second" @click="refreshFile">
+                                    <span class="one-reload"></span> Làm mới
+                                </button>
+                                <button class="btn btn-second" @click.prevent="CAPNHAT_FILE">
+                                    <span class="one-file-plus"></span> Lưu file
+                                </button>
+                            </div>
+                            <div class="pull-right">
+                                <a class="red btn f20 lh20" @click="vbtnClose_Click">
+                                    <span class="-ap icon-arrow-right3"></span>
+                                </a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w80">Nhóm file</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <!-- <SelectExt v-model="tt_file.nhom_file" :allowFiltering="true" data-text-field="NAME" 
+                                        data-value-field="ID"
+                                        :dataSource="cbNhomFile"> -->
+                                        <SelectExt v-model="tt_file.nhom_file" :allowFiltering="true" 
+                                            data-text-field="NAME" data-value-field="ID"
+                                            :dataSource="cbNhomFile">
+                                        </SelectExt>
+                                    </SelectExt>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w80">Loại File</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <SelectExt v-model="tt_file.loai_file" :allowFiltering="true" data-text-field="loai_file" 
+                                        data-value-field="loaifile_id"
+                                        :dataSource="cbLoaiFile">
+                                    </SelectExt>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                                <div class="key w85">Đường dẫn</div>
+                                <div class="input-more-button">
+                                    <label class="btn" for="upload-file">
+                                        <span class="-ap icon-more_horiz"></span>
+                                        <input type="file" ref="files" class="hidden" id="upload-file" 
+                                            @change="UploadFileHoSo"/>
+                                    </label>
+                                    <vue-input v-model.trim="tt_file.duong_dan" type="file" id="file" />
+                                </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w80">Ghi chú</div>
+                            <div class="value">
+                                <input type="text" class="form-control" v-model="tt_file.ghichu" />
+                            </div>
+                        </div>
+                        <div class="title-bg-main">
+                            <div class="pull-left">
+                                <span class="title mart5">Danh sách thuê bao</span>
+                                <a href="#" class="btn btn-second pad2 lh20 button-not-bg marl10">
+                                    <span class="nc-icon-outline arrows-1_refresh-69 f20"></span>
+                                </a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="#" class="btn btn-second pad2 lh20 button-not-bg marl10">
+                                    <span class="nc-icon-outline ui-2_filter f20"></span>
+                                </a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <vue-card >
+                            <DataGrid 
+                                ref="danh_sach_thue_bao" :showFilter="true" :allowPaging="true" :enablePagingServer="false" 
+                                :showColumnCheckbox="true" :dataSource="options.thuebao" :columns="config.thuebao" 
+                                @selectedItemsChanged="focusItemTB" :allowGrouping='true' :groupSettings='groupOptions'
+                            />
+                        </vue-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id>
+
+        </div>
+        
+    </div>
+</div>

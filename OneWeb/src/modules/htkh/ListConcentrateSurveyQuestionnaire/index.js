@@ -1,0 +1,3 @@
+import ListConcentrateSurveyQuestionnaire from './ListConcentrateSurveyQuestionnaire'
+
+export default ListConcentrateSurveyQuestionnaire

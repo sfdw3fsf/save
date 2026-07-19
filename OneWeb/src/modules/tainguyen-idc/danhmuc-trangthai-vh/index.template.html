@@ -1,0 +1,167 @@
+<div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a
+          style="cursor: pointer;"
+          href="javascript:;"
+          @click="setMode('add')"
+          :class="{ 'disabled': !(mode === 'view') }"
+        >
+          <span class="icon one-file-plus"></span>Nhập mới
+        </a>
+      </li>
+      <li>
+        <a style="cursor: pointer;" href="javascript:;" @click="onClickSave" :class="{ 'disabled': mode === 'view' }">
+          <span class="icon one-save"></span> Ghi lại
+        </a>
+      </li>
+      <li>
+        <a class="pointer" @click="setMode('view')" :class="{ 'disabled': mode === 'view' }">
+          <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Hủy bỏ
+        </a>
+      </li>
+      <li>
+        <a
+          style="cursor: pointer;"
+          href="javascript:;"
+          @click="setMode('edit')"
+          :class="{ 'disabled': !(mode === 'view') }"
+        >
+          <span class="icon one-edit"></span>Sửa
+        </a>
+      </li>
+      <li>
+        <a
+          style="cursor: pointer;"
+          href="javascript:;"
+          @click="onClickDelete"
+          :class="{ 'disabled': !(mode === 'view') }"
+        >
+          <span class="icon one-trash"></span>Xóa
+        </a>
+      </li>
+      <li>
+        <a style="cursor: pointer;" @click="onClickImport"> <span class="icon one-xlsx-import"></span>Import </a>
+      </li>
+      <li>
+        <a style="cursor: pointer;" @click="onClickExport"> <span class="icon one-excel"></span>Export </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Thông tin trạng thái vận hành</div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="col-sm-4 key">ID trạng thái<span class="red">*</span></div>
+                <div class="col-sm-8 value">
+                  <input
+                    type="number"
+                    class="form-control"
+                    :class="controls.ttvh_id.invalid ? 'is-invalid' : ''"
+                    disabled="true"
+                    v-model="currentItem.ttvh_id"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="col-sm-4 key">Hiệu lực</div>
+                <div class="col-sm-8 value padt4">
+                  <div class="check-action">
+                    <input
+                      type="checkbox"
+                      class="check"
+                      :disabled="!controls.sudung.enabled"
+                      v-model="currentItem.sudung"
+                      :true-value="1"
+                      :false-value="0"
+                    /><span class="name"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="col-sm-4 key">Tên trạng thái <span class="red">*</span></div>
+                <div class="col-sm-8 value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :class="controls.trangthai_vh.invalid ? 'is-invalid' : ''"
+                    :disabled="!controls.trangthai_vh.enabled"
+                    v-model="currentItem.trangthai_vh"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="col-sm-4 key">Ghi chú</div>
+                <div class="col-sm-8 value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    :class="controls.ghichu.invalid ? 'is-invalid' : ''"
+                    :disabled="!controls.ghichu.enabled"
+                    v-model="currentItem.ghichu"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="box-form">
+          <div class="row">
+            <div class="legend-title">Danh sách trạng thái vận hành</div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <DataGrid
+                ref="gridItems"
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :showColumnCheckbox="true"
+                :allowExcelExport="true"
+                v-bind:columns="columnsOfGrid"
+                :dataSource="dataItems"
+                @rowSelected="onRowSelected"
+              >
+              </DataGrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ModalImportExcel
+    ref="modalImportExcel"
+    :title="importConfig.title"
+    :tableColumns="importConfig.tableColumns"
+    :gridColumns="importConfig.gridColumns"
+    :templateFileName="importConfig.templateFileName"
+    :formatCellValue="formatTrangThaiCellValue"
+    :validationRules="importConfig.validationRules"
+    :checkDataResult="importConfig.checkDataResult"
+    :processExcelData="processExcelData"
+    @save-data="handleSaveImportData"
+    @check-data="handleCheckImportData"
+  />
+</div>

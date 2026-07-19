@@ -1,0 +1,3 @@
+import TraCuuDoiChieuTraCuocVinaphoneVTT from './TraCuuDoiChieuTraCuocVinaphoneVTT'
+
+export default TraCuuDoiChieuTraCuocVinaphoneVTT

@@ -1,0 +1,227 @@
+
+<div>    
+    <div class="list-actions-top">
+        <ul class="list" style="overflow: visible !important;">
+            <li @click="onClickNhapMoi()" >
+                <a>
+                    <span class="icon one-reload1"></span> Nhập mới
+                </a>
+            </li>
+            <li @click="onClickTimKiem()" >
+                <a>
+                    <span class="icon  one-search"></span> Tìm kiếm
+                </a>
+            </li>
+            <!-- <li @click=""  v-if="Enabled.inPhieu">
+                <a>
+                    <span class="icon one-print"></span> Phiếu
+                </a>
+            </li> -->
+
+            <li class="dropdown"  v-if="Enabled.inPhieu">
+                <a data-toggle="dropdown">
+                    <span class="icon one-print"></span>In phiếu
+                </a>
+
+                <ul class="dropdown-menu">
+                    <li @click="onClickPhieuTongHop()">
+                        <a>  
+                            <span class="dropdown-icon one-print"></span> Tổng hợp 
+                        </a>
+                    </li>
+                    <li @click="onClickPhieuChiTiet()">
+                        <a >
+                            <span class="dropdown-icon one-print"></span> Chi tiết
+                        </a>
+                    </li>                      
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="popup-body">
+        <div class="row grid-stack-box" style="padding: 0px 6px;">
+            <div class="box-col box-form col-sm-6 col-12">
+                <div class="legend-title" style="padding-top: 15px;">Thông tin tra cứu phiếu</div>
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Loại phiếu</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                   
+                                    <ejs-dropdownlist
+                                            class="form-control"
+                                            ref="cboTuKho"
+                                            locale='vi'
+                                            v-model="params.loaiPhieuId"
+                                            :dataSource='dataSource.DSLoaiPhieu' 
+                                            :fields="{value:'LOAIPHIEU_ID', text: 'LOAIPHIEU'}"
+                                            :allowFiltering="true"
+                                            :filtering='filterLoaiPhieu'                                                                       
+                                            >
+                                        </ejs-dropdownlist>       
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Mã phiếu</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <input type="text" class="form-control" v-model="params.maPhieu" @keyup.enter="onClickTimKiem()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Từ ngày</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker class="form-control" 
+                                        :format="dateConfig.formatDay" v-model="params.tuNgay" :allowEdit=false>
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                        <div class="info-row">
+                            <div class="key w100">Đến ngày</div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker class="form-control" 
+                                        :format="dateConfig.formatDay" v-model="params.denNgay" :allowEdit=false>
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+            <div class="box-col box-form col-sm-6 col-12">
+                
+                <div class="legend-title" style="padding-top: 15px;">Thông tin file</div>
+                <div class="info-row">
+                    <div class="key w90">File/Văn bản</div>
+                    <div id="textarea" class="form-control" style="height: 100px;">
+                        <div class="text-area-content mb-2 row" style="padding: 0px 7px;" v-for="file in dataSource.DSFile">
+                            <div class="col-sm-10 col-12">
+                                {{file.fileName}}
+                            </div>
+                            <div class="col-sm-2 col-12" style="text-align: right;"> 
+                                <button @click="onClickDownFile(file)" class="btn btn-primary">
+                                    <span class="icon one-search" ></span>
+                                </button>                                               
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+                    
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách phiếu</div>
+            <div class="tab-content">
+                <DataGrid  :columns="[
+                    {fieldName: 'MA', headerText: 'Mã phiếu', allowFiltering: true},                        
+                    {fieldName: 'LOAIPHIEU', headerText: 'Loại phiếu', allowFiltering: true},
+                    {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true},
+                    {fieldName: 'DONVI_GIAO', headerText: 'Đơn vị giao', allowFiltering: true},
+                    {fieldName: 'NHANVIEN_GIAO', headerText: 'Nhân viên giao', allowFiltering: true },
+                    {fieldName: 'DONVI_NHAN', headerText: 'Đơn vị nhận', allowFiltering: true },
+                    {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true },
+                    {fieldName: 'NGAY_YC', headerText: 'Ngày yêu cầu', allowFiltering: true },
+                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},  
+                    {fieldName: 'VATTU_ID', headerText:'', visible:false, isPrimaryKey:true}    
+                    ]" 
+                    ref="gridTongHop" 
+                    :dataSource="dataSource.DSPhieu" 
+                    :showFilter="true" 
+                    dataKeyField=""
+                    @selectedRowChanged="DSPhieuFocus"                         
+                    :allowPaging="true"
+                    :enablePagingServer="false"
+                    />   
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Chi tiết thực hiện</div>
+            <DataGrid  :columns="[
+                {fieldName: 'HUONGGIAO', headerText: '', allowFiltering: true , isGroupedColumn:true},
+                {fieldName: 'DVG', headerText: 'Đơn vị giao', allowFiltering: true},
+                {fieldName: 'NGAY_GIAO', headerText: 'Ngày giao', allowFiltering: true},
+                {fieldName: 'NV_GIAO', headerText: 'Người giao', allowFiltering: true},
+                {fieldName: 'ND_GIAO', headerText: 'Nội dung giao', allowFiltering: true},
+                {fieldName: 'DVN', headerText: 'Đơn vị nhận', allowFiltering: true},
+                {fieldName: 'TRANGTHAI_PH', headerText: 'Trạng thái phiếu', allowFiltering: true},
+                {fieldName: 'NGAY_TRA', headerText: 'Ngày trả', allowFiltering: true},
+                {fieldName: 'ND_TRA', headerText: 'Nội dung trả', allowFiltering: true},
+                {fieldName: 'LYDOTRA', headerText: 'Lý do trả', allowFiltering: true},
+                {fieldName: 'NGAY_TH', headerText: 'Ngày CN', allowFiltering: true},
+                {fieldName: 'NV_TH', headerText: 'Người thực hiện', allowFiltering: true},
+                {fieldName: 'SO_DT', headerText: 'Điện thoại liên hệ', allowFiltering: true},                        
+                {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},
+                {fieldName: 'KETQUA_XL', headerText: 'Kết quả XL', allowFiltering: true},
+                {fieldName: 'CHUONGTRINH', headerText: 'Ứng dụng', allowFiltering: true},
+                {fieldName: 'ND_THUCHIEN', headerText: 'ND thực hiện', allowFiltering: true},
+                {fieldName: 'NGUOI_XULY', headerText: 'Người xử lý', allowFiltering: true},
+                {fieldName: '', headerText: '', allowFiltering: false, width: 120, template: onClickNhanVien, cssClass: 'text-center'}, 
+                ]" 
+                ref="gridTongHop" 
+                :dataSource="dataSource.DSChiTietPhieu" 
+                :showFilter="true" 
+                dataKeyField=""
+                @selectedRowChanged=""                         
+                :allowPaging="true"
+                :enablePagingServer="false"
+                :enabledSelectFirstRow="false"
+                />   
+        </div>
+    </div>
+    <ejs-dialog
+        :enableResize='true'
+        :allowDragging='true'
+        :visible='false'
+        ref="popupDSNhanVien"
+        :animationSettings='animationSettings'
+        showCloseIcon=true width='80%'
+        :target='target'        
+        > 
+        
+            <div class="modal-content popup-box" >
+                <div class="popup-header">
+                    <div class="title">DANH SÁCH NHÂN VIÊN THỰC HIỆN</div>                    
+                </div>
+                <div class="popup-body">
+                    <DataGrid  :columns="[                       
+                        {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true},
+                        {fieldName: 'NV_GIAO', headerText: 'Người giao', allowFiltering: true},
+                        {fieldName: 'TEN_DV', headerText: 'Đơn vị', allowFiltering: true},
+                        {fieldName: 'MA_NV', headerText: 'Mã NV TH', allowFiltering: true},
+                        {fieldName: 'TEN_NV', headerText: 'Người thực hiện', allowFiltering: true},
+                        {fieldName: 'SO_DT', headerText: 'Điện thoại', allowFiltering: true},
+                        {fieldName: 'NHIEMVU', headerText: 'Nhiệm vụ', allowFiltering: true},
+                        {fieldName: 'KQXL_ID', headerText: 'Kết quả XL', allowFiltering: true},
+                        {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true},
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true},                        
+                        ]" 
+                        ref="gridNhanVien" 
+                        :dataSource="dataSource.DSChiTietNhanVien" 
+                        :showFilter="true" 
+                        dataKeyField=""
+                        @selectedRowChanged=""                         
+                        :allowPaging="true"
+                        :enablePagingServer="false"
+                        :enabledSelectFirstRow="false"
+                        />   
+                </div>
+                
+            </div>
+        
+    </ejs-dialog>
+</div>
+
+
+

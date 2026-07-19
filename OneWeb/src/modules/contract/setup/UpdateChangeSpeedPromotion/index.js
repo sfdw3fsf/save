@@ -1,0 +1,2 @@
+import UpdateChangeSpeedPromotion from './UpdateChangeSpeedPromotion'
+export default UpdateChangeSpeedPromotion

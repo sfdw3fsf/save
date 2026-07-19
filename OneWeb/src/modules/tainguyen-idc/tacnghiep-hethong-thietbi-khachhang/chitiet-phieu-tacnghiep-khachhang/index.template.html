@@ -1,0 +1,346 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="ModalChiTietPhieuTacNghiepKhachHang"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+>
+  <div class="popup-box">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span>
+        {{
+          currentMode == 'VIEW'
+            ? ' Chi tiết phiếu tác nghiệp: ' + (item && item.PHIEU_YC ? item.PHIEU_YC : 'Chưa có phiếu')
+            : currentMode == 'EDIT'
+            ? ' Xử lý phiếu tác nghiệp: ' + (item && item.PHIEU_YC ? item.PHIEU_YC : 'Chưa có phiếu')
+            : ' Chi tiết phiếu tác nghiệp'
+        }}
+      </div>
+      <div class="close -ap icon-close" data-dismiss="modal" @click="closeModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li>
+          <b-link href="javascript:void(0)" @click="onSave" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-save"></span>Ghi lại
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onChuyenXuLy" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-file-arrow-right"></span>Chuyển xử lý
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onTraPhieu" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-file-back"></span>Trả phiếu
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="onHoanThanh" :disabled="currentMode == 'VIEW'">
+            <span class="icon one-file-check"></span>Hoàn thành
+          </b-link>
+        </li>
+        <li>
+          <b-link href="javascript:void(0)" @click="closeModal">
+            <span class="icon ui-1_circle-remove nc-icon-glyph"></span>Đóng
+          </b-link>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-content p-2">
+      <!-- THÔNG TIN CÔNG VIỆC THỰC HIỆN -->
+      <div class="box-form">
+        <div class="legend-title">Thông tin công việc thực hiện</div>
+
+        <div class="row">
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w160">Mã công việc <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtMaCongViec.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.MA_CONG_VIEC"
+                  placeholder="Nhập mã công việc"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w160">Đơn vị thực hiện <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtDonViThucHien.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.DON_VI_THUC_HIEN"
+                  placeholder="IDC Miền Bắc"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-12">
+            <div class="info-row">
+              <div class="key w160">Người thực hiện <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtNguoiThucHien.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.NGUOI_THUC_HIEN"
+                  placeholder="Trần Đăng Phúc ( lây thông tin người phối hợp từ urd 5 sang )"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Loại công việc <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtLoaiCongViec.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.LOAI_CONG_VIEC"
+                  placeholder="Cấp phát tài nguyên Rack ( lây thông tin từ urd 5 sang)"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Người phối hợp <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtNguoiPhoiHop.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.NGUOI_PHOI_HOP"
+                  placeholder="Trần Đăng Phúc ( lây thông tin người phối hợp urd5 sang)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Hạng mục triển khai <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtHangMucTrienKhai.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.HANG_MUC_TRIEN_KHAI"
+                  placeholder="Cấp mới 1 Rack cho khách hàng X ( lây thông tin từ urd 5 sang)"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Thời điểm yêu cầu</div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <ejs-datepicker
+                    v-model="currentItem.THOI_DIEM_YEU_CAU"
+                    :disabled="currentMode == 'VIEW'"
+                    placeholder="Chọn thời điểm yêu cầu"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Căn cứ Phiếu yêu cầu <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtCanCuPhieuYeuCau.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.CAN_CU_PHIEU_YEU_CAU"
+                  placeholder="Lấy thông tin trường căn cứ khai báo ở urd 5 nhà thị vào đây"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Trạng thái thực hiện <span class="red">(*)</span></div>
+              <div class="value">
+                <SelectExt
+                  v-model="currentItem.TRANG_THAI_THUC_HIEN"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :class="controls.selectTrangThaiThucHien.invalid ? 'is-invalid' : ''"
+                  :dataSource="trangThaiThucHienList"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="Chọn trạng thái"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Mã công việc cha <span class="red">(*)</span></div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control"
+                  :class="controls.txtMaCongViecCha.invalid ? 'is-invalid' : ''"
+                  :disabled="currentMode == 'VIEW'"
+                  v-model="currentItem.MA_CONG_VIEC_CHA"
+                  placeholder="hiển thị thông tin mã công việc cha"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w160">Thời điểm hoàn thành</div>
+              <div class="value">
+                <div class="d-flex align-items-center">
+                  <ejs-datepicker
+                    v-model="currentItem.THOI_DIEM_HOAN_THANH"
+                    :disabled="currentMode == 'VIEW'"
+                    placeholder="Chọn thời điểm hoàn thành"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DANH SÁCH HỆ THỐNG/ THIẾT BỊ IDC -->
+      <div class="box-form mt-3">
+        <div class="row">
+          <div class="legend-title d-flex justify-content-between align-items-center">
+            <span>Danh sách Hệ thống/ thiết bị IDC</span>
+          </div>
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="row mb-3">
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Tại IDC</div>
+              <div class="value">
+                <SelectExt
+                  v-model="filterData.taiIDC"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :dataSource="idcList"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="IDC Nam Thăng Long"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Mảng thiết bị</div>
+              <div class="value">
+                <SelectExt
+                  v-model="filterData.mangThietBi"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :dataSource="mangThietBiList"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="Hạ tầng M&E ( 1 hạ tầng / 2: mạng / 3: phụ trợ )"
+                />
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Hệ thống</div>
+              <div class="value">
+                <SelectExt
+                  v-model="filterData.heThong"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :dataSource="heThongList"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="Hệ thống IDC NTL"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-12">
+            <div class="info-row">
+              <div class="key w100">Loại thiết bị</div>
+              <div class="value">
+                <SelectExt
+                  v-model="filterData.loaiThietBi"
+                  dataTextField="TEN"
+                  dataValueField="ID"
+                  :dataSource="loaiThietBiList"
+                  :disabled="currentMode == 'VIEW'"
+                  placeholder="UPS"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Bảng dữ liệu -->
+        <div class="row">
+          <div class="col-12">
+            <DataGrid
+              ref="grdThietBiIDC"
+              :allowPaging="true"
+              :enablePagingServer="false"
+              :showColumnCheckbox="false"
+              :dataSource="thietBiIDCData"
+              v-bind:columns="[
+                                {fieldName: 'ID_THIET_BI', headerText: 'ID Thiết bị', textAlign: 'Left', width: 100},
+                                {fieldName: 'TEN_THIET_BI', headerText: 'Tên thiết bị', textAlign: 'Left', width: 150},
+                                {fieldName: 'SERIAL', headerText: 'Serial', textAlign: 'Left', width: 120},
+                                {fieldName: 'CONG_SUAT_TKE', headerText: 'Công suất tke', textAlign: 'Left', width: 120},
+                                {fieldName: 'TOA_NHA', headerText: 'Tòa nhà', textAlign: 'Left', width: 100},
+                                {fieldName: 'MAT_SAN', headerText: 'Mặt sàn', textAlign: 'Left', width: 100},
+                                {fieldName: 'PHONG_ZONE', headerText: 'Phòng/Zone', textAlign: 'Left', width: 120},
+                                {fieldName: 'RACK', headerText: 'Rack', textAlign: 'Left', width: 80},
+                                {fieldName: 'U', headerText: 'U', textAlign: 'Center', width: 60},
+                                {fieldName: 'TRANG_THAI_VAN_HANH', headerText: 'Trạng thái vận hành', textAlign: 'Left', width: 150},
+                                {fieldName: 'ACTIONS', headerText: 'Thao tác', textAlign: 'Center', template: actionColumn(this), width: 120}
+                                ]"
+              :enabledSelectFirstRow="true"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ModalChiTietThietBiTacNghiepKhachHang ref="ModalChiTietThietBiTacNghiepKhachHang"></ModalChiTietThietBiTacNghiepKhachHang>
+</ejs-dialog>

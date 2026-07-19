@@ -1,0 +1,617 @@
+<div>
+    <!-- <breadcrumb :header="header" /> -->
+    <div class="list-actions-top" style="position: unset;">
+        <ul class="list" style="position: unset;">
+            <li @click="HienThiDSDK">
+                <a>
+                    <span class="icon one-file-attach"></span> Lấy TT
+                </a>
+            </li>
+            <li>
+                <a v-if="statusNhapMoi" @click="NhapMoi()">
+                    <span class="icon  nc-icon-glyph ui-1_circle-add"></span> Nhập mới
+                </a>
+                <a v-else class="disabledInput">
+                    <span class="icon  nc-icon-glyph ui-1_circle-add"></span> Nhập mới
+                </a>
+            </li>
+            <li>
+                <a v-if="statusGhiLai" @click="GhiLai()">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+                <a v-else class="disabledInput">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a v-if="statusHuyBo" @click="SetButton(0)">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+                <a v-else class="disabledInput">
+                    <span class="icon nc-icon-glyph ui-1_circle-remove"></span>Hủy
+                </a>
+            </li>
+            <li>
+                <a v-if="statusXoa" @click="Xoa()">
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+                <a v-else class="disabledInput">
+                    <span class="icon one-trash"></span>Xóa
+                </a>
+            </li>
+            <li>
+                <a v-show="statusNopPhieu" @click="NopPhieu()">
+                    <span class="icon one-file-refresh"></span>Nộp ĐK
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" v-if="statusInPhieu">
+                    <div class="dropdown" style="position: unset;">
+                        <a href="#" data-toggle="dropdown" class="inphieu">
+                            <span class=" icon one-print"></span>In phiếu <span
+                                class="fa fa-angle-down text-desc"></span>
+                        </a>
+                        <div class="dropdown-menu top40 inphieu-menu">
+                            <a href="javascript:void(0)" style="color: #007bff;" @click="btnInPhieu()">
+                                <span class="icon one-print"></span> Phiếu Đăng Ký
+                            </a>
+                            <a href="javascript:void(0)" style="color: #007bff;" @click="btnBC_BB30_Click()">
+                                <span class="icon one-print"></span> Phiếu đăng ký công trình
+                            </a>
+                            <a href="javascript:void(0)" style="color: #007bff;" @click="ToolStripMenuItem_Click()">
+                                <span class="icon one-print"></span> Phiếu đề xuất cấp phát vật tư
+                            </a>
+                        </div>
+                    </div>
+                </a>
+                <a v-else class="disabledInput">
+                    <span class="icon one-print"></span>In phiếu <span class="fa fa-angle-down text-desc"></span>
+                </a>
+            </li>
+            <li>
+                <a @click="exportExcelDSVTTMDDK()">
+                    <span class="icon one-xlsx-import"></span>Xuất Excel
+                </a>
+            </li>
+            <li>
+                <a v-if="statusNhapExcel" href="javascript:;">
+                    <label for="uploadEx">
+                        <span class="icon one-xlsx"></span> Nhập từ Excel
+                        <input ref="fileInput" type="file" id="uploadEx" style="display: none" @change="importExcel"
+                            accept=".xls, .xlsx" @click="$refs.fileInput.value=null" />
+                    </label>
+                </a>
+                <a v-else class="disabledInput">
+                    <span class="icon one-xlsx"></span>Nhập Excel
+                </a>
+            </li>
+            <li>
+                <!-- <a v-b-modal.popupCopyDangKy> -->
+                <a @click="tsbtnCopyDK_Click()">
+                    <span class="icon nc-icon-glyph files_copy"></span>Copy ĐK
+                </a>
+                <CopyDangKy ref='frmCopyDK' :tag="tagForm" />
+            </li>
+            <li>
+                <a @click="btnChonDK_Click()" v-show="chonDK_visible">
+                    <span class="icon -ap icon-collections_bookmark"></span>Chọn đăng ký
+                </a>
+                <ChonDangKy ref='frmChonDangKy' :tag="tagForm" :vdangky_id="dangKyId_DSVT" />
+            </li>
+            <!-- <li>
+        <a href="#">
+          <span class="icon one-circle-question"></span>Trợ giúp
+        </a>
+      </li> -->
+        </ul>
+    </div>
+    <div class="page-content" id="checkTTDKNCVT">
+        <div class="row">
+            <div>
+                <Split :gutterSize="20">
+                    <SplitArea :size="50" :minSize="100">
+                        <div class="box-form">
+                            <div class="legend-title">
+                                <span class="icon fa fa-angle-up" @click="showTTDKNCVT = !showTTDKNCVT"></span>
+                                <span class="name">Thông tin đăng ký nhu cầu vật tư</span>
+                            </div>
+                            <div class="row" v-if="showTTDKNCVT">
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Chu kỳ ĐK</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <b-form-select v-model="chuKyDKSelected" class="form-control"
+                                                    :options="chuKyDangKy">
+                                                </b-form-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Ngày YC</div>
+                                        <div class="value">
+                                            <ejs-datetimepicker v-model="ngayYC" locale="vi" :allowEdit=false
+                                                :showClearButton="false" :format="'dd/MM/y HH:mm:ss'" :value="today">
+                                            </ejs-datetimepicker>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Thời gian ĐK</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <b-form-select v-model="thoiGianDKSelected" :options="listThoiGianDK"
+                                                    :disabled="thoigianDK_show" class="form-control">
+                                                </b-form-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" v-if="showTTDKNCVT">
+                                <div class="col-sm-5 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Mã phiếu</div>
+                                        <div class="value">
+                                            <input v-model="txtMaPhieuDK" type="text" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w80">Số công văn</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="soCVSelected">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Năm ĐK</div>
+                                        <div class="value">
+                                            <input type="number" class="form-control" value="namDK" v-model="namDK">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" v-if="showTTDKNCVT">
+                                <div class="col-sm-9 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Dự án</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <b-form-select v-model="duAnNVSelected" :options="listDuAnNV"
+                                                    class="form-control">
+                                                </b-form-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Đợt ĐK</div>
+                                        <div class="value">
+                                            <div class="select-custom">
+                                                <b-form-select v-model="dotDKSelected" :options="listDotDK"
+                                                    :disabled="dotDK_show" class="form-control">
+                                                </b-form-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row" v-if="showTTDKNCVT">
+                                <div class="key w90">Công trình</div>
+                                <div class="value" v-click-outside="hideCongTrinh">
+                                    <div class="vattu_box">
+                                        <div class="li input-text">
+                                            <div class="select-custom">
+                                                <input @click="showCongTrinh = !showCongTrinh"
+                                                    v-model="text_congTrinhSelected" class="form-control"
+                                                    :options="listCongTrinh">
+                                                </input>
+                                            </div>
+                                        </div>
+                                        <div id="vattu_table_DangKy">
+                                            <DataGrid v-if="showCongTrinh" v-bind:columns="[
+                                                {fieldName: 'SOHIEU_CT', headerText: 'Số hiệu', allowFiltering: true, allowSorting: false, width:'70px'},
+                                                {fieldName: 'TEN_CT', headerText: 'Tên công trình', allowFiltering: true, allowSorting: false}
+                                                ]" v-bind:dataSource="listCongTrinh" :showFilter="true"
+                                                @selectedRowChanged="gridCongTrinh_selectedRowChanged"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="false"
+                                                dataKeyField="CONGTRINH_ID" :defaultColumnCheckboxChecked="false"
+                                                :allowPaging="true" :enablePagingServer="false">
+                                            </DataGrid>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="showTTDKNCVT">
+                                <!-- <div class="col-sm-9 col-12"> -->
+                                <div class="info-row">
+                                    <div class="key w90">Ghi chú</div>
+                                    <div class="value">
+                                        <input v-model="txtGhiChu" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <!-- </div> -->
+                            </div>
+                            <div>
+                                <div class="info-row">
+                                    <div class="key w90">Kho</div>
+                                    <!-- <div class="value" v-click-outside="hide"> -->
+                                    <div class="value">
+                                        <div class="select-custom">
+                                            <SelectExt v-model="khoSelected" :allowFiltering="true"
+                                                dataTextField="tenKho" dataValueField="khoID" :dataSource="listKho">
+                                            </SelectExt>
+                                        </div>
+                                        <!-- <div class="vattu_box">
+                                    <div class="li input-text">
+                                        <div class="select-custom">
+                                            <input @click="kho_Visible = !kho_Visible"
+                                                v-model="text_khoSelected" class="form-control"
+                                                :options="listKho">
+                                            </input>
+                                        </div>
+                                    </div>
+                                    <div id="vattu_table_DangKy">
+                                        <DataGrid v-if="kho_Visible" v-bind:columns="[
+                                      {fieldName: 'tenKho', headerText: 'Tên Kho', allowFiltering: true, allowSorting: false},
+                                      ]" v-bind:dataSource="listKho" :showFilter="true"
+                                            @selectedRowChanged="gridListKho_selectedRowChanged"
+                                            :enabledSelectFirstRow="false"
+                                            :showColumnCheckbox="false" dataKeyField="khoID"
+                                            :defaultColumnCheckboxChecked="false" :allowPaging="true"
+                                            :enablePagingServer="false">
+                                        </DataGrid>
+                                    </div>
+                                </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" v-if="showTTDKNCVT">
+                                <div class="col-sm-9 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">Người liên hệ</div>
+                                        <div class="value" v-click-outside="hide">
+                                            <div class="vattu_box">
+                                                <div class="li input-text">
+                                                    <div class="select-custom">
+                                                        <input @click="showNhanVienLH = !showNhanVienLH"
+                                                            v-model="nhanVienLienHeSelected" class="form-control"
+                                                            :options="listNhanVienLienHe">
+                                                        </input>
+                                                    </div>
+                                                </div>
+                                                <div id="vattu_table_DangKy">
+                                                    <DataGrid v-if="showNhanVienLH" v-bind:columns="[
+                                                        {fieldName: 'TEN_NV', headerText: 'Tên nhân viên', allowFiltering: true, allowSorting: false},
+                                                        {fieldName: 'TEN_DV', headerText: 'Tên đơn vị', allowFiltering: true, allowSorting: false}
+                                                        ]" v-bind:dataSource="listNhanVienLienHe" :showFilter="true"
+                                                        @selectedRowChanged="gridNhanVienLH_selectedRowChanged"
+                                                        :enabledSelectFirstRow="false" :showColumnCheckbox="false"
+                                                        dataKeyField="NHANVIEN_ID" :defaultColumnCheckboxChecked="false"
+                                                        :allowPaging="true" :enablePagingServer="false">
+                                                    </DataGrid>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-12">
+                                    <div class="info-row">
+                                        <div class="key w90">SĐT</div>
+                                        <div class="value">
+                                            <input type="text" class="form-control" v-model="txtSDT">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row" v-if="showTTDKNCVT">
+                                <div class="key w90">File CV</div>
+                                <div class="value">
+                                    <div class="input-more-button">
+                                        <label for="upload" class="btn">
+                                            <span class="-ap icon-more_horiz"></span>
+                                        </label>
+                                        <input type="file" ref="fileInput" @change="onChangeFile" id="upload"
+                                            style="display: none" multiple />
+                                        <div id="textarea" class="form-control"
+                                            style="height: 80px;resize: vertical; overflow: auto;">
+                                            <div class="text-area-content mb-2" v-for="item in fileNames">
+                                                <div class="row" v-if="!!item">
+                                                    <div class="col-sm-8 col-12">
+                                                        <b>{{item.split('/')[4]}}</b>
+                                                    </div>
+                                                    <div class="col-sm-4 col-12"
+                                                        style="text-align:right; padding-left: 5px; padding-right: 5px;">
+                                                        <a href="#" @click.prevent="onClickDownFile(item)"
+                                                            class="btn btn-success btn-sm">
+                                                            <span class="-ap icon-download"></span>
+                                                        </a>
+                                                        <a href="#" @click.prevent="onClickDeleteFile(item)"
+                                                            class="btn btn-danger btn-sm">
+                                                            <span class="-ap icon-trash"></span>
+                                                        </a>
+                                                        <a href="#" @click.prevent="onClickViewFile(item)"
+                                                            class="btn btn-primary btn-sm">
+                                                            <span class="-ap icon-search"></span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SplitArea>
+                    <SplitArea :size="50" :minSize="100">
+                        <div class="box-form">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách đăng ký nhu cầu vật tư
+                                </div>
+                                <div class="pull-right">
+                                    <div class="list-checks">
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" class="check" v-model="radio_DKNCVT" checked
+                                                    value="0">
+                                                <span class="name">Chưa nộp</span>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="check-action">
+                                                <input type="radio" class="check" v-model="radio_DKNCVT" value="1">
+                                                <span class="name">Đã nộp</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="table-content">
+                                <DataGrid v-bind:columns="[
+                                    {fieldName: 'MAPHIEU_DK', headerText: 'Mã phiếu', allowFiltering: true, allowSorting: false, width: '120px', freeze:'Left'},
+                                    {fieldName: '', headerText: 'Xem ĐK', allowFiltering: true, allowSorting: false, width: '120px', freeze:'Left', template: xemDangKy},
+                                    {fieldName: 'MA_CTRINH', headerText: 'Mã CT', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TEN_DK', headerText: 'Thời gian ĐK', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SO_CV', headerText: 'Số công văn', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'MA_CT', headerText: 'Dự án', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'NGAY_DK', headerText: 'Ngày yêu cầu', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'DOT', headerText: 'Đợt', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'CONLAI', headerText: 'Số tháng ĐK', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'ND_TRA', headerText: 'Lý do trả', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TRANGTHAI', headerText: 'Trạng thái', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'TRANGTHAI_VT', headerText: 'Trạng thái VT', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'NGAYNOP', headerText: 'Ngày nộp', allowFiltering: true, allowSorting: false}
+                                    ]" v-bind:dataSource="listDangKyNhuCauTinhTrang" :showFilter="true"
+                                    @selectedRowChanged="gridDangKyNCTT_selectedRowChanged" :showColumnCheckbox="false"
+                                    dataKeyField="DANGKY_ID" :allowPaging="true" :enablePagingServer="false">
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </SplitArea>
+                </Split>
+            </div>
+            <div>
+                <Split :gutterSize="20">
+                    <SplitArea :size="50" :minSize="100">
+                        <div class="box-form">
+                            <div class="legend-title">
+                                <div class="pull-left mart7">Danh sách vật tư đã đăng ký</div>
+                                <div class="pull-right">
+                                    <a class="btn btn-second pad4" @click="GhiLai()">
+                                        <span class=" f20 lh20 one-save"></span>
+                                    </a>
+                                    <a @click="fetchDSVatTuDaDK(dangKyId_DSVT)" class="btn btn-second pad4">
+                                        <span class=" f20 lh20 one-reload"></span>
+                                    </a>
+                                    <a @click="removeAllVatTu()" class="btn btn-second pad4">
+                                        <span class=" f20 lh20 nc-icon-glyph ui-1_circle-remove"></span>
+                                    </a>
+                                    <a @click="exportExcelDSVTDDK()" class="btn btn-second pad4">
+                                        <span class=" f20 lh20 one-excel"></span>
+                                    </a>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="table-content">
+                                <DataGrid v-bind:columns="[
+                                    {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: false, freeze:'Left'},
+                                    {fieldName: 'TEN_VT', headerText: 'Tên vật tư', allowFiltering: true, allowSorting: false, freeze:'Left'},
+                                    {fieldName: 'MUCDICH', headerText: 'Mục đích', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'DVI_TINH', headerText: 'ĐVT', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SL_TON_DK', headerText: 'SL Tồn ĐK', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SOLUONG', headerText: 'Số lượng', allowFiltering: true, allowSorting: false, allowEditing: true},
+                                    {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false},
+                                    {fieldName: 'SL_DUYET', headerText: 'SL Duyệt', allowFiltering: true, allowSorting: false},
+                                    {fieldName: '', headerText: 'Xóa', template: removeVT, textAlign: 'center', width:'100px', freeze: 'Right'}
+                                    ]" v-bind:dataSource="listVatTuDaDK" :showFilter="true" @:showColumnCheckbox="true"
+                                    :defaultColumnCheckboxChecked="false"
+                                    @selectedItemsChanged="selected_listVatTuDaDK_checkbox"
+                                    @selectedRowChanged="grid_listVatTuDaDK_selectedRowChanged" dataKeyField="VTDK_ID"
+                                    :allowPaging="true" :enablePagingServer="false" @cellSaved="editGridVatTuDaDK"
+                                    :editSettings='editSettings'>
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </SplitArea>
+                    <SplitArea :size="50" :minSize="100">
+                        <div class="box-form">
+                            <div class="legend-title">
+                                <div class="pull-left">
+                                    Danh sách vật tư theo mục đích đăng ký nhu cầu
+                                </div>
+                                <div class="pull-right">
+                                    <a href="#" class="btn btn-second pad4" @click="exportExcelDSVTTMDDK()">
+                                        <span class=" f20 lh20 one-excel"></span>
+                                    </a>
+                                    <a class="btn btn-second pad4" @click="reload_DSVT_MUCDICH()">
+                                        <span class=" f20 lh20 one-reload"></span>
+                                    </a>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90 red">Mục đích ĐK</div>
+                                <div class="value" v-click-outside="hideMDDK">
+                                    <div class="vattu_box">
+                                        <div class="li input-text">
+                                            <div class="select-custom">
+                                                <input @click="showMucDichDK = !showMucDichDK" v-model="text_MucDichDK"
+                                                    class="form-control" :options="listMucDichDK">
+                                                </input>
+                                            </div>
+                                        </div>
+                                        <div id="vattu_table_DangKy">
+                                            <DataGrid v-if="showMucDichDK" v-bind:columns="[
+                                        {fieldName: 'maMd',headerText: 'Mã mục đích', allowFiltering: true, allowSorting: false},
+                                        {fieldName: 'mucDich',headerText: 'Tên mục đích', allowFiltering: true, allowSorting: false}
+                                        ]" v-bind:dataSource="listMucDichDK" :showFilter="false"
+                                                @selectedRowChanged="gridMucDichDK_selectedRowChanged"
+                                                :showColumnCheckbox="false" dataKeyField="mucDichId" :allowPaging="true"
+                                                :enablePagingServer="false">
+                                            </DataGrid>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="key w90 red">
+                                    <div class="check-action">
+                                        <input type="checkbox" class="check" v-model="showCbxTimkiem">
+                                        <span class="name">{{txt_VatTu}}</span>
+                                    </div>
+                                </div>
+                                <div class="value" v-click-outside="hideVTDK">
+                                    <div class="vattu_box">
+                                        <div class="li input-text">
+                                            <div class="select-custom">
+                                                <input @click="showVatTuTK = !showVatTuTK" class="form-control"
+                                                    v-model="cboTimKiem">
+                                                </input>
+                                            </div>
+                                        </div>
+                                        <div id="vattu_table_DangKy" v-if="!showCbxTimkiem">
+                                            <DataGrid v-if="showVatTuTK" v-bind:columns="[
+                                                {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: false, width:'70px'},
+                                                {fieldName: 'TEN_VT', headerText: 'Tên VT', allowFiltering: true, allowSorting: false}
+                                                ]" v-bind:dataSource="list_CbxTimkiem" :showFilter="true"
+                                                @selectedRowChanged="gridVatTuDK_selectedRowChanged"
+                                                :showColumnCheckbox="false" :enabledSelectFirstRow="false"
+                                                :allowPaging="true" :enablePagingServer="false" dataKeyField="VATTU_ID">
+                                            </DataGrid>
+                                        </div>
+                                        <div id="vattu_table_DangKy" v-else>
+                                            <DataGrid v-if="showVatTuTK" v-bind:columns="[
+                                                {fieldName: 'MA_VT', headerText: 'Mã VT', allowFiltering: true, allowSorting: false, width:'70px'},
+                                                {fieldName: 'TEN_VT', headerText: 'Tên VT', allowFiltering: true, allowSorting: false}
+                                                ]" v-bind:dataSource="list_CbxTimkiem" :showFilter="true"
+                                                @selectedRowChanged="gridVatTuDK_selectedRowChanged"
+                                                :showColumnCheckbox="false" :enabledSelectFirstRow="false"
+                                                dataKeyField="VATTU_ID" :allowPaging="true" :enablePagingServer="false">
+                                            </DataGrid>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="table-content" style="height:330px;overflow-x:hidden;" > -->
+                            <ejs-treegrid ref='gridDSVTTMDDK' :dataSource='listVatTuMD_show' :allowPaging='true'
+                                :allowSorting='true' :allowResize='true' :editSettings='editSettings'
+                                :cellSaved='editGridVatTuTheoMucDich' :selectionSettings='selectionSettings'
+                                :filterSettings='filterOptions' childMapping='children' :treeColumnIndex='0'
+                                :autoCheckHierarchy='false' :rowSelected="onRowSelectingTreeGrid" locale="vi-VN"
+                                :pageSettings='pageSettings' v-if="!showCbxTimkiem" :frozenColumns='3'
+                                allowResizing='true'>
+                                <e-columns>
+                                    <e-column field='STT' type="checkbox" headerText='' width='100'
+                                        headerTextAlign="Center" textAlign="Center" freeze='Left'></e-column>
+                                    <e-column field="TEN_VT" headerText="Tên vật tư" width="200" textAlign="Left"
+                                        headerTextAlign="Center" :allowEditing='false' freeze='Left'>
+                                    </e-column>
+                                    <e-column field="MA_VT" headerText="Mã VT" width="200" textAlign="Left"
+                                        :allowEditing='false' :allowResize='true' headerTextAlign="Center"
+                                        freeze='Left'>
+                                    </e-column>
+                                    <e-column field="DVI_TINH" headerText="ĐVT" width="120" textAlign="Left"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="GHICHU" headerText="Ghi chú" width="100" textAlign="Left"
+                                        headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="PART_NUMBER" headerText="Part number" width="150"
+                                        :allowEditing='false' textAlign="Right" headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="MOTA" headerText="Mô tả" width="100" textAlign="Left"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="HANG_SX" headerText="Hãng SX" width="100" textAlign="Left"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="SL_TON" headerText="SL Tồn" width="100" textAlign="Right"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="SOLUONG" headerText="Số lượng" width="120" headerTextAlign="Center"
+                                        textAlign="Right" :allowEditing='true' editType='numericedit'>
+                                    </e-column>
+                                </e-columns>
+                            </ejs-treegrid>
+                            <!-- </div> -->
+                            <!-- <div class="table-content" style="height:330px;overflow-x:hidden;" > -->
+                            <ejs-treegrid ref='gridDSVTTMDDK' :dataSource='listVatTuDK_Ton' :allowPaging='true'
+                                :allowSorting='true' :allowResize='true' :editSettings='editSettings'
+                                :cellSaved='editGridVatTuTheoMucDich' :selectionSettings='selectionSettings'
+                                :filterSettings='filterOptions' childMapping='children' :treeColumnIndex='0'
+                                :autoCheckHierarchy='false' :rowSelected="onRowSelectingTreeGrid" locale="vi-VN"
+                                :pageSettings='pageSettings' v-else :frozenColumns='3' allowResizing='true'>
+                                <e-columns>
+                                    <e-column field='STT' type="checkbox" headerText='' width='100'
+                                        headerTextAlign="Center" textAlign="Center" freeze='Left'></e-column>
+                                    <e-column field="TEN_VT" headerText="Tên vật tư" width="200" textAlign="Left"
+                                        headerTextAlign="Center" :allowEditing='false' freeze='Left'>
+                                    </e-column>
+                                    <e-column field="MA_VT" headerText="Mã VT" width="200" textAlign="Left"
+                                        :allowEditing='false' :allowResize='true' headerTextAlign="Center"
+                                        freeze='Left'>
+                                    </e-column>
+                                    <e-column field="DVI_TINH" headerText="ĐVT" width="120" textAlign="Left"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="GHICHU" headerText="Ghi chú" width="100" textAlign="Left"
+                                        headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="PART_NUMBER" headerText="Part number" width="150"
+                                        :allowEditing='false' textAlign="Right" headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="MOTA" headerText="Mô tả" width="100" textAlign="Left"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="HANG_SX" headerText="Hãng SX" width="100" textAlign="Left"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="SL_TON" headerText="SL Tồn" width="100" textAlign="Right"
+                                        :allowEditing='false' headerTextAlign="Center">
+                                    </e-column>
+                                    <e-column field="SOLUONG" headerText="Số lượng" width="120" headerTextAlign="Center"
+                                        textAlign="Right" :allowEditing='true' editType='numericedit'>
+                                    </e-column>
+                                </e-columns>
+                            </ejs-treegrid>
+
+                            <!-- </div> -->
+                        </div>
+                    </SplitArea>
+                </Split>
+            </div>
+            <XemDangKy ref='frmXemDangKy' :tag="tagForm" :vdangky_id="dangKyId_DSVT"/>
+        </div>
+    </div>
+</div>

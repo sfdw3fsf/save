@@ -1,0 +1,464 @@
+<b-modal
+  ref="frmPopUpTiepNhan"
+  size="xxl"
+  hide-header
+  hide-header-close
+  hide-footer
+  body-class="p-0"
+  centered
+  no-close-on-backdrop
+  @show="handleShowModal"
+  style="min-width: 1250px !important;"
+>
+  <div class="modal-content popup-box modal-tiep-nhan">
+    <div class="popup-header">
+      <div class="title">
+        <span class="icon one-notepad"></span> {{ headerTitle }}
+      </div>
+      <div class="close -ap icon-close" @click="hideModal"></div>
+    </div>
+    <div class="list-actions-top">
+      <ul class="list">
+        <li @click="btnTimKiem_Click">
+          <a style="cursor: pointer;">
+            <span class="icon one-search"></span> Tìm kiếm
+          </a>
+        </li>
+        <li v-show="tsbtnCapNhatMucDo.Visible"
+            @click="tsbtnCapNhatMucDo_Click">
+          <a style="cursor: pointer;"
+             href="javascript:void(0)"
+             :class="{disabled: !tsbtnCapNhatMucDo.Enabled}">
+            <span class="icon one-alert"></span> Xử lý ngay
+          </a>
+        </li>
+        <li>
+          <a style="cursor: pointer;" @click="tsbtnChiTiet_Click">
+            <span class="icon one-file-bookmark"></span> Chi tiết
+          </a>
+        </li>
+        <li @click="tsbtnDoKiem_Click">
+          <a href="javascript: void(0)">
+            <span class="dropdown-icon one-clipart-arrow-right"></span> Show Port
+          </a>
+        </li>
+        <li @click="tsbtnTestAllPort_Click">
+          <a href="javascript: void(0)">
+            <span class="dropdown-icon nc-icon-glyph arrows-1_simple-up"></span> Test Port
+          </a>
+        </li>
+        <li @click="tsbtnXuatFile_Click">
+          <a href="javascript: void(0)">
+            <span class="icon one-file-download"></span> Xuất file
+          </a>
+        </li>
+        <li @click="tsbtnXuatExcel_Click">
+          <a href="javascript: void(0)">
+            <span class="icon one-file-excel"></span> Xuất Excel
+          </a>
+        </li>
+        <li @click="tsbtnGianDo_Click">
+          <a href="javascript: void(0)">
+            <span class="icon  one-file-search"></span> Tra cứu cáp
+          </a>
+        </li>
+        <li @click="tsbKHGoi_Click">
+          <a href="javascript: void(0)">
+            <span class="dropdown-icon nc-icon-glyph media-2_headphones-mic"></span>KH gọi
+          </a>
+        </li>
+        <li @click="btnNhapMoi_Click" :class="{disabled: !btnNhapMoi.Enabled}">
+          <a href="javascript: void(0)">
+            <span class="icon one-file-noti"></span>Nhập mới
+          </a>
+        </li>
+        <li style="display: none"><a id="sms" @click="gridTTXL_onSMS">SMS</a></li>
+        <li style="display: none"><a id="sua" @click="gridTTXL_onSua">Sửa</a></li>
+        <li style="display: none"><a id="xoa" @click="gridTTXL_onXoa">Xóa</a></li>
+        <input type="text" style="display: none" id="tientrinhbh_id"/>
+        <input type="text" style="display: none" id="noidung"/>
+        <li>
+          <a style="cursor: pointer;" @click="hideModal">
+            <span class="icon one-cancel"></span> Thoát
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-body">
+      <div class="row">
+        <div class="col-sm-3 col-12">
+          <div class="box-form h-100">
+            <div class="legend-title">Chọn đơn vị</div>
+            <div class="tree-plus tree-icon ovauto" style="height: 415px;">
+              <ejs-treeview id='treeview' ref="treeObj"
+                            @nodeSelected="selectDonViFocusedNodeChange"
+                            :fields='this.fields' :showCheckBox='false'></ejs-treeview>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5 col-12">
+          <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại nhóm</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="cboLoaiNhom.value"
+                                 :allowFiltering="true"
+                                 :dataSource="cboLoaiNhom.datasource"
+                                 dataValueField="nhom_id"
+                                 dataTextField="ten_nhom"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại HĐ/PL</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="cboLoaiHDPL.value"
+                                 :allowFiltering="true"
+                                 :dataSource="cboLoaiHDPL.datasource"
+                                 dataValueField="loaihd_id"
+                                 dataTextField="ten_loaihd"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Dịch vụ VT</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="cboDichVuVT.value"
+                                 :allowFiltering="true"
+                                 :dataSource="cboDichVuVT.datasource"
+                                 dataValueField="dichvuvt_id"
+                                 dataTextField="ten_dvvt"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Trạng thái</div>
+                  <div class="value">
+                    <div class="select-custom">
+                      <SelectExt v-model="cboTrangThaiBH.value"
+                                 :allowFiltering="true"
+                                 :dataSource="cboTrangThaiBH.datasource"
+                                 dataValueField="ttbh_id"
+                                 dataTextField="trangthai_bh"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row mb-0">
+                  <div class="key w90">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="chkNgayBH">
+                      <span class="name">YC Từ</span>
+                    </div>
+                  </div>
+                  <div class="">
+                    <vue-date :disable="!chkNgayBH"
+                              type="date"
+                              format="DD/MM/YYYY"
+                              v-model="vngaybh_tu"/>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row mb-0">
+                  <div class="key w90">
+                    <span class="name">Đến ngày</span>
+                  </div>
+                  <div class="">
+                    <vue-date :disable="!chkNgayBH"
+                              type="date"
+                              format="DD/MM/YYYY"
+                              v-model="vngaybh_den"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" v-model="chkNgayNT">
+                      <span class="name">NT Từ</span>
+                    </div>
+                  </div>
+                  <div class="">
+                    <vue-date :disable="!chkNgayNT"
+                              type="date"
+                              format="DD/MM/YYYY"
+                              v-model="vngaynt_tu"/>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">
+                    <span class="name">Đến ngày</span>
+                  </div>
+                  <div class="">
+                    <vue-date :disable="!chkNgayNT"
+                              type="date"
+                              format="DD/MM/YYYY"
+                              v-model="vngaynt_den"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="box-form mb-0">
+            <div class="legend-title">Thông tin thuê bao</div>
+
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90 red font-weight-bold">Số máy/ACC</div>
+                  <div class="value">
+                    <input type="text" class="form-control"
+                           v-on:keypress.enter="txtMaTB_KeyPress"
+                           v-model="tttb.ma_tb">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Tên thuê bao</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="tttb.ten_tb">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Kiểu LĐ</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="tttb.kieu_ld">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Số ảo</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="tttb.ma_lt">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="info-row">
+                  <div class="key w90">Mã GD</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="tttb.ma_gd">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="info-row">
+                  <div class="key w90">Địa chỉ LĐ</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="tttb.diachi_ld">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="info-row">
+                  <div class="key w90">Ghi chú</div>
+                  <div class="value">
+                    <input type="text" class="form-control" v-model="tttb.ghichu">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 col-12">
+          <div class="box-form h-100">
+            <div class="legend-title">Danh sách tiến trình xử lý</div>
+            <DataGrid :dataSource="gridTienTrinh"
+                      :columns="gridTienTrinhCols"
+                      :enablePagingServer="false"
+                      :selectionSettings="{ checkboxMode: 'ResetOnRowClick' }"
+                      :enabledSelectFirstRow="true"
+                      @rowSelected="gridTienTrinh_selectedRowChanged"
+                      @rowDeselected="() => {this.itemTTFocused = null}"
+                      @actionComplete="gridTTXL_actionComplete"
+                      @rowDoubleClicked="gridTTXL_rowDoubleClicked"
+                      panelDataHeight="270"
+                      ref="gridTienTrinh"></DataGrid>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="box-form">
+            <div class="legend-title">Danh sách phiếu yêu cầu</div>
+            <DataGrid :dataSource="gridDanhSach"
+                      :columns="gridDanhSachCols"
+                      :allowPaging="true"
+                      :enablePagingServer="false"
+                      :allow-excel-export="true"
+                      @rowSelected="gridDanhSach_selectedRowChanged"
+                      @rowDeselected="() => {this.itemFocused = null}"
+                      ref="gridDanhSach"></DataGrid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ExportDataModal :data="gridDanhSach" ref="frmLayDuLieuBC"></ExportDataModal>
+
+  <ejs-dialog ref="dlg_noidungtt"
+              target=".modal-tiep-nhan"
+              width='65%'
+              height="350"
+              :position="position"
+              :enableResize='true'
+              :visible="false"
+              :isModal="true"
+              :header='"Nhập nội dung tiến trình báo hỏng"'
+              :showCloseIcon="true">
+    <NoiDungTT ref="ppNoiDungTT"
+               :vtinh="ndtt.ndtt_vtinh"
+               :tag="ndtt.ndtt_tag"
+               :vtientrinhbh_id="ndtt.ndtt_vtientrinhbh_id"
+               :vnhom_id="ndtt.ndtt_vnhom_id"
+               :vbaohong_id="ndtt.ndtt_vbaohong_id"
+               :vnoidung_goc="ndtt.ndtt_vnoidung_goc"
+               :vnd_baohong="ndtt.ndtt_vnd_baohong"
+               @btnGhiLai_Click="ndtt_btnGhiLai_Click"/>
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize='true'
+              :visible="false"
+              :position="position"
+              :header='"Nhập nội dung tiến trình báo hỏng"'
+              :isModal="true"
+              ref="dlg_noidung"
+              showCloseIcon=false
+              target=".modal-tiep-nhan"
+              width='50%'
+              height="300">
+    <NoiDung :tientrinhbh_id="nd_tientrinhbh_id"
+             @btnGhiLai_Click="nd_btnGhiLai_Click"
+             ref="ppNoiDung"/>
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize='true' :allowDragging='true' :visible='false' ref="popupGuiSmsRef"
+              header='Gửi SMS tiến trình báo hỏng'
+              :isModal="true"
+              showCloseIcon=true width='60%' height='900' target=".modal-tiep-nhan" :position="position">
+    <PopupGuiSms ref="guiSmsRef"
+                 @onClose="onClosePopupGuiSMS"
+    />
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize='true'
+              :visible="false"
+              :position="position"
+              :header='"Danh sách tin nhắn đã gửi"'
+              :isModal="true"
+              ref="dlg_sms_sent"
+              showCloseIcon=false
+              target=".modal-tiep-nhan"
+              width='50%'
+              height="300">
+    <div class="box-form">
+      <div class="legend-title">Danh sách tin nhắn đã gửi</div>
+      <div class="table-content">
+        <DataGrid :columns="[
+          { fieldName: 'nguoi_cn', headerText: 'Người gửi', allowFiltering: true },
+          { fieldName: 'ngay_cn', headerText: 'Ngày gửi', allowFiltering: true },
+          { fieldName: 'so_dt', headerText: 'Số điện thoại', allowFiltering: true },
+          { fieldName: 'noidung', headerText: 'Nội dung', allowFiltering: true }
+        ]"
+                  :dataSource="smsSentList"
+                  :showColumnCheckbox="false"
+                  :enable-paging-server="false"
+                  :allowPaging="true"
+                  :showFilter="true"
+        ></DataGrid>
+      </div>
+    </div>
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize='true'
+              :visible="false"
+              :position="position"
+              :header='"Tra cứu thuê bao - phiến dọc"'
+              :isModal="true"
+              ref="dlg_mdf"
+              showCloseIcon=false
+              target=".modal-tiep-nhan"
+              width='80%'
+              height="800">
+    <frmTraCuuMDF ref="frmTraCuuMDF"/>
+  </ejs-dialog>
+
+  <frmPhanAnhBH ref="dialogfrmPhanAnhBH" :params="frmPhanAnhBHInput" :targetDialog="'.modal-tiep-nhan'"></frmPhanAnhBH>
+
+  <ejs-dialog
+    :isModal="false"
+    :enableResize="true"
+    :visible="false"
+    ref="checkPort"
+    :header='"Kiểm tra Port thuê bao"'
+    showCloseIcon="true"
+    target=".main-wrapper"
+    width="60%"
+    height="500"
+    allowDragging="true"
+    @close="checkPortOnClose"
+    :animationSettings="animationSettings"
+  >
+    <div>
+      <CheckPort v-if="checkPortDialog.isVisiable" type="modal"
+          v-bind="checkPortDialog.input"
+      />
+    </div>
+  </ejs-dialog>
+
+  <ejs-dialog :enableResize='true'
+              :visible="false"
+              :header='"Tra cứu chi tiết phiếu báo hỏng"'
+              :isModal="true"
+              ref="dlg_tracuuphieubh"
+              showCloseIcon=false
+              target=".modal-tiep-nhan"
+              width='90%'
+              height="800">
+    <frmTraCuuPhieuBH ref="frmTraCuuPhieuBH"/>
+  </ejs-dialog>
+</b-modal>

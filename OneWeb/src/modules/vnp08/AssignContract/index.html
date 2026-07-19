@@ -1,0 +1,385 @@
+<div>
+    <vue-bread-crumb :header="header" />
+    <vue-nav>
+        <ul class="list">
+            <li>
+                <a @click="clickButton('NHAPLAI')">
+                    <span class="icon one-reload1"></span>Nhập lại
+                </a>
+            </li>
+            <li>
+                <a @click="clickButton('GHILAI')">
+                    <span class="icon one-save"></span>Ghi lại
+                </a>
+            </li>
+            <li>
+                <a @click="clickButton('CHOT')">
+                    <span class="icon one-file-check3"></span>Chốt
+                </a>
+            </li>
+        </ul>
+    </vue-nav>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">
+                Danh sách hợp đồng
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key nowrap">
+                            <div class="list-checks">
+                                <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" class="check" value="1" v-model="kieugoi_id" />
+                                        <span class="name">Hợp đồng</span>
+                                    </div>
+                                </div>
+                                <!-- <div class="item">
+                                    <div class="check-action">
+                                        <input type="radio" class="check" value="2" v-model="kieugoi_id" />
+                                        <span class="name">Danh bạ</span>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <input type="text" v-on:keyup.enter="TimThongTinKH" v-model="txtMaGD"
+                                    class="form-control highlight" :disabled="clickable()" ref="focus">
+                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1 col-12"></div>
+                <div class="col-sm-5 col-12">
+                    <div class="info-row">
+                        <div class="list-checks">
+                            <div class="item">
+                                <input type="radio" id="a1" value='1' v-model="selectedOption" @change="check_radio($event)" :disabled="true"/>
+                                <label class="name" for="a1"><span>Phát triển trực tiếp</span></label>
+                                <input type="radio" id="a2" value='2' v-model="selectedOption" @change="check_radio($event)" style="margin-left: 10px;" />
+                                <label class="name" for="a2"><span>Phát triển gián tiếp</span></label>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row" style="display: flex;justify-content: space-between;">
+                <div class="col-sm-3 col-12">
+                    <div class="info-row" >
+                        <div class="list-checks">
+                            
+                            <input type="checkbox" id="check_all" v-model="check_all" @change="check($event)" class="check"
+                                :disabled="check_toanbo">
+                            <span for="check_all" class="name">Toàn bộ thuê bao thuộc đối tượng quản lý</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-12">
+                    <div class="info-row">
+                        <div class="list-checks">
+                            <input id="check_vk" type="checkbox" v-model="check_vk" @change="checkVK($event)" class="check">
+                            <span class="name" for="check_vk">Vượt khung</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w130">Văn bản vượt khung</div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <input disabled v-model="items.file_upload" type="text" class="form-control" :disabled="!check_vk">
+                                <span @click="$refs.files_upload.click()" class="text-main icon -ap icon-upload"></span>
+                                <input hidden type="file" ref="files_upload" id="upload-file5" @change="changeFile" :disabled="!check_vk">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w70">Ngày gán
+                        </div>
+                        <div class="value">
+                            <ejs-datepicker v-model="items.ngay_gan" :format="'dd/MM/yyyy'"></ejs-datepicker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-content mart10">
+                <table class="table-result table-gachle">
+                    <tr>
+                        <!-- <td>
+                            <div v-if="!check_toanbo">
+                                <DataGrid v-bind:columns="ds_thuebao_main.header" v-bind:dataSource="ds_thuebao_main.list"
+                                    :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                    :enabledSelectFirstRow="false" :showColumnCheckbox="false"
+                                    @selectedRowChanged="Select_thuebao_main" ref="mainGridRef" id="mainGridRef">
+                                </DataGrid>
+                            </div>
+                            <div v-else>
+                                <DataGrid v-bind:columns="ds_danhba_timkiem.header"
+                                    v-bind:dataSource="ds_danhba_timkiem.list" :enable-paging-server="false"
+                                    :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false"
+                                    :showColumnCheckbox="false" @selectedRowChanged="Select_thuebao_danhba" ref="dbGridRef"
+                                    id="dbGridRef">
+                                </DataGrid>
+                            </div>
+                        </td> -->
+                        <td>
+                            <div>
+                                <DataGrid v-bind:columns="ds_thuebao_main.header" v-bind:dataSource="ds_thuebao_main.list"
+                                    :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enabledSelectFirstRow="false"
+                                    :showColumnCheckbox="false" @selectedRowChanged="Select_thuebao_main" ref="mainGridRef" id="mainGridRef">
+                                </DataGrid>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="box-move-select-table">
+            <div class="box-col" v-show="!hideTab">
+                <div class="nav tabs tab-over">
+                    <a href="#" :class="{active:Tab1}" style="padding-right: 10px; padding-left: 10px;"
+                        @click.prevent="SelectTab1">NV AM(Phát triển mới) đã gán</a>
+    
+                    <a href="#" :class="{active:Tab2}" style="padding-right: 10px; padding-left: 10px;"
+                        @click.prevent="SelectTab2">NV duy trì</a>
+    
+                    <a href="#" :class="{active:Tab5}" style="padding-right: 10px; padding-left: 10px;"
+                        @click.prevent="SelectTab5">NV PS(Hỗ trợ kỹ thuật) đã gán</a>
+    
+                    <a href="#" :class="{active:Tab3}" style="padding-right: 10px; padding-left: 10px;"
+                        @click.prevent="SelectTab3">NV AS(Hỗ trợ bán hàng) đã gán</a>
+    
+                    <a href="#" :class="{active:Tab4}" style="padding-right: 10px; padding-left: 10px;"
+                        @click.prevent="SelectTab4">NV CSKH</a>
+    
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <div class="table-content">
+                            <table class="table-result table-gachle">
+                                <tr>
+                                    <td>
+                                        <div v-if="Tab1">
+                                            <DataGridNV v-bind:columns="ds_nhanvien_ptm.header"
+                                                v-bind:dataSource="ds_nhanvien_ptm.list"
+                                                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                                @rowSelected="onSelectedRowChange_PTM"
+                                                @rowDeselected="onDeselectedRowChange_PTM">
+                                            </DataGridNV>
+                                        </div>
+                                        <div v-if="Tab3">
+                                            <DataGridNV v-bind:columns="ds_nhanvien_hotro.header"
+                                                v-bind:dataSource="ds_nhanvien_hotro.list"
+                                                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                                @rowSelected="onSelectedRowChange_HOTRO"
+                                                @rowDeselected="onDeselectedRowChange_HOTRO">
+                                            </DataGridNV>
+                                        </div>
+                                        <div v-if="Tab2">
+                                            <DataGridNV v-bind:columns="ds_nhanvien_duytri.header"
+                                                v-bind:dataSource="ds_nhanvien_duytri.list"
+                                                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                                @rowSelected="onSelectedRowChange_DUYTRI"
+                                                @rowDeselected="onDeselectedRowChange_DUYTRI">
+                                            </DataGridNV>
+                                        </div>
+                                        <div v-if="Tab5">
+                                            <DataGridNV v-bind:columns="ds_nhanvien_hotro_kythuat.header"
+                                                v-bind:dataSource="ds_nhanvien_hotro_kythuat.list"
+                                                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                                @rowSelected="onSelectedRowChange_HOTRO_KYTHUAT"
+                                                @rowDeselected="onDeselectedRowChange_HOTRO_KYTHUAT">
+                                            </DataGridNV>
+                                        </div>
+                                        <div v-if="Tab4">
+                                            <DataGridNV v-bind:columns="ds_nhanvien_cskh.header"
+                                                v-bind:dataSource="ds_nhanvien_cskh.list"
+                                                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                                @rowSelected="onSelectedRowChange_CSKH"
+                                                @rowDeselected="onDeselectedRowChange_CSKH">
+                                            </DataGridNV>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-col" v-show="hideTab">
+                <div class="nav tabs tab-over">
+                    <a href="#" :class="{active:TabGIANTIEP}" style="padding-right: 10px; padding-left: 10px;"
+                    >Danh sách NVPT Gián tiếp</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <div class="table-content">
+                            <table class="table-result table-gachle">
+                                <tr>
+                                    <td>
+                                        <div v-if="TabGIANTIEP">
+                                            <DataGrid v-bind:columns="ds_nhanvien_giantiep.header" 
+                                                v-bind:dataSource="ds_nhanvien_giantiep.list"
+                                                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                                @rowSelecting="GTRowSelecting($event)"
+                                                @rowSelected="onSelectedRowChange_GIANTIEP"
+                                                @rowDeselected="onDeselectedRowChange_GIANTIEP" @rowDataBound='rowDataBound' ref="giantiepGridRef">
+                                            </DataGrid>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn" data-toggle="modal" v-on:click="Gogan_click()" >
+                    <span class="-ap icon-chevron-thin-right"></span>
+                </button>
+                <button class="btn" data-toggle="modal" v-on:click="Gan_click()">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                </button>
+            </div>
+            <div class="box-col">
+                <div class="box-form">
+                    <div class="row" v-if="selectedOption != 2">
+                        <div class="col-sm-2 col-12">
+                            <div class="title fw6 mart7">Danh sách1:</div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Loại NV</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt placeholder="Loại nhân viên" v-model="loainv_id" :allowFiltering="true"
+                                            dataTextField="TEN" dataValueField="LOAINV_ID"
+                                            :dataSource="options.cbx_dsloainv" @change="select_LoaiNV($event)">
+                                        </SelectExt>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Đơn vị</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt placeholder="Đơn vị" v-model="donvi_id" :allowFiltering="true"
+                                            dataTextField="ten_dv" dataValueField="donvi_id"
+                                            :dataSource="options.cbx_dsdonvi" @change="select_Donvi($event)">
+                                        </SelectExt>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" v-else>
+                        <div class="col-sm-2 col-12">
+                            <div class="title fw6 mart7">Danh sách2:</div>
+                        </div>
+                        <div class="col-sm-4 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Loại NV</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt placeholder="Loại nhân viên" v-model="loainv_id" :allowFiltering="true"
+                                            dataTextField="ten" dataValueField="loainv_id" :dataSource="options.cbx_dsloainv"
+                                            @change="select_LoaiNV($event)">
+                                        </SelectExt>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12">
+                            <div class="info-row">
+                                <div class="key w30 nowrap">Đơn vị</div>
+                                <div class="value">
+                                    <div class="select-custom">
+                                        <SelectExt placeholder="Đơn vị" v-model="donvi_id" :allowFiltering="true" dataTextField="ten_dv"
+                                            dataValueField="donvi_id" :dataSource="options.cbx_dsdonvi" @change="select_Donvi($event)">
+                                        </SelectExt>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table class="table-result table-gachle">
+                            <tr>
+                                <td>
+                                    <div>
+                                        <DataGridNV v-bind:columns="ds_nhavien_chuagan.header"
+                                            v-bind:dataSource="ds_nhavien_chuagan.list"
+                                            :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                                            :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                            :enabledSelectFirstRow="false" :showColumnCheckbox="true"
+                                            @rowSelected="onSelectedRowChange_NVCG"
+                                            @rowDeselected="onDeselectedRowChange_NVCG"
+                                            @actionComplete="actionCompleteHandle" ref="chuaganGridRef">
+                                        </DataGridNV>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        VNPT-IT &copy; 2021
+    </footer>
+    
+    <div class="modal" id="popupTCTTTB">
+        <div class="modal-dialog" style="width: 70%; max-width: 1220px; margin-top: 100px;">
+            <div class="modal-content popup-box">
+                <div class="popup-header">
+                    <div class="title">Danh sách hợp đồng</div>
+                    <div class="close -ap icon-close" data-dismiss="modal" v-on:click="close_timkiem_hdtb()">
+                    </div>
+                </div>
+    
+                <div class="popup-body">
+                    <div class="box-form">
+                        <div class="table-content">
+                            <table class="table-result table-gachle">
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <DataGrid v-bind:columns="ds_hopdong_thuebao_timkiem.header"
+                                                v-bind:dataSource="ds_hopdong_thuebao_timkiem.list"
+                                                :enable-paging-server="false" :allowPaging="true" :showFilter="true"
+                                                :enabledSelectFirstRow="false" :showColumnCheckbox="false" :pageSize="8"
+                                                @selectedRowChanged="Select_ds_hopdong_thuebao_timkiem">
+                                            </DataGrid>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

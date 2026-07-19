@@ -1,0 +1,247 @@
+<div class="phong-zone-detail-form">
+  <!-- Action buttons -->
+  <div class="list-actions-top" style="position: sticky; top: 0; background: white; z-index: 10; margin-bottom: 15px;"
+    v-if="!isReadOnly">
+    <ul class="list">
+      <li>
+        <a href="#" @click.prevent="onSave">
+          <span class="icon one-save"></span> Ghi lại
+        </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="$emit('saveSuccessed', false)">
+          <span class="icon nc-icon-glyph ui-1_circle-remove"></span> Hủy
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SECTION 1: Thông tin phòng/zone -->
+  <div class="box-form">
+    <div class="legend-title">Thông tin phòng/zone</div>
+
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w200">ID Phòng / Zone</div>
+          <div class="value">
+            <input type="text" class="form-control" :value="form.id ? form.id : ''"
+              :placeholder="!form.id ? 'Tự sinh' : ''" readonly />
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="key w200">Tên phòng/zone <span class="required">*</span></div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="form.ten" :disabled="isReadOnly"
+              :class="controls.txtTen.invalid ? 'is-invalid' : ''" />
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="key w200">Mục đích sử dụng <span class="required">*</span></div>
+          <div class="value">
+            <SelectExt v-model="form.mucDichSuDung" dataTextField="TEN" dataValueField="ID"
+              :dataSource="[...mucDichSuDungList]" :disabled="isReadOnly"
+              :class="{invalidBox: this.controls.selectMucDichSuDung.invalid}" />
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="key w200">Ngày đưa vào vận hành</div>
+          <div class="value">
+            <ejs-datepicker ref="datepicker" v-model="form.thoiDiemVanHanh"
+              :cssClass="controls.dateThoiDiemVanHanh.invalid ? 'is-invalid' : ''" :disabled="isReadOnly" :min="minDate"
+              :max="maxDate" format="dd/MM/yyyy" @change="onDatePickerChange" />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w200">Ghi chú</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="form.ghiChu" :disabled="isReadOnly" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w200">Hiệu lực</div>
+          <div class="value padt4">
+            <div class="check-action">
+              <input type="checkbox" class="check" v-model="form.suDung" :true-value="1" :false-value="0"
+                :disabled="isReadOnly" style="cursor: pointer;" /><span class="name"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="key w200">Diện tích (m2)</div>
+          <div class="value">
+            <input type="number" class="form-control" v-model="form.dienTich" :disabled="isReadOnly"
+              :class="controls.txtDienTich.invalid ? 'is-invalid' : ''" />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w200">Trạng thái vận hành</div>
+          <div class="value">
+            <SelectExt v-model="form.trangThaiVanHanh" dataTextField="TEN" dataValueField="ID"
+              :dataSource="[...trangThaiVanHanhList]" :disabled="isReadOnly"
+              :class="{invalidBox: this.controls.selectTrangThaiVanHanh.invalid}" />
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="key w200">Ảnh đại diện</div>
+          <div class="value">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <input ref="fileInputAnhDaiDien" type="file" accept="image/*" style="display: none;"
+                @change="onChangeAnhDaiDien" />
+              <input type="text" class="form-control"
+                :value="form.anhDaiDien ? 'Đã chọn ảnh' : (form.id === 0 ? 'Chưa chọn ảnh' : '')" readonly
+                style="flex: 1;" :placeholder="(form.id === 0 || buttons.btnSave.enabled) ? 'Chọn ảnh đại diện' : ''" />
+              <button type="button" class="btn btn-primary" @click="onClickUploadAnhDaiDien" :disabled="isReadOnly"
+                style="min-width: 80px;">
+                Chọn ảnh
+              </button>
+            </div>
+            <div v-if="previewAnhDaiDien || loadingImageUrl" class="preview mt-2">
+              <div v-if="loadingImageUrl" class="image-loading">
+                <div style="text-align: center;">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="sr-only">Đang tải...</span>
+                  </div>
+                  <div style="margin-top: 8px; font-size: 12px; color: #6c757d;">Đang tải ảnh...</div>
+                </div>
+              </div>
+              <img v-else :src="previewAnhDaiDien" alt="Preview" class="preview-image" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Vị trí Phòng / Zone -->
+  <div class="box-form">
+    <div class="legend-title">Vị trí Phòng / Zone</div>
+
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w200">Đơn vị IDC <span class="required">*</span></div>
+          <div class="value">
+            <SelectExt v-model="form.donViIdc" dataTextField="TEN" dataValueField="ID" :dataSource="donViIdcList"
+              :disabled="isReadOnly" :class="{invalidBox: this.controls.selectDonViIdc.invalid}"
+              @change="onDonViIdcChange" />
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="key w200">IDC <span class="required">*</span></div>
+          <div class="value">
+            <SelectExt v-model="form.idcId" dataTextField="TEN" dataValueField="ID" :dataSource="[...idcList]"
+              :disabled="isReadOnly" :class="{invalidBox: this.controls.selectIdc.invalid}" @change="onIdcChange" />
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="key w200">Tòa nhà <span class="required">*</span></div>
+          <div class="value">
+            <SelectExt v-model="form.toaNhaId" dataTextField="TEN" dataValueField="ID_TOANHA"
+              :dataSource="[...toaNhaList]" :disabled="isReadOnly"
+              :class="{invalidBox: this.controls.selectToaNha.invalid}" @change="onToaNhaChange" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w200">Mặt sàn <span class="required">*</span></div>
+          <div class="value">
+            <SelectExt v-model="form.matsanId" dataTextField="TEN" dataValueField="ID"
+              :dataSource="[...matSanSelectionList]" :disabled="isReadOnly"
+              :class="{invalidBox: this.controls.selectMatSan.invalid}" />
+          </div>
+        </div>
+
+        <!-- Khi VIEW: hiển thị viTri -->
+        <div class="info-row" v-if="!buttons.btnSave.enabled && form.id > 0">
+          <div class="key w200">Vị trí phòng/zone</div>
+          <div class="value">
+            <input type="text" class="form-control" :value="form.viTri || ''" readonly placeholder="Chưa có vị trí" />
+          </div>
+        </div>
+
+        <!-- Khi INSERT/EDIT: hiển thị 2 input TOADO_X và TOADO_Y -->
+        <div class="info-row" v-if="buttons.btnSave.enabled || form.id === 0">
+          <div class="key w200">Tọa độ X</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="form.toaDoX" :disabled="true"
+              :class="controls.txtToaDoX.invalid ? 'is-invalid' : ''" />
+          </div>
+        </div>
+
+        <div class="info-row" v-if="buttons.btnSave.enabled || form.id === 0">
+          <div class="key w200">Tọa độ Y</div>
+          <div class="value">
+            <input type="text" class="form-control" v-model="form.toaDoY" :disabled="true"
+              :class="controls.txtToaDoY.invalid ? 'is-invalid' : ''" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Năng lực không gian -->
+  <div class="box-form">
+    <div class="legend-title">Năng lực không gian</div>
+
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <div class="info-row">
+          <div class="key w200">Rack thiết kế</div>
+          <div class="value">
+            <input type="number" class="form-control" v-model="form.slRackThietKe" :disabled="isReadOnly"
+              :class="controls.txtSlRackThietKe.invalid ? 'is-invalid' : ''" />
+          </div>
+        </div>
+
+        <!-- Hiển thị khi view (không ở chế độ edit) -->
+        <div class="info-row" v-if="!buttons.btnSave.enabled && form.id > 0">
+          <div class="key w200">Số lượng Rack đã lắp đặt</div>
+          <div class="value">
+            <input type="number" class="form-control" :value="form.slRackDaLapDat || ''" readonly />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12">
+        <div class="info-row" v-if="!buttons.btnSave.enabled && form.id > 0">
+          <div class="key w200">Số lượng Rack khả dụng</div>
+          <div class="value">
+            <input type="number" class="form-control" :value="form.slRackKhaDung || ''" readonly />
+          </div>
+        </div>
+
+        <div class="info-row" v-if="!buttons.btnSave.enabled && form.id > 0">
+          <div class="key w200">Công suất định danh thiết bị</div>
+          <div class="value">
+            <input type="number" class="form-control" :value="form.csDinhDanhThietBi || ''" readonly />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Thuộc tính bổ sung -->
+  <div class="box-form" v-if="form.id > 0 || buttons.btnSave.enabled">
+    <div class="legend-title d-flex justify-content-between align-items-center">
+      <div class="pull-left">Thuộc tính bổ sung</div>
+      <button v-if="buttons.btnSave.enabled" class="btn btn-sm btn-outline-primary float-right" @click="onAddThuocTinh">
+        <i class="fa fa-plus"></i> Thêm thuộc tính
+      </button>
+    </div>
+    <div class="mt-2">
+      <DataGrid :columns="thuocTinhColumns" :dataSource="dsThuocTinhBoSung" :showColumnCheckbox="false"
+        :enablePagingServer="false" :allowPaging="true" :showFilter="true" ref="grdThuocTinhBoSung" />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,206 @@
+<div id="SearchInstallDetail" >
+  <div class="breadcrumb-top">
+    <div class="main-title">Cơ chế phân chia doanh thu bán chéo</div>
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Trang chủ </a>
+      </li>
+      <li class="breadcrumb-item"><a href="#">Bán chéo</a></li>
+      <li class="breadcrumb-item active">Cơ chế phân chia doanh thu bán chéo</li>
+    </ul>
+  </div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a :class="{ disabled: check_nhapmoi }" href="#" @click.prevent="nhap_moi"> <span class="icon one-file-plus"></span>Nhập mới </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="ghi_lai"> <span class="icon one-save"></span>Ghi lại </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="Delete"> <span class="icon one-trash"></span>Xóa </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="box-form">
+      <div class="legend-title">Thông tin cơ chế</div>
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Mã cơ chế </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="Ma_coche" :disabled="true" />
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Đơn vị BH <k-required-marker/></div>
+                <div class="value">
+                  <!-- <input type="text" class="form-control" v-model="donvi_BH" :disabled="click_check" @change="select_donvicon" /> -->
+                  <select2 :options="donvi_BH.list" v-model="donvi_BH.value" :disabled="check_phanvung" @change="select_donvicon">
+                    <option disabled value="0">Select one</option>
+                  </select2>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Phân loại HĐ<k-required-marker/></div>
+                <div class="value">
+                  <select2 :options="phanloai_hd.list" v-model="phanloai_hd.value" :disabled="false">
+                    <option disabled value="0">Select one</option>
+                  </select2>
+                </div>
+              </div>
+            </div>
+            <!-- cột thứ 2 -->
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w100">Số công văn <k-required-marker/></div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <button class="btn" @click="showPopupCongVan" :disabled="false">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <!-- <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" :donvi_id="0" :nhanvien_id="0" :donvi_dl_id="donvi_dl_id" /> -->
+                    <input type="text" class="form-control highlight" v-model="so_congvan" v-on:keyup.enter="timkiem_congvan" :disabled="false" />
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="value">
+                  <div class="select-custom">
+                    <select2 ref="mySelect" :options="donvi.list" v-model="donvi.value" :key="donviKey":disabled="false">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="key w100">Số lượng TB<k-required-marker/></div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="Sl_thuebao" :disabled="false" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w100">Loại HĐ <k-required-marker/></div>
+                <div class="value">
+                  <!-- <div class="select-custom">
+                    <select2 :options="loai_HD.list" v-model="loai_HD.value" :disabled="false">
+                      <option disabled value="0">Select one</option>
+                    </select2>
+                  </div> -->
+                  <ejs-multiselect id='multiselect'
+                  :dataSource="loai_HD.list"
+                  placeholder=""
+                  mode="CheckBox"
+                  v-model="loai_HD.value"
+                  locale='vi-VN'
+                  :fields="{text: 'text', value: 'id' }"
+                  :showSelectAll="true"
+                  @change="handleMultiSelectChange"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- cột thứ 2 -->
+        <div class="col-sm-6 col-12">
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90">Mã KH<k-required-marker/></div>
+                <div class="value">
+                  <div class="input-more-button">
+                    <!-- <button class="btn" @click="showPopupSearchContract" :disabled="false">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button> -->
+                    <button class="btn" @click="showModal">
+                      <span class="-ap icon-more_horiz"></span>
+                    </button>
+                    <div id="app">
+                      <div v-if="isModalVisible" class="modal-overlay-tu">
+                        <div class="popup">
+                          <button class="close-btn" @click="isModalVisible = false">×</button>
+                          <div class="modal-content-tu">
+                            <h3>Chọn tra cứu mã khách hàng theo:</h3>
+                            <!-- <p>Please select one of the options below.</p> -->
+                            <div class="popup-buttons">
+                              <button class="confirm-btn" @click="showPopupSearchAccount">Danh bạ</button>
+                              <button class="confirm-btn" @click="showPopupSearchContract">Hợp đồng</button>        
+                              <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" :donvi_id="0" :nhanvien_id="0" :donvi_dl_id="0" />              
+                            </div>
+                          </div>
+                        </div> 
+                      </div>
+                    </div>
+                    <!-- <SearchContractModal ref="popupSearchContract" @accept="acceptSearchContract" :donvi_id="0" :nhanvien_id="0" :donvi_dl_id="donvi_dl_id" /> -->
+                    <input type="text" class="form-control highlight" v-model="ma_kh" v-on:keyup.enter="timkiem_makh" :disabled="false" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w90"> Mã số thuế </div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="ma_sothue" :disabled="false" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w90"> Tên KH<k-required-marker/></div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="ten_kh" :disabled="false" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-12">
+              <div class="info-row">
+                <div class="key w90"> Địa chỉ KH<k-required-marker/></div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="diachi_kh" :disabled="false" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title" style="color: rgb(0, 0, 0);">
+        <div class="pull-left">Thông tin phân chia doanh thu</div>
+        <div class="pull-right">
+          <button class="btn" @click="Click_themhhang">
+            <span class="text-primary fw-bold fa fa-plus-square-o"> Thêm mới</span>
+          </button>
+          <button class="btn" @click="Click_DeleteTT">
+            <span class="text-primary fw-bold icon one-trash "> Xóa thông tin </span>
+          </button>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="clearfix"></div>
+      <k-table-custom :dataSources="gridDanhSachPCDT" :columns="columns2" :listbox="listbox" :allowFilter="true" :allowCheckBox="allowCheckBox"
+        @onRowCheckChange="onRowCheckChange" @dataCheckeds="onDataCheckeds_1" :rowSelectedIndex="1" @Change_Dichvu="Change_Dichvu" @Change_Donvi="Change_Donvi" 
+        @Change_Loaihinh="Change_Loaihinh" @Change_congdoan="Change_congdoan" @Change_Loai_pt="Change_Loai_pt" @Change_Tyle="Change_Tyle" @input="handleInput" 
+        @Click_DeleteRow="Click_DeleteRow" @Click_EditRow="Click_EditRow" @Click_CopyRow="Click_CopyRow" @onChangePage="onChangePage" :index_currentPage="index_currentPage" />
+    </div>
+    <div class="box-form">
+      <div class="legend-title">Danh sách cơ chế phân chia doanh thu bán chéo</div>
+      <div class="clearfix"></div>
+       <DataGrid v-bind:columns="ds_coche.header" v-bind:dataSource="ds_coche.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" @rowSelected="gridDSTB_rowSelected" /> <!--@selectedItemsChanged="grdThuebaoChanged" @rowDoubleClicked="onDanhSachThueBaoGridDoubleClicked" @rowSelected="gridDSTB_rowSelected" /> -->
+    </div>
+    <b-modal id="popupComponents" size="huge" :title="popupComponentHeader" :hide-header="popupComponentHeader?false:true"
+      hide-footer modal-class="modal-custom" body-class="modal-body p-0">
+      <component :is="popupComponent" ref="generalPopup" :dulieu="popupComponentData" v-bind="popupComponentAttr"
+        isPopup="true" v-on="popupComponentEvts" @form-close="popupClosed"></component>
+    </b-modal>
+  </div>
+  <footer class="footer">
+    VNPT-IT &copy; 2021
+  </footer>
+</div>

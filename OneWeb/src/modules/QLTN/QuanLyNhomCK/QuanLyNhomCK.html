@@ -1,0 +1,598 @@
+<div >
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" class="pointer" v-on:click.prevent="doLayTT()" >
+          <span class="icon  one-file-history2"></span> Lấy TT
+        </a>
+      </li>
+      <li>
+          <a href="#" class="pointer" v-on:click.prevent="doAddNew()"  :class="{ disabled: !configs.f_addnew_enabled }" v-show="configs.f_addnew_visible">
+              <span class="icon one-save"></span>Tạo mới
+          </a>
+      </li>
+      <li>
+          <a href="#" class="pointer" v-on:click.prevent="doUpdate()" :class="{ disabled: !configs.f_update_enabled }" v-show="configs.f_update_visible">
+              <span class="icon one-save"></span>Cập nhật
+          </a>
+      </li>
+      <li>
+          <a href="#" class="pointer" v-on:click.prevent="doCancel()" :class="{ disabled: !configs.f_cancel_enabled }" v-show="configs.f_cancel_visible">
+              <span class="icon one-xlsx-import"></span>Hủy bỏ
+          </a>
+      </li>
+      <li>
+        <a href="#" class="pointer" v-on:click.prevent="doDelete()" :class="{ disabled: !configs.f_delete_enabled }" v-show="configs.f_delete_visible">
+            <span class="icon one-xlsx-import"></span>Xóa nhóm
+        </a>
+      </li>
+      <li>
+        <a class="pointer" href="#"  v-on:click.prevent="doReadFile()" v-show="configs.f_readfile_visible">
+          <span class="icon one-book"></span> Đọc file excel
+        </a>
+        <input id="gannhom_upload_excel" ref="gannhom_upload_excel" @change="uploadFileGanNhom" type="file" hidden>
+      </li>
+
+      <li>
+        <a class="pointer" href="#"  v-on:click.prevent="doCreateByFile()">
+          <span class="icon one-file-attach"></span> Tạo nhóm theo file
+        </a>
+        <input id="taonhom_upload_excel" ref="taonhom_upload_excel" @change="uploadFileTaoNhom" type="file" hidden>
+      </li>
+      <li>
+        <a class="pointer" @click="doSetDate()">
+          <span class="icon one-calendar"></span> Thiết lập ngày
+        </a>
+        <app-nhap-ngay-quet ref="refNhapNgayQuet"></app-nhap-ngay-quet>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="grid-stack-box">
+      <Split style="height:310px;">
+        <SplitArea :size="30" :minSize="100">
+          <div class="box-col box-form" id="boxLeft1">
+            <div class="legend-title">
+              <div class="title pull-left">Thông tin nhóm thanh toán</div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w90">Mã nhóm</div>
+                      <div class="value">
+                          <div class="input-more-button -right">
+                              <input type="text" ref="refMaNhom" autofocus class="form-control highlight" v-model="params.p_ma_nhom" @keyup.enter="TRA_CUU_MA_NHOM"></input>
+                              <button class="btn" >
+                                  <span class="icon one-search"></span>
+                              </button>
+
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                  <div class="info-row">
+                      <div class="key w90">Ngày tạo</div>
+                      <div class="value">
+                        <ejs-datepicker
+                          v-model="p_ngay_tao"
+                          :value="configs.dateConfig.value"
+                          :max="configs.dateConfig.maxDate"
+                          :format="configs.dateConfig.format"
+                          :allowEdit=false
+                          :showClearButton=false
+                          >
+                        </ejs-datepicker>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="info-row">
+                  <div class="key w90">Tên nhóm</div>
+                  <div class="value">
+                      <input type="text"  class="form-control"  v-model="params.p_ten_nhom">
+                  </div>
+                </div>
+            </div>
+            <div class="row">
+              <div class="info-row">
+                <div class="key w90">Số TK</div>
+                <div class="value">
+                    <input type="text"  class="form-control"  v-model="params.p_so_tk">
+                </div>
+              </div>
+          </div>
+          <div class="row">
+              <div class="info-row">
+                <div class="key w90">Chứng từ</div>
+                <div class="value">
+                    <input type="text"  class="form-control" v-model="params.p_chung_tu">
+                </div>
+              </div>
+          </div>
+
+            <div class="row">
+                <div class="info-row">
+                  <div class="key w90">Ghi chú</div>
+                  <div class="value">
+                    <textarea class="form-control" ref="refNDThucHien"style="height: 70px;resize: vertical;" v-model="params.p_ghi_chu"></textarea>
+                  </div>
+                </div>
+
+
+            </div>
+
+          </div>
+      </SplitArea>
+      <SplitArea :size="70" :minSize="100">
+        <div class="box-col box-form" id="boxRight1">
+          <div class="legend-title">
+              <div class="pull-left">
+                  Danh sách nhóm thanh toán
+              </div>
+              <div class="pull-right">
+                  <div class="check-action">
+                      <input type="checkbox" class="check">
+                      <span class="name">Chọn nhanh</span>
+                  </div>
+              </div>
+              <div class="clearfix"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3 col-12">
+                <div class="info-row">
+                    <div class="value">
+                      <b-form-checkbox
+                        v-model="params.p_chk_tu_ngay"
+                        class="check"
+                        value="1"
+                        unchecked-value="0"
+                      >
+                        <span class="name">Từ ngày</span>
+                      </b-form-checkbox>
+                    </div>
+                    <div class="value">
+                      <ejs-datepicker
+                        v-model="p_tu_ngay"
+                        :value="configs.dateConfig.value"
+                        :max="configs.dateConfig.maxDate"
+                        :format="configs.dateConfig.format"
+                        :allowEdit=false
+                        :showClearButton=false
+                        :disabled="!chk_tungay"
+                        >
+                      </ejs-datepicker>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-sm-3 col-12">
+                <div class="info-row">
+                    <div class="key w90">Đến ngày</div>
+                    <div class="value">
+                      <ejs-datepicker
+                        v-model="p_den_ngay"
+                        :value="configs.dateConfig.value"
+                        :max="configs.dateConfig.maxDate"
+                        :format="configs.dateConfig.format"
+                        :allowEdit=false
+                        :showClearButton=false
+                        :disabled="!chk_tungay"
+                        >
+                      </ejs-datepicker>
+                    </div>
+
+                </div>
+            </div>
+          </div>
+          <div class="table-content">
+            <DataGrid
+              :panelDataHeight='"85"'
+              :enablePagingServer="false"
+              v-bind:dataSource="dsNhomCK"
+              :showFilter="true"
+              :allowPaging="true"
+              :allowExcelExport="true"
+              :totalRecords="nhomCKPageInfo.totalElement"
+              :pageSize="nhomCKPageInfo.maxSize"
+              :pageIndex="nhomCKPageInfo.page"
+              :key="keyDSNhomCK"
+              ref="gridDSNhomCK"
+              @selectedRowChanged="onNhomCKRowChange"
+              :columns="[
+              {fieldName: 'NHOMCK_ID', headerText: 'ID Nhóm', allowFiltering: true, allowSorting: false},
+              {fieldName: 'MA_NHOM', headerText: 'Mã nhóm', allowFiltering: true, allowSorting: false},
+              {fieldName: 'TEN_NHOM', headerText: 'Tên nhóm', allowFiltering: true, allowSorting: false},
+              {fieldName: 'NGAYTAO', headerText: 'Ngày tạo', allowFiltering: true, allowSorting: false, allowHtml:true},
+              {fieldName: 'STK', headerText: 'Số tài khoản', allowFiltering: true, allowSorting: false, allowHtml:true},
+              {fieldName: 'CHUNGTU', headerText: 'Chúng từ', allowFiltering: true, allowSorting: false, allowHtml:true},
+              {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowHtml:true}
+              ]"
+            >
+            </DataGrid>
+          </div>
+        </div>
+      </SplitArea>
+    </Split>
+    </div>
+
+
+
+      <div class="box-form" style="height: 560px;">
+          <div class="box-move-select-table">
+              <div class="box-col">
+                  <div class="legend-title">
+
+                      <div class="pull-left">
+                          Danh sách thanh toán đã gán
+                      </div>
+                      <div class="pull-right">
+                        <b-form-checkbox
+                          v-model="params.p_chk_chonnhanh_dagan"
+                          class="check"
+                          value="1"
+                          unchecked-value="0"
+                        >
+                          <span class="name">Chọn nhanh</span>
+                        </b-form-checkbox>
+                      </div>
+                      <div class="clearfix"></div>
+
+
+
+                  </div>
+
+                  <div class="table-content">
+                    <DataGrid
+                      :panelDataHeight='"350"'
+                      :enablePagingServer="false"
+                      v-bind:dataSource="dsMaTTDaGan"
+                      :showFilter="true"
+                      :allowPaging="true"
+                      :allowExcelExport="true"
+                      :showColumnCheckbox="true"
+                      :enabledSelectFirstRow="false"
+                      :totalRecords="dsDaGanPageInfo.totalElement"
+                      :pageSize="dsDaGanPageInfo.maxSize"
+                      :pageIndex="dsDaGanPageInfo.page"
+                      :key="keyDSMaTTDaGan"
+                      ref="gridDSMaTTDaGan"
+                      :columns="[
+                          {fieldName: 'THANHTOAN_ID', visible: false},
+                          {fieldName: 'MA_TT', headerText: 'Mã Thanh toán', allowFiltering: true, allowSorting: false, width: 120},
+                          {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, allowSorting: false, width: 100},
+                          {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false, width: 200},
+                          {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting: false, allowHtml:true, width: 200},
+                          {fieldName: 'MA_NV', headerText: 'Mã tuyến', allowFiltering: true, allowSorting: false, allowHtml:true, width: 120}
+                          ]"
+                    ></DataGrid>
+                  </div>
+
+              </div>
+              <div class="actions">
+                  <button class="btn" @click="doGo()">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                  </button>
+                  <button class="btn" @click="doGan()">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                  </button>
+                </div>
+              <div class="box-col">
+
+                  <div class="tabs nav tab-over">
+                      <a href="#" data-toggle="tab" @click="params.p_tab_kieugan = 1; configs.f_readfile_visible = false" :class="{active: params.p_tab_kieugan === 1}">Tìm kiếm</a>
+                      <a href="#" data-toggle="tab" @click="params.p_tab_kieugan = 2; configs.f_readfile_visible = true" :class="{active: params.p_tab_kieugan === 2}">Gán theo file</a
+                      >
+                  </div>
+                  <div class="box-form tab-content">
+                      <div class="tab-pane" :class="{active: params.p_tab_kieugan === 1}" id="tabTimKiem">
+                          <div class="legend-title">
+
+                              <div class="pull-left">
+                                  Danh sách thanh toán chưa gán
+                              </div>
+                              <div class="pull-right">
+                                <b-form-checkbox
+                                  v-model="params.p_chk_chonnhanh_chuagan"
+                                  class="check"
+                                  value="1"
+                                  unchecked-value="0"
+                                >
+                                  <span class="name">Chọn nhanh</span>
+                                </b-form-checkbox>
+                              </div>
+                              <div class="clearfix"></div>
+
+                          </div>
+
+                          <div class="info-row">
+                              <div class="key w60">Tiêu chí</div>
+                              <div class="value dropdown">
+                                  <div class="select-custom">
+                                      <button class="btn form-control tleft" @click="is_show = true">Tiêu chí: {{lblTieuChi}}</button>
+                                  </div>
+                                  <div class="fullw pad10 vattu_table" v-show="is_show" >
+                                      <div class="legend-title">Điều kiện lọc</div>
+                                      <div class="grid-stack-box">
+                                        <Split style="height:200px;">
+                                          <SplitArea :size="50" :minSize="100">
+                                            <div class="" id="boxLeft">
+                                                <div class="info-row">
+                                                    <div class="key w120">
+                                                        <b-form-checkbox
+                                                          v-model = "params.p_chk_opt0"
+                                                          class = "check"
+                                                          value = '1'
+                                                          unchecked-value = '0'
+                                                        >
+                                                          <span class="name">Tra cứu theo</span>
+                                                        </b-form-checkbox>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="row">
+                                                            <div class="col-sm-7 col-12">
+                                                              <ejs-dropdownlist :enabled="chk_opt0" :allowFiltering="false" :dataSource='params.p_options' :fields="configs.fieldsOpts" v-model = "params.p_opt0"></ejs-dropdownlist>
+                                                            </div>
+                                                            <div class="col-sm-5 col-12">
+                                                                <input type="text" class="form-control" v-model="params.p_tieuchi0">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="info-row">
+                                                    <div class="key w120">
+                                                      <b-form-checkbox
+                                                        v-model = "params.p_chk_opt1"
+                                                        class = "check"
+                                                        value = '1'
+                                                        unchecked-value = '0'
+                                                      >
+                                                        <span class="name">Tra cứu theo</span>
+                                                      </b-form-checkbox>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="row">
+                                                            <div class="col-sm-7 col-12">
+                                                              <ejs-dropdownlist :enabled="chk_opt1" :allowFiltering="false" :dataSource='params.p_options' :fields="configs.fieldsOpts" v-model = "params.p_opt1"></ejs-dropdownlist>
+                                                            </div>
+                                                            <div class="col-sm-5 col-12">
+                                                                <input type="text" class="form-control" v-model="params.p_tieuchi1">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w120">
+                                                        <b-form-checkbox
+                                                          v-model = "params.p_chk_opt2"
+                                                          class = "check"
+                                                          value = '1'
+                                                          unchecked-value = '0'
+                                                        >
+                                                          <span class="name">Tra cứu theo</span>
+                                                        </b-form-checkbox>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="row">
+                                                            <div class="col-sm-7 col-12">
+                                                              <ejs-dropdownlist :enabled="chk_opt2" :allowFiltering="false" :dataSource='params.p_options' :fields="configs.fieldsOpts" v-model = "params.p_opt2"></ejs-dropdownlist>
+                                                            </div>
+                                                            <div class="col-sm-5 col-12">
+                                                                <input type="text" class="form-control" v-model="params.p_tieuchi2">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w120">
+                                                      <b-form-checkbox
+                                                        v-model = "params.p_chk_opt3"
+                                                        class = "check"
+                                                        value = '1'
+                                                        unchecked-value = '0'
+                                                      >
+                                                        <span class="name">Tra cứu theo</span>
+                                                      </b-form-checkbox>
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="row">
+                                                            <div class="col-sm-7 col-12">
+                                                              <ejs-dropdownlist :enabled="chk_opt3" :allowFiltering="false" :dataSource='params.p_options' :fields="configs.fieldsOpts" v-model = "params.p_opt3"></ejs-dropdownlist>
+                                                            </div>
+                                                            <div class="col-sm-5 col-12">
+                                                                <input type="text" class="form-control" v-model="params.p_tieuchi3">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info-row">
+                                                    <div class="key w120">
+                                                    </div>
+                                                    <div class="value">
+                                                        <div class="row">
+                                                            <div class="col-sm-12 col-12 pull-right">
+                                                              <button type="button" @click="doSearch()" class="btn btn-secondary btn-md">Tìm kiếm</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                          </SplitArea>
+                                          <SplitArea :size="49" :minSize="100">
+                                            <div class="" id="boxRight">
+                                              <div class="info-row">
+                                                  <div class="key w100">
+                                                      Kiểu nợ
+                                                  </div>
+                                                  <div class="value">
+                                                    <ejs-dropdownlist :allowFiltering="false" :dataSource='params.p_kieuno_options' :fields="configs.fieldsKieuNo" v-model = "params.p_kieuno"></ejs-dropdownlist>
+                                                  </div>
+                                              </div>
+                                              <div class="info-row">
+                                                  <div class="key w100">
+                                                    <b-form-checkbox
+                                                      v-model = "params.p_chk_tutien"
+                                                      class = "check"
+                                                      value = '1'
+                                                      unchecked-value = '0'
+                                                    >
+                                                      <span class="name">Từ tiền</span>
+                                                    </b-form-checkbox>
+                                                  </div>
+                                                  <div class="value">
+                                                    <div class="input-icon-right calculator-box">
+                                                      <ejs-numerictextbox locale="vi-VN" :enabled="chk_tutien" style="padding-right:15px" :showSpinButton="false" class="red form-control tright" v-model="$data.params.p_tutien" format="N0"></ejs-numerictextbox>
+                                                      <span class="icon one-calculator" @click="isTuTienCalShow = !isTuTienCalShow"></span>
+                                                      <app-calculator @display="$data.params.p_tutien = $event" :value="$data.params.p_tutien" :is-show="isTuTienCalShow" @close="isTuTienCalShow = !isTuTienCalShow"></app-calculator>
+                                                    </div>
+                                                  </div>
+                                              </div>
+                                              <div class="info-row">
+                                                  <div class="key w100">
+                                                    <b-form-checkbox
+                                                      v-model = "params.p_chk_dentien"
+                                                      class = "check"
+                                                      value = '1'
+                                                      unchecked-value = '0'
+                                                    >
+                                                      <span class="name">Đến tiền</span>
+                                                    </b-form-checkbox>
+                                                  </div>
+                                                  <div class="value">
+                                                    <div class="input-icon-right calculator-box">
+                                                      <ejs-numerictextbox locale="vi-VN" :enabled="chk_dentien" style="padding-right:15px" :showSpinButton="false" class="red form-control tright" v-model="$data.params.p_dentien" format="N0"></ejs-numerictextbox>
+                                                      <span class="icon one-calculator" @click="isDenTienCalShow = !isDenTienCalShow"></span>
+                                                      <app-calculator @display="$data.params.p_dentien = $event" :value="$data.params.p_dentien" :is-show="isDenTienCalShow" @close="isDenTienCalShow = !isDenTienCalShow"></app-calculator>
+                                                    </div>
+                                                  </div>
+                                              </div>
+                                              <div class="info-row">
+                                                  <div class="key w100">
+                                                    <b-form-checkbox
+                                                        v-model = "params.p_chk_chungtu"
+                                                        class = "check"
+                                                        value = '1'
+                                                        unchecked-value = '0'
+                                                      >
+                                                        <span class="name">Chứng từ</span>
+                                                      </b-form-checkbox>
+                                                  </div>
+                                                  <div class="value">
+                                                      <input :disabled="!chk_chungtu" type="text" class="form-control" v-model="params.p_chungtu">
+                                                  </div>
+                                              </div>
+                                              <div class="info-row">
+                                                  <div class="key w100">
+                                                      Kỳ HĐ
+                                                  </div>
+                                                  <div class="value">
+                                                    <ejs-datepicker
+                                                      v-model="p_ky_hd"
+                                                      :max="configs.max_kyhoadon"
+                                                      :start="'Year'"
+                                                      :depth="'Year'"
+                                                      :format="'MM/y'"
+                                                      :width="'100%'"
+                                                    >
+                                                    </ejs-datepicker>
+                                                  </div>
+                                              </div>
+                                              <div class="info-row" v-show="f_show_khoanmuc">
+                                                  <div class="key w100">
+                                                      <b-form-checkbox
+                                                        v-model = "params.p_chk_khoanmuc"
+                                                        class = "check"
+                                                        value = '1'
+                                                        unchecked-value = '0'
+                                                      >
+                                                        <span class="name">Khoản mục</span>
+                                                      </b-form-checkbox>
+                                                  </div>
+                                                  <div class="value">
+                                                    <ejs-multiselect
+                                                        :dataSource='params.p_khoanmuc_options'
+                                                        :fields='configs.khoanmuc.fields'
+                                                        v-model="params.khoanmuc"
+                                                        :enabled="chk_khoanmuc"
+                                                        :mode="configs.khoanmuc.mode"
+                                                        :showSelectAll="configs.khoanmuc.showSelectAll"
+                                                        :showDropDownIcon="configs.khoanmuc.showDropDownIcon"
+                                                        :filterBarPlaceholder="configs.khoanmuc.filterBarPlaceholder"
+                                                        :allowFiltering="configs.khoanmuc.allowFiltering"
+                                                        :filtering="onKhoanMucFiltering"
+
+                                                      ></ejs-multiselect>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          </SplitArea>
+                                        </Split>
+                                      </div>
+                                      <div class="p-2">
+                                        <button type="button" @click="is_show = false" class="btn btn-secondary btn-sm"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                  </div>
+                              </div>
+                          </div>
+
+                        <DataGrid
+                            v-bind:dataSource="dsMaTTChuaGan"
+                            :showFilter="true"
+                            :allowPaging="true"
+                            :allowExcelExport="true"
+                            :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                            :enablePagingServer="false"
+                            :totalRecords="dsChuaGanPageInfo.totalElement"
+                            :pageSize="dsChuaGanPageInfo.maxSize"
+                            :pageIndex="dsChuaGanPageInfo.page"
+                            :key="keyDSMaTTChuaGan"
+                            ref="gridDSMaTTChuaGan"
+                            :panelDataHeight='"250"'
+                            :columns="[
+                            {fieldName: 'MA_TT', headerText: 'Mã Thanh toán', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'MATB_DD', headerText: 'Mã đại diện', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'TEN_TT', headerText: 'Tên thanh toán', allowFiltering: true, allowSorting: false},
+                            {fieldName: 'TONGNO', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, allowHtml:true, type: 'number', format: 'N0'},
+                            {fieldName: 'NOPS', headerText: 'Nợ phát sinh', allowFiltering: true, allowSorting: false, allowHtml:true, type: 'number', format: 'N0'},
+                            {fieldName: 'NODK', headerText: 'Nợ đầu kỳ', allowFiltering: true, allowSorting: false, allowHtml:true, type: 'number', format: 'N0'},
+                            {fieldName: 'HINHTHUC_TT', headerText: 'Hình thức thanh toán', allowFiltering: true, allowSorting: false, allowHtml:true},
+                            {fieldName: 'DIACHI_TT', headerText: 'Địa chỉ thanh toán', allowFiltering: true, allowSorting: false, allowHtml:true},
+                            {fieldName: 'STK', headerText: 'Số tài khoản', allowFiltering: true, allowSorting: false, allowHtml:true},
+                            {fieldName: 'MA_TUYEN', headerText: 'Mã tuyến', allowFiltering: true, allowSorting: false, allowHtml:true}
+                            ]"
+                        ></DataGrid>
+                      </div>
+                      <div class="tab-pane " :class="{active: params.p_tab_kieugan === 2}" id="tabGanTheoFile">
+                      <DataGrid
+                          :showFilter="true"
+                          :allowPaging="true"
+                          :enablePagingServer="false"
+                          :showColumnCheckbox="true"
+                          :enabledSelectFirstRow="false"
+                          v-bind:dataSource="dsMaTTChuaGanTheoFile"
+                          :totalRecords="dsChuaGanTheoFilePageInfo.totalElement"
+                          :pageSize="dsChuaGanTheoFilePageInfo.maxSize"
+                          :pageIndex="dsChuaGanTheoFilePageInfo.page"
+                          ref="gridDSMaTTChuaGanTheoFile"
+                          :columns="[
+                          {fieldName: 'NHOMCK_ID', headerText: 'ID nhóm', allowFiltering: true, allowSorting: false},
+                          {fieldName: 'MA_TT', headerText: 'Mã thanh toán', allowFiltering: true, allowSorting: false, allowHtml:true}
+                          ]"
+                      ></DataGrid>
+                      </div>
+                  </div>
+
+
+              </div>
+          </div>
+      </div>
+  </div>
+</div>

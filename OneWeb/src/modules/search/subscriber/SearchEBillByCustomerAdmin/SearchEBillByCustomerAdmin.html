@@ -1,0 +1,155 @@
+<div class="main-wrapper">
+    <breadcrumb :header="header" />
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" @click.prevent="btnSearchClicked">
+                    <span class="icon one-file-search"></span>Tra cứu
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="ThemBienDong">
+                    <span class="icon one-file-arrow-left"></span>Thêm BD
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="onShowModal">
+                    <span class="icon one-print"></span>In biên nhận
+                </a>
+            </li>
+            <li>
+                <a href="#" @click.prevent="PopUpTimKiem">
+                    <span class="icon one-search"></span>Tìm kiếm
+                </a>
+            </li>
+            
+            
+        </ul>
+        
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="radio" class="check" id="one" value="One" v-model="check" @click="fkey = true; magd = false; token = true">
+                                <span class="name">Mã GD</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="magd" v-model="txtmagd">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="radio" class="check" id="two" value="Two" v-model="check" @click="fkey = false; magd = true; token = true">
+                                <span class="name">Fkey</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="fkey" v-model="txtfkey">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w80">
+                            <div class="check-action">
+                                <input type="radio" class="check" id="three" value="Three" v-model="check" @click="fkey = true; magd = true; token = false">
+                                <span class="name">Token</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <input type="text" class="form-control" :disabled="token" v-model="txttoken">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-12">
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkTuNgay">
+                                <span class="name">Từ ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    :format="config.dateConfig.format"
+                                    v-model = "TuNgay"
+                                    :enabled="checkTuNgay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w100">
+                            <div class="check-action">
+                                <input type="checkbox" class="check" v-model="checkDenNgay">
+                                <span class="name">Đến ngày</span>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker
+                                    :format="config.dateConfig.format"
+                                    v-model = "DenNgay"
+                                    :enabled="checkDenNgay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <p class="note mart10 italic fw6 red">Chuỗi Token (ví dụ: 01GTKT0/002-AA/19E:1234567)</p>
+                </div>
+            </div>
+            
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Danh sách hóa đơn</div>
+            <div class="table-content">
+                    <DataGrid v-bind:columns="[{ fieldName: 'index.#text', headerText: 'Stt', allowFiltering: true, cssClass: 'text-right', width: '70px'},
+                    { fieldName: 'fkey.#text', headerText: 'Fkey', allowFiltering: true },
+                    { fieldName: 'pattern.#text', headerText: 'Mẫu hóa đơn', allowFiltering: true },
+                    { fieldName: 'serial.#text', headerText: 'Ký hiệu', allowFiltering: true},
+                    { fieldName: 'invNum.#text', headerText: 'Số hóa đơn', allowFiltering: true },
+                    { fieldName: 'name.#text', headerText: 'Tên hóa đơn', allowFiltering: true },
+                    { headerText: 'Tháng xuất HĐ', allowFiltering: true},
+                    { fieldName: 'publishDate.#text', headerText: 'Ngày phát hành', allowFiltering: true },
+                    { fieldName: 'status.#text', headerText: 'Trạng thái hóa đơn', allowFiltering: true },
+                    { fieldName: 'payment.#text', headerText: 'Trạng thái thanh toán', allowFiltering: true},
+                    { headerText: 'Xem chi tiết', allowFiltering: true, template: viewInvTemplate, cssClass: 'text-center' },
+                    { headerText: '*.inv', allowFiltering: true, allowSorting: false, width: 90, template: downloadInvTemplate, cssClass: 'text-center'},
+                    { headerText: '*.pdf', allowFiltering: true, allowSorting: false, width: 80, template: downloadPdfTemplate, cssClass: 'text-center'},
+                    { headerText: '*.xml', allowFiltering: true, allowSorting: false, width: 80, template: downloadXmlTemplate, cssClass: 'text-center'}]"
+                        v-bind:dataSource="ketquatimkiem.list"
+                        :enable-paging-server="false"
+                        :showFilter="true"
+                        :allowPaging="true"
+                        :showColumnCheckbox="false"
+                        :enabledSelectFirstRow="true"
+                        @selectedRowChanged="selectedRowChanged"
+                        >
+                    </DataGrid>
+            </div>
+        </div>
+    </div>
+    <ejs-dialog :enableResize="true" :allowDragging="true"  :visible="false" :animationSettings="animationSettings"
+                ref="timkiemkhachhang" :header="'Tìm kiếm khách hàng phát hành hóa đơn điện tử tự quản'"
+            	showCloseIcon="true" width="80%" height="100%" target="#app" :isModal="true">
+            <popupTimKiem ></popupTimKiem>
+    </ejs-dialog>
+    <!-- In biên nhận -->
+    <ejs-dialog :enableResize="true" :allowDragging="true"  :visible="false"
+                ref="dialogPreview" :header="'Preview biên nhận'"
+            	showCloseIcon="true" width="80%" height="100%" target="#app" :isModal="true">
+        <VuePdfApp
+            class="rounded"
+            style="height: 100%"
+            :pdf="pdf"
+            @open="openPdf"
+        />
+	</ejs-dialog>
+
+</div>

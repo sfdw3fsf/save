@@ -1,0 +1,239 @@
+<div class="main-wrapper">
+  <div class="breadcrumb-top">
+    <div class="main-title">Gán kho nhân viên</div>
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="#"><span class="nc-icon-outline ui-1_home-simple"></span> Dữ liệu </a>
+      </li>
+      <li class="breadcrumb-item"><a href="#">Danh mục QLVT</a></li>
+      <li class="breadcrumb-item active">Gán kho nhân viên</li>
+    </ul>
+  </div>
+  <div class="list-actions-top">
+    <ul class="list">
+      <li>
+        <a href="#" @click.prevent="refresh"> <span class="icon one-reload1"></span>Làm mới [F5] </a>
+      </li>
+      <li v-if="show_btn">
+        <a href="#" @click.prevent="btn_ghilai"> <span class="icon one-save"></span>Cập nhật </a>
+      </li>
+      <li>
+        <a href="#" @click.prevent="test"> <span class="icon one-circle-question"></span>Trợ giúp </a>
+      </li>
+    </ul>
+  </div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-sm-3 col-12">
+        <div class="box-form">
+          <div class="legend-title">Danh sách đơn vị</div>
+          <div class="input-icon-right">
+            <input type="text" class="form-control" v-model="keywordSearchUnit" @keypress.enter="searchUnitTreeView" />
+            <span class="icon nc-icon-outline ui-1_zoom"></span>
+          </div>
+          <!-- <div class="tree-plus ovauto" style="height: 800px;">
+                       
+                        <treemenu 
+                        @cbClicked="tree_menu_donvi_cbClicked"
+                        :nodes="tree_menu_donvi.childs" 
+                        :depth="0"   
+                        :label="tree_menu_donvi.text"
+                        :hsid="tree_menu_donvi.id"
+                        :hascheckbox="false"
+                        :selected="tree_menu_donvi.isSelected"></treemenu>
+                    </div> -->
+
+          <!-- <div class="tree-plus ovauto" style="height: 800px;">
+                        <ejs-treeview id='treeview' :fields="fields" :showCheckBox='false'
+                        @nodeClicked='tree_menu_donvi_cbClicked'></ejs-treeview>
+                    </div> -->
+
+          <!-- <div class="tree-plus" style="height: 395px;overflow: auto;">
+                        <ejs-treeview  :fields='fields'></ejs-treeview>
+                    </div> -->
+          <ejs-treeview id="treeview" ref="treeObj" :fields="fields" @nodeSelected="tree_menu_donvi_cbClicked"></ejs-treeview>
+        </div>
+      </div>
+      <div class="col-sm-9 col-12">
+        <div class="box-form">
+          <div class="legend-title">Danh sách nhân viên</div>
+          <div class="row">
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w100">
+                  Mã người dùng
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="text" class="form-control highlight" v-model="ma_nd" v-on:keyup.enter="search(0,ma_nd)" />
+                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w100">
+                  Mã nhân viên
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="text" class="form-control highlight" v-model="ma_nv" v-on:keyup.enter="search(1,ma_nv)" />
+                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="info-row">
+                <div class="key w100">
+                  Tên nhân viên
+                </div>
+                <div class="value">
+                  <div class="input-icon-right">
+                    <input type="text" class="form-control highlight" v-model="ten_nv" v-on:keyup.enter="search(2,ten_nv)" />
+                    <span class="icon nc-icon-outline ui-1_zoom"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <gridview :datalist="listbox.ds_nhanvien.list" :headers="listbox.ds_nhanvien.header"
+                    flcol="false" v-bind:checkheader="false" lastcoltemplate="0"  @recordChange="grd_nhanvien_Changed"></gridview> -->
+          <DataGrid v-bind:columns="listbox.ds_nhanvien.header" v-bind:dataSource="listbox.ds_nhanvien.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :enableResize="true" @selectedRowChanged="grd_nhanvien_Changed" :enabledSelectFirstRow="false" ref="dgvNhanVien">
+          </DataGrid>
+
+          <div class="nav tabs tab-over mart20">
+            <a href="#tab1" class="active" data-toggle="tab" @click.prevent="display_btn(false)">Danh sách quản lý kho</a>
+            <a href="#tab2" data-toggle="tab" @click.prevent="display_btn(true)">Danh sách quyền xác nhận</a>
+          </div>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+              <div class="box-move-select-table">
+                <div class="box-col">
+                  <div class="legend-title">
+                    <div class="check-action">
+                      <input type="checkbox" class="check" />
+                      <span class="name">Danh sách kho đã gán</span>
+                    </div>
+                  </div>
+                  <!-- <div class="info-row">
+                                        <div class="value padl0">
+                                            <div class="input-icon-right">
+                                                <input type="text" class="form-control">
+                                                <span class="icon nc-icon-outline ui-1_zoom"></span>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                  <!-- <gridview :datalist="listbox.tree_dagan.list" :headers="listbox.tree_dagan.header"
+                                    flcol="false" v-bind:checkheader="true" lastcoltemplate="0"  ></gridview> -->
+                  <DataGrid v-bind:columns="listbox.tree_dagan.header" v-bind:dataSource="listbox.tree_dagan.list" :enable-paging-server="false" :allowPaging="true" :showFilter="true" :showColumnCheckbox="true" :enableResize="true" ref="DsDaGan" :enabledSelectFirstRow="false"> </DataGrid>
+                </div>
+                <div class="actions">
+                  <button class="btn" @click="btn_gokho">
+                    <span class="-ap icon-chevron-thin-right"></span>
+                  </button>
+                  <button class="btn" @click="btn_gankho">
+                    <span class="-ap icon-chevron-thin-left"></span>
+                  </button>
+                </div>
+                <div class="box-col">
+                  <div class="legend-title">
+                    Danh sách kho chưa gán
+                  </div>
+                  <div class="info-row">
+                    <div class="value padl0">
+                      <div class="input-icon-right">
+                        <input type="text" class="form-control" v-model="khochuagan_search" @keypress.enter="searchkhochuagan" />
+                        <span class="icon nc-icon-outline ui-1_zoom"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-plus tree-icon" style="height: 328px;overflow:auto;">
+                    <!-- <treemenu 
+                                        @cbClicked="tree_menu_chuagan_cbClicked"
+                                        :nodes="tree_kho_chuagan.childs" 
+                                        :depth="0"   
+                                        :label="tree_kho_chuagan.text"
+                                        :hsid="tree_kho_chuagan.id"
+                                        :hascheckbox="true"
+                                        :selected="tree_kho_chuagan.isSelected"></treemenu> -->
+                    <ejs-treeview :fields="tree_chuagan" :showCheckBox="true" :autoCheck="true" id="treeviewchuagan" :nodeChecked="selectedNodes" :checkedNodes="checkedNodes"></ejs-treeview>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab2">
+              <!-- <gridcheckbox :datalist="listbox.quyen_xacnhan.list" :headers="listbox.quyen_xacnhan.header" 
+                            @prop_update="updatedata_xacnhan"
+                            flcol="false" v-bind:checkheader="false" lastcoltemplate="0" >
+                            </gridcheckbox> -->
+
+              <!-- <DataGrid 
+                            v-bind:columns="listbox.quyen_xacnhan.header"                    
+                            v-bind:dataSource="listbox.quyen_xacnhan.list"
+                            :enable-paging-server="false"                                        
+                            :allowPaging="true"
+                            :showFilter="true"
+                            :enableResize='true'
+                            :enabledSelectFirstRow="false">
+                            </DataGrid> -->
+
+              <!-- <ejs-grid ref="grid" :dataSource='listbox.quyen_xacnhan.list' locale='vi-VN' :allowSorting='true' :allowFiltering='true' 
+                            :allowPaging='true'  :editSettings="{ allowEditing: true, mode: 'Normal' }":actionComplete="actionComplete" height='400'>
+                                <e-columns>
+                                    <e-column field='ten_kho' headerText='Kho' headerTextAlign="center" textAlign='Left'></e-column>
+                                    <e-column field='ten_dv' headerText='Đơn vị' headerTextAlign="center"></e-column>
+                                    <e-column field="quyen_kg" headerText="Quyền gửi" width="100" editType="booleanedit" displayAsCheckBox="true" type="boolean" textAlign="Center" :allowEditing="true"></e-column>
+                                    <e-column field="quyen_kn" headerText="Quyền nhận" width="100" editType="booleanedit" displayAsCheckBox="true" type="boolean" textAlign="Center" :allowEditing="true"></e-column>
+                                   
+                                </e-columns>
+                               
+                            </ejs-grid>  -->
+              <!-- Vì tester bắt buộc phải bỏ check box trong grid nên phải dùng chiêu tà đạo -->
+              <div style="display: none">
+                <b-button-group class="mr-4">
+                  <b-button id="chonTatCaQuyenGui" variant="success" @click="() => capNhatTatCaQuyenGui(true)">Chọn tất cả quyền gửi</b-button>
+                  <b-button id="boChonTatCaQuyenGui" variant="danger" @click="() => capNhatTatCaQuyenGui(false)">Bỏ chọn tất cả quyền gửi</b-button>
+                </b-button-group>
+                <b-button-group>
+                  <b-button id="chonTatCaQuyenNhan" variant="success" @click="() => capNhatTatCaQuyenNhan(true)">Chọn tất cả quyền nhận</b-button>
+                  <b-button id="boChonTatCaQuyenNhan" variant="danger" @click="() => capNhatTatCaQuyenNhan(false)">Bỏ chọn tất cả quyền nhận</b-button>
+                </b-button-group>
+              </div>
+              <ejs-grid
+                ref="grid"
+                height="auto"
+                width="auto"
+                :dataSource="listbox.quyen_xacnhan.list"
+                locale="vi-VN"
+                :allowResizing="true"
+                :allowSorting="true"
+                :allowScrolling="true"
+                :allowPaging="true"
+                :allowFiltering="true"
+                :filterSettings="{ mode: 'Immediate', immediateModeDelay: 500 }"
+                :pageSettings="pageSettings"
+                :editSettings="{ allowEditing: true, mode: 'Normal' }"
+                :load="onRowClick"
+              >
+                <e-columns>
+                  <e-column field="ten_kho" headerText="Kho" headerTextAlign="center" textAlign="Left" width="150" isPrimaryKey="true" :filter="{ operator: 'contains' }"></e-column>
+                  <e-column field="ten_dv" headerText="Đơn vị" headerTextAlign="center" textAlign="Left" width="250" :allowEditing="false" :filter="{ operator: 'contains' }"></e-column>
+                  <!-- <e-column type='checkbox' field='dangky' headerText='Mua' headerTextAlign="center" textAlign= 'Center' displayAsCheckBox='true' width='50' format='C2' :allowEditing="false" editType="booleanedit"></e-column> -->
+                  <e-column field="quyen_kg" headerText="Quyền gửi" width="100" editType="booleanedit" displayAsCheckBox="true" type="boolean" textAlign="Center" :allowEditing="true" :filterBarTemplate="templateQuyenGui"></e-column>
+                  <e-column field="quyen_kn" headerText="Quyền nhận" width="100" editType="booleanedit" displayAsCheckBox="true" type="boolean" textAlign="Center" :allowEditing="true" :filterBarTemplate="templateQuyenNhan"></e-column>
+                </e-columns>
+              </ejs-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    VNPT-IT &copy; 2021
+  </footer>
+</div>

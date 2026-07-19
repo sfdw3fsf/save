@@ -1,0 +1,2 @@
+import RevocationCACerCreatesError from './RevocationCACerCreatesError'
+export default RevocationCACerCreatesError

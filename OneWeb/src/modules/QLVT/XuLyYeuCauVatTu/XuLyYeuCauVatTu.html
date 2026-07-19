@@ -1,0 +1,298 @@
+<div>
+    <div class="list-actions-top" style="position: unset;">
+        <ul class="list" style="position: unset;">
+            <!-- <li>
+                <a class="pointer" @click="btntest">
+                    <span class="icon one-reload1"></span>test
+                </a>
+            </li> -->
+            <b-modal
+                ref="BuyDevicesModal1"
+                size="xl"
+                body-class="height:auto !important"
+                hide-footer
+                title="Chọn thiết bị"
+            >
+                <PopupBuyDevices1 ref="PopupBuyDevices" />
+            </b-modal>
+            <li>
+                <a class="pointer" @click="btnLayTTMoi">
+                    <span class="icon one-reload1"></span>Lấy TT
+                </a>
+            </li>
+            <li :class=" {disabled: !enabled.tsbtnHoanThanh}">
+                <a class="pointer" @click="tsbtnHoanThanh">
+                    <span class="icon one-file-check2"></span>Xác nhận
+                </a>
+            </li>
+            <!--  -->
+            <li :class=" {disabled: !enabled.tsbtnGiaoPhieu}">
+                <a
+                    class="pointer"
+                    @click="tsbtnGiaoPhieu"                    
+                >
+                    <span class="icon fa fa-arrow-right"></span>Giao phiếu
+                </a>
+                <frmGiaoPhieuVT ref="frmGiaoPhieuVT"></frmGiaoPhieuVT>
+                <div v-if="isRender">
+                    <ejs-dialog
+                        :position="{X: 'center', Y: 'top'}"
+                        :enableResize="true"
+                        :allowDragging="true"
+                        :visible="false"
+                        :animationSettings="animationSettings"
+                        ref="dlgGiaoPhieuCTTC"
+                        width="80%"
+                        height="80%"
+                        :showCloseIcon="true"  
+                        :close="closeGiaoPhieu"                   
+                    >
+                        <frmGiaoPhieuCTTC ref="frmGiaoPhieuCTTC"
+                    /></ejs-dialog>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-sm-5 col-12">
+                <div class="box-form">
+                    <div class="legend-title">
+                        <span
+                            :class="gParams.classIconHiddenBox"
+                            @click="onClickHiddenBox()"
+                        ></span>
+                        Thông tin khách hàng
+                    </div>
+
+                    <div class="row" v-if="visible.boxSearch">
+                        <div class="info-row">
+                            <div class="row">
+                                <div class="col-sm-8 col-12">
+                                    <div class="info-row">
+                                        <div class="key w110">Mã GD</div>
+                                        <div class="value">
+                                            <input
+                                                type="text"
+                                                class="form-control highlight"
+                                                v-model="gParams.txtMaGD"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <div class="info-row">
+                                        <div class="key w100">
+                                            Mã khách hàng
+                                        </div>
+                                        <div class="value">
+                                            <input
+                                                type="text"
+                                                class="form-control highlight"
+                                                v-model="gParams.txtMaKH"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="key w110">Tên khách hàng</div>
+                            <div class="value">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    v-model="gParams.txtTenKH"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="key w110">Địa chỉ KH</div>
+                            <div class="value">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    v-model="gParams.txtDiaChiKH"
+                                />
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="key w110">Ghi chú</div>
+                            <div class="value">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    v-model="gParams.txtGiaGoi"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legend-title mart10">
+                        Thiết bị cấp kho khách hàng
+                    </div>
+                    <div class="input-more-button">
+                        <button class="btn" @click="btnLayThietBi">
+                            <span class="-ap icon-more_horiz"></span>
+                        </button>
+                        <b-modal
+                            ref="BuyDevicesModal"
+                            size="xl"
+                            body-class="height:auto !important"
+                            hide-footer
+                            title="Chọn thiết bị"
+                        >
+                            <PopupBuyDevices
+                                ref="PopupBuyDevices"
+                                @form-close="frmChonTbConfirm"
+                                :dulieu="buyDevicesData"
+                                :isPopup="true"
+                            />
+                        </b-modal>
+                        <textarea
+                            name=""
+                            class="form-control"
+                            style="height: 110px;resize: none;font-weight: bold;"
+                            v-model="getLsb"
+                            readonly
+                        ></textarea>
+                        <!-- <ejs-listbox :dataSource="getLsb"></ejs-listbox> -->
+                    </div>
+                    <div class="legend-title mart10">Kết quả xử lý</div>
+                    <div class="info-row">
+                        <div class="key w110">Kết quả XL</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                <ejs-dropdownlist
+                                    class="form-control"
+                                    locale="vi"
+                                    v-model="gParams.cboketquaxl"
+                                    :dataSource="cboketquaxl"
+                                    :fields="{value:'kqxl_id', text: 'ketqua_xl'}"
+                                    :allowFiltering="true"
+                                    @change=""
+                                >
+                                </ejs-dropdownlist>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="key w110">Ghi chú</div>
+                        <div class="value">
+                            <input
+                                type="text"
+                                class="form-control"
+                                v-model="gParams.txtGhiChu"
+                            />
+                        </div>
+                    </div>
+                    <div class="tabs nav tab-over">
+                        <a
+                            href="#tab1"
+                            style="min-width: 195px;"
+                            class="active"
+                            data-toggle="tab"
+                            @click="selectTab(0)"
+                            >Chưa xử lý</a
+                        >
+                        <a
+                            href="#tab2"
+                            style="min-width: 195px;"
+                            data-toggle="tab"
+                            @click="selectTab(1)"
+                            >Đã xử lý</a
+                        >
+                    </div>
+                    <div class="tab-content">
+                        <div id="tab1" class="tab-pane active">
+                            <div class="table-content">
+                                <DataGrid
+                                    v-bind:columns="[
+                                    { fieldName: field='MA_GD', headerText: 'Mã giao dịch' , textAlign: 'center', allowFiltering: true,},                        
+                                    { fieldName: field='NGAY_YC' ,headerText: 'Ngày YC' , textAlign: 'center', allowFiltering: true,},                        
+                                    { fieldName: field='NGAYGIAO', headerText: 'Ngày giao' , textAlign: 'center', allowFiltering: true,},                        
+                                    { fieldName: field='NHANVIEN_GIAO', headerText: 'Người giao' , textAlign: 'center', allowFiltering: true, },                        
+                                    { fieldName: field='TENDV_GIAO', headerText: 'Đơn vị Giao' , textAlign: 'center', allowFiltering: true, },                        
+                                    { fieldName: field='TRANGTHAI_PH', headerText: 'Trạng thái phiếu' , textAlign: 'left', allowFiltering: true, },                        
+                                    { fieldName: field='TEN_KH', headerText: 'Tên khách hàng' , textAlign: 'left', allowFiltering: true, },                        
+                                    { fieldName: field='DIACHI_KH', headerText: 'Địa chỉ khách hàng' , textAlign: 'left', allowFiltering: true, },                                                              
+                                    ]"
+                                    ref="gridDaGiao"
+                                    :dataSource="gridDaGiao"
+                                    :showFilter="true"
+                                    :enablePagingServer="false"
+                                    :showColumnCheckbox="false"
+                                    :allowPaging="true"
+                                    @selectedRowChanged="onGridDaGiaoRowChanged"
+                                >
+                                </DataGrid>
+                            </div>
+                        </div>
+
+                        <div id="tab2" class="tab-pane">
+                            <div class="table-content">
+                                <DataGrid
+                                    v-bind:columns="[
+                                    { fieldName: field='MA_GD', headerText: 'Mã giao dịch' , textAlign: 'center', allowFiltering: true,},                        
+                                    { fieldName: field='NGAY_YC' ,headerText: 'Ngày YC' , textAlign: 'center', allowFiltering: true,},                        
+                                    { fieldName: field='NGAYGIAO', headerText: 'Ngày hoàn thiện' , textAlign: 'center', allowFiltering: true,},                        
+                                    { fieldName: field='NHANVIEN_GIAO', headerText: 'Người giao' , textAlign: 'center', allowFiltering: true, },                        
+                                    { fieldName: field='TENDV_GIAO', headerText: 'Đơn vị Giao' , textAlign: 'center', allowFiltering: true, },                        
+                                    { fieldName: field='TRANGTHAI_PH', headerText: 'Trạng thái phiếu' , textAlign: 'left', allowFiltering: true, },                        
+                                    { fieldName: field='TEN_KH', headerText: 'Tên khách hàng' , textAlign: 'left', allowFiltering: true, },                        
+                                    { fieldName: field='DIACHI_KH', headerText: 'Địa chỉ khách hàng' , textAlign: 'left', allowFiltering: true, },                              
+                                    { fieldName: field='KETQUA_XL', headerText: 'Kết quả xử lý' , textAlign: 'left', allowFiltering: true, },                              
+                                    { fieldName: field='ND_GIAO', headerText: 'Nội dung giao' , textAlign: 'left', allowFiltering: true, },                              
+                                    ]"
+                                    ref="gridDaThucHien"
+                                    :dataSource="gridDaThucHien"
+                                    :showFilter="true"
+                                    :enablePagingServer="false"
+                                    :showColumnCheckbox="false"
+                                    :allowPaging="true"
+                                    @selectedRowChanged="onGridDaThucHienRowChanged"
+                                >
+                                </DataGrid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 col-12">
+                <div class="box-form">
+                    <div class="legend-title">Chi tiết thuê bao</div>
+                    <div class="table-content">
+                        <DataGrid
+                            v-bind:columns="[
+                            { fieldName: field='MA_TT', headerText: 'Mã TT' , textAlign: 'center', allowFiltering: true, width: 130},                        
+                            { fieldName: field='MA_TB',headerText: 'Số máy/Acc' , textAlign: 'center', allowFiltering: true, width: 130},                        
+                            { fieldName: field='TEN_TB', headerText: 'Tên thuê bao' , textAlign: 'center', allowFiltering: true, width: 130},                        
+                            { fieldName: field='DIACHI_TB', headerText: 'Địa chỉ thuê bao' , textAlign: 'center', allowFiltering: true, width: 130 },                        
+                            { fieldName: field='DIACHI_LD', headerText: 'Địa chỉ lắp đặt' , textAlign: 'center', allowFiltering: true,  width: 130},                        
+                            { fieldName: field='LOAIHINH_TB', headerText: 'Loại hình' , textAlign: 'left', allowFiltering: true, width: 130 },                        
+                            { fieldName: field='NGAY_SD', headerText: 'Ngày SD' , textAlign: 'left', allowFiltering: true, width: 130 },                        
+                            { fieldName: field='DOANHTHU', headerText: 'Doanh thu' , textAlign: 'left', allowFiltering: true,format: 'N0', type: 'number', width: 130 },                        
+                            { fieldName: field='TEN_GOI', headerText: 'Gói nâng cấp' , textAlign: 'left', allowFiltering: true, width: 130 },                        
+                            { fieldName: field='TENGOI_HT', headerText: 'Gói hiện tại'  , textAlign: 'left', allowFiltering: true, width: 130 },                                          
+                            { fieldName: field='DOANHTHU_DK', headerText: 'Doanh thu dự kiến'  , textAlign: 'left', allowFiltering: true,format: 'N0', type: 'number', width: 130  },                                          
+                            { fieldName: field='CHENHLECH', headerText: 'Chênh lệch'  , textAlign: 'left', allowFiltering: true,format: 'N0', type: 'number', width: 130  },                                          
+                            ]"
+                            ref="gridThueBao"
+                            :dataSource="gridThueBao"
+                            :showFilter="true"
+                            :enablePagingServer="false"
+                            :showColumnCheckbox="false"
+                            :allowPaging="true"
+                            @selectedRowChanged=""
+                            :aggregates="aggregatesColumns"
+                            @queryCellInfo="onThueBaoQueryCellInfor"
+                        >
+                        </DataGrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

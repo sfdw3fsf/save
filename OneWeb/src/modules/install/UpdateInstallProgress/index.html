@@ -1,0 +1,439 @@
+<div class="main-wrapper">
+  <breadcrumb :header="header" />
+  <vue-nav>
+    <ul class="list">
+      <li
+        v-for="action in actions"
+        v-show="action.visible"
+        :key="action.id"
+        :class="{ disabled: false }"
+        @click="onClickAction(action.id)"
+      >
+      <!-- :class="{ 'disabled-color': action.disabled }" -->
+        <a style="cursor: pointer;" >
+          <span class="icon" :class="action.icon"></span> {{ action.name }}
+        </a>
+      </li>
+    </ul>
+    <input
+      ref="fileTTRef"
+      type="file"
+      id="upload"
+      style="display: none"
+      @change="importFile"
+    >
+  </vue-nav>
+
+  <div class="page-content">
+    <div class="row">
+      <div class="col-sm-7 col-12">
+        <div class="grid-stack-box">
+          <div class="box-col box-form" id="boxLeft">
+            <div class="legend-title">Chọn đơn vị</div>
+            <div class="tree-plus" style="height: 380px;overflow: auto;">
+              <ejs-treeview
+                id='treeview'
+                ref="donViTreeRef"
+                :fields="treeFields"
+                :allowMultiSelection='true'
+                :selectedNodes="selectedNodes"
+                :expandedNodes="expandedNodes"
+                @nodeSelected="onNodeSelected"
+              ></ejs-treeview>
+            </div>
+          </div>
+          <div class="box-col box-form" id="boxRight">
+            <div class="legend-title">Thông tin tìm kiếm</div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại nhóm</div>
+                  <div class="value">
+                    <div class="select-custom" ref="loaiNhomRef">
+                      <SelectExt
+                        dataValueField="nhom_id"
+                        dataTextField="ten_nhom"
+                        v-model.number="timKiemFilter.loaiNhomId"
+                        :settings="{ dropdownParent: $refs['loaiNhomIdRef'] }"
+                        :dataSource="loaiNhomOptions"
+                        :disabled="true"
+                        @change="onChangeLoaiNhom"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Dịch vụ</div>
+                  <div class="value">
+                    <div class="select-custom" ref="dichVuRef">
+                      <SelectExt
+                        dataValueField="DICHVUVT_ID"
+                        dataTextField="TEN_DVVT"
+                        v-model.number="timKiemFilter.dichVuId"
+                        :settings="{ dropdownParent: $refs['dichVuRef'] }"
+                        :dataSource="dichVuOptions"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại HĐ/PL</div>
+                  <div class="value">
+                    <div class="select-custom" ref="loaiHDPLRef">
+                      <SelectExt
+                        dataValueField="loaihd_id"
+                        dataTextField="ten_loaihd"
+                        v-model.number="timKiemFilter.loaiHDPLId"
+                        :settings="{ dropdownParent: $refs['loaiHDPLRef'] }"
+                        :dataSource="loaiHDPLOptions"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Ngày giao</div>
+                  <div class="value w20 padt7">
+                    <div class="check-action">
+                      <input
+                        type="checkbox"
+                        class="check"
+                        v-model="timKiemFilter.ckbNgayGiao"
+                        @change="onChangeCkbNgayGiao">
+                      <span class="name"></span>
+                    </div>
+                  </div>
+                  <vue-date
+                    type="date"
+                    labelWidth="90"
+                    v-model="timKiemFilter.ngayGiao"
+                    :disable="timKiemFilter.isDisabledNgayGiao"
+                    :format="'DD/MM/YYYY'"
+                    :checkbox="false"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="title-bg-main">
+                  <span class="title">Thông tin thuê bao</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90 fw6 red">Số máy/Acc</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control highlight4 text font-weight-bold"
+                      v-model="thueBaoFilter.acc"
+                      @keyup.enter="getDanhSachTienTrinhTC(thueBaoFilter.acc)"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Tên thuê bao</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control text font-weight-bold"
+                      v-model="thueBaoFilter.tenThueBao"
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Số ảo</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control text font-weight-bold"
+                      v-model="thueBaoFilter.soAo"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Kiểu LĐ</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control text font-weight-bold"
+                      v-model="thueBaoFilter.kieuLD"
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90">Loại KH lớn</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control text font-italic"
+                      v-model="thueBaoFilter.loaiKHLon"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Địa chỉ LĐ</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control text font-weight-bold"
+                  v-model="thueBaoFilter.diaChiLapDat"
+                >
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="key w90">Ghi chú</div>
+              <div class="value">
+                <input
+                  type="text"
+                  class="form-control text font-weight-bold"
+                  v-model="thueBaoFilter.ghiChu"
+                >
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <div class="title-bg-main">
+                  <span class="title">Thông tin phiếu</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-12">
+                <div class="info-row">
+                  <div class="key w90 fw6 red">Mã GD</div>
+                  <div class="value">
+                    <input
+                      type="text"
+                      class="form-control highlight4 text font-weight-bold"
+                      v-model="phieuFilter.maGD"
+                      @keyup.enter="getDanhSachTienTrinhTC(phieuFilter.maGD)"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <vue-input labelWidth="90" label="Số quyết định" v-model="phieuFilter.soQuyetDinh" />
+            <div class="row">
+              <div class="col-sm-6 col-12">
+                <vue-input labelWidth="90" label="Đơn vị" v-model="phieuFilter.donVi" />
+              </div>
+              <div class="col-sm-6 col-12">
+                <vue-input labelWidth="90" label="Nhân viên" v-model="phieuFilter.nhanVien" />
+              </div>
+            </div>
+            <vue-input labelWidth="90" label="Nội dung giao" v-model="phieuFilter.noiDungGiao" />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-5 col-12">
+        <div class="box-form">
+          <div class="legend-title">Danh sách tiến trình xử lý</div>
+          <div class="table-content" :style="{ height: baoTon.isShow ? '185px' : '420px' }">
+            <DataGrid
+              :columns="tienTrinhXuLy.headers"
+              :dataSource="tienTrinhXuLy.dataSources"
+              :showColumnCheckbox="false"
+              :enable-paging-server="false"
+              :allowPaging="true"
+              :showFilter="true"
+            />
+          </div>
+
+          <div v-show="baoTon.isShow">
+            <div class="legend-title">Danh sách báo tồn</div>
+            <div class="table-content" style="height: 180px;">
+              <DataGrid
+                :columns="baoTon.headers"
+                :dataSource="baoTon.dataSources"
+                :showColumnCheckbox="false"
+                :enable-paging-server="false"
+                :allowPaging="true"
+                :showFilter="true"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-form">
+      <div class="legend-title">
+        <div class="pull-left">
+          Danh sách phiếu yêu cầu
+        </div>
+        <div class="pull-right">
+          <div class="check-action normal">
+            <input type="checkbox" class="check" v-model="ckbLocNV" @change="onChangeLocNV">
+            <span class="name">Lọc theo nhân viên lập PL</span>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="table-content">
+        <DataGrid
+          :columns="phieuYeuCau.headers"
+          :dataSource="phieuYeuCau.dataSources"
+          :showColumnCheckbox="false"
+          :enable-paging-server="false"
+          :allowPaging="true"
+          :showFilter="true"
+          @selectedRowChanged="onSelectedRowChanged"
+        />
+      </div>
+    </div>
+  </div>
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupNhapTienTrinhRef"
+    :header='"Nhập nội dung tiến trình thi công"'
+    showCloseIcon=true
+    width='35%'
+    height='600'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <popup-nhap-tien-trinh
+      ref="nhapTienTrinhRef"
+      :tienTrinh="nhapTienTrinhProp"
+      @onSuccess="onSuccessNhapTienTrinh"
+    />
+  </ejs-dialog>
+
+  <ejs-dialog
+    :isModal="false"
+    :enableResize="true"
+    :visible="false"
+    ref="checkPort"
+    :header='"Kiểm tra Port thuê bao"'
+    showCloseIcon="true"
+    target=".main-wrapper"
+    width="60%"
+    height="500"
+    allowDragging="true"
+    @close="checkPortOnClose"
+    :animationSettings="animationSettings"
+  >
+    <div>
+      <CheckPort v-if="checkPortDialog.isVisiable" type="modal"
+        v-bind="checkPortDialog.input"
+      />
+    </div>
+  </ejs-dialog>
+
+  <popup-test-port ref="popupTestPortRef" :maTB="showIPAccountProp" :status="testPortStatusProp" />
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupShowIPRef"
+    header='Show IP'
+    showCloseIcon=true
+    width='60%'
+    height='700'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <div class="top-modal popupBody">
+      <SearchVISAOtherProvince ref="showIPRef" :accountProp="showIPAccountProp" />
+    </div>
+  </ejs-dialog>
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupDoiPortRef"
+    header='Đổi port'
+    showCloseIcon=true
+    width='80%'
+    height='600'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <thay-doi-thong-so-internet ref="doiPortRef" />
+  </ejs-dialog>
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupLichSuVTRef"
+    header='Lịch sử vật tư đã cấp cho thuê bao'
+    showCloseIcon=true
+    width='50%'
+    height='550'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <popup-lich-su-vt ref="lichSuVTRef" :maTb="thueBaoFilter.soAo" />
+  </ejs-dialog>
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupTraCuuCapRef"
+    header='Tra cứu cáp'
+    showCloseIcon=true
+    width='80%'
+    height='600'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <TracuuThongtinTrenmdf ref="traCuuCapRef" />
+  </ejs-dialog>
+
+  <ejs-dialog
+    :enableResize='true'
+    :allowDragging='true'
+    :visible='false'
+    ref="popupGuiSmsRef"
+    header='Gửi SMS tiến trình báo hỏng'
+    showCloseIcon=true
+    width='60%'
+    height='900'
+    target='.main-wrapper'
+    :position="position"
+  >
+    <popup-gui-sms
+      ref="guiSmsRef"
+      :hdtbId="smsProp.hdtbId"
+      :nhomId="smsProp.nhomId"
+      :tienTrinhTCId="smsProp.tientrinhTCId"
+      :maTB="smsProp.maTB"
+      :noiDung="smsProp.noiDung"
+      @onClose="onClosePopupGuiSMS"
+    />
+  </ejs-dialog>
+
+  <appModalXuatDuLieu
+    id="modal-xuat-dulieu"
+    ref="xuatDuLieuRef"
+    :thuocTinh="xuatFileHeaders"
+    :data="phieuYeuCau.dataSources"
+  />
+</div>

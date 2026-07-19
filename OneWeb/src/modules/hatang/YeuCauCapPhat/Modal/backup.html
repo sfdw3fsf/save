@@ -1,0 +1,230 @@
+<ejs-dialog
+  :enableResize="true"
+  :allowDragging="false"
+  :visible="false"
+  ref="backupDialog"
+  :animationSettings="animationSettings"
+  :showHeader="false"
+  :showCloseIcon="false"
+  width="80%"
+  height="auto"
+  :target="target"
+>
+  <div class="modal-content popup-box">
+    <div class="popup-header">
+      <div class="title" style="font-weight: 600;">Thông tin nhu cầu</div>
+      <div class="close -ap icon-close" @click="closeDialog"></div>
+    </div>
+    <div class="popup-body">
+      <div class="row">
+        <div class="list-actions-top">
+          <ul class="list">
+            <li>
+              <b-link href="javascript:void(0)" @click="onSave"> <span class="icon one-save"></span>Cập nhật </b-link>
+            </li>
+            <li>
+              <b-link href="javascript:void(0)" @click="closeDialog">
+                <span class="icon ui-1_circle-remove nc-icon-glyph"></span> Huỷ bỏ
+              </b-link>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="box-form" style="margin-top: 10px;">
+          <div class="legend-title">Backup</div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Kiến trúc/Thành phần</div>
+                <div class="value">
+                  <SelectExt
+                    :dataSource="kientrucList"
+                    dataTextField="name"
+                    dataValueField="id"
+                    v-model="currentItem.thanhphan"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Thời gian khởi tạo <span class="red">*</span></div>
+                <div class="value">
+                  <!-- <input
+                    type="date"
+                    class="form-control"
+                    v-model="currentItem.ngaytao"
+                    :class="controls.txtThoiGianKhoiTao.invalid ? 'is-invalid' : ''"
+                    :min="minDate"
+                  /> -->
+                  <ejs-datepicker
+                    class="form-control bg-none bor0 fw6 text"
+                    :class="controls.txtThoiGianKhoiTao.invalid ? 'is-invalid' : ''"
+                    :format="'dd/MM/yyyy'"
+                    :showClearButton="false"
+                    v-model="currentItem.ngaytao"
+                    :min="new Date()"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Thời gian bắt đầu <span class="red">*</span></div>
+                <div class="value">
+                  <!-- <input
+                    type="date"
+                    class="form-control"
+                    v-model="currentItem.batdau"
+                    :class="controls.txtThoiGianBatDau.invalid ? 'is-invalid' : ''"
+                    :min="minDate"
+                  /> -->
+                  <ejs-datepicker
+                    class="form-control bg-none bor0 fw6 text"
+                    :class="controls.txtThoiGianBatDau.invalid ? 'is-invalid' : ''"
+                    :format="'dd/MM/yyyy'"
+                    :showClearButton="false"
+                    v-model="currentItem.batdau"
+                    :min="new Date()"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Thời gian kết thúc <span class="red">*</span></div>
+                <div class="value">
+                  <!-- <input
+                    type="date"
+                    class="form-control"
+                    v-model="currentItem.ketthuc"
+                    :class="controls.txtThoiGianKetThuc.invalid ? 'is-invalid' : ''"
+                    :min="minDate"
+                  /> -->
+                  <ejs-datepicker
+                    class="form-control bg-none bor0 fw6 text"
+                    :class="controls.txtThoiGianKetThuc.invalid ? 'is-invalid' : ''"
+                    :format="'dd/MM/yyyy'"
+                    :showClearButton="false"
+                    v-model="currentItem.ketthuc"
+                    :min="new Date()"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Backup tập trung</div>
+                <div class="value">
+                  <!-- <input type="number" class="form-control" v-model="currentItem.tap_trung" /> -->
+                  <SelectExt
+                    dataTextField="text"
+                    dataValueField="value"
+                    :dataSource="bkp_select"
+                    v-model="currentItem.tap_trung"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Backup manual</div>
+                <div class="value">
+                  <!-- <input type="number" class="form-control" /> -->
+                  <SelectExt
+                    dataTextField="text"
+                    dataValueField="value"
+                    :dataSource="bkp_select"
+                    v-model="currentItem.manual"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Dung lượng backup</div>
+                <div class="value">
+                  <input
+                    type="number"
+                    class="form-control"
+                    v-model="currentItem.dungluong"
+                    @blur="formatPositive('dungluong')"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Dung lượng tăng trưởng</div>
+                <div class="value">
+                  <input
+                    type="number"
+                    class="form-control"
+                    v-model="currentItem.dungluong_tangtruong"
+                    @blur="formatPositive('dungluong_tangtruong')"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Vị trí</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.vitri_backup" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Tần suất</div>
+                <div class="value">
+                  <input type="text" class="form-control" v-model="currentItem.tansuat" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Số bản bkp cần lưu</div>
+                <div class="value">
+                  <input
+                    type="number"
+                    class="form-control"
+                    v-model="currentItem.sl_backup"
+                    @blur="formatPositive('sl_backup')"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-12">
+              <div class="info-row">
+                <div class="key w150">Có đẩy ra thiết bị lưu trữ ngoài ko?</div>
+                <div class="value padt4">
+                  <div class="check-action">
+                    <input
+                      type="checkbox"
+                      class="check"
+                      :true-value="1"
+                      :false-value="0"
+                      v-model="currentItem.external_backup"
+                    /><span class="name"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ejs-dialog>

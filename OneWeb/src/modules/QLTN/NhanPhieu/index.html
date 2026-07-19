@@ -1,0 +1,683 @@
+<div>
+    <div class="list-actions-top">
+        <ul class="list">
+            <li>
+                <a href="#" v-on:click.prevent="onClickDanhSach" title="Danh sách">
+                    <span class="icon nc-icon-glyph design_bullet-list-67"></span> Danh sách
+                </a>
+            </li>
+            <li v-bind:style="[currentTab == 3 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" v-on:click.prevent="onClickHuyTraTronBo" title="Hủy trả trọn bộ">
+                    <span class="icon one-file-money"></span> Hủy trả trọn bộ
+                </a>
+            </li>
+            <li v-bind:style="[currentTab == 1 || currentTab == 7 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" @click.prevent="onClickNhapExcel" title="Nhập Excel - File Excel nhập vào phải đúng định dạng! - Chỉ có 3 trường theo thứ tự: MA_TT, LYDO_ID, GHICHU">
+                    <span class="icon one-xlsx"></span> Nhập Excel
+                </a>
+                <input id="upload_nhap_excel" ref="ref_upload_nhap_excel" @change="onChangeNhapFile" accept=".xlsx, .xls" type="file" hidden>
+            </li>
+            <li
+                v-bind:style="[currentTab == 1 || currentTab == 4  || currentTab == 7 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" v-on:click.prevent="onClickTraGiayBao" title="Trả giấy báo">
+                    <span class="icon one-file-back1"></span> Trả giấy báo
+                </a>
+            </li>
+            <li v-bind:style="[currentTab == 1 || currentTab == 4 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" v-on:click.prevent="onClickTraHoaDon" title="Trả hóa đơn">
+                    <span class="icon one-file-money"></span> Trả hóa đơn
+                </a>
+            </li>
+            <li v-bind:style="[currentTab == 2 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" v-on:click.prevent="onClickHuyTraHoaDon" title="Hủy trả hóa đơn">
+                    <span class="icon one-file-money"></span> Hủy trả hóa đơn
+                </a>
+            </li>
+            <li v-bind:style="[currentTab == 1 || currentTab == 4 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" v-on:click.prevent="onClickTraTronBo" title="Trả trọn bộ">
+                    <span class="icon one-wallet"></span> Trả trọn bộ
+                </a>
+            </li>
+            <li v-bind:style="[currentTab != 6 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" v-on:click.prevent="onClickCapNhat" title="Cập nhật">
+                    <span class="icon one-reload1"></span> Cập nhật
+                </a>
+            </li>
+            <li v-bind:style="[currentTab != 1 && currentTab != 6 ? {display: 'inline-block'} : {display: 'none'}]">
+                <a href="#" @click.prevent="onClickDocFileExcel" title="Cấu trúc file gồm MA_TT, NVQL_XL">
+                    <span class="icon one-book"></span>Đọc file
+                </a>
+                <input id="upload_doc_excel" ref="ref_upload_doc_excel" @change="onChangeDocFile" accept=".xlsx, .xls" type="file" hidden>
+            </li>
+            <li>
+                <a href="#" v-on:click.prevent="onClickExport" title="Xuất Excel">
+                    <span class="icon one-xlsx-import"></span> Xuất Excel
+                </a>
+            </li>
+            <li>
+                <a href="#"  v-on:click.prevent="onClickNhatKy" title="Nhật ký">
+                    <span class="icon one-remider"></span> Nhật ký
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="box-form">
+            <div class="legend-title"><span class="icon fa" :class="showSearch ? 'fa-angle-down' : 'fa-angle-up'" @click="onToggleSearchForm"></span> Thông tin tìm kiếm</div>
+            <div class="search-content" v-show="showSearch">
+                <div class="row">
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Kiểu tìm kiếm</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" v-model="searchForm.searchType" class="form-control">
+                                        <option value="1">1 - Thứ tự in</option>
+                                        <option value="2">2 - Mã TT Neo</option>
+                                        <option value="3">3 - Mã TT</option>
+                                        <option value="4">4 - Mã vạch</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Nhân viên TC</div>
+                            <div class="value">
+                                <ejs-multiselect
+                                    :dataSource='dsNVTC'
+                                    :fields='configs.nvtc.fields'
+                                    v-model="dsNVTCId"
+                                    :changeOnBlur="true"
+                                    :mode="configs.nvtc.mode"
+                                    :showSelectAll="configs.nvtc.showSelectAll"
+                                    :showDropDownIcon="configs.nvtc.showDropDownIcon"
+                                    :filterBarPlaceholder="configs.nvtc.filterBarPlaceholder"
+                                    @filtering="onFilteringNVTC"
+                                    @change="onOk"
+                                ></ejs-multiselect>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w150">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="searchForm.ckbNgayNhanGiayBao">
+                                    <span class="name">Ngày nhận giấy báo</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker :enabled="searchForm.ckbNgayNhanGiayBao"
+                                        class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark"
+                                        :format="dateFormat" :showClearButton="true" v-model="searchForm.ngayNhanGiayBao">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Tìm kiếm</div>
+                            <div class="value">
+                                <input type="text" v-model="searchForm.txtTimKiem" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Lượt giao</div>
+                            <div class="value">
+                                <div class="vattu_box">
+                                    <div class="input-group">
+                                        <div class="li input-text">
+                                            <div class="select-custom">
+                                                <input ref="luotGiao" readonly v-model="searchForm.idLuotGiao"
+                                                    class="form-control bg-none" @click="onChangeLuotGiao">
+                                                </input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="vattu_table" :class="{ displayNone: showTable }">
+                                        <DataGrid3
+                                            v-bind:columns="[
+                                        {fieldName: 'TEN_NV', headerText: 'NVTC', allowFiltering: true, allowSorting: false},
+                                        {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false,width:'100'},
+                                        {fieldName: 'NGAYGIAO', headerText: 'Ngày giao', allowFiltering: true, allowSorting: false,width:'150'},
+                                        {fieldName: 'SOLUONG_GBC', headerText: 'Giấy báo', allowFiltering: true, allowSorting: false,width:'100', format: 'N0', type: 'number'},
+                                        {fieldName: 'SOLUONG_HD', headerText: 'HĐ giao', allowFiltering: true, allowSorting: false,width:'100', format: 'N0', type: 'number'},
+                                        {fieldName: 'TONGTIEN_HD', headerText: 'Tiền HĐ giao', allowFiltering: true, allowSorting: false,width:'150', format: 'N0', type: 'number'}]"
+                                            v-bind:dataSource="dsLuotGiao" :showFilter="true" :showColumnCheckbox="true"
+                                            dataKeyField="GIAOPHIEU_ID" :defaultColumnCheckboxChecked="true" :key="keyDSLuotGiao"
+                                            @selectedItemsChanged="onSelectRowCheckbox" ref="table">
+                                        </DataGrid3>
+                                        <div class="p-2">
+                                            <button type="button" @click="onChangeLuotGiao" class="btn btn-secondary btn-sm"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-12">
+                        <div class="info-row">
+                            <div class="key w90">Loại phiếu</div>
+                            <div class="value">
+                                <div class="select-custom">
+                                    <select name="" id="" v-model="searchForm.idLoaiPhieu" @change="onChangeLoaiPhieu"
+                                        class="form-control">
+                                        <option v-for="dv in dsLoaiPhieu" v-bind:value="dv.LOAIPHIEU_ID">{{dv.LOAIPHIEU}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="info-row">
+                            <div class="key w150">
+                                <div class="check-action">
+                                    <input type="checkbox" class="check" v-model="searchForm.ckbNgayHenTra">
+                                    <span class="name">Ngày hẹn trả</span>
+                                </div>
+                            </div>
+                            <div class="value">
+                                <div class="input-icon-right">
+                                    <ejs-datepicker :enabled="searchForm.ckbNgayHenTra"
+                                        class="form-control bg-none bor0 fw6 text h24" :placeholder="waterMark"
+                                        :format="dateFormat" :showClearButton="true" v-model="searchForm.ngayHenTra">
+                                    </ejs-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="legend-title">Thông tin cập nhật</div>
+            <div class="row">
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Nhóm lý do</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                 <SelectExt v-model.trim="updateForm.idNhomLyDo" :dataSource="dsNhomLyDoTra" dataTextField="noidung"
+                                    dataValueField="lydotra_id" />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Lý do</div>
+                        <div class="value">
+                            <div class="select-custom">
+                                 <SelectExt v-model.trim="updateForm.idLyDo" :dataSource="dsLyDoTra" dataTextField="NOIDUNG"
+                                    dataValueField="LYDOTRA_ID" />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">Ngày đến</div>
+                        <div class="value">
+                            <div class="input-icon-right">
+                                <ejs-datepicker class="form-control bg-none bor0 fw6 text" :placeholder="waterMark"
+                                    :format="dateFormat" :showClearButton="false" v-model="updateForm.ngayDen">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-12">
+                    <div class="info-row">
+                        <div class="key w90">
+                            Ghi chú
+                        </div>
+                        <div class="value">
+                            <input type="text" v-model="updateForm.ghiChu" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-form">
+            <div class="nav tab-over tabs">
+                <a href="#tab1" @click="switchTab(1)" class="active" data-toggle="tab">Phiếu chưa thu</a>
+                <a href="#tab2" @click="switchTab(2)" data-toggle="tab">Trả hóa đơn</a>
+                <a href="#tab3" @click="switchTab(3)" data-toggle="tab">Trả trọn bộ</a>
+                <a href="#tab4" @click="switchTab(4)" data-toggle="tab">Phiếu hẹn</a>
+                <a href="#tab5" @click="switchTab(5)" data-toggle="tab">Trả giấy báo</a>
+                <a href="#tab6" @click="switchTab(6)" data-toggle="tab">Các phiếu thu được</a>
+                <a href="#tab7" @click="switchTab(7)" data-toggle="tab">Hóa đơn loại</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                            { fieldName: '_CHECK', visible: false, allowEditing: false },
+                            { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                            { fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'SO_SERI', headerText: 'Số Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false },
+                            { fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                            { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                            { fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'DATA_LINK', headerText: 'Link TT', allowFiltering: true, allowSorting: false, allowEditing: false,template: getColumnTemplateDataLink(this) }
+                        ]" 
+
+                      v-bind:dataSource="tabData[1]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                            @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                            @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid" @recordDoubleClick="recordDoubleClick" @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                            :totalRecords="tabData[1].length"
+                            :enablePagingServer="false"
+                            :aggregates="PTAggregatesColumns"
+                            :key="tabKey[1]" :panelDataHeight='"350"'
+                            ref="table01" :pageSize="200"
+                            @keyPressed="keyPressedHandler"
+                            >
+                        </DataGrid3>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                            { fieldName: '_CHECK', visible: false },
+                            { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                            { fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'SO_SERI', headerText: 'Số Seri', allowFiltering: true, allowSorting: false, allowEditing: false },    
+                            { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false },
+                            { fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting: false },
+                            { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                            { fieldName: 'ND_THUCHIEN', headerText: 'NVQLTC xử lý', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                            { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowEditing: true },
+                            { fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false, allowEditing: false }
+                        ]" v-bind:dataSource="tabData[2]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                            @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                            @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid"  @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                            :totalRecords="tabData[2].length"
+                            :enablePagingServer="false"
+                            :aggregates="PTAggregatesColumns"
+                            :selectionSettings="{checkboxOnly: true, type: 'Multiple'}"
+                            :key="tabKey[2]" :panelDataHeight='"350"'
+                            ref="table02" :pageSize="200"
+                            @keyPressed="keyPressedHandler"
+                            >
+                        </DataGrid3>
+                    </div>
+                </div>
+                <div class="tab-pane " id="tab3">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                            { fieldName: '_CHECK', visible: false },
+                            { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                            { fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                            { fieldName: 'SO_SERI', headerText: 'Số Seri', allowFiltering: true, allowSorting: false, allowEditing: false },    
+                            { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false },
+                            { fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting: false },
+                            { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                            { fieldName: 'ND_THUCHIEN', headerText: 'NVQLTC xử lý', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                            { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowEditing: true },
+                            { fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                            { fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false, allowEditing: false }
+                        ]" v-bind:dataSource="tabData[3]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                             @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                             @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid" @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                             :totalRecords="tabData[3].length"
+                             :enablePagingServer="false"
+                             :aggregates="PTAggregatesColumns"
+                             :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                             :key="tabKey[3]" :panelDataHeight='"350"'
+                             ref="table03" :pageSize="200"
+                             @keyPressed="keyPressedHandler"                             
+                             >
+                        </DataGrid3>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab4">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                        { fieldName: '_CHECK', visible: false },
+                        { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                        { fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'SO_SERI', headerText: 'Số Seri', allowFiltering: true, allowSorting: false, allowEditing: false },    
+                        { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false },
+                        { fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting: false },
+                        { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                        { fieldName: 'ND_THUCHIEN', headerText: 'NVQLTC xử lý', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                        { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                        { fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },                        
+                        { fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false, allowEditing: false }
+                    ]" v-bind:dataSource="tabData[4]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                             @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                             @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid" @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                             :totalRecords="tabData[4].length"
+                             :aggregates="PTAggregatesColumns"
+                             :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                             :key="tabKey[4]" :panelDataHeight='"350"'
+                             ref="table04" :pageSize="200"
+                             @keyPressed="keyPressedHandler"
+                             >
+                        </DataGrid3>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab5">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                        { fieldName: '_CHECK', visible: false },
+                        { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                        { fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'SO_SERI', headerText: 'Số Seri', allowFiltering: true, allowSorting: false, allowEditing: false },    
+                        { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false },
+                        { fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting: false },
+                        { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                        { fieldName: 'ND_THUCHIEN', headerText: 'NVQLTC xử lý', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                        { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                        { fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },                        
+                        { fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false, allowEditing: false }
+                    ]" v-bind:dataSource="tabData[5]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                             @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                             @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid" @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                             :totalRecords="tabData[5].length"
+                             :enablePagingServer="false"
+                             :aggregates="PTAggregatesColumns"
+                             :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                             :key="tabKey[5]" :panelDataHeight='"350"'
+                             ref="table05" :pageSize="200"
+                             @keyPressed="keyPressedHandler"
+                             >
+                        </DataGrid3>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab6">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                        { fieldName: '_CHECK', visible: false },
+                        { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                        { fieldName: 'MA_TUYEN', headerText: 'Tuyến thu', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting: false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'SO_SERI', headerText: 'Số Seri', allowFiltering: true, allowSorting: false, allowEditing: false },    
+                        { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting: false },
+                        { fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting: false },
+                        { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                        { fieldName: 'ND_THUCHIEN', headerText: 'NVQLTC xử lý', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                        { fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting: false, allowEditing: true, cssClass: 'grid-green' },
+                        { fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting: false, allowEditing: false },                        
+                        { fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting: false, allowEditing: false },
+                        { fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting: false, allowEditing: false }
+                    ]" v-bind:dataSource="tabData[6]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                             @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                             @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid" @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                             :totalRecords="tabData[6].length"
+                             :enablePagingServer="false"
+                             :aggregates="PTAggregatesColumns"
+                             :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                             :key="tabKey[6]" :panelDataHeight='"350"'
+                             ref="table06" :pageSize="200"
+                             @keyPressed="keyPressedHandler"
+                             >
+                        </DataGrid3>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab7">
+                    <div class="table-content-1">
+                        <DataGrid3 :columns="[
+                        { fieldName: '_CHECK', visible: false },
+                        { fieldName: 'MA_TT', headerText: 'Mã TT', allowFiltering: true, allowSorting: false, allowEditing: false, isPrimaryKey: true },
+                        { fieldName: 'TIEN', headerText: 'Tiền nợ', allowFiltering: true, allowSorting:false, type: 'number', format: 'N0', allowEditing: false },
+                        { fieldName: 'MATB_DD', headerText: 'Mã TBĐD', allowFiltering: true, allowSorting:false, allowEditing: false },
+                        { fieldName: 'TIEN_HD', headerText: 'Tiền hóa đơn', allowFiltering: true, allowSorting:false, type:'number', format:'N0', allowEditing: false },
+                        { fieldName: 'TEN_TT', headerText: 'Tên TT', allowFiltering: true, allowSorting:false, allowEditing: false },
+                        { fieldName: 'SODT_LH', headerText: 'ĐT LH', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        { fieldName: 'DIACHI_TT', headerText: 'Địa chỉ TT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        { fieldName: 'SO_SERI' , headerText: 'Số Seri', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        { fieldName: 'NO_PS', headerText: 'Nợ PS', allowFiltering: true, allowSorting:false, allowEditing: false, type: 'number', format: 'N0'},
+                        { fieldName: 'NO_PS_2', headerText: 'Nợ n-2', allowFiltering: true, allowSorting:false, allowEditing: false, type: 'number', format: 'N0'},
+                        { fieldName: 'NO_PS_3', headerText: 'Nợ n-3', allowFiltering: true, allowSorting:false, allowEditing: false, type: 'number', format: 'N0'},
+                        { fieldName: 'NO_PS_4', headerText: 'Nợ n-4', allowFiltering: true, allowSorting:false, allowEditing: false, type: 'number', format: 'N0'},
+                        { fieldName: 'NO_DK', headerText: 'Nợ ĐK', allowFiltering: true, allowSorting:false, allowEditing: false, type: 'number', format: 'N0'},
+                        { fieldName: 'TIENNO_QL', headerText: 'Tiền nợ QL', allowFiltering: true, allowSorting:false, allowEditing: false, type: 'number', format: 'N0'},
+                        { fieldName: 'SO_THUNG', headerText: 'Số thùng', allowFiltering: true, allowSorting:false},
+                        {fieldName: 'HINHTHUC_TT', headerText: 'HTTT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'HINHTHUC_TT_2', headerText: 'HTTT n-2', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'THANHTOAN_2', headerText: 'Thanh toán n-2', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'HINHTHUC_TT_3', headerText: 'HTTT n-3', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'HINHTHUC_TT_3', headerText: 'Thanh toán n-2', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'HINHTHUC_TT_4', headerText: 'HTTT n-4', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'HINHTHUC_TT_4', headerText: 'Thanh toán n-4', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TRANGTHAI_TB', headerText: 'Trạng thái TB', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'NGAY_CM', headerText: 'Ngày chêm/mở', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'MA_KHL', headerText: 'Mã KHL', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TEN_DVVT', headerText: 'Dịch vụ', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'MST', headerText: 'MST', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'DONVI_BHKV', headerText: 'Phòng BHKV', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TEN_DLTC', headerText: 'Tên ĐLTC', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'SDT_DLTC', headerText: 'Số ĐT ĐLTC', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TO_KD', headerText: 'Tổ KD', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TEN_QLDB', headerText: 'Tên QLĐB', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'SDT_QLDB', headerText: 'SĐT QLĐB', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TO_KT', headerText: 'Đơn vị VT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TEN_NVVT', headerText: 'Tên NVVT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'SDT_CNVT', headerText: 'SĐT CNVT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'SERI', headerText: 'Seri', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'THUTU_IN', headerText: 'Thứ tự in', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'NGAYHEN', headerText: 'Ngày hẹn', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'NGAYNHAN_HD', headerText: 'Ngày nhận', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        { fieldName: 'LYDOTRA_ID', headerText: 'Lý do', allowFiltering: true, allowSorting: false, allowEditing: true, dataSource: this.dsLyDoTraChung, foreignKeyField: 'LYDOTRA_ID', foreignKeyValue: 'NOIDUNG', editType: 'dropdownedit', edit: this.lyDoParams, cssClass: 'grid-green' },
+                        {fieldName: 'GHICHU', headerText: 'Ghi chú', allowFiltering: true, allowSorting:false, allowHtml:true, allowEditing: true, cssClass: 'grid-green'},
+                        {fieldName: 'GHICHU_GDV', headerText: 'Ghi chú GDV', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'ND_THUCHIEN', headerText: 'NVQLTC xử lý', allowFiltering: true, allowSorting:false, allowHtml:true, allowEditing: true},
+                        {fieldName: 'SMS', headerText: 'SMS', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'POPUP', headerText: 'Popup', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'OUTBOUND', headerText: 'Outbound', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'SOLAN_NN', headerText: 'Số lần NN', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'KQ_TTVT', headerText: 'KQ nhắc TTVT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'KQ_TTKD', headerText: 'KQ nhắc GDV', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'MAIN_GHEP', headerText: 'Mã in ghép', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'GIAOPHIEU_ID', headerText: 'Lượt giao', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'THUNO', headerText: 'Thu nợ', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'MANV_TC', headerText: 'Mã NV/HTTT', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TEN_LKHL', headerText: 'Loại KHL', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TENHT_GIAO', headerText: 'HT giao', allowFiltering: true, allowSorting:false, allowEditing: false},
+                        {fieldName: 'TEN_PLKH', headerText: 'Phân loại KH', allowFiltering: true, allowSorting:false, allowEditing: false}
+                    ]" v-bind:dataSource="tabData[7]" :showFilter="true" dataKeyField="MA_TT"
+                            :selectedRow="indexFocus" :showColumnCheckbox="true"
+                            :enabledSelectFirstRow="false"
+                             @checkBoxChange="checkBoxChange" @rowSelected="dsPhieuRowSelected" @rowDeselected="dsPhieuRowDeselected" @dataBound="dsPhieuDatabound"
+                             @actionComplete="actionComplete" @selectedRowChanged="onSelectRowGrid" @queryCellInfo="queryCellInfo"
+                            :allowPaging="true"
+                            :editSettings="editSettings"
+                             :totalRecords="tabData[7].length"
+                             :enablePagingServer="false"
+                             :aggregates="PTAggregatesColumns"
+                             :selectionSettings="{enableToggle: false, type: 'Single', checkboxMode: 'ResetOnRowClick', checkboxOnly: true }"
+                             :key="tabKey[7]" :panelDataHeight='"350"'
+                             ref="table07" :pageSize="200"
+                             @keyPressed="keyPressedHandler"
+                             >
+                        </DataGrid3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <b-modal id="modal-error" hide-footer hide-header no-close-on-backdrop>
+        <div>
+            <div>
+                <button type="button" @click="$bvModal.hide('modal-error')" class="close mb-2" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div>
+                <table class="table-result table-gachle">
+                    <thead class="center">
+                        <tr>
+                            <th class="w10">STT</th>
+                            <th>Mã thanh toán</th>
+                            <th>Lỗi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in dsLoiExcel">
+                            <td>{{index + 1}}</td>
+                            <td>{{item.MA_TT}}</td>
+                            <td>{{item.LOI}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </b-modal>
+
+    <b-modal id="modal-export" hide-footer modal-class="modal-export"  title="Xuất dữ liệu" no-close-on-backdrop size="lg">
+        <div>
+          <div>
+            <ModalExport :data="dataExport" :columnsIn="columnsExport"></ModalExport>
+          </div>
+        </div>
+    </b-modal>
+    <b-modal id="modal-nhatky" modal-class="modal-nhatky" hide-footer hide-header no-close-on-backdrop size="lg">
+        <div>
+            <NhatKy v-on:close="onCloseModal"
+            :dsLyDoTra="dsLyDoTra"
+            :rowData="rowChosen"
+            :passParam="passParam"
+            :dsKiemTra="dsKiemTra"
+            >
+        </NhatKy>
+        </div>
+    </b-modal>
+    <DSLoi ref="refDSLoi" :ds_loi="this.dsLoi"></DSLoi>
+</div>
